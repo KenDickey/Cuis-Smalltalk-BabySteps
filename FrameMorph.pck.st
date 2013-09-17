@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1824] on 16 September 2013 at 3:06:34.932703 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1824] on 17 September 2013 at 3:26:18.165551 pm'!
 'Description Please enter a description for this package'!
-!provides: 'FrameMorph' 1 6!
+!provides: 'FrameMorph' 1 7!
 !classDefinition: #FrameMorph category: #FrameMorph!
 BorderedRectMorph subclass: #FrameMorph
 	instanceVariableNames: 'colorIndex frameSelector'
@@ -31,6 +31,11 @@ cycleBorderColor
 	self borderColor: (self class colors at: colorIndex).
 	
 	^ self borderColor! !
+
+!FrameMorph methodsFor: 'accessing' stamp: 'KenD 9/17/2013 15:25'!
+defaultColor
+
+     ^ Color transparent! !
 
 !FrameMorph methodsFor: 'drawing' stamp: 'KenD 9/16/2013 15:04'!
 drawOn: aCanvas
@@ -112,7 +117,7 @@ colors
 	
 	^ Colors ! !
 
-!FrameMorph class methodsFor: 'examples' stamp: 'KenD 9/16/2013 14:28'!
+!FrameMorph class methodsFor: 'examples' stamp: 'KenD 9/17/2013 15:23'!
 example1
 "
 	self example1.
@@ -120,7 +125,7 @@ example1
 	| fm |
 	fm := FrameMorph new..
 	"fm cycleBorderColor."
-	fm frameSelector: #raised.
+	fm frameSelector: #simple.
 	fm borderWidth: 8.
 	fm morphPosition: 20@20.
 	fm morphExtent: 200@100.
