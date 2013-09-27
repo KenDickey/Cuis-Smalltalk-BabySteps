@@ -1,9 +1,9 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1832] on 26 September 2013 at 7:19:24.69431 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1832] on 27 September 2013 at 4:33:15.372632 pm'!
 'Description I am a line from startPoint to endPoint as a Morph.'!
-!provides: 'Morphic-LineMorph' 1 2!
+!provides: 'Morphic-LineMorph' 1 4!
 !classDefinition: #LineMorph category: #'Morphic-LineMorph'!
-RectangleLikeMorph subclass: #LineMorph
-	instanceVariableNames: 'startPointSelector endPointSelector lineWidth'
+Morph subclass: #LineMorph
+	instanceVariableNames: 'color extent startPointSelector endPointSelector lineWidth'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Morphic-LineMorph'!
@@ -15,12 +15,25 @@ LineMorph class
 !LineMorph commentStamp: '<historical>' prior: 0!
 I am a line from startPoint to endPoint!
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 15:39'!
-defaultColor
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 15:36'!
+basicExtent: aPoint
 
-	^ Color transparent! !
+	extent := aPoint! !
 
-!LineMorph methodsFor: 'drawing' stamp: 'KenD 9/26/2013 19:05'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 15:32'!
+color
+
+	^ color! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 15:34'!
+color: aColor
+
+	(aColor class = Color) ifFalse: [ Error signal: 'Not a color: ', aColor printString ].
+	
+	color := aColor.
+	self redrawNeeded ! !
+
+!LineMorph methodsFor: 'drawing' stamp: 'KenD 9/27/2013 15:55'!
 drawOn: aCanvas
 	"Draw self in own coordinates"
 	
@@ -30,7 +43,7 @@ drawOn: aCanvas
 		line: (rect perform: startPointSelector)
 		to:  (rect perform: endPointSelector)
 		width: lineWidth
-		color: self color! !
+		color: color! !
 
 !LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 19:11'!
 endPoint
@@ -38,22 +51,24 @@ endPoint
 
 	^ (self rect perform: endPointSelector) + (self morphPosition) truncated ! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 16:25'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 16:23'!
 endPoint: aPoint
 	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
-	(aPoint isKindOf: Point)
-		ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
+	
+	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
 		
-	self setPointSelectorsFromStartPoint: self startPoint endPoint: aPoint! !
+	self setPointSelectorsFromStartPoint: self startPoint 
+		  endPoint: aPoint! !
 
-!LineMorph methodsFor: 'initialization' stamp: 'KenD 9/26/2013 15:52'!
+!LineMorph methodsFor: 'initialization' stamp: 'KenD 9/27/2013 15:54'!
 initialize
 
 	super initialize.
+	extent := 100@180.
 	startPointSelector := #topLeft.
 	endPointSelector   := #bottomRight.
 	lineWidth := 6.
-	self color: Color cyan.
+	color := Color cyan.
 	! !
 
 !LineMorph methodsFor: 'geometry testing' stamp: 'KenD 9/26/2013 15:39'!
@@ -77,30 +92,36 @@ lineWidth: newWidthInPixels
 	lineWidth := newWidthInPixels.
 	self redrawNeeded ! !
 
-!LineMorph methodsFor: 'private' stamp: 'KenD 9/26/2013 19:19'!
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 16:28'!
 minimumExtent
 
-	^ 0@0! !
+	^ 0 @ 0 ! !
 
-!LineMorph methodsFor: 'geometry' stamp: 'KenD 9/26/2013 18:48'!
+!LineMorph methodsFor: 'geometry' stamp: 'KenD 9/27/2013 16:29'!
 morphExtent
 	"Answer an extent which includes me, taking into account my lineWidth"
 
-	^ super morphExtent + lineWidth + lineWidth! !
+	^ extent + lineWidth + lineWidth! !
 
-!LineMorph methodsFor: 'geometry' stamp: 'KenD 9/26/2013 19:17'!
+!LineMorph methodsFor: 'geometry' stamp: 'KenD 9/27/2013 16:28'!
 morphExtent: aPoint 
 	"Set the receiver's extent to value provided. Honor my minimumExtent."
 
-	super morphExtent: (aPoint max: self minimumExtent)! !
+	| innerExtent |
+	innerExtent := aPoint - lineWidth - lineWidth.
+	extent = innerExtent ifTrue: [^ self ].
+	self redrawNeeded.
+	extent _ (innerExtent max: self minimumExtent).
+	self redrawNeeded! !
 
-!LineMorph methodsFor: 'private' stamp: 'KenD 9/26/2013 16:29'!
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 15:45'!
 rect
 
-	^ Rectangle origin: 0@0 corner: super morphExtent! !
+	^ Rectangle origin: 0@0 corner: extent! !
 
-!LineMorph methodsFor: 'private' stamp: 'KenD 9/26/2013 18:50'!
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 16:30'!
 setPointSelectorsFromStartPoint: startPoint endPoint: endPoint
+	"Reset both my start and end points -- points in owner coordinates"
 
 	| origin corner rect |
 	origin := ((startPoint x) min: (endPoint x)) @ ((startPoint y) min: (endPoint y)).
@@ -119,8 +140,11 @@ setPointSelectorsFromStartPoint: startPoint endPoint: endPoint
 	(endPoint = rect bottomRight)  ifTrue: [ endPointSelector   := #bottomRight ].
 
 	self basicExtent: rect extent.
-	self morphPositionInWorld: rect origin.
-! !
+	self morphPositionInWorld: rect topLeft.
+	"@@DEBUG@@"
+"	('SetArgs: startPoint: ', startPoint asString, ' endPoint: ', endPoint asString) print.
+	('Result:    startPoint: ', self startPoint asString, ' endPoint: ', self endPoint asString) print.
+"! !
 
 !LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 19:11'!
 startPoint
@@ -128,13 +152,14 @@ startPoint
 	
 	^ (self rect perform: startPointSelector) + (self morphPosition) truncated! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 16:25'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 16:23'!
 startPoint: aPoint
 	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
-	(aPoint isKindOf: Point)
-		ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
+	
+	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
 		
-	self setPointSelectorsFromStartPoint: aPoint endPoint: self endPoint! !
+	self setPointSelectorsFromStartPoint: aPoint 
+		 endPoint: self endPoint! !
 
 !LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 16:48'!
 startPoint: newStart endPoint: newEnd
@@ -147,11 +172,11 @@ startPoint: newStart endPoint: newEnd
 		
 	self setPointSelectorsFromStartPoint: newStart endPoint: newEnd! !
 
-!LineMorph methodsFor: 'initialize-release' stamp: 'KenD 9/26/2013 16:21'!
+!LineMorph methodsFor: 'initialize-release' stamp: 'KenD 9/27/2013 15:59'!
 startPoint: startPoint endPoint: endPoint width: numPixels color: aColor
 
 	lineWidth := numPixels.
-	self color: aColor.
+	color := aColor.
 	self setPointSelectorsFromStartPoint: startPoint endPoint: endPoint.
 	! !
 
