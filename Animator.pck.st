@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1824] on 20 September 2013 at 3:58:13.851161 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1832] on 27 September 2013 at 3:26:42.11968 pm'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 7!
+!provides: 'Animator' 1 8!
 !classDefinition: #Animator category: #Animator!
 Object subclass: #Animator
 	instanceVariableNames: 'actor action stepTime'
@@ -112,18 +112,30 @@ blinkAction
 					ifFalse: [ aMorph show ]
 	  ]! !
 
+!Animator class methodsFor: 'actions' stamp: 'KenD 9/27/2013 15:22'!
+cycleColors: aColorCollection forSelector: collorSetter
+	"Follow a path"
+	
+	| colorIndex |
+	colorIndex := 0.
+	^ [ :aMorph | 
+			colorIndex := colorIndex + 1.
+			colorIndex > aColorCollection size ifTrue:  [ colorIndex := 1 ].
+			aMorph perform: collorSetter with: (aColorCollection at: colorIndex).
+			aMorph redrawNeeded.
+	  ]! !
+
 !Animator class methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:57'!
 defaultStepTime
 	"Twice a second"
 
 	^ 500 "milliSeconds"! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/20/2013 15:22'!
-example1
+!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:23'!
+example1    "Blinking"
 "
 	self example1.
 "
-	
 	| morph animator |
 	morph := ImageMorph initializedInstance openInWorld.
 	morph morphPosition: 200 @ 100.
@@ -132,14 +144,13 @@ example1
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/20/2013 15:47'!
-example2
+!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:24'!
+example2    "Grow &Shrink"
 "
 	self example2.
 	
 	Animator stopStepping.
 "
-	
 	| morph animator |
 	morph := BorderedRectMorph initializedInstance openInWorld.
 	morph morphPosition: 200 @ 100.
@@ -149,8 +160,8 @@ example2
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/20/2013 15:49'!
-example3
+!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:24'!
+example3    "Follow a path, repeatedly"
 "
 	self example3.
 	
@@ -166,8 +177,8 @@ example3
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/20/2013 15:26'!
-example4
+!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:24'!
+example4    "Bounces off walls of container"
 "
 	self example4.
 	
@@ -182,14 +193,13 @@ example4
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/20/2013 15:36'!
-example5  "Compose actions"
+!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:25'!
+example5  "Compose actions:  grow&shring + path"
 "
 	self example5.  
 	
 	Animator stopStepping.
 "
-	
 	| morph actions animator |
 	morph := BorderedRectMorph initializedInstance.
 	morph morphPosition: 120@120;
@@ -206,14 +216,13 @@ example5  "Compose actions"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/20/2013 15:46'!
-example6  "Compose actions -- alternative"
+!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:25'!
+example6  "Compose actions -- alternative:  grow&shring + path"
 "
 	self example6.  
 	
 	Animator stopStepping.
 "
-	
 	| morph originalAction newAction animator |
 	morph := EllipseMorph initializedInstance.
 	morph morphPosition: 120@120;
@@ -230,6 +239,25 @@ example6  "Compose actions -- alternative"
 	"Update with composed action"
 	animator action: [ :m | originalAction value: m. newAction value: m ].
 	
+	animator startStepping.
+	^ animator ! !
+
+!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:23'!
+example7  "Color Cycling"
+"
+	self example7.  
+"
+	| morph colors animator |
+	morph := BorderedRectMorph initializedInstance.
+	morph borderWidth: 4;
+		      morphPosition: 100@200.
+	colors := { Color green. Color brightGreen.}.
+	animator :=  
+		Animator actor: morph 
+					   action: (Animator cycleColors: colors 
+											  forSelector: #borderColor:)
+					   stepTime: 300.
+	morph openInWorld.
 	animator startStepping.
 	^ animator ! !
 
