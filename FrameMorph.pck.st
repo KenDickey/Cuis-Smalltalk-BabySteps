@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1824] on 26 September 2013 at 7:09:21.471883 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1824] on 28 September 2013 at 9:01:39.096132 am'!
 'Description I am a simple frame [hollow rectangle]'!
-!provides: 'FrameMorph' 1 18!
+!provides: 'FrameMorph' 1 19!
 !classDefinition: #AddedCursors category: #FrameMorph!
 CursorWithMask subclass: #AddedCursors
 	instanceVariableNames: ''
@@ -245,14 +245,16 @@ handlesMouseOver: evt
 
 	^ true! !
 
-!FrameMorph methodsFor: 'initialization' stamp: 'KenD 9/15/2013 21:13'!
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 9/28/2013 09:00'!
 initialize
 
 	super initialize.
 	
-	colorIndex := 1.
-	self borderColor: (self class colors at: colorIndex).
-	self frameSelector: #simple.! !
+	colorIndex := 4.
+	self borderColor: (self class colors at: colorIndex);
+		 frameSelector: #simple;
+		borderWidth: 8;
+		morphExtent: 100@160.! !
 
 !FrameMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/22/2013 19:03'!
 justGrabbedFrom: formerOwner
