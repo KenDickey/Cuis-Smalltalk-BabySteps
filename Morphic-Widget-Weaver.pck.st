@@ -1,6 +1,56 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1820] on 13 September 2013 at 2:04:52.544016 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1836] on 29 September 2013 at 3:52:41.290326 pm'!
 'Description UI construction by widget composition.'!
-!provides: 'Morphic-Widget-Weaver' 1 11!
+!provides: 'Morphic-Widget-Weaver' 1 16!
+!classDefinition: #AddedCursors category: #'Morphic-Widget-Weaver'!
+CursorWithMask subclass: #AddedCursors
+	instanceVariableNames: ''
+	classVariableNames: 'ClosedHand OpenHand'
+	poolDictionaries: ''
+	category: 'Morphic-Widget-Weaver'!
+!classDefinition: 'AddedCursors class' category: #'Morphic-Widget-Weaver'!
+AddedCursors class
+	instanceVariableNames: ''!
+
+!classDefinition: #LineMorph category: #'Morphic-Widget-Weaver'!
+Morph subclass: #LineMorph
+	instanceVariableNames: 'color extent startPointSelector endPointSelector lineWidth'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Widget-Weaver'!
+!classDefinition: 'LineMorph class' category: #'Morphic-Widget-Weaver'!
+LineMorph class
+	instanceVariableNames: ''!
+
+!classDefinition: #ConnectorMorph category: #'Morphic-Widget-Weaver'!
+BorderedRectMorph subclass: #ConnectorMorph
+	instanceVariableNames: 'connectionEndPoint connection state dragWidget'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Widget-Weaver'!
+!classDefinition: 'ConnectorMorph class' category: #'Morphic-Widget-Weaver'!
+ConnectorMorph class
+	instanceVariableNames: ''!
+
+!classDefinition: #FrameMorph category: #'Morphic-Widget-Weaver'!
+BorderedRectMorph subclass: #FrameMorph
+	instanceVariableNames: 'colorIndex frameSelector'
+	classVariableNames: 'Colors'
+	poolDictionaries: ''
+	category: 'Morphic-Widget-Weaver'!
+!classDefinition: 'FrameMorph class' category: #'Morphic-Widget-Weaver'!
+FrameMorph class
+	instanceVariableNames: ''!
+
+!classDefinition: #FramedWidget category: #'Morphic-Widget-Weaver'!
+FrameMorph subclass: #FramedWidget
+	instanceVariableNames: 'targetWidget'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Widget-Weaver'!
+!classDefinition: 'FramedWidget class' category: #'Morphic-Widget-Weaver'!
+FramedWidget class
+	instanceVariableNames: ''!
+
 !classDefinition: #ViewLens category: #'Morphic-Widget-Weaver'!
 SystemWindow subclass: #ViewLens
 	instanceVariableNames: 'viewPort propertySheet'
@@ -22,6 +72,21 @@ ViewPort class
 	instanceVariableNames: ''!
 
 
+!AddedCursors commentStamp: '<historical>' prior: 0!
+Additional Cursors -- see class side!
+
+!LineMorph commentStamp: '<historical>' prior: 0!
+I am a line from startPoint to endPoint!
+
+!ConnectorMorph commentStamp: '<historical>' prior: 0!
+I am a connection endpoint!
+
+!FrameMorph commentStamp: '<historical>' prior: 0!
+I appear as an empty frame!
+
+!FramedWidget commentStamp: '<historical>' prior: 0!
+I am a frame for UIWidgets which shows connector handles!
+
 !ViewLens commentStamp: '<historical>' prior: 0!
 I am SystemWindow which is selected via a ViewPort window.
 
@@ -31,6 +96,684 @@ I can be used to edit a Morph's salient instance variables (a.k.a. properties)!
 I am a port through which to select morphs.
 
 I must be embedded in a ViewLens window.!
+
+!AddedCursors class methodsFor: 'constants' stamp: 'KenD 9/23/2013 20:17'!
+closedHand
+"
+	self closedHand show.
+"
+	^ ClosedHand ! !
+
+!AddedCursors class methodsFor: 'private' stamp: 'KenD 9/22/2013 19:23'!
+historicalCruft
+"
+	self historicalCruft.
+"
+
+	| openHand openHandMask closedHand closedHandMask openHandCursor closedHandCursor |
+	openHand := Form fromFileNamed: 'handOpen2.png'.
+	openHandMask  := Form fromFileNamed: 'handOpen2-mask.png'.
+	closedHand  :=  Form fromFileNamed: 'handClosed2.png'.
+	closedHandMask  := Form fromFileNamed: 'handClosed2-mask.png'.
+
+	openHandCursor := (CursorWithMask derivedFrom: openHand)  setMaskForm: openHandMask.
+	closedHandCursor := (CursorWithMask derivedFrom: closedHand)  setMaskForm: closedHandMask.
+	
+	OpenHand := openHandCursor.
+	ClosedHand := closedHandCursor.
+	
+	^ openHandCursor! !
+
+!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/22/2013 19:35'!
+initClosedHand
+"
+	self initClosedHand.
+"
+	ClosedHand := ((CursorWithMask
+	extent: 16@16
+	depth: 1
+	fromArray: #(
+		2r0000000000000000
+		2r0000000000000000
+		2r0000000000000000
+		2r0000000000000000
+		2r110110110100000000000000000
+		2r1001001001010000000000000000
+		2r1000000000010000000000000000
+		2r111000000000010000000000000000
+		2r1001000000000010000000000000000
+		2r1000000000000010000000000000000
+		2r1000000000000010000000000000000
+		2r1000000000000110000000000000000
+		2r100000000001110000000000000000
+		2r10000000011100000000000000000
+		2r1000000011000000000000000000
+		2r100000011000000000000000000)
+	offset: -1@-1) setMaskForm: (Form
+	extent: 16@16
+	depth: 1
+	fromArray: #(
+		2r0000000000000000
+		2r0000000000000000
+		2r0000000000000000
+		2r1101101101000000000000000000
+		2r11111111111100000000000000000
+		2r11111111111110000000000000000
+		2r1111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r1111111111111100000000000000000
+		2r111111111111000000000000000000
+		2r11111111110000000000000000000
+		2r1111111110000000000000000000
+		2r1111111110000000000000000000)
+	offset: 0@0)).! !
+
+!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/28/2013 17:26'!
+initOpenHand
+"
+	self initOpenHand.
+"
+
+	OpenHand :=  ((CursorWithMask
+	extent: 16@16
+	depth: 1
+	fromArray: #(
+		2r0000000000000000
+		2r110110110000000000000000000
+		2r1001001001100000000000000000
+		2r1001001001010000000000000000
+		2r1001001001010000000000000000
+		2r1101001001001010000000000000000
+		2r1011001001001010000000000000000
+		2r1001001001001010000000000000000
+		2r1001000000000010000000000000000
+		2r1000100000000010000000000000000
+		2r1000000000000010000000000000000
+		2r1000000000000110000000000000000
+		2r100000000001110000000000000000
+		2r10000000011100000000000000000
+		2r1000000011000000000000000000
+		2r100000011000000000000000000)
+	offset: -1@-1) setMaskForm: (Form
+	extent: 16@16
+	depth: 1
+	fromArray: #(
+		2r1101101100000000000000000000
+		2r11111111111000000000000000000
+		2r11111111111100000000000000000
+		2r11111111111100000000000000000
+		2r11011111111111100000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r11111111111111110000000000000000
+		2r1111111111111100000000000000000
+		2r111111111111000000000000000000
+		2r11111111110000000000000000000
+		2r1111111110000000000000000000
+		2r1111111110000000000000000000)
+	offset: 0@0))! !
+
+!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/22/2013 17:16'!
+initialize
+"
+	self initialize.
+"
+	self initOpenHand.
+	self initClosedHand.! !
+
+!AddedCursors class methodsFor: 'constants' stamp: 'KenD 9/23/2013 20:17'!
+openHand
+"
+	self openHand show.
+"
+
+	^ OpenHand ! !
+
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 15:36'!
+basicExtent: aPoint
+
+	extent := aPoint! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 15:32'!
+color
+
+	^ color! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 16:35'!
+color: aColor
+
+	(aColor class = Color) ifFalse: [ Error signal: 'Not a color: ', aColor printString ].
+
+	color := aColor.
+	self redrawNeeded ! !
+
+!LineMorph methodsFor: 'drawing' stamp: 'KenD 9/27/2013 15:55'!
+drawOn: aCanvas
+	"Draw self in own coordinates"
+	
+	| rect |
+	rect := self rect.
+	aCanvas
+		line: (rect perform: startPointSelector)
+		to:  (rect perform: endPointSelector)
+		width: lineWidth
+		color: color! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 19:11'!
+endPoint
+	"Answer my endPoint in owner's coordinates"
+
+	^ (self rect perform: endPointSelector) + (self morphPosition) truncated ! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:42'!
+endPoint: aPoint
+	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
+	
+	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
+		
+	self setPointSelectorsFromStartPoint: self startPoint 
+		  endPoint: aPoint.
+	self redrawNeeded.! !
+
+!LineMorph methodsFor: 'initialization' stamp: 'KenD 9/27/2013 15:54'!
+initialize
+
+	super initialize.
+	extent := 100@180.
+	startPointSelector := #topLeft.
+	endPointSelector   := #bottomRight.
+	lineWidth := 6.
+	color := Color cyan.
+	! !
+
+!LineMorph methodsFor: 'geometry testing' stamp: 'KenD 9/26/2013 15:39'!
+isOrthoRectangularMorph
+
+	^ false! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 18:55'!
+length
+
+	^ self startPoint dist: self endPoint! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 16:23'!
+lineWidth
+
+	^ lineWidth ! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 16:22'!
+lineWidth: newWidthInPixels
+
+	lineWidth := newWidthInPixels.
+	self redrawNeeded ! !
+
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 16:28'!
+minimumExtent
+
+	^ 0 @ 0 ! !
+
+!LineMorph methodsFor: 'geometry' stamp: 'KenD 9/27/2013 16:29'!
+morphExtent
+	"Answer an extent which includes me, taking into account my lineWidth"
+
+	^ extent + lineWidth + lineWidth! !
+
+!LineMorph methodsFor: 'geometry' stamp: 'KenD 9/27/2013 16:28'!
+morphExtent: aPoint 
+	"Set the receiver's extent to value provided. Honor my minimumExtent."
+
+	| innerExtent |
+	innerExtent := aPoint - lineWidth - lineWidth.
+	extent = innerExtent ifTrue: [^ self ].
+	self redrawNeeded.
+	extent _ (innerExtent max: self minimumExtent).
+	self redrawNeeded! !
+
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 15:45'!
+rect
+
+	^ Rectangle origin: 0@0 corner: extent! !
+
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/29/2013 14:41'!
+setPointSelectorsFromStartPoint: startPoint endPoint: endPoint
+	"Reset both my start and end points -- points in owner coordinates"
+
+	| origin corner rect |
+	origin := ((startPoint x) min: (endPoint x)) @ ((startPoint y) min: (endPoint y)).
+	corner := ((startPoint x) max: (endPoint x)) @ ((startPoint y) max: (endPoint y)).
+	
+	rect := Rectangle origin: origin corner: corner. "Owner coordinates"
+
+	(startPoint = rect topLeft)        ifTrue: [ startPointSelector := #topLeft ].
+	(startPoint = rect topRight)       ifTrue: [ startPointSelector := #topRight ].
+	(startPoint = rect bottomLeft)  ifTrue: [ startPointSelector := #bottomLeft ].
+	(startPoint = rect bottomRight) ifTrue: [ startPointSelector := #bottomRight ].
+	
+	(endPoint = rect topLeft)         ifTrue: [ endPointSelector   := #topLeft ].
+	(endPoint = rect topRight)        ifTrue: [ endPointSelector   := #topRight ].
+	(endPoint = rect bottomLeft)   ifTrue: [ endPointSelector   := #bottomLeft ].
+	(endPoint = rect bottomRight)  ifTrue: [ endPointSelector   := #bottomRight ].
+
+	self basicExtent: rect extent.
+	self morphPosition: rect topLeft.
+	"@@DEBUG@@"
+"	('SetArgs: startPoint: ', startPoint asString, ' endPoint: ', endPoint asString) print.
+	('Result:    startPoint: ', self startPoint asString, ' endPoint: ', self endPoint asString) print.
+"! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 19:11'!
+startPoint
+	"Answer my startPoint in owner's coordinates"
+	
+	^ (self rect perform: startPointSelector) + (self morphPosition) truncated! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:43'!
+startPoint: aPoint
+	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
+	
+	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
+		
+	self setPointSelectorsFromStartPoint: aPoint 
+		 endPoint: self endPoint.
+	self redrawNeeded.! !
+
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:43'!
+startPoint: newStart endPoint: newEnd
+	"Reset my start and end points (Nota Bene: points in owner coordinates)"
+
+	(newStart isKindOf: Point)
+		ifFalse: [ Error signal: 'Not a Point: ', newStart printString ].
+	(newEnd isKindOf: Point)
+		ifFalse: [ Error signal: 'Not a Point: ', newEnd printString ].
+		
+	self setPointSelectorsFromStartPoint: newStart endPoint: newEnd.
+	self redrawNeeded.! !
+
+!LineMorph methodsFor: 'initialize-release' stamp: 'KenD 9/27/2013 15:59'!
+startPoint: startPoint endPoint: endPoint width: numPixels color: aColor
+
+	lineWidth := numPixels.
+	color := aColor.
+	self setPointSelectorsFromStartPoint: startPoint endPoint: endPoint.
+	! !
+
+!LineMorph class methodsFor: 'instance creation' stamp: 'KenD 9/26/2013 16:21'!
+initializedInstance
+	"Hand out a sample line"
+
+	^ self new startPoint: 20@30 endPoint: 120@160 width: 6 color: Color cyan
+! !
+
+!LineMorph class methodsFor: 'instance creation' stamp: 'KenD 9/26/2013 18:51'!
+startPoint: start endPoint: end
+
+	^ self new startPoint: start endPoint: end! !
+
+!LineMorph class methodsFor: 'instance creation' stamp: 'KenD 9/26/2013 16:21'!
+startPoint: start endPoint: end width: numPixels color: aColor
+
+	^ self new startPoint: start endPoint: end width: numPixels color: aColor! !
+
+!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/29/2013 13:37'!
+center
+	"Answer center of my extent"
+
+	^ self morphExtent // 2! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:21'!
+connect: otherConnector
+
+	connection := otherConnector.
+	self borderColor: self connectedBorderColor.
+	self color: self connectedColor.
+	self state: #connected.! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:04'!
+connectedBorderColor
+
+	^ Color orange! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:04'!
+connectedColor
+
+	^ Color green! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 13:02'!
+cursor
+
+	^ AddedCursors openHand
+! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/29/2013 13:27'!
+deselect
+	"unselect me if I am selected"
+
+	(self state = #selected) ifTrue: [ self unselect ].! !
+
+!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/29/2013 14:59'!
+dragWidget
+
+	dragWidget ifNil: [ 
+		dragWidget := (LineMorph 
+							startPoint: self center
+							endPoint:   self morphExtent  "Wrong but harmless" 
+							width: 8 
+							color: Color yellow).
+		self addMorph: dragWidget.
+	].
+
+	^ dragWidget ! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 13:03'!
+handlesMouseDown: aMouseButtonEvent
+
+	AddedCursors closedHand show.
+	^ true! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 14:01'!
+handlesMouseMove: aMouseButtonEvent
+
+	^ true! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 13:03'!
+handlesMouseOver: evt
+
+	^ true! !
+
+!ConnectorMorph methodsFor: 'initialization' stamp: 'KenD 9/29/2013 13:37'!
+initialize
+	
+	| arrowImage |
+	super initialize.
+	self morphExtent: 40@40.
+	self borderWidth: 6.
+	self state: #unselected.
+	arrowImage := ImageMorph new 
+						image: (FormCanvas arrowWithGradientOfDirection: #right).
+	self addMorph: arrowImage.
+	arrowImage morphPosition: (self center) 
+										- (arrowImage morphExtent // 2).  "center the arrowHead"
+	! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 15:12'!
+mouseButton1Down: aMouseButtonEvent localPosition: localEventPosition
+	"Handle a mouse down event."
+
+    Transcript newLine; show: (self name , ' got #mouseButton1Down:localPosition:').  
+
+	self processMouseDown: aMouseButtonEvent localPosition: localEventPosition.! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 15:27'!
+mouseButton1Up: aMouseButtonEvent localPosition: localEventPosition
+	"Handle a mouse button 1 up event."
+	
+	dragWidget ifNotNil: [ dragWidget hide. dragWidget := nil ].
+	Cursor normal beCursor.
+	self deselect.! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 13:03'!
+mouseEnter: evt
+
+	super mouseEnter: evt.
+	AddedCursors openHand show.
+! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 13:03'!
+mouseLeave: evt
+
+	Cursor normal beCursor.
+	super mouseLeave: evt! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 15:29'!
+mouseMove: aMouseMoveEvent localPosition: localEventPosition
+	"Handle a mouse move event"
+"
+    Transcript newLine; 
+		show: (self name , 
+				' got #mouseMove:localPosition: at ',
+				localEventPosition printString).  
+"	
+	self dragWidget endPoint: localEventPosition.
+
+	"Don't let World open a menu"
+	aMouseMoveEvent wasHandled:  true.   ! !
+
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 15:16'!
+processMouseDown: evt localPosition: localEventPosition
+"
+    Transcript newLine; 
+		show: 	(self name , 
+				 ' got #processMouseDown:localPosition: at ',
+				 localEventPosition asString).  
+"
+	self select.
+	self dragWidget show.
+	self dragWidget endPoint: localEventPosition.
+	AddedCursors closedHand show.
+	self runningWorld activeHand newMouseFocus: self.	
+	"Don't let World open a menu"
+	evt wasHandled:  true.   
+! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:14'!
+select
+
+	self borderColor: self selectedBorderColor.
+	self color: self selectedColor.
+	self state: #selected.! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:03'!
+selectedBorderColor
+
+	^ Color yellow! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:04'!
+selectedColor
+
+	^ Color orange! !
+
+!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/28/2013 20:14'!
+state
+
+	^ state! !
+
+!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/28/2013 20:18'!
+state: newState
+
+	(#(unselected selected connected) asSet includes: newState)
+		ifFalse: [ Error signal: 'Cennection state must be one of ',
+									'#(unselected selected connected)'
+		].
+	
+	state := newState! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:03'!
+unSelectedBorderColor
+
+	^ Color black! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/28/2013 20:03'!
+unSelectedColor
+
+	^ Color orange! !
+
+!ConnectorMorph methodsFor: 'connection state' stamp: 'KenD 9/29/2013 13:27'!
+unselect
+	"Always unselect me (note #deselect)"
+	
+	self borderColor: self unSelectedBorderColor.
+	self color: self unSelectedColor.
+	self state: #unselected.! !
+
+!FrameMorph methodsFor: 'accessing' stamp: 'KenD 9/16/2013 14:58'!
+borderWidth
+
+	^ borderWidth ! !
+
+!FrameMorph methodsFor: 'events-processing' stamp: 'KenD 9/15/2013 21:15'!
+cycleBorderColor
+	"Change border color to next in Colors"
+	
+	(colorIndex = self class colors size)
+	ifTrue:  [colorIndex := 1]
+	ifFalse: [colorIndex := colorIndex + 1].
+	
+	self borderColor: (self class colors at: colorIndex).
+	
+	^ self borderColor! !
+
+!FrameMorph methodsFor: 'accessing' stamp: 'KenD 9/17/2013 15:25'!
+defaultColor
+
+     ^ Color transparent! !
+
+!FrameMorph methodsFor: 'drawing' stamp: 'KenD 9/29/2013 13:04'!
+drawOn: aCanvas
+	"A canvas is already set with a proper transformation from our coordinates to those of the Canvas target."
+	
+	aCanvas
+		frameRectangle: (0@0 extent: extent) 
+		color: borderColor 
+		borderWidth: borderWidth 
+		borderStyleSymbol: self frameSelector
+! !
+
+!FrameMorph methodsFor: 'accessing' stamp: 'KenD 9/15/2013 20:57'!
+frameSelector
+
+	^ frameSelector! !
+
+!FrameMorph methodsFor: 'accessing' stamp: 'KenD 9/15/2013 21:02'!
+frameSelector: aSymbol
+
+	(#(simple inset raised) includes: aSymbol) ifFalse: [
+		 Error signal: aSymbol printString, ' must be #raised, #inset, or #simple' 
+	]. 
+	frameSelector := aSymbol! !
+
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 9/29/2013 15:44'!
+initialize
+
+	super initialize.
+	
+	colorIndex := 1.
+	self borderColor: (self class colors at: colorIndex);
+		 frameSelector: #simple;
+		borderWidth: 8;
+		morphExtent: 100@160.! !
+
+!FrameMorph methodsFor: 'geometry testing' stamp: 'KenD 9/16/2013 15:03'!
+morphContainsPoint: aPoint
+	"Only the frame contains a point"
+	| outerExtent innerExtent |
+	outerExtent := (0@0 extent: self morphExtent).
+	innerExtent := outerExtent insetBy: self borderWidth.
+	^ (outerExtent containsPoint: aPoint) 
+		and: [(innerExtent containsPoint: aPoint) not].! !
+
+!FrameMorph methodsFor: 'events' stamp: 'KenD 9/17/2013 16:06'!
+startStepping
+	"Start stepping the receiver"
+	
+	| w |
+	w _ self world.
+	w ifNotNil: [
+		w startStepping: self 
+			at: Time localMillisecondClock
+			selector: #step 
+			arguments:nil 
+			stepTime: 400.
+		self redrawNeeded ]! !
+
+!FrameMorph methodsFor: 'events-processing' stamp: 'KenD 9/15/2013 21:22'!
+step
+
+	self cycleBorderColor ! !
+
+!FrameMorph methodsFor: 'events' stamp: 'KenD 9/15/2013 21:35'!
+stopStepping
+
+	self world stopStepping: self.! !
+
+!FrameMorph class methodsFor: 'accessing' stamp: 'KenD 9/15/2013 21:05'!
+colors
+	
+	^ Colors ! !
+
+!FrameMorph class methodsFor: 'examples' stamp: 'KenD 9/17/2013 15:23'!
+example1
+"
+	self example1.
+"
+	| fm |
+	fm := FrameMorph new..
+	"fm cycleBorderColor."
+	fm frameSelector: #simple.
+	fm borderWidth: 8.
+	fm morphPosition: 20@20.
+	fm morphExtent: 200@100.
+	fm openInWorld.
+	fm startStepping.
+"
+	fm stopStepping.
+"! !
+
+!FrameMorph class methodsFor: 'class initialization' stamp: 'KenD 9/29/2013 15:43'!
+initialize
+"
+	self initialize.
+"
+	Colors := { Color yellow. Color mustard. Color brown. }.! !
+
+!FramedWidget methodsFor: 'connections' stamp: 'KenD 9/29/2013 13:14'!
+addConnectorHandles
+
+	| connectorHandle |
+	self targetWidget ifNil: [ ^ nil ].
+	"@@@FIXME: TEST SCAFFOLD"
+	
+	connectorHandle := ConnectorMorph new.
+	self addMorph: connectorHandle.
+	connectorHandle morphPosition: (self morphExtent x) @ 10.
+	
+	! !
+
+!FramedWidget methodsFor: 'initialization' stamp: 'KenD 9/29/2013 13:20'!
+forWidget: aWidget
+
+	targetWidget := aWidget.
+	self addConnectorHandles.
+	self morphPosition: aWidget morphPosition - (self borderWidth @ self borderWidth).
+	self morphExtent: aWidget morphExtent + (2 * self borderWidth).! !
+
+!FramedWidget methodsFor: 'accessing' stamp: 'KenD 9/29/2013 13:09'!
+targetWidget
+
+	^ targetWidget ! !
+
+!FramedWidget class methodsFor: 'examples' stamp: 'KenD 9/29/2013 15:50'!
+example1
+"
+	FramedWidget example1.
+"
+	| widget frame |
+	widget := OneLineEditorMorph initializedInstance.
+	widget morphPosition: 20@40.
+	frame := self forWidget: widget.
+	widget openInWorld.
+	frame openInWorld.
+	^ frame! !
+
+!FramedWidget class methodsFor: 'instance creation' stamp: 'KenD 9/29/2013 13:08'!
+forWidget: aWidget
+
+	^ self new forWidget: aWidget! !
 
 !ViewLens methodsFor: 'GUI building' stamp: 'KenD 9/6/2013 17:55'!
 buildMorphicWindow
@@ -202,3 +945,5 @@ processMouseDown: evt localPosition: localEventPosition
 selectedMorph
 
 	^ selectedMorph! !
+AddedCursors initialize!
+FrameMorph initialize!
