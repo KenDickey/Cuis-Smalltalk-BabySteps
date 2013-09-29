@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1824] on 28 September 2013 at 9:01:39.096132 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1836] on 28 September 2013 at 5:26:22.136118 pm'!
 'Description I am a simple frame [hollow rectangle]'!
-!provides: 'FrameMorph' 1 19!
+!provides: 'FrameMorph' 1 20!
 !classDefinition: #AddedCursors category: #FrameMorph!
 CursorWithMask subclass: #AddedCursors
 	instanceVariableNames: ''
@@ -102,13 +102,13 @@ initClosedHand
 		2r1111111110000000000000000000)
 	offset: 0@0)).! !
 
-!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/22/2013 19:34'!
+!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/28/2013 17:26'!
 initOpenHand
 "
 	self initOpenHand.
 "
 
-	OpenHand := ((CursorWithMask
+	OpenHand :=  ((CursorWithMask
 	extent: 16@16
 	depth: 1
 	fromArray: #(
@@ -118,10 +118,10 @@ initOpenHand
 		2r1001001001010000000000000000
 		2r1001001001010000000000000000
 		2r1101001001001010000000000000000
-		2r1011000000000010000000000000000
+		2r1011001001001010000000000000000
+		2r1001001001001010000000000000000
 		2r1001000000000010000000000000000
-		2r1001000000000010000000000000000
-		2r1000000000000010000000000000000
+		2r1000100000000010000000000000000
 		2r1000000000000010000000000000000
 		2r1000000000000110000000000000000
 		2r100000000001110000000000000000
@@ -148,7 +148,7 @@ initOpenHand
 		2r11111111110000000000000000000
 		2r1111111110000000000000000000
 		2r1111111110000000000000000000)
-	offset: 0@0)).! !
+	offset: 0@0))! !
 
 !AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/22/2013 17:16'!
 initialize
