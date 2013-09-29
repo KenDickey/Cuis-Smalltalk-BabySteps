@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1832] on 27 September 2013 at 4:33:15.372632 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1832] on 29 September 2013 at 4:23:01.886748 pm'!
 'Description I am a line from startPoint to endPoint as a Morph.'!
-!provides: 'Morphic-LineMorph' 1 4!
+!provides: 'Morphic-LineMorph' 1 6!
 !classDefinition: #LineMorph category: #'Morphic-LineMorph'!
 Morph subclass: #LineMorph
 	instanceVariableNames: 'color extent startPointSelector endPointSelector lineWidth'
@@ -25,11 +25,11 @@ color
 
 	^ color! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 15:34'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 16:35'!
 color: aColor
 
 	(aColor class = Color) ifFalse: [ Error signal: 'Not a color: ', aColor printString ].
-	
+
 	color := aColor.
 	self redrawNeeded ! !
 
@@ -51,14 +51,15 @@ endPoint
 
 	^ (self rect perform: endPointSelector) + (self morphPosition) truncated ! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 16:23'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:42'!
 endPoint: aPoint
 	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
 	
 	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
 		
 	self setPointSelectorsFromStartPoint: self startPoint 
-		  endPoint: aPoint! !
+		  endPoint: aPoint.
+	self redrawNeeded.! !
 
 !LineMorph methodsFor: 'initialization' stamp: 'KenD 9/27/2013 15:54'!
 initialize
@@ -119,7 +120,7 @@ rect
 
 	^ Rectangle origin: 0@0 corner: extent! !
 
-!LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 16:30'!
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/29/2013 14:41'!
 setPointSelectorsFromStartPoint: startPoint endPoint: endPoint
 	"Reset both my start and end points -- points in owner coordinates"
 
@@ -140,7 +141,7 @@ setPointSelectorsFromStartPoint: startPoint endPoint: endPoint
 	(endPoint = rect bottomRight)  ifTrue: [ endPointSelector   := #bottomRight ].
 
 	self basicExtent: rect extent.
-	self morphPositionInWorld: rect topLeft.
+	self morphPosition: rect topLeft.
 	"@@DEBUG@@"
 "	('SetArgs: startPoint: ', startPoint asString, ' endPoint: ', endPoint asString) print.
 	('Result:    startPoint: ', self startPoint asString, ' endPoint: ', self endPoint asString) print.
@@ -152,16 +153,17 @@ startPoint
 	
 	^ (self rect perform: startPointSelector) + (self morphPosition) truncated! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/27/2013 16:23'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:43'!
 startPoint: aPoint
 	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
 	
 	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
 		
 	self setPointSelectorsFromStartPoint: aPoint 
-		 endPoint: self endPoint! !
+		 endPoint: self endPoint.
+	self redrawNeeded.! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 16:48'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:43'!
 startPoint: newStart endPoint: newEnd
 	"Reset my start and end points (Nota Bene: points in owner coordinates)"
 
@@ -170,7 +172,8 @@ startPoint: newStart endPoint: newEnd
 	(newEnd isKindOf: Point)
 		ifFalse: [ Error signal: 'Not a Point: ', newEnd printString ].
 		
-	self setPointSelectorsFromStartPoint: newStart endPoint: newEnd! !
+	self setPointSelectorsFromStartPoint: newStart endPoint: newEnd.
+	self redrawNeeded.! !
 
 !LineMorph methodsFor: 'initialize-release' stamp: 'KenD 9/27/2013 15:59'!
 startPoint: startPoint endPoint: endPoint width: numPixels color: aColor
