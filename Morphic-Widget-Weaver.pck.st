@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1836] on 29 September 2013 at 3:52:41.290326 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1836] on 30 September 2013 at 5:04:59.696347 pm'!
 'Description UI construction by widget composition.'!
-!provides: 'Morphic-Widget-Weaver' 1 16!
+!provides: 'Morphic-Widget-Weaver' 1 18!
 !classDefinition: #AddedCursors category: #'Morphic-Widget-Weaver'!
 CursorWithMask subclass: #AddedCursors
 	instanceVariableNames: ''
@@ -23,7 +23,7 @@ LineMorph class
 
 !classDefinition: #ConnectorMorph category: #'Morphic-Widget-Weaver'!
 BorderedRectMorph subclass: #ConnectorMorph
-	instanceVariableNames: 'connectionEndPoint connection state dragWidget'
+	instanceVariableNames: 'connectionEndPoint connection state dragWidget arrowHead'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Morphic-Widget-Weaver'!
@@ -43,7 +43,7 @@ FrameMorph class
 
 !classDefinition: #FramedWidget category: #'Morphic-Widget-Weaver'!
 FrameMorph subclass: #FramedWidget
-	instanceVariableNames: 'targetWidget'
+	instanceVariableNames: 'targetWidget moveDelta'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Morphic-Widget-Weaver'!
@@ -253,7 +253,7 @@ color: aColor
 	color := aColor.
 	self redrawNeeded ! !
 
-!LineMorph methodsFor: 'drawing' stamp: 'KenD 9/27/2013 15:55'!
+!LineMorph methodsFor: 'drawing' stamp: 'KenD 9/30/2013 16:06'!
 drawOn: aCanvas
 	"Draw self in own coordinates"
 	
@@ -271,12 +271,13 @@ endPoint
 
 	^ (self rect perform: endPointSelector) + (self morphPosition) truncated ! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:42'!
+!LineMorph methodsFor: 'accessing' stamp: 'jmv 9/29/2013 22:47'!
 endPoint: aPoint
 	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
 	
 	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
 		
+	self redrawNeeded.
 	self setPointSelectorsFromStartPoint: self startPoint 
 		  endPoint: aPoint.
 	self redrawNeeded.! !
@@ -292,11 +293,6 @@ initialize
 	color := Color cyan.
 	! !
 
-!LineMorph methodsFor: 'geometry testing' stamp: 'KenD 9/26/2013 15:39'!
-isOrthoRectangularMorph
-
-	^ false! !
-
 !LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 18:55'!
 length
 
@@ -307,9 +303,10 @@ lineWidth
 
 	^ lineWidth ! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 16:22'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/30/2013 14:36'!
 lineWidth: newWidthInPixels
 
+	self redrawNeeded.
 	lineWidth := newWidthInPixels.
 	self redrawNeeded ! !
 
@@ -340,12 +337,12 @@ rect
 
 	^ Rectangle origin: 0@0 corner: extent! !
 
-!LineMorph methodsFor: 'private' stamp: 'KenD 9/29/2013 14:41'!
+!LineMorph methodsFor: 'private' stamp: 'KenD 9/30/2013 15:29'!
 setPointSelectorsFromStartPoint: startPoint endPoint: endPoint
 	"Reset both my start and end points -- points in owner coordinates"
 
 	| origin corner rect |
-	origin := ((startPoint x) min: (endPoint x)) @ ((startPoint y) min: (endPoint y)).
+	origin  := ((startPoint x) min: (endPoint x)) @ ((startPoint y) min: (endPoint y)).
 	corner := ((startPoint x) max: (endPoint x)) @ ((startPoint y) max: (endPoint y)).
 	
 	rect := Rectangle origin: origin corner: corner. "Owner coordinates"
@@ -373,17 +370,18 @@ startPoint
 	
 	^ (self rect perform: startPointSelector) + (self morphPosition) truncated! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:43'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/30/2013 14:36'!
 startPoint: aPoint
 	"aPoint is in owner coordinates.  Set my startPoint in own coordinates"
 	
 	(aPoint isKindOf: Point) ifFalse: [ Error signal: 'Not a Point: ', aPoint printString ].
-		
+	
+	self redrawNeeded.
 	self setPointSelectorsFromStartPoint: aPoint 
 		 endPoint: self endPoint.
 	self redrawNeeded.! !
 
-!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/29/2013 14:43'!
+!LineMorph methodsFor: 'accessing' stamp: 'KenD 9/30/2013 14:36'!
 startPoint: newStart endPoint: newEnd
 	"Reset my start and end points (Nota Bene: points in owner coordinates)"
 
@@ -391,15 +389,16 @@ startPoint: newStart endPoint: newEnd
 		ifFalse: [ Error signal: 'Not a Point: ', newStart printString ].
 	(newEnd isKindOf: Point)
 		ifFalse: [ Error signal: 'Not a Point: ', newEnd printString ].
-		
+
+	self redrawNeeded.	
 	self setPointSelectorsFromStartPoint: newStart endPoint: newEnd.
 	self redrawNeeded.! !
 
-!LineMorph methodsFor: 'initialize-release' stamp: 'KenD 9/27/2013 15:59'!
+!LineMorph methodsFor: 'initialize-release' stamp: 'KenD 9/30/2013 15:25'!
 startPoint: startPoint endPoint: endPoint width: numPixels color: aColor
 
 	lineWidth := numPixels.
-	color := aColor.
+	color       := aColor.
 	self setPointSelectorsFromStartPoint: startPoint endPoint: endPoint.
 	! !
 
@@ -456,14 +455,16 @@ deselect
 
 	(self state = #selected) ifTrue: [ self unselect ].! !
 
-!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/29/2013 14:59'!
+!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/30/2013 16:13'!
 dragWidget
 
+	| lineWidth |
+	lineWidth := 8.
 	dragWidget ifNil: [ 
 		dragWidget := (LineMorph 
-							startPoint: self center
+							startPoint: (self center) - (lineWidth // 2)
 							endPoint:   self morphExtent  "Wrong but harmless" 
-							width: 8 
+							width: lineWidth
 							color: Color yellow).
 		self addMorph: dragWidget.
 	].
@@ -486,22 +487,21 @@ handlesMouseOver: evt
 
 	^ true! !
 
-!ConnectorMorph methodsFor: 'initialization' stamp: 'KenD 9/29/2013 13:37'!
+!ConnectorMorph methodsFor: 'initialization' stamp: 'KenD 9/30/2013 14:44'!
 initialize
 	
-	| arrowImage |
 	super initialize.
 	self morphExtent: 40@40.
 	self borderWidth: 6.
 	self state: #unselected.
-	arrowImage := ImageMorph new 
+	arrowHead := ImageMorph new 
 						image: (FormCanvas arrowWithGradientOfDirection: #right).
-	self addMorph: arrowImage.
-	arrowImage morphPosition: (self center) 
-										- (arrowImage morphExtent // 2).  "center the arrowHead"
+	self addMorph: arrowHead.
+	arrowHead morphPosition: (self center) 
+										- (arrowHead morphExtent // 2).  "center the arrowHead"
 	! !
 
-!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 15:12'!
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/30/2013 16:58'!
 mouseButton1Down: aMouseButtonEvent localPosition: localEventPosition
 	"Handle a mouse down event."
 
@@ -509,11 +509,20 @@ mouseButton1Down: aMouseButtonEvent localPosition: localEventPosition
 
 	self processMouseDown: aMouseButtonEvent localPosition: localEventPosition.! !
 
-!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 15:27'!
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/30/2013 16:59'!
 mouseButton1Up: aMouseButtonEvent localPosition: localEventPosition
 	"Handle a mouse button 1 up event."
 	
-	dragWidget ifNotNil: [ dragWidget hide. dragWidget := nil ].
+	dragWidget ifNotNil: [ 
+"
+		('mouse button up; global mouse location: ', 
+		(self morphPositionInWorld + localEventPosition) asString
+		) print.
+"
+		dragWidget delete. 
+		dragWidget := nil 
+	].
+	arrowHead show.
 	Cursor normal beCursor.
 	self deselect.! !
 
@@ -544,7 +553,7 @@ mouseMove: aMouseMoveEvent localPosition: localEventPosition
 	"Don't let World open a menu"
 	aMouseMoveEvent wasHandled:  true.   ! !
 
-!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/29/2013 15:16'!
+!ConnectorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/30/2013 16:44'!
 processMouseDown: evt localPosition: localEventPosition
 "
     Transcript newLine; 
@@ -554,6 +563,7 @@ processMouseDown: evt localPosition: localEventPosition
 "
 	self select.
 	self dragWidget show.
+	arrowHead hide.
 	self dragWidget endPoint: localEventPosition.
 	AddedCursors closedHand show.
 	self runningWorld activeHand newMouseFocus: self.	
@@ -583,11 +593,11 @@ state
 
 	^ state! !
 
-!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/28/2013 20:18'!
+!ConnectorMorph methodsFor: 'private' stamp: 'KenD 9/30/2013 14:43'!
 state: newState
 
 	(#(unselected selected connected) asSet includes: newState)
-		ifFalse: [ Error signal: 'Cennection state must be one of ',
+		ifFalse: [ Error signal: 'Connection state must be one of ',
 									'#(unselected selected connected)'
 		].
 	
@@ -744,13 +754,19 @@ addConnectorHandles
 	
 	! !
 
-!FramedWidget methodsFor: 'initialization' stamp: 'KenD 9/29/2013 13:20'!
+!FramedWidget methodsFor: 'initialization' stamp: 'KenD 9/30/2013 16:35'!
 forWidget: aWidget
 
 	targetWidget := aWidget.
 	self addConnectorHandles.
-	self morphPosition: aWidget morphPosition - (self borderWidth @ self borderWidth).
+	super morphPosition: aWidget morphPosition - (self borderWidth @ self borderWidth).
 	self morphExtent: aWidget morphExtent + (2 * self borderWidth).! !
+
+!FramedWidget methodsFor: 'event handling' stamp: 'KenD 9/30/2013 17:04'!
+justDroppedInto: newOwnerMorph event: anEvent
+	"Someone moved me.  Move my target as well"
+	
+	self targetWidget morphPosition: (self morphPosition + self borderWidth)! !
 
 !FramedWidget methodsFor: 'accessing' stamp: 'KenD 9/29/2013 13:09'!
 targetWidget
