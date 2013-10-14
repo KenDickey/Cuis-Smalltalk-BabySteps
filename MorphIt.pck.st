@@ -1,6 +1,7 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1840] on 2 October 2013 at 3:28:01.702435213 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000033 pm'!
 'Description MorphIt is a morphic construction kit/system.'!
-!provides: 'MorphIt' 1 11!
+!provides: 'MorphIt' 1 12!
+!requires: 'ValueHolder' 1 17 1!
 !classDefinition: #MorphMorph category: #MorphIt!
 ImageMorph subclass: #MorphMorph
 	instanceVariableNames: 'name'
@@ -246,7 +247,7 @@ with: otherArgs
 	self removeAction.
 	with := otherArgs! !
 
-!MorphAction class methodsFor: 'examples' stamp: 'KenD 10/2/2013 17:08'!
+!MorphAction class methodsFor: 'examples' stamp: 'KenD 10/12/2013 17:02'!
 example1
 "
 	self example1.
@@ -259,7 +260,7 @@ example1
 	ma where: Transcript.
 	ma with: 'Log My Success!!!!!!'.
 	ma droppedOn: cm.
-	Transcript display.
+	Transcript display. 
 	cm triggerEvent: #logMe.! !
 
 !MorphGraphic methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:26'!
