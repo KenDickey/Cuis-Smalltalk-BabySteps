@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1824] on 15 September 2013 at 5:28:46.448988 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000061 pm'!
 'Description I display a pallet of images (of things) to drag'!
-!provides: 'Morphic-Display-Pallet' 1 11!
+!provides: 'Morphic-Display-Pallet' 1 13!
 !classDefinition: #ImagePallet category: #'Morphic-Display-Pallet'!
 PluggableScrollPane subclass: #ImagePallet
 	instanceVariableNames: 'nameImageCollection imageFilter'
@@ -119,10 +119,10 @@ processImage: anImage
 
 	! !
 
-!ImagePallet class methodsFor: 'instance creation' stamp: 'KenD 9/14/2013 16:31'!
+!ImagePallet class methodsFor: 'instance creation' stamp: 'KenD 10/12/2013 17:24'!
 fromCollection: nameImageAssociations
 
-	^ self basicNew collection: nameImageAssociations! !
+	^ self basicNew initialize collection: nameImageAssociations! !
 
 !ImagePallet class methodsFor: 'instance creation' stamp: 'KenD 9/14/2013 16:31'!
 fromCollection: nameImageAssociations imageFilter: aClosure
