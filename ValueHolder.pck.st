@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1845] on 2 October 2013 at 3:28:01.702435055 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000187 pm'!
 'Description Holders for constrained values.'!
-!provides: 'ValueHolder' 1 14!
+!provides: 'ValueHolder' 1 20!
 !classDefinition: #ValueHolder category: #ValueHolder!
 Object subclass: #ValueHolder
 	instanceVariableNames: 'value'
@@ -104,6 +104,11 @@ contents: newValue
 
 		self value: newValue ! !
 
+!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:23'!
+defaultName
+
+	^ 'ValueHolder'! !
+
 !ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:28'!
 errorStringFor: aValue
 	"My subclasses do this"
@@ -140,6 +145,11 @@ checkValue: aValue
 
 	^ (aValue class == theClass)! !
 
+!ValueOfClass methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:25'!
+defaultName
+
+	^ 'ValueOfClass' , theClass name! !
+
 !ValueOfClass methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:37'!
 errorStringFor: aValue
 
@@ -174,6 +184,11 @@ checkValue: aValue
 	"I accept only instances inheriting from a Class"
 
 	^ (aValue isKindOf: theKind)! !
+
+!ValueOfKind methodsFor: 'as yet unclassified' stamp: 'KenD 10/12/2013 17:26'!
+defaultName
+
+	^ 'ValueOfKind' , theKind name! !
 
 !ValueOfKind methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:46'!
 errorStringFor: aValue
@@ -213,6 +228,11 @@ checkValue: aValue
 			and: [ aValue <= maxValue ] ]
 	! !
 
+!ValueOfRange methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:26'!
+defaultName
+
+	^ 'ValueRange', self minValue printString, 'To', self maxValue printString ! !
+
 !ValueOfRange methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:34'!
 errorStringFor: aValue
 
@@ -228,11 +248,12 @@ minValue
 
 	^ minValue ! !
 
-!ValueOfRange methodsFor: 'private' stamp: 'KenD 10/2/2013 17:14'!
+!ValueOfRange methodsFor: 'private' stamp: 'KenD 10/12/2013 17:11'!
 minValue: min maxValue: max
 
 	minValue  := min.
 	maxValue := max.
+	self privateSetValue: min. "default"
 	! !
 
 !ValueOfRange class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 17:15'!
@@ -259,6 +280,11 @@ checkValue: aValue
 
 	^ (super checkValue: aValue)
 		and: [ selectionList includes: aValue ]! !
+
+!ValueOneOf methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:26'!
+defaultName
+
+	^ 'OneOf', self mySelectionList size asString! !
 
 !ValueOneOf methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:35'!
 errorStringFor: aValue

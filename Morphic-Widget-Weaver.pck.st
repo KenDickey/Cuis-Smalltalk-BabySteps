@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1840] on 2 October 2013 at 3:45:50.037273 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000298 pm'!
 'Description Widget Composition Package'!
-!provides: 'Morphic-Widget-Weaver' 1 24!
+!provides: 'Morphic-Widget-Weaver' 1 44!
 !classDefinition: #AddedCursors category: #'Morphic-Widget-Weaver'!
 CursorWithMask subclass: #AddedCursors
 	instanceVariableNames: ''
@@ -81,6 +81,16 @@ BorderedRectMorph subclass: #ViewPort
 ViewPort class
 	instanceVariableNames: ''!
 
+!classDefinition: #SignMorph category: #'Morphic-Widget-Weaver'!
+HoverHelpMorph subclass: #SignMorph
+	instanceVariableNames: 'object'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Widget-Weaver'!
+!classDefinition: 'SignMorph class' category: #'Morphic-Widget-Weaver'!
+SignMorph class
+	instanceVariableNames: ''!
+
 
 !AddedCursors commentStamp: '<historical>' prior: 0!
 Additional Cursors -- see class side!
@@ -108,7 +118,19 @@ I can be used to edit a Morph's salient instance variables (a.k.a. properties)
 ViewLens open: nil label: 'View Lens'.!
 
 !ViewPort commentStamp: '<historical>' prior: 0!
-I am jused in a ViewLens as a transparent view.!
+I am used in a ViewLens as a transparent view.!
+
+!SignMorph commentStamp: '<historical>' prior: 0!
+My instances are visual proxy's for objects which do not have a visual representation.
+
+This is helpful for drag-n-drop.
+
+A sign by its nature points to something else.  Use: 
+	SignMorph forObject: <object>
+
+ivar:
+   object - the object I point-to/denote/stand-for
+!
 
 !AddedCursors class methodsFor: 'constants' stamp: 'KenD 9/23/2013 20:17'!
 closedHand
@@ -248,7 +270,7 @@ openHand
 
 	^ OpenHand ! !
 
-!ConstructionLens class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 15:08'!
+!ConstructionLens class methodsFor: 'instance creation' stamp: 'KenD 10/12/2013 16:26'!
 new
 
 	|  window |
@@ -257,14 +279,16 @@ new
 		model: nil;
 		buildMorphicWindow;
 		setLabel: 'Construction Lens';
+		color: Color transparent;
 		yourself! !
 
-!ConstructionLens class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 15:08'!
+!ConstructionLens class methodsFor: 'instance creation' stamp: 'KenD 10/12/2013 16:27'!
 open
 
 	|  window |
 	window _ ViewLens new.
 	^ window
+		color: Color transparent;
 		openInWorld;
 		yourself! !
 
@@ -780,6 +804,13 @@ initialize
 "
 	Colors := { Color yellow. Color mustard. Color brown. }.! !
 
+!FramedWidget methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:01'!
+acceptDroppingMorph: aMorph event: evt
+	"This message is sent when a morph is dropped onto a morph that has agreed to accept the dropped morph by responding 'true' to the wantsDroppedMorph:Event: message. This default implementation just adds the given morph to the receiver. 
+	I don't do that"
+
+	^ self! !
+
 !FramedWidget methodsFor: 'connections' stamp: 'KenD 10/1/2013 15:05'!
 addConnectorHandles
 
@@ -793,21 +824,25 @@ addConnectorHandles
 "
 	! !
 
-!FramedWidget methodsFor: 'initialization' stamp: 'KenD 9/30/2013 16:35'!
+!FramedWidget methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 16:29'!
+allowsMorphDrop
+	"Answer whether we accept dropping morphs. Redefined to answer true."
+
+	^ true! !
+
+!FramedWidget methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:24'!
 forWidget: aWidget
 
-	targetWidget := aWidget.
-	self addConnectorHandles.
-	super morphPosition: aWidget morphPosition - (self borderWidth @ self borderWidth).
-	self morphExtent: aWidget morphExtent + (2 * self borderWidth).! !
+	self forWidget: aWidget localPosition: aWidget morphPosition! !
 
-!FramedWidget methodsFor: 'initialization' stamp: 'KenD 10/1/2013 15:39'!
+!FramedWidget methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:37'!
 forWidget: aWidget localPosition: aPoint
 
 	targetWidget := aWidget.
 	self addConnectorHandles.
 	super morphPosition: aPoint - (self borderWidth @ self borderWidth).
-	self morphExtent: aWidget morphExtent + (2 * self borderWidth).! !
+	self morphExtent: aWidget morphExtent + (2 * self borderWidth).
+	self refreshSubmorphs.! !
 
 !FramedWidget methodsFor: 'event handling' stamp: 'KenD 9/30/2013 17:04'!
 justDroppedInto: newOwnerMorph event: anEvent
@@ -815,10 +850,72 @@ justDroppedInto: newOwnerMorph event: anEvent
 
 	self targetWidget morphPosition: (self morphPosition + self borderWidth)! !
 
+!FramedWidget methodsFor: 'geometry testing' stamp: 'KenD 10/12/2013 16:59'!
+morphContainsPoint: aPoint
+	"Even ''empty'', I intercept mouse clicks"
+	
+	^ (Rectangle origin: 0@0 corner: self morphExtent) containsPoint: aPoint! !
+
+!FramedWidget methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:08'!
+processDropMorph: aDropEvent localPosition: positionInAMorph
+	"Handle a dropping morph."
+	
+	| aMorph |
+	aDropEvent wasHandled ifTrue: [ ^self ]. "Do it just once, for one drop destination"
+	aDropEvent wasHandled: true.
+
+	aMorph _ aDropEvent contents.
+	aMorph droppedOn: self targetWidget.
+"	self acceptDroppingMorph: aMorph event: aDropEvent.
+	aMorph justDroppedInto: self event: aDropEvent
+"
+	self world activeHand removeMorph: aMorph. "@@FIXME@@"
+	self refreshSubmorphs.
+! !
+
+!FramedWidget methodsFor: 'morph modifiers' stamp: 'KenD 10/12/2013 17:01'!
+refreshSubmorphs
+	"remove submorphs and get 'em back"
+	| curPos deltaX deltaY myExtent|
+	curPos := self borderWidth @ self borderWidth.
+	deltaX := deltaY := 40.  "Large Icon Size including border"
+	myExtent := self morphExtent max: 80@240.
+	
+	self removeAllMorphs.  
+	(MorphMorph modifiersOf: self targetWidget) 
+		ifNotNil: [ :modifiers | modifiers do: 
+			[ :m | 
+				m ifNotNil: [
+					self addMorph: m.
+					m morphPosition: curPos.
+					(curPos x + deltaX > myExtent x)
+						ifTrue: [ curPos := self borderWidth @ (curPos y + deltaY) ]
+						ifFalse: [ curPos := (curPos x + deltaX) @ curPos y ].
+"					Transcript newLine; show: 'SubM curPos: ', curPos printString .
+"
+				]
+			]
+		].
+	self redrawNeeded.
+	! !
+
+!FramedWidget methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 16:33'!
+sentTo: aMorph localPosition: positionInAMorph
+	"Dispatch the receiver into aMorph"
+
+	^ aMorph droppedOn: self targetWidget! !
+
 !FramedWidget methodsFor: 'accessing' stamp: 'KenD 9/29/2013 13:09'!
 targetWidget
 
 	^ targetWidget ! !
+
+!FramedWidget methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 16:30'!
+wantsDroppedMorph: aMorph event: evt
+	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self.
+	This method just answers super. It is included here to say it is relevant to D&D behavior."
+
+	^ (aMorph isKindOf: MorphMorph)! !
 
 !FramedWidget class methodsFor: 'examples' stamp: 'KenD 9/29/2013 15:50'!
 example1
@@ -934,7 +1031,7 @@ viewPort
 
 	^ viewPort ! !
 
-!ViewPort methodsFor: 'event handling' stamp: 'KenD 10/2/2013 10:03'!
+!ViewPort methodsFor: 'event handling' stamp: 'KenD 10/12/2013 17:05'!
 click: evt localPosition: localEventPosition
 	"Select the morph under me and notify my owner of the change"
 
@@ -955,17 +1052,18 @@ click: evt localPosition: localEventPosition
 	morphsAtPoint := self runningWorld morphsAt: globalPos unlocked: true.
 	"NB: #morphsAt:behind:unlocked: never finds anything"
  	morphsUnderMeAtPoint :=
-		morphsAtPoint reject: [ :elt |
-			(morphsToIgnore includes: elt)
-				or: [ (elt isKindOf: PluggableMorph) not ]
+		morphsAtPoint reject: [ :m |
+			((morphsToIgnore includes: m) 
+				or: [ m isKindOf: FrameMorph ])
+					or: [ m isKindOf: MorphMorph ]
 		].
 
 	(morphsUnderMeAtPoint isEmpty)
 		ifTrue: [ selectedMorph := nil ]
 		ifFalse: [
 			selectedMorph := morphsUnderMeAtPoint first.
-			self frameMorphsInCollection: morphsUnderMeAtPoint withColor: Color red.
-			self frameMorphsInCollection: { selectedMorph } withColor: Color green.
+			"self frameMorphsInCollection: morphsUnderMeAtPoint withColor: Color yellow."
+			self frameMorphsInCollection: { selectedMorph } withColor: Color red.
 		].
 
 "	selectedMorph ifNotNil: [ selectedMorph addHalo ].    proof of concept"! !
@@ -976,7 +1074,12 @@ clipsSubmorphs
 	submorphs to the receiver's clipping bounds."
 	^ true! !
 
-!ViewPort methodsFor: 'drawing' stamp: 'KenD 10/2/2013 09:36'!
+!ViewPort methodsFor: 'private' stamp: 'KenD 10/12/2013 17:34'!
+defaultColor
+
+	^ Color transparent! !
+
+!ViewPort methodsFor: 'drawing' stamp: 'KenD 10/12/2013 17:04'!
 frameMorphsInCollection: morphsCollection
 	"Show frames of morphs in/under me"
 
@@ -984,15 +1087,12 @@ frameMorphsInCollection: morphsCollection
 	canvas := Display getCanvas.
 	oldClipRect := canvas clipRect.
 	canvas setClipRect: (self morphBoundsInWorld ).
-	[morphsCollection do: [ :m | | frame |
-		frame := FramedWidget forWidget: m.
-		frame morphPosition: (self myPositionForMorph: m)  - frame borderWidth.
-		self addMorph: frame.
-"		canvas frameRectangle:   (m morphBoundsInWorld )
-				color: Color red
-				borderWidth: 4
-				borderStyleSymbol: #raised.
-"		]
+	[morphsCollection do: 
+		[ :m | | frame |
+			frame := FramedWidget forWidget: m.
+			frame morphPosition: (self myPositionForMorph: m)  - frame borderWidth.
+			self addMorph: frame.
+		]
 	] ensure: [canvas setClipRect: oldClipRect].! !
 
 !ViewPort methodsFor: 'drawing' stamp: 'KenD 10/2/2013 09:36'!
@@ -1062,13 +1162,13 @@ myWindow
 
 	^ o! !
 
-!ViewPort methodsFor: 'event handling' stamp: 'KenD 9/5/2013 16:44'!
+!ViewPort methodsFor: 'event handling' stamp: 'KenD 10/12/2013 17:31'!
 processMouseDown: evt localPosition: localEventPosition
 	"Do nothing upon mouse-down except inform the hand to watch for a
 	click; wait until an ensuing #click: message gets dispatched"
-
+"
 	Transcript newLine; show: (self name , ' got #processMouseDown:localPosition:').
-
+"
 " Never gets clicked. Click goes to World PasteUpMorph.  "
 "
 	evt hand waitForClicksOrDrag: self
@@ -1096,5 +1196,98 @@ includeInNewMorphMenu
 	"Not to be instantiated from the menu"
 
 	^ false! !
+
+!SignMorph methodsFor: 'delegation' stamp: 'KenD 10/5/2013 16:58'!
+doesNotUnderstand: aMessage
+	"Delegate operations to the object I represent and Answer the result."
+
+	^ aMessage sendTo: object.! !
+
+!SignMorph methodsFor: 'initialization' stamp: 'KenD 10/5/2013 17:23'!
+forObject: anObject
+
+	super initialize.  "Initialize extent as required by #redrawNeeded"
+	object := anObject.
+	self contents: anObject name.  "NOTE: Object defaults this to #printString"
+! !
+
+!SignMorph methodsFor: 'initialization' stamp: 'KenD 10/5/2013 17:23'!
+forObject: anObject withName: aString
+
+	super initialize.  "Initialize extent as required by #redrawNeeded"
+	object := anObject.
+	self contents: aString asString
+! !
+
+!SignMorph methodsFor: 'accessing' stamp: 'KenD 10/5/2013 17:15'!
+name
+
+	^ contents ! !
+
+!SignMorph methodsFor: 'accessing' stamp: 'KenD 10/5/2013 16:58'!
+object
+
+	^ object! !
+
+!SignMorph class methodsFor: 'instance creation' stamp: 'KenD 10/5/2013 16:54'!
+contents: someString
+
+	Error signal: 'USE: ', self name asString, ' forObject: anObject'
+	! !
+
+!SignMorph class methodsFor: 'examples' stamp: 'KenD 10/5/2013 17:03'!
+example1
+"
+	self example1
+"
+	| newInst |
+	newInst := SignMorph forObject: Preferences standardListFont.
+	newInst openInWorld.
+	
+	^ newInst ! !
+
+!SignMorph class methodsFor: 'examples' stamp: 'KenD 10/5/2013 17:27'!
+example2
+"
+	self example2
+"
+	| newInst  |
+	newInst := SignMorph forObject: #giveMeASign .
+	newInst openInWorld.
+	
+	^ newInst ! !
+
+!SignMorph class methodsFor: 'examples' stamp: 'KenD 10/5/2013 17:28'!
+example3
+"
+	self example3
+"
+	| newInst rect |
+	rect := Rectangle origin: 1@2 corner: 2@3.
+	newInst := SignMorph forObject: rect withName: 'aRectangle(' , rect hash asString, ')' .
+	newInst openInWorld.
+	
+	^ newInst ! !
+
+!SignMorph class methodsFor: 'instance creation' stamp: 'KenD 10/5/2013 16:52'!
+forObject: anObject
+
+	^ self basicNew forObject: anObject ! !
+
+!SignMorph class methodsFor: 'instance creation' stamp: 'KenD 10/5/2013 17:28'!
+forObject: anObject withName: aString
+
+	^ self basicNew forObject: anObject withName: aString! !
+
+!SignMorph class methodsFor: 'new-morph participation' stamp: 'KenD 10/5/2013 16:55'!
+includeInNewMorphMenu 
+
+	^ false! !
+
+!SignMorph class methodsFor: 'instance creation' stamp: 'KenD 10/5/2013 16:54'!
+new
+
+	Error signal: 'USE: ', self name asString, ' forObject: anObject'
+	! !
 AddedCursors initialize!
 FrameMorph initialize!

@@ -1,8 +1,9 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000086 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000222 pm'!
 'Description MorphIt is a morphic construction kit/system.'!
-!provides: 'MorphIt' 1 27!
+!provides: 'MorphIt' 1 37!
 !requires: 'Graphics-Files-Additional' nil nil nil!
 !requires: 'Morphic-Display-Pallet' nil nil nil!
+!requires: 'Morphic-Widget-Weaver' nil nil nil!
 !requires: 'ValueHolder' 1 17 1!
 !classDefinition: #BorderedImageMorph category: #MorphIt!
 ImageMorph subclass: #BorderedImageMorph
@@ -93,7 +94,7 @@ Drop an instance of me to change a Morph's color.!
 !MorphValueHolder commentStamp: '<historical>' prior: 0!
 My instances represent ValueHolders!
 
-!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/12/2013 17:35'!
+!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/12/2013 16:55'!
 morphIt
 "
 	ImagePallet morphIt.
@@ -103,6 +104,9 @@ morphIt
 		{ 'Action'->(MorphAction new).
 		  'Graphic Modifier'->(MorphGraphic new).
 		  'Color blue'->(MorphTheColor forColor: Color blue).
+		  'Color green'->(MorphTheColor forColor: Color green).
+		  'Color red'->(MorphTheColor forColor: Color red).
+		  'Color yellow'->(MorphTheColor forColor: Color yellow).
 		  'Color'->(MorphValueHolder holderOfColors).
 		  'Float'->(MorphValueHolder holderOfFloats).
 		  'Integer'->(MorphValueHolder holderOfIntegers).
@@ -205,6 +209,11 @@ balloonText
 
 	self subclassResponsibility ! !
 
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:27'!
+defaultName
+
+	^ self class printString withFirstCharacterDownshifted ! !
+
 !MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/2/2013 17:17'!
 droppedOn: aMorph
 	"I have been dropped on aMorph.  Do my initialization action."
@@ -216,21 +225,28 @@ icon
 
 	self subclassResponsibility ! !
 
-!MorphMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 17:10'!
+!MorphMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:51'!
 initialize
 	"Set my defaults"
 
 	super initialize.
 	self image: (self icon magnifyTo: 32@32).
-	name := self class printString withFirstCharacterDownshifted.
+
 ! !
 
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:42'!
+!MorphMorph methodsFor: 'morph interactions' stamp: 'KenD 10/12/2013 16:33'!
+modifiersOf: aMorph
+	"Answer aMorph morphModifiers"
+	
+	^ aMorph valueOfProperty: #morphModifiers  ifAbsent: [ nil ]
+	! !
+
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:51'!
 name
 
 	^name 
 		ifNotNil: [ :myName |  myName ]
-		ifNil: [ 'unnamed ', self class asString ]
+		ifNil: [ self defaultName ]
 ! !
 
 !MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:49'!
@@ -239,6 +255,13 @@ name: aString
 	(aString isKindOf: String)
 		ifFalse: [ Error signal: 'Name must be a string ', aString printString ]
 		ifTrue: [ name := aString ]! !
+
+!MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:13'!
+rejectDropMorphEvent: evt
+	"Rejected drop of me.  Remove me from the hand."
+	
+	self removeMeFromTheHand
+! !
 
 !MorphMorph methodsFor: 'morph interactions' stamp: 'KenD 10/2/2013 17:31'!
 removeFromModifiersOf: aMorph
@@ -253,11 +276,26 @@ removeFromModifiersOf: aMorph
 		ifFalse: [ aMorph setProperty: #morphModifiers toValue: morphModifiers ]
 	! !
 
+!MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:13'!
+removeMeFromTheHand
+	"Rejected drop of me.  Remove me from the hand."
+	
+	self world activeHand removeMorph: self
+! !
+
 !MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/2/2013 17:18'!
 removedFrom: aMorph
 	"I have been removed from aMorph.  Do my cleanup action."
 	
 	self subclassResponsibility ! !
+
+!MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:10'!
+wantsToBeDroppedInto: aMorph
+	"Return true if it's okay to drop the receiver into aMorph. This check is symmetric to #wantsDroppedMorph:event: to give both parties a chance of figuring out whether they like each other."
+	"This message is sent to the dragged morph, not to the owner.
+	It is included here just for reference."
+
+	^ (aMorph isKindOf: FramedWidget) " or: [ aMorph isKindOf: PasteUpMorph ]"! !
 
 !MorphMorph class methodsFor: 'new-morph participation' stamp: 'KenD 10/12/2013 17:12'!
 includeInNewMorphMenu
@@ -265,10 +303,22 @@ includeInNewMorphMenu
 	
 	^ false! !
 
+!MorphMorph class methodsFor: 'morph modifiers' stamp: 'KenD 10/12/2013 16:34'!
+modifiersOf: aMorph
+	"Answer aMorph morphModifiers"
+	
+	^ aMorph valueOfProperty: #morphModifiers  ifAbsent: [ nil ]
+	! !
+
 !MorphAction methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:26'!
 balloonText
 
 	^ 'Action when Event'! !
+
+!MorphAction methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:29'!
+defaultName
+
+	^ 'MorphAction'! !
 
 !MorphAction methodsFor: 'dropping/grabbing' stamp: 'KenD 10/2/2013 16:57'!
 droppedOn: aMorph
@@ -404,12 +454,24 @@ balloonText
 
 	^ 'Modify Graphic Features'! !
 
+!MorphGraphic methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:31'!
+defaultName
+
+	^ 'GraphicModifier'.
+! !
+
+!MorphGraphic methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:16'!
+droppedOn: aMorph
+	"I have been dropped on aMorph.  Do my initialization action."
+
+	self notYetImplemented ! !
+
 !MorphGraphic methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:41'!
 icon
 
 	^ Theme content get: #( 'Theme' '16x16' 'apps' 'preferences-desktop-locale.png' )! !
 
-!MorphGraphic methodsFor: 'initialization' stamp: 'KenD 10/2/2013 16:27'!
+!MorphGraphic methodsFor: 'initialization' stamp: 'KenD 10/12/2013 17:31'!
 initialize
 
 	super initialize.
@@ -419,8 +481,14 @@ initialize
 	ink := #Copy.
 	shape := #Rectangle.
 	applyWhen := #MouseDown.
-	removeWhen := #MouseUp
+	removeWhen := #MouseUp.
 	! !
+
+!MorphGraphic methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:16'!
+removedFrom: aMorph
+	"I have been removed from aMorph.  Do my cleanup action."
+	
+	self notYetImplemented ! !
 
 !MorphTheColor methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:26'!
 balloonText
@@ -433,6 +501,11 @@ color
 	
 	^ myColor! !
 
+!MorphTheColor methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:52'!
+defaultName
+
+		^ 'Color', self color name asString capitalized.! !
+
 !MorphTheColor methodsFor: 'dropping/grabbing' stamp: 'KenD 10/2/2013 16:41'!
 droppedOn: aMorph
 	"I have been dropped on aMorph.  Change its color."
@@ -440,11 +513,12 @@ droppedOn: aMorph
 	
 	aMorph color: self color ! !
 
-!MorphTheColor methodsFor: 'initialization' stamp: 'KenD 10/12/2013 17:21'!
+!MorphTheColor methodsFor: 'initialization' stamp: 'KenD 10/12/2013 17:30'!
 forColor: aColor
 
 	myColor := aColor.
-	self image: (myColor icon magnifyTo: 32@32).! !
+	self image: (myColor icon magnifyTo: 32@32).
+! !
 
 !MorphTheColor methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:40'!
 icon
@@ -477,15 +551,27 @@ balloonText
 
 	^ balloonText ! !
 
-!MorphValueHolder methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 16:33'!
+!MorphValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:52'!
+defaultName
+
+	^ self valueHolder defaultName.
+! !
+
+!MorphValueHolder methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:14'!
 droppedOn: aMorph
 	"Add self as property to aMorph"
 	
 	| propSym |
 	propSym := self name asSymbol.
 	(aMorph hasProperty: propSym)
-		ifTrue: [ PopUpMenu inform: 'Morph already has a property named ', self name asString ]
-		ifFalse: [ aMorph setProperty: propSym toValue: self valueHolder ].
+		ifTrue: [ 
+			self removeMeFromTheHand.
+			PopUpMenu inform: 'Morph already has a property named ', self name asString.
+		]
+		ifFalse: [ 
+			aMorph setProperty: propSym toValue: self valueHolder.
+			self addToModifiersOf: aMorph. "So I show up in FrameMorphs"
+		].
 ! !
 
 !MorphValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:47'!
@@ -508,7 +594,7 @@ valueHolder
 
 	^ valueHolder ! !
 
-!MorphValueHolder methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:26'!
+!MorphValueHolder methodsFor: 'initialization' stamp: 'KenD 10/12/2013 17:32'!
 valueHolder: aValueHolder icon: aForm balloonText: aString
 
 	valueHolder := aValueHolder.

@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000061 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000299 pm'!
 'Description I display a pallet of images (of things) to drag'!
-!provides: 'Morphic-Display-Pallet' 1 13!
+!provides: 'Morphic-Display-Pallet' 1 14!
 !classDefinition: #ImagePallet category: #'Morphic-Display-Pallet'!
 PluggableScrollPane subclass: #ImagePallet
 	instanceVariableNames: 'nameImageCollection imageFilter'
@@ -77,11 +77,6 @@ collection: aNameImageCollection filter: imageSelector
 imageDictionary
 
 	^ imageDictionary ! !
-
-!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 9/13/2013 20:26'!
-initialize
-	"initialize the state of the receiver"
-	super initialize.! !
 
 !ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 9/14/2013 20:21'!
 layoutImages: numAcross extent: layoutExtent
