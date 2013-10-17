@@ -1,9 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000222 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000312 pm'!
 'Description MorphIt is a morphic construction kit/system.'!
-!provides: 'MorphIt' 1 37!
+!provides: 'MorphIt' 1 38!
 !requires: 'Graphics-Files-Additional' nil nil nil!
 !requires: 'Morphic-Display-Pallet' nil nil nil!
-!requires: 'Morphic-Widget-Weaver' nil nil nil!
 !requires: 'ValueHolder' 1 17 1!
 !classDefinition: #BorderedImageMorph category: #MorphIt!
 ImageMorph subclass: #BorderedImageMorph
@@ -93,6 +92,12 @@ Drop an instance of me to change a Morph's color.!
 
 !MorphValueHolder commentStamp: '<historical>' prior: 0!
 My instances represent ValueHolders!
+
+!Form methodsFor: '*morphit' stamp: 'KenD 10/12/2013 16:39'!
+icon32
+	"Answer a 32 x 32 icon of myself"
+	
+	^self magnifyTo: 32 @ 32! !
 
 !ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/12/2013 16:55'!
 morphIt
@@ -225,12 +230,14 @@ icon
 
 	self subclassResponsibility ! !
 
-!MorphMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:51'!
+!MorphMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:49'!
 initialize
 	"Set my defaults"
 
 	super initialize.
-	self image: (self icon magnifyTo: 32@32).
+	(self class includesSelector: #icon32)
+		ifTrue: [ self image: self icon32 ]
+	 	ifFalse: [ self image: (self icon magnifyTo: 32@32) ].
 
 ! !
 
@@ -574,8 +581,13 @@ droppedOn: aMorph
 		].
 ! !
 
-!MorphValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:47'!
+!MorphValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:41'!
 icon
+
+	^ icon magnifyTo: 16 @ 16! !
+
+!MorphValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:41'!
+icon32
 
 	^ icon! !
 
