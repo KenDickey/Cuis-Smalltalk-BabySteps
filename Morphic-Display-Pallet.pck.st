@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000299 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 17 October 2013 at 5:53:30.286000112 pm'!
 'Description I display a pallet of images (of things) to drag'!
-!provides: 'Morphic-Display-Pallet' 1 14!
+!provides: 'Morphic-Display-Pallet' 1 25!
 !classDefinition: #ImagePallet category: #'Morphic-Display-Pallet'!
 PluggableScrollPane subclass: #ImagePallet
 	instanceVariableNames: 'nameImageCollection imageFilter'
@@ -9,6 +9,26 @@ PluggableScrollPane subclass: #ImagePallet
 	category: 'Morphic-Display-Pallet'!
 !classDefinition: 'ImagePallet class' category: #'Morphic-Display-Pallet'!
 ImagePallet class
+	instanceVariableNames: ''!
+
+!classDefinition: #ColorPallet category: #'Morphic-Display-Pallet'!
+ImagePallet subclass: #ColorPallet
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Display-Pallet'!
+!classDefinition: 'ColorPallet class' category: #'Morphic-Display-Pallet'!
+ColorPallet class
+	instanceVariableNames: ''!
+
+!classDefinition: #MorphModifierPallet category: #'Morphic-Display-Pallet'!
+ImagePallet subclass: #MorphModifierPallet
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Display-Pallet'!
+!classDefinition: 'MorphModifierPallet class' category: #'Morphic-Display-Pallet'!
+MorphModifierPallet class
 	instanceVariableNames: ''!
 
 !classDefinition: #WidgetPallet category: #'Morphic-Display-Pallet'!
@@ -37,6 +57,12 @@ I Display a pallet of widgets to grab a copy of to drop on something else
 
 !
 
+!ColorPallet commentStamp: '<historical>' prior: 0!
+I am just a way of instantiating a Color Palette!
+
+!MorphModifierPallet commentStamp: '<historical>' prior: 0!
+I am just a way of instantiating a Morph Modifier Palette!
+
 !PalletLayoutMorph commentStamp: '<historical>' prior: 0!
 I am a LayoutMorph which allows grabbing (cloning) my submorphs.!
 
@@ -47,10 +73,10 @@ collection: aNameImageCollection
 	self collection: aNameImageCollection filter: [ :any | any ] 
 ! !
 
-!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 9/14/2013 16:33'!
+!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 10/17/2013 17:04'!
 collection: aNameImageCollection filter: imageSelector
 
-	| numImages imageExtent spaceWidth imageWidth maxWidth numAcross imageHeight numDown |
+	| numImages imageExtent spaceWidth imageWidth maxWidth numAcross imageHeight numDown layoutExtent |
 	nameImageCollection := aNameImageCollection.
 	imageFilter := imageSelector.
 	
@@ -58,18 +84,19 @@ collection: aNameImageCollection filter: imageSelector
 	numImages isZero ifTrue: [Error signal: 'I require a non-empty collection to display!!'].
 	numImages> 1000 ifTrue: [Error signal: 'Collection too large to display safely'].
 	"@@FIXME: assumes all images same size@@"
-	imageExtent := (self processImage: (aNameImageCollection anyOne value)) layoutBounds extent.
+	imageExtent := (self processImage: (aNameImageCollection anyOne value)) morphExtent.
 
-	spaceWidth := 5. "Pixels between images"
-	maxWidth := (DisplayScreen actualScreenSize x) // 2.
+	spaceWidth := 2. "Pixels between images"
+	maxWidth := (DisplayScreen actualScreenSize x) // 1.4.
 	imageWidth := (imageExtent x) + spaceWidth.
-	numAcross := ((maxWidth - spaceWidth) // imageWidth) max: 1.
-	numDown := numImages // numAcross + 1.
+	numAcross := (((maxWidth - spaceWidth) // imageWidth) max: 1) min: numImages.
+	numDown := (numImages / numAcross) ceiling.
 	imageHeight := (imageExtent y) + spaceWidth.
-
-	self layoutImages: numAcross 
-		 extent: (imageWidth * numAcross + spaceWidth) 
-				@ (imageHeight * numDown + spaceWidth).
+	layoutExtent := (imageWidth * numAcross + spaceWidth) 
+					@ (imageHeight * numDown + spaceWidth).
+	
+	self layoutImages: numAcross extent: layoutExtent.
+	self morphExtent:  (layoutExtent min: ((DisplayScreen actualScreenSize) // 1.4)).
 
 ! !
 
@@ -78,34 +105,65 @@ imageDictionary
 
 	^ imageDictionary ! !
 
-!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 9/14/2013 20:21'!
+!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 10/17/2013 16:31'!
 layoutImages: numAcross extent: layoutExtent
 
 	"Lay out images in self"
-	| column nextRow count |
+	| column nextRow count rowLayoutSpec numInLastRow |
 	count := -1.
-	column := LayoutMorph newColumn separation: 5.
+	rowLayoutSpec := LayoutSpec 
+							fixedWidth: layoutExtent x  
+							proportionalHeight: 1.0 
+							minorDirectionPadding: #left.
+							
+	column := LayoutMorph newColumn separation: 2.
 	self nameImageCollection do: [ :nameImageAssoc || name image imageMorph |
-		     name := nameImageAssoc key.
+		      name := nameImageAssoc key.
 			image := nameImageAssoc value.
 			count := count + 1.  "Row count"
 			(count \\ numAcross) isZero ifTrue: [ "Start a new Row"
-				nextRow := PalletLayoutMorph newRow separation: 5.
+				nextRow := PalletLayoutMorph newRow separation: 2.
+				nextRow layoutSpec: rowLayoutSpec.
 				column addMorph: nextRow.
 			].
 			imageMorph := self processImage: image.
 			imageMorph setBalloonText: name asString.
 			nextRow addMorph: imageMorph.
 	].
+	numInLastRow := (nextRow submorphs size).
+	(numInLastRow > 0)
+		ifTrue: [ | morphWidth | "Last row is short -- want Morphs together on left"
+			morphWidth := nextRow submorphs first morphExtent x.
+			nextRow layoutSpec: 
+					(LayoutSpec 
+							fixedWidth: ((morphWidth + 2) * numInLastRow + 2)
+							proportionalHeight: 1.0 
+							minorDirectionPadding: #left).
+		].
 	column addMorph: nextRow. "add last row"
+	column layoutSpec: (LayoutSpec
+							proportionalWidth: 1.0 
+							fixedHeight: layoutExtent y 
+							minorDirectionPadding: #top)..
 	column morphExtent: layoutExtent.
 	self addToScroller: column.
-	self morphExtent: layoutExtent. ! !
+
+
+! !
 
 !ImagePallet methodsFor: 'accessing' stamp: 'KenD 9/14/2013 16:33'!
 nameImageCollection
 
 	^ nameImageCollection ! !
+
+!ImagePallet methodsFor: 'open/close' stamp: 'KenD 10/17/2013 17:24'!
+openInWorld: aWorld
+	"This msg and its callees result in the window being activeOnlyOnTop"
+	aWorld addMorph: self.
+	self morphBoundsInWorld: self morphExtent. "Trust setup code"
+	aWorld startSteppingSubmorphsOf: self.
+	"Do it deferred. Was needed for text cursor to start blinking if (Preferences disable: #focusFollowsMouse) "
+	WorldState addDeferredUIMessage: [ self activate ]! !
 
 !ImagePallet methodsFor: 'private' stamp: 'KenD 9/13/2013 20:08'!
 processImage: anImage
@@ -129,12 +187,12 @@ includeInNewMorphMenu
 	"Return true for all classes that can be instantiated from the menu"
 	^ false! !
 
-!ImagePallet class methodsFor: 'examples' stamp: 'KenD 9/14/2013 20:21'!
+!ImagePallet class methodsFor: 'examples' stamp: 'KenD 10/17/2013 16:49'!
 largerIcons
 "
 	ImagePallet largerIcons.
 "
-	| ip sw iconsCollection savedExtent sortedCollection |
+	| ip sw iconsCollection savedExtent sortedCollection extraExtent |
 	iconsCollection := OrderedCollection new. 
 	{ 'actions'. 'apps'. 'categories'. 'devices'. 'emblems'. 'emotes'. 'mimetypes'. 'places'. 'smalltalk'. 'status'. } do: [ :category |
 		iconsCollection addAll: (Theme content get: {'Theme'. '16x16'. category}) array.
@@ -152,17 +210,20 @@ largerIcons
 	sw := SystemWindow new.
 	sw addMorph: ip.
 	sw setLabel: 'Pick an Icon'.
-	sw openInWorld.	
-	sw 	morphExtent: savedExtent + (30 @ 36).   "Layout algorithm resets extent"! !
+	sw openInWorld.
+	extraExtent := ScrollBar scrollbarThickness + 3
+					 @ (ScrollBar scrollbarThickness + 3 + sw labelRectangle height).
+	sw morphExtent: (savedExtent + extraExtent
+			min: ((DisplayScreen actualScreenSize) // 1.2)).  "openInWorld resets extent"! !
 
-!ImagePallet class methodsFor: 'examples' stamp: 'KenD 9/15/2013 16:21'!
+!ImagePallet class methodsFor: 'examples' stamp: 'KenD 10/17/2013 16:50'!
 namedColors
 "
 	self useCSS3ColorDict.                    "" To get CSS3/Web color names""
 	self useXKCDColorDict.                    "" To get XKCD color names""
 	ImagePallet namedColors.
 "
-	| ip sw sortedColors a b savedExtent |
+	| ip sw sortedColors a b savedExtent extraExtent |
 	sortedColors := SortedCollection sortBlock: 
 		 [ :aAssoc :bAssoc |
 			a := aAssoc value.
@@ -180,16 +241,18 @@ namedColors
 	sw addMorph: ip;
 		setLabel: 'Pick a Color'.
 	sw openInWorld. 
-	"Layout resets sw extent"
-	sw 	morphExtent: savedExtent + (30 @ 34).   "Layout algorithm resets extent"
-! !
+	"openInWorld resets extent"
+	extraExtent := ScrollBar scrollbarThickness + 4
+					 @ (ScrollBar scrollbarThickness + 4 + sw labelRectangle height).
+	sw morphExtent: (savedExtent + extraExtent
+			min: ((DisplayScreen actualScreenSize) // 1.2)).  "openInWorld resets extent"! !
 
-!ImagePallet class methodsFor: 'examples' stamp: 'KenD 9/14/2013 20:21'!
+!ImagePallet class methodsFor: 'examples' stamp: 'KenD 10/17/2013 16:50'!
 namedIcons
 "
 	ImagePallet namedIcons.
 "
-	| ip sw iconsCollection sortedCollection savedExtent |
+	| ip sw iconsCollection sortedCollection savedExtent extraExtent |
 	iconsCollection := OrderedCollection new. 
 	{ 'actions'. 'apps'. 'categories'. 'devices'. 'emblems'. 'emotes'.
 	  'mimetypes'. 'places'. 'smalltalk'. 'status'. } do: [ :category |
@@ -209,7 +272,9 @@ namedIcons
 	sw addMorph: ip.
 	sw setLabel: 'Pick an Icon'.
 	sw openInWorld.
-	sw 	morphExtent: savedExtent + (30 @ 36).   "Layout algorithm resets extent"! !
+	extraExtent := ScrollBar scrollbarThickness + 4
+					 @ (ScrollBar scrollbarThickness + 4 + sw labelRectangle height).
+	sw 	morphExtent: savedExtent + extraExtent.   "openInWorld algorithm resets extent"! !
 
 !ImagePallet class methodsFor: 'instance creation' stamp: 'KenD 9/13/2013 16:10'!
 new

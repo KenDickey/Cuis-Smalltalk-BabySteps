@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000298 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 12 October 2013 at 9:37:33.582000107 pm'!
 'Description Widget Composition Package'!
-!provides: 'Morphic-Widget-Weaver' 1 44!
+!provides: 'Morphic-Widget-Weaver' 1 50!
 !classDefinition: #AddedCursors category: #'Morphic-Widget-Weaver'!
 CursorWithMask subclass: #AddedCursors
 	instanceVariableNames: ''
@@ -9,16 +9,6 @@ CursorWithMask subclass: #AddedCursors
 	category: 'Morphic-Widget-Weaver'!
 !classDefinition: 'AddedCursors class' category: #'Morphic-Widget-Weaver'!
 AddedCursors class
-	instanceVariableNames: ''!
-
-!classDefinition: #ConstructionLens category: #'Morphic-Widget-Weaver'!
-Morph subclass: #ConstructionLens
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Morphic-Widget-Weaver'!
-!classDefinition: 'ConstructionLens class' category: #'Morphic-Widget-Weaver'!
-ConstructionLens class
 	instanceVariableNames: ''!
 
 !classDefinition: #LineMorph category: #'Morphic-Widget-Weaver'!
@@ -94,9 +84,6 @@ SignMorph class
 
 !AddedCursors commentStamp: '<historical>' prior: 0!
 Additional Cursors -- see class side!
-
-!ConstructionLens commentStamp: '<historical>' prior: 0!
-I am just a way to get a ViewLens!
 
 !LineMorph commentStamp: '<historical>' prior: 0!
 I am a line from startPoint to endPoint!
@@ -269,28 +256,6 @@ openHand
 "
 
 	^ OpenHand ! !
-
-!ConstructionLens class methodsFor: 'instance creation' stamp: 'KenD 10/12/2013 16:26'!
-new
-
-	|  window |
-	window _ ViewLens new.
-	^ window
-		model: nil;
-		buildMorphicWindow;
-		setLabel: 'Construction Lens';
-		color: Color transparent;
-		yourself! !
-
-!ConstructionLens class methodsFor: 'instance creation' stamp: 'KenD 10/12/2013 16:27'!
-open
-
-	|  window |
-	window _ ViewLens new.
-	^ window
-		color: Color transparent;
-		openInWorld;
-		yourself! !
 
 !LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 15:36'!
 basicExtent: aPoint
@@ -701,12 +666,35 @@ cycleBorderColor
 
 	^ self borderColor! !
 
-!FrameMorph methodsFor: 'accessing' stamp: 'KenD 9/17/2013 15:25'!
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:45'!
+defaultBorderColor
+	"answer the default border color/fill style for the receiver"
+	
+	^  self class colors first! !
+
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:41'!
+defaultBorderWidth
+	"answer the default border width for the receiver"
+	
+	^ 8! !
+
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 9/17/2013 15:25'!
 defaultColor
 
      ^ Color transparent! !
 
-!FrameMorph methodsFor: 'drawing' stamp: 'KenD 9/29/2013 13:04'!
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:59'!
+defaultExtent
+
+	^ 100 @ 60! !
+
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:41'!
+defaultFrameSelector
+	"answer the default frame selector for the receiver"
+	
+	^ #simple! !
+
+!FrameMorph methodsFor: 'drawing' stamp: 'KenD 10/12/2013 17:29'!
 drawOn: aCanvas
 	"A canvas is already set with a proper transformation from our coordinates to those of the Canvas target."
 
@@ -714,7 +702,7 @@ drawOn: aCanvas
 		frameRectangle: (0@0 extent: extent)
 		color: borderColor
 		borderWidth: borderWidth
-		borderStyleSymbol: self frameSelector
+		borderStyleSymbol: frameSelector
 ! !
 
 !FrameMorph methodsFor: 'accessing' stamp: 'KenD 9/15/2013 20:57'!
@@ -730,16 +718,17 @@ frameSelector: aSymbol
 	].
 	frameSelector := aSymbol! !
 
-!FrameMorph methodsFor: 'initialization' stamp: 'KenD 9/29/2013 15:44'!
+!FrameMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:58'!
 initialize
 
 	super initialize.
 
 	colorIndex := 1.
-	self borderColor: (self class colors at: colorIndex);
-		 frameSelector: #simple;
-		borderWidth: 8;
-		morphExtent: 100@160.! !
+	self borderColor:    self defaultBorderColor;
+		 frameSelector: self defaultFrameSelector;
+		 borderWidth:    self defaultBorderWidth;
+		 morphExtent:    self defaultExtent.
+! !
 
 !FrameMorph methodsFor: 'geometry testing' stamp: 'KenD 9/16/2013 15:03'!
 morphContainsPoint: aPoint
@@ -996,10 +985,10 @@ defaultColor
 
 	^ Color transparent! !
 
-!ViewLens methodsFor: 'initialization' stamp: 'KenD 10/2/2013 15:21'!
+!ViewLens methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:39'!
 defaultExtent
 
-	^ 640@700! !
+	^ 260@300! !
 
 !ViewLens methodsFor: 'initialization' stamp: 'KenD 10/2/2013 15:21'!
 initialize
@@ -1030,6 +1019,24 @@ selectedMorph
 viewPort
 
 	^ viewPort ! !
+
+!ViewLens class methodsFor: 'new-morph participation' stamp: 'KenD 10/12/2013 16:45'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ true! !
+
+!ViewLens class methodsFor: 'new-morph participation' stamp: 'KenD 10/12/2013 16:46'!
+initializedInstance
+
+	| window |
+	window _ self new.
+	^ window
+		model: nil;
+		buildMorphicWindow;
+		setLabel: 'Construction Lens';
+		color: Color transparent;
+		yourself! !
 
 !ViewPort methodsFor: 'event handling' stamp: 'KenD 10/12/2013 17:05'!
 click: evt localPosition: localEventPosition
