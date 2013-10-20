@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 17 October 2013 at 5:53:30.286000111 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 17 October 2013 at 5:53:30.286000163 pm'!
 'Description MorphIt is a morphic construction kit/system.'!
-!provides: 'MorphIt' 1 48!
+!provides: 'MorphIt' 1 50!
 !requires: 'Graphics-Files-Additional' nil nil nil!
 !requires: 'ValueHolder' 1 17 1!
 !requires: 'Morphic-Display-Pallet' nil nil nil!
@@ -100,77 +100,39 @@ icon32
 	
 	^self magnifyTo: 32 @ 32! !
 
-!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 16:57'!
-morphIt
+!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:10'!
+morphModifierPallet
 "
-	ImagePallet morphIt.
+	ImagePallet morphModifierPallet.
 "
-	|  sw ip morphMorphs savedExtent extraExtent |
-	morphMorphs := 
-		{ 'Action'->(MorphAction new).
-		  'Graphic Modifier'->(MorphGraphic new).
-		  'Color blue'->(MorphTheColor forColor: Color blue).
-		  'Color green'->(MorphTheColor forColor: Color green).
-		  'Color red'->(MorphTheColor forColor: Color red).
-		  'Color yellow'->(MorphTheColor forColor: Color yellow).
-		  'Color'->(MorphValueHolder holderOfColors).
-		  'Float'->(MorphValueHolder holderOfFloats).
-		  'Integer'->(MorphValueHolder holderOfIntegers).
-		  'Point'->(MorphValueHolder holderOfPoints).
-		  'Range'->(MorphValueHolder holderOfRange).
-		  'String'->(MorphValueHolder holderOfStrings).
-		}.
-	ip := ImagePallet fromCollection: morphMorphs.
-	savedExtent := ip morphExtent.
-	
-	sw := SystemWindow new.
-	sw  setLabel: 'Morph Modifiers';
-		addMorph: ip..
-	sw openInWorld. 
-	
-	"openInWorld resets sw extent"
-	extraExtent := ScrollBar scrollbarThickness + 4
-					 @ (ScrollBar scrollbarThickness + 4 + sw labelRectangle height).
-	sw morphExtent: (savedExtent + extraExtent
-			min: ((DisplayScreen actualScreenSize) // 1.1)).  "openInWorld resets extent"	! !
+	| pallet savedExtent |
+	pallet := MorphModifierPallet initializedInstance.
+	savedExtent := pallet morphExtent.
+	pallet openInWorld.
+	"openInWorld changes extent; change it back"
+	pallet morphExtent: savedExtent.! !
 
-!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 16:54'!
+!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:19'!
 namedColorsPalette
 "
 	self useCSS3ColorDict.                    "" To get CSS3/Web color names""
 	self useXKCDColorDict.                    "" To get XKCD color names""
 	ImagePallet namedColorsPalette.
 "
-	| ip sw sortedColors a b savedExtent extraExtent |
-	sortedColors := SortedCollection sortBlock: 
-		 [ :aAssoc :bAssoc |
-			a := aAssoc value.
-			b := bAssoc value.
-			(a hue < b hue) or: [(a hue = b hue) and: [a saturation < b saturation ]]
-		].
-	Color colorNamesDict associationsDo: [ :assoc | sortedColors add: assoc ].
-	
-	ip := ImagePallet 
-			fromCollection: sortedColors
-			imageFilter: [:color | MorphTheColor forColor: color].
-	savedExtent := ip morphExtent.
+	| pallet savedExtent |
+	pallet := MorphColorPallet initializedInstance.
+	savedExtent := pallet morphExtent.
+	pallet openInWorld.
+	"openInWorld changes extent; change it back"
+	pallet morphExtent: savedExtent.
+! !
 
-	sw := SystemWindow new.
-	sw addMorph: ip;
-		setLabel: 'Color Modifiers'.
-	sw openInWorld. 
-	"openInWorld resets sw extent"
-	extraExtent := ScrollBar scrollbarThickness + 14
-					 @ (ScrollBar scrollbarThickness + 4 + sw labelRectangle height).
-	sw morphExtent: (savedExtent + extraExtent
-			min: ((DisplayScreen actualScreenSize) // 1.1)).  "openInWorld resets extent"	! !
-
-!ColorPallet class methodsFor: '*morphit' stamp: 'KenD 10/12/2013 17:09'!
+!MorphColorPallet class methodsFor: '*morphit' stamp: 'KenD 10/12/2013 17:09'!
 includeInNewMorphMenu
 
 	^ true! !
 
-!ColorPallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:34'!
+!MorphColorPallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:13'!
 initializedInstance 
 
 	| colorPallet sortedColors a b imagePallet savedExtent extraExtent |
@@ -192,11 +154,11 @@ initializedInstance
 		setLabel: 'Color Modifiers';
 		addMorph: imagePallet.
 		
-	extraExtent := ScrollBar scrollbarThickness + 14
+	extraExtent := ScrollBar scrollbarThickness + 4
 					 @ (ScrollBar scrollbarThickness + 4 
 							+ colorPallet labelRectangle height).
-	colorPallet morphExtent: (savedExtent + extraExtent
-								min: ((DisplayScreen actualScreenSize) // 1.1)). 
+	colorPallet morphExtent: (savedExtent + extraExtent   "But don't be too big to display!!"
+								min: ((DisplayScreen actualScreenSize) // 1.1)).
 			
 	^ colorPallet! !
 
@@ -205,7 +167,7 @@ includeInNewMorphMenu
 
 	^ true! !
 
-!MorphModifierPallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:31'!
+!MorphModifierPallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:14'!
 initializedInstance
 
 	| morphMorphs imagePallet modifierPallet savedExtent extraExtent |
@@ -236,6 +198,7 @@ initializedInstance
 					 @ (ScrollBar scrollbarThickness + 4 
 							+ modifierPallet labelRectangle height).
 	modifierPallet morphExtent: (savedExtent + extraExtent
+			 "But don't be too big to display!!"
 			min: ((DisplayScreen actualScreenSize) // 1.1)). 
 		
 	^ modifierPallet 

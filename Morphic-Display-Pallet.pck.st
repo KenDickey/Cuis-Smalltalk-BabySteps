@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 17 October 2013 at 5:53:30.286000112 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 17 October 2013 at 5:53:30.286000166 pm'!
 'Description I display a pallet of images (of things) to drag'!
-!provides: 'Morphic-Display-Pallet' 1 25!
+!provides: 'Morphic-Display-Pallet' 1 28!
 !classDefinition: #ImagePallet category: #'Morphic-Display-Pallet'!
 PluggableScrollPane subclass: #ImagePallet
 	instanceVariableNames: 'nameImageCollection imageFilter'
@@ -11,14 +11,14 @@ PluggableScrollPane subclass: #ImagePallet
 ImagePallet class
 	instanceVariableNames: ''!
 
-!classDefinition: #ColorPallet category: #'Morphic-Display-Pallet'!
-ImagePallet subclass: #ColorPallet
+!classDefinition: #MorphColorPallet category: #'Morphic-Display-Pallet'!
+ImagePallet subclass: #MorphColorPallet
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Morphic-Display-Pallet'!
-!classDefinition: 'ColorPallet class' category: #'Morphic-Display-Pallet'!
-ColorPallet class
+!classDefinition: 'MorphColorPallet class' category: #'Morphic-Display-Pallet'!
+MorphColorPallet class
 	instanceVariableNames: ''!
 
 !classDefinition: #MorphModifierPallet category: #'Morphic-Display-Pallet'!
@@ -57,7 +57,7 @@ I Display a pallet of widgets to grab a copy of to drop on something else
 
 !
 
-!ColorPallet commentStamp: '<historical>' prior: 0!
+!MorphColorPallet commentStamp: '<historical>' prior: 0!
 I am just a way of instantiating a Color Palette!
 
 !MorphModifierPallet commentStamp: '<historical>' prior: 0!
@@ -73,7 +73,7 @@ collection: aNameImageCollection
 	self collection: aNameImageCollection filter: [ :any | any ] 
 ! !
 
-!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 10/17/2013 17:04'!
+!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 10/17/2013 16:48'!
 collection: aNameImageCollection filter: imageSelector
 
 	| numImages imageExtent spaceWidth imageWidth maxWidth numAcross imageHeight numDown layoutExtent |
@@ -87,7 +87,7 @@ collection: aNameImageCollection filter: imageSelector
 	imageExtent := (self processImage: (aNameImageCollection anyOne value)) morphExtent.
 
 	spaceWidth := 2. "Pixels between images"
-	maxWidth := (DisplayScreen actualScreenSize x) // 1.4.
+	maxWidth := (DisplayScreen actualScreenSize x) // 2.
 	imageWidth := (imageExtent x) + spaceWidth.
 	numAcross := (((maxWidth - spaceWidth) // imageWidth) max: 1) min: numImages.
 	numDown := (numImages / numAcross) ceiling.
@@ -96,7 +96,7 @@ collection: aNameImageCollection filter: imageSelector
 					@ (imageHeight * numDown + spaceWidth).
 	
 	self layoutImages: numAcross extent: layoutExtent.
-	self morphExtent:  (layoutExtent min: ((DisplayScreen actualScreenSize) // 1.4)).
+	self morphExtent:  (layoutExtent min: ((DisplayScreen actualScreenSize) // 2)).
 
 ! !
 
@@ -105,11 +105,11 @@ imageDictionary
 
 	^ imageDictionary ! !
 
-!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 10/17/2013 16:31'!
+!ImagePallet methodsFor: 'initialize-release' stamp: 'KenD 10/17/2013 16:36'!
 layoutImages: numAcross extent: layoutExtent
 
 	"Lay out images in self"
-	| column nextRow count rowLayoutSpec numInLastRow |
+	| column nextRow count rowLayoutSpec |
 	count := -1.
 	rowLayoutSpec := LayoutSpec 
 							fixedWidth: layoutExtent x  
@@ -130,16 +130,8 @@ layoutImages: numAcross extent: layoutExtent
 			imageMorph setBalloonText: name asString.
 			nextRow addMorph: imageMorph.
 	].
-	numInLastRow := (nextRow submorphs size).
-	(numInLastRow > 0)
-		ifTrue: [ | morphWidth | "Last row is short -- want Morphs together on left"
-			morphWidth := nextRow submorphs first morphExtent x.
-			nextRow layoutSpec: 
-					(LayoutSpec 
-							fixedWidth: ((morphWidth + 2) * numInLastRow + 2)
-							proportionalHeight: 1.0 
-							minorDirectionPadding: #left).
-		].
+	"Don't spread out morphs in the last row"
+	((nextRow submorphs size) > 0) ifTrue: [ nextRow shrinkWrap.].
 	column addMorph: nextRow. "add last row"
 	column layoutSpec: (LayoutSpec
 							proportionalWidth: 1.0 
@@ -155,15 +147,6 @@ layoutImages: numAcross extent: layoutExtent
 nameImageCollection
 
 	^ nameImageCollection ! !
-
-!ImagePallet methodsFor: 'open/close' stamp: 'KenD 10/17/2013 17:24'!
-openInWorld: aWorld
-	"This msg and its callees result in the window being activeOnlyOnTop"
-	aWorld addMorph: self.
-	self morphBoundsInWorld: self morphExtent. "Trust setup code"
-	aWorld startSteppingSubmorphsOf: self.
-	"Do it deferred. Was needed for text cursor to start blinking if (Preferences disable: #focusFollowsMouse) "
-	WorldState addDeferredUIMessage: [ self activate ]! !
 
 !ImagePallet methodsFor: 'private' stamp: 'KenD 9/13/2013 20:08'!
 processImage: anImage
@@ -372,6 +355,50 @@ allowsSubmorphDrag
 	"Answer whether our morphs can just be grabbed with the hand, instead of requiring the use of the halo. Redefined to answer true."
 
 	^ true! !
+
+!PalletLayoutMorph methodsFor: 'layout' stamp: 'KenD 10/17/2013 16:51'!
+shrinkWrap
+	"Resize self to minimally contain submorphs with specified separation"
+	
+	| width height sep |
+	((self direction) = #horizontal) "(a row)"
+		ifTrue:  [
+			sep := self xSeparation.
+			width := sep + 
+				(self submorphs 
+					inject: 0 
+					into: [ :subTotal :m |  subTotal + (m morphExtent x) + sep ]).
+			sep := 2 * self ySeparation.
+			height := 
+				(self submorphs 
+					inject: 10 
+					into: [ :maxHeight :m |  maxHeight max: (m morphExtent y) + sep ]).
+			self layoutSpec: 
+					(LayoutSpec 
+							fixedWidth: width
+							proportionalHeight: 1.0 
+							minorDirectionPadding: #left)
+		]
+		ifFalse: [ " vertical  (a column)"
+			sep := 2 * self xSeparation.
+			width := 
+				(self submorphs 
+					inject: 10 
+					into: [ :maxWidth :m |  maxWidth max: (m morphExtent x) + sep ]).
+			sep := self ySeparation.
+			height := sep + 
+				(self submorphs 
+					inject: 0 
+					into: [ :subTotal :m |  subTotal + (m morphExtent y) + sep ]).
+			self layoutSpec: 
+					(LayoutSpec 
+							proportionalWidth: 1.0 
+							fixedHeight: height
+							minorDirectionPadding: #top)
+		].
+
+	self morphExtent: width @ height.
+	self layoutSubmorphs.! !
 
 !PalletLayoutMorph class methodsFor: 'new-morph participation' stamp: 'KenD 9/15/2013 16:40'!
 includeInNewMorphMenu
