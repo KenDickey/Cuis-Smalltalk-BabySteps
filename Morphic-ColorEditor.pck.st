@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 25 November 2013 at 8:18:21.699818 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 27 November 2013 at 4:12:55.708474 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 20!
+!provides: 'Morphic-ColorEditor' 1 25!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
 	instanceVariableNames: 'color'
@@ -41,6 +41,16 @@ SystemWindow subclass: #ColorEditorWindow
 ColorEditorWindow class
 	instanceVariableNames: ''!
 
+!classDefinition: #ColorPaneMorph category: #'Morphic-ColorEditor'!
+ImageMorph subclass: #ColorPaneMorph
+	instanceVariableNames: 'zeroPlaneForm zIndex zValue colorPoint focusMorph'
+	classVariableNames: 'BlueIndex BrightnessIndex GreenIndex HueIndex RedIndex SaturationIndex'
+	poolDictionaries: ''
+	category: 'Morphic-ColorEditor'!
+!classDefinition: 'ColorPaneMorph class' category: #'Morphic-ColorEditor'!
+ColorPaneMorph class
+	instanceVariableNames: ''!
+
 !classDefinition: #RadioGroup category: #'Morphic-ColorEditor'!
 LayoutMorph subclass: #RadioGroup
 	instanceVariableNames: 'list font buttonOnLeft buttons'
@@ -73,6 +83,15 @@ I am a ScrollBar which can get new values from my model.!
 
 !ColorEditorWindow commentStamp: '<historical>' prior: 0!
 I present the ColorEditor UI!
+
+!ColorPaneMorph commentStamp: '<historical>' prior: 0!
+I present a plane in a color cube.
+
+The x and y selectors map to a 256 x 256 plane with a constant z.
+The z value is "mixed in" to give a (x,y,z) color plane. [ see #refreshForm]
+The selected color point (x,y) is visually noted by a focusMorph "ring".
+One may click on the pane to update the colorPoint.
+!
 
 !RadioGroup commentStamp: '<historical>' prior: 0!
 I manage a RadioGroup -- a Group of RadioButtons, each with a label.
@@ -460,6 +479,12 @@ ofSize: numPixels
 
 	^ self new ofSize: numPixels! !
 
+!PluggableScrollBar methodsFor: 'initialization' stamp: 'KenD 11/26/2013 21:12'!
+initialize
+
+	super initialize.
+	slider morphExtent: self buttonExtent @ self buttonExtent.! !
+
 !PluggableScrollBar methodsFor: 'accessing' stamp: 'KenD 11/25/2013 18:44'!
 model: thang setValueSelector: setValueSym refreshValueSelector: getValueSym
 
@@ -474,12 +499,36 @@ refreshValueFromModel
 	refreshValueSelector ifNotNil: [
 		self value:  (model perform: refreshValueSelector) ]! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/25/2013 19:11'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/27/2013 15:56'!
+buildColorPaneColumn
+
+	| colorPaneColumn selector |
+	selector := self defaultRadioSelector asLowercase asSymbol.
+	colorPane := (ColorPaneMorph 
+								zSelector: self defaultRadioSelector 
+								zValue:  (self model perform: selector)
+								colorPoint: 10@10).
+	colorPane updateColorFromModel: self model;
+		layoutSpec: (LayoutSpec fixedWidth: 256 
+										fixedHeight: 256 
+										minorDirectionPadding: #center).
+	colorPane when: #colorChanged send: #updateColorFromPane to: self.
+	colorPaneColumn := LayoutMorph newColumn.
+	colorPaneColumn 
+		addMorph: colorPane
+		layoutSpec: (LayoutSpec 
+							fixedWidth: 276 
+							proportionalHeight: 1 
+							minorDirectionPadding: #center).
+	
+	^ colorPaneColumn ! !
+
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/26/2013 20:58'!
 buildMorphicWindow
 	"Create a useful ColorEditor window"
 	
 	self layoutMorph beRow. " A row of columns"
-"	self addMorph: self buildColorPaneColumn. "
+	self addMorph: self buildColorPaneColumn. 
 	self addMorph: self buildSliderColumn. 
 	self addMorph: self buildRadioButtonColumn.
 		
@@ -544,7 +593,7 @@ buildRadioButtonColumn
 		yourself
 	! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/25/2013 19:32'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/27/2013 15:12'!
 buildSliderColumn
 
 	sliderColumn := LayoutMorph newColumn.
@@ -554,10 +603,10 @@ buildSliderColumn
 
 	! !
 
-!ColorEditorWindow methodsFor: 'private' stamp: 'KenD 11/19/2013 21:15'!
-colorSpace
+!ColorEditorWindow methodsFor: 'private' stamp: 'KenD 11/26/2013 21:27'!
+colorPane
 
-	^ colorSpace! !
+	^ colorPane ! !
 
 !ColorEditorWindow methodsFor: 'private' stamp: 'KenD 11/19/2013 21:15'!
 colorSwatch
@@ -590,7 +639,7 @@ initialize
 
 	! !
 
-!ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 11/25/2013 19:47'!
+!ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 15:00'!
 newRadioSelection: selectionSymbol
 
 	"Only one radio group can be selected at a time"
@@ -599,30 +648,43 @@ newRadioSelection: selectionSymbol
 	( #(Hue Saturation Brightness) includes: selectionSymbol ) 
 		ifTrue: [ self rgbRadio unselectAll ].
 		
-	self resetSliderColumn: selectionSymbol 
+	self resetSliderColumn: selectionSymbol.
+	self colorPane fromModel: self model selector: selectionSymbol.
+	self colorPane resetFocus.
+
+	
 	! !
 
-!ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 11/24/2013 08:46'!
+!ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 11/26/2013 21:28'!
 refreshColor
 	"model color has changed.  Refresh my views."
 	
 	self 
 		refreshColorSwatch;
-		refreshRGBString! !
+		refreshRGBString;
+		refreshColorPane! !
 
-!ColorEditorWindow methodsFor: 'private' stamp: 'KenD 11/23/2013 16:03'!
+!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/27/2013 14:43'!
+refreshColorPane
+	"When selector changes.."
+
+	self colorPane updateColorFromModel: self model.! !
+
+!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/27/2013 14:43'!
 refreshColorSwatch
-
+	"When color changes"
+	
 	colorSwatch image: (model color iconOrThumbnailOfSize: self colorSwatchExtent)! !
 
-!ColorEditorWindow methodsFor: 'private' stamp: 'KenD 11/24/2013 08:51'!
+!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/24/2013 08:51'!
 refreshRGBString
 	"Reset my rgbString from current model color"
 
 	self rgbString contents: '16r' , self model hexStringRGB! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/25/2013 20:17'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/27/2013 15:20'!
 resetSliderColumn: sliderSym
+	"Radio selector changed.."
 
 	| scrollBar labelString |
 	"#(Red Green Blue Hue Saturation Brightness) inclides: sliderSym"
@@ -645,7 +707,8 @@ resetSliderColumn: sliderSym
 	scrollBar refreshValueFromModel.
 
 	labelString := sliderSym asString.
-	self sliderColumn 
+	
+	^self sliderColumn 
 		removeAllMorphs;
 		separation: 6;
 		layoutSpec: (LayoutSpec 
@@ -685,6 +748,12 @@ sliderColumn
 
 	^ sliderColumn! !
 
+!ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 16:02'!
+updateColorFromPane
+	"Someone changed color in colorPane.  Update my model"
+	
+	self model setColor: self colorPane focusColor! !
+
 !ColorEditorWindow class methodsFor: 'initialization' stamp: 'KenD 11/24/2013 16:47'!
 defaultColor
 
@@ -718,6 +787,280 @@ openColor: aColor
 		openInWorld: self runningWorld extent: self defaultExtent;
 		yourself
 ! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 15:48'!
+colorPoint
+
+	^ colorPoint ! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 16:01'!
+colorPoint: aPoint
+
+	colorPoint := aPoint! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 14:58'!
+colorSelector
+
+	^ #(red green blue hue saturation brightness) at: self zIndex ! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 16:11'!
+focusColor
+	"Answer my focus color"
+	
+	^ ({
+		[ :x :y :z | Color r: z/256 g: x/256 b: y/256 ] . "Red"
+		[ :x :y :z | Color r: x/256 g: z/256 b: y/256 ] . "Green"
+		[ :x :y :z | Color r: x/256 g: y/256 b: z/256 ] . "Blue"
+		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Hue"
+		[ :x :y :z | Color h: x/256*360 s: z/256 v: y/256 ]. "Saturation"
+		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Brightness"
+	} at: zIndex) value: colorPoint x value: colorPoint y value: zValue 
+
+! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/26/2013 18:20'!
+focusMorph
+
+	^ focusMorph! !
+
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/26/2013 17:04'!
+focusMorphDiameter
+	
+	^ 10! !
+
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/27/2013 14:45'!
+fromModel: model selector: aSelector
+
+	zIndex := self zIndexFromSelector: aSelector.
+	self 
+		updateColorFromModel: model;
+		makeBaseForm;
+		refreshForm 
+! !
+
+!ColorPaneMorph methodsFor: 'events' stamp: 'KenD 11/27/2013 15:29'!
+handlesMouseDown: aMouseButtonEvent
+	"Do I want to receive mouseDown events (mouseDown:, mouseMove:, mouseUp:)?"
+
+	^true! !
+
+!ColorPaneMorph methodsFor: 'events' stamp: 'KenD 11/27/2013 15:57'!
+handlesMouseOver: evt
+	"Do I want to receive mouseEnter: and mouseLeave: when the button is up and the hand is empty?" 
+	
+	^true! !
+
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/26/2013 18:43'!
+initialize
+
+	super initialize.
+	self image: (Form extent: 256@256 depth: 32).
+	self makeFocusMorph.! !
+
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/27/2013 09:44'!
+makeBaseForm
+	"answer a base form for color plane with (x,y,0)"
+
+	| colorConstructors colorMaker |
+	zeroPlaneForm := Form extent: 256@256 depth:  32.
+	colorConstructors := {
+		[ :x :y :z | Color r: z g: x/256 b: y/256 ] . "Red"
+		[ :x :y :z | Color r: x/256 g: z b: y/256 ] . "Green"
+		[ :x :y :z | Color r: x/256 g: y/256 b: z ] . "Blue"
+		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Hue"
+		[ :x :y :z | Color h: x/256*360 s: z v: y/256 ]. "Saturation"
+		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Brightness"
+	}.
+	colorMaker := colorConstructors at: self zIndex.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			zeroPlaneForm colorAt: x @ y put: (colorMaker value: x value: y value: 0)
+		]
+	].
+
+
+	"@@FIXME@@"
+	! !
+
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/26/2013 18:43'!
+makeFocusMorph
+
+	focusMorph := EllipseMorph new. 
+	focusMorph 
+		morphExtent: self focusMorphDiameter @ self focusMorphDiameter;
+		color: Color transparent;
+		borderWidth: 2;
+		borderColor: Color orange;
+		morphPosition: 0@0.
+		
+	self addMorph: self focusMorph.! !
+
+!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 15:48'!
+mouseButton1Up: aMouseButtonEvent localPosition: localEventPosition
+
+	(self morphContainsPoint: localEventPosition)
+		ifTrue: [ 
+				self colorPoint: localEventPosition.
+				self triggerEvent: #colorChanged
+		]
+! !
+
+!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 15:57'!
+mouseEnter: event
+
+	Cursor currentCursor: Cursor crossHair ! !
+
+!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 15:59'!
+mouseLeave: event
+
+	Cursor currentCursor: Cursor normal! !
+
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/27/2013 09:27'!
+refreshForm
+	"Create color pane from x,y base blending in z"
+
+	| plane colorMaker |
+	colorMaker := {
+		[ Color r: self zValue / 256 g: 0 b: 0 ]. "Red"
+		[ Color r: 0 g: self zValue / 256 b: 0 ]. "Green"
+		[ Color r: 0 g: 0 b: self zValue / 256 ]. "Blue"
+		[ Color h: self zValue s: 0 v: 0 ]. "Hue -- Nota Bene: 0..360.0 NOT 0..1.0"
+		[ Color h: 0 s: self zValue / 100 v: 0 ]. "Saturation"
+		[ Color h: 0 s: 0 v: self zValue / 100 ]. "Brightness"
+	}.
+	self image: (self zeroPlaneForm copy). "(x,y,0)"
+	plane := ((colorMaker at: self zIndex) value) 
+				iconOrThumbnailOfSize: 256@256. "(0,0,z)"
+	self form copy: (0@0 corner: 256@256) from: plane to: 0@0 rule: 20 "rgbAdd"
+! !
+
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/27/2013 14:54'!
+resetFocus
+
+	self focusMorph morphPosition: (colorPoint - (self focusMorphDiameter / 2))
+	! !
+
+!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 14:56'!
+updateColorFromModel: model
+	"No selector change, but color changed"
+	
+	|  updateFuns |
+	updateFuns := {
+		[ zValue := model red. colorPoint := model green @ model blue ].
+		[ zValue := model green. colorPoint := model red @ model blue ].
+		[ zValue := model blue. colorPoint := model red @ model green ].
+		[ zValue := model hue. colorPoint := model saturation @ model brightness ].
+		[ zValue := model saturation. colorPoint := model hue @ model brightness ].
+		[ zValue := model brightness. colorPoint := model hue @ model saturation ].
+	}.
+	(updateFuns at: self zIndex) value.
+	self refreshForm.
+	self resetFocus.
+! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/26/2013 18:27'!
+zIndex
+
+	^ zIndex
+! !
+
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/26/2013 21:35'!
+zIndex: oneTo6 zValue: anInteger colorPoint: aPoint
+
+	zIndex := oneTo6.
+	zValue := anInteger.
+	colorPoint := aPoint.
+	self focusMorph morphPosition: (aPoint - (self focusMorphDiameter / 2)).
+	self makeBaseForm.
+	self refreshForm.
+! !
+
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/27/2013 09:21'!
+zIndexFromSelector: aSelector
+
+	^ #(red green blue hue saturation brightness) 
+			indexOf: aSelector asLowercase asSymbol
+			ifAbsent: [ self error: 'Invalid selector' , aSelector asString ]! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/26/2013 13:29'!
+zValue
+
+	^ zValue ! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/26/2013 13:31'!
+zValue: zeroTo255
+
+	zValue := zeroTo255.  "Does NOT change colorPoint"
+! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/26/2013 17:48'!
+zeroPlaneForm
+
+	^ zeroPlaneForm! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:33'!
+blueIndex
+
+	^ BlueIndex ! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:34'!
+brightnessIndex
+
+	^ BrightnessIndex ! !
+
+!ColorPaneMorph class methodsFor: 'examples' stamp: 'KenD 11/26/2013 18:22'!
+greenExample
+	"RGB with Color Teal: r=2,g=147,b=134"
+	"123"
+"
+	self greenExample.
+"
+	(self 
+		zSelector: #Green
+		zValue: 147 
+		colorPoint: 2@134) openInWorld! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:33'!
+greenIndex
+
+	^ GreenIndex ! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:33'!
+hueIndex
+
+	^ HueIndex ! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/26/2013 18:04'!
+initialize
+	"self initialize"
+	
+	"See usage in ColorPaneMorph>>makeBaseForm"
+	RedIndex := 1. 
+	GreenIndex := 2.
+	BlueIndex := 3.
+	HueIndex := 4.
+	SaturationIndex := 5.
+	BrightnessIndex := 6.! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:33'!
+redIndex
+
+	^ RedIndex ! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:34'!
+saturationIndex
+
+	^ SaturationIndex ! !
+
+!ColorPaneMorph class methodsFor: 'instance creation' stamp: 'KenD 11/26/2013 18:14'!
+zSelector: aSymbol zValue: anInteger colorPoint: aPoint
+
+	^ self new 
+			zIndex: (#(Red Green Blue Hue Saturation Brightness) 
+						 indexOf: aSymbol
+						 ifAbsent: [ self error: 'Invalid selector' , aSymbol asString ])
+			zValue: anInteger 
+			colorPoint: aPoint! !
 
 !RadioGroup methodsFor: 'accessing' stamp: 'KenD 11/24/2013 16:55'!
 buttonFor: aSymbol
@@ -1115,3 +1458,4 @@ rgbOneOf
 			]
 			toString: [ :n | n printString ]! !
 RadioButtonMorph initialize!
+ColorPaneMorph initialize!
