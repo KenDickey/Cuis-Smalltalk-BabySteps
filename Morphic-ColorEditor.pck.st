@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 27 November 2013 at 4:12:55.708474 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 29 November 2013 at 6:23:40.695586001 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 25!
+!provides: 'Morphic-ColorEditor' 1 30!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
 	instanceVariableNames: 'color'
@@ -44,7 +44,7 @@ ColorEditorWindow class
 !classDefinition: #ColorPaneMorph category: #'Morphic-ColorEditor'!
 ImageMorph subclass: #ColorPaneMorph
 	instanceVariableNames: 'zeroPlaneForm zIndex zValue colorPoint focusMorph'
-	classVariableNames: 'BlueIndex BrightnessIndex GreenIndex HueIndex RedIndex SaturationIndex'
+	classVariableNames: 'BlueIndex BrightnessForm BrightnessIndex BrightnessOverlay GBForm GreenIndex HueIndex HueOverlay RBForm RGForm RedIndex SaturationForm SaturationIndex SaturationOverlay'
 	poolDictionaries: ''
 	category: 'Morphic-ColorEditor'!
 !classDefinition: 'ColorPaneMorph class' category: #'Morphic-ColorEditor'!
@@ -254,16 +254,17 @@ greenFactor
 
 	^ self color green! !
 
-!ColorEditorModel methodsFor: 'accessing' stamp: 'KenD 11/24/2013 19:22'!
-greenFactor:   zeroToOne
+!ColorEditorModel methodsFor: 'accessing' stamp: 'KenD 11/27/2013 20:09'!
+greenFactor: zeroToOne
 
 	self setColor: (Color 
 		r: self color red
 		g: (zeroToOne * 255 / 255) asFloat 
 		b: self color blue)! !
 
-!ColorEditorModel methodsFor: 'printing' stamp: 'KenD 11/24/2013 08:39'!
+!ColorEditorModel methodsFor: 'printing' stamp: 'KenD 11/27/2013 20:13'!
 hexStringRGB
+	"Answer mu RGB as hex but with no 16r prefix"
 
 	^ (self red    printPaddedWith: $0 to: 2 base: 16) , 
 	  (self green printPaddedWith: $0 to: 2 base: 16) , 
@@ -803,7 +804,7 @@ colorSelector
 
 	^ #(red green blue hue saturation brightness) at: self zIndex ! !
 
-!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 16:11'!
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 21:10'!
 focusColor
 	"Answer my focus color"
 	
@@ -812,8 +813,8 @@ focusColor
 		[ :x :y :z | Color r: x/256 g: z/256 b: y/256 ] . "Green"
 		[ :x :y :z | Color r: x/256 g: y/256 b: z/256 ] . "Blue"
 		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Hue"
-		[ :x :y :z | Color h: x/256*360 s: z/256 v: y/256 ]. "Saturation"
-		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Brightness"
+		[ :x :y :z | Color h: x/256*360 s: z/100 v: y/256 ]. "Saturation"
+		[ :x :y :z | Color h: x/256*360 s: y/256 v: z/100 ]. "Brightness"
 	} at: zIndex) value: colorPoint x value: colorPoint y value: zValue 
 
 ! !
@@ -828,15 +829,37 @@ focusMorphDiameter
 	
 	^ 10! !
 
-!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/27/2013 14:45'!
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/29/2013 14:35'!
 fromModel: model selector: aSelector
 
 	zIndex := self zIndexFromSelector: aSelector.
-	self 
-		updateColorFromModel: model;
-		makeBaseForm;
-		refreshForm 
+	self updateColorFromModel: model
 ! !
+
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/28/2013 14:51'!
+hackHSVform
+	"answer a base form for color plane with (x,y,0)"
+
+	| colorConstructors colorMaker displayForm |
+	displayForm := Form extent: 256@256 depth:  32.
+	colorConstructors := {
+		[ :x :y :z | ^self  ] . "Red"
+		[ :x :y :z | ^self ] . "Green"
+		[ :x :y :z | ^self ] . "Blue"
+		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Hue"
+		[ :x :y :z | Color h: x/256*360 s: z/256 v: y/256 ]. "Saturation"
+		[ :x :y :z | Color h: x/256*360 s: x/256 v: z/256]. "Brightness"
+	}.
+	colorMaker := colorConstructors at: self zIndex.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			displayForm colorAt: x @ y put: (colorMaker value: x value: y value: self zValue)
+		]
+	].
+
+	self image: displayForm
+	"@@FIXME@@"
+	! !
 
 !ColorPaneMorph methodsFor: 'events' stamp: 'KenD 11/27/2013 15:29'!
 handlesMouseDown: aMouseButtonEvent
@@ -857,31 +880,6 @@ initialize
 	self image: (Form extent: 256@256 depth: 32).
 	self makeFocusMorph.! !
 
-!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/27/2013 09:44'!
-makeBaseForm
-	"answer a base form for color plane with (x,y,0)"
-
-	| colorConstructors colorMaker |
-	zeroPlaneForm := Form extent: 256@256 depth:  32.
-	colorConstructors := {
-		[ :x :y :z | Color r: z g: x/256 b: y/256 ] . "Red"
-		[ :x :y :z | Color r: x/256 g: z b: y/256 ] . "Green"
-		[ :x :y :z | Color r: x/256 g: y/256 b: z ] . "Blue"
-		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Hue"
-		[ :x :y :z | Color h: x/256*360 s: z v: y/256 ]. "Saturation"
-		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Brightness"
-	}.
-	colorMaker := colorConstructors at: self zIndex.
-	1 to: 256 do: [ :x |
-		1 to: 256 do:  [ :y | 
-			zeroPlaneForm colorAt: x @ y put: (colorMaker value: x value: y value: 0)
-		]
-	].
-
-
-	"@@FIXME@@"
-	! !
-
 !ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/26/2013 18:43'!
 makeFocusMorph
 
@@ -895,13 +893,15 @@ makeFocusMorph
 		
 	self addMorph: self focusMorph.! !
 
-!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 15:48'!
+!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/29/2013 00:12'!
 mouseButton1Up: aMouseButtonEvent localPosition: localEventPosition
 
 	(self morphContainsPoint: localEventPosition)
 		ifTrue: [ 
-				self colorPoint: localEventPosition.
-				self triggerEvent: #colorChanged
+				self 
+					colorPoint: localEventPosition;
+					resetFocus;
+					triggerEvent: #colorChanged
 		]
 ! !
 
@@ -915,24 +915,87 @@ mouseLeave: event
 
 	Cursor currentCursor: Cursor normal! !
 
-!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/27/2013 09:27'!
-refreshForm
-	"Create color pane from x,y base blending in z"
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/28/2013 22:32'!
+pureColorForm
+	"Create form from current color"
 
-	| plane colorMaker |
+	^ self focusColor iconOrThumbnailOfSize: 256@256
+
+! !
+
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/28/2013 23:20'!
+rORgORbForm
+	"Answer a pureColorForm of my z component -- which must be Red, Green, or Blue"
+
+	|  colorMaker |
 	colorMaker := {
 		[ Color r: self zValue / 256 g: 0 b: 0 ]. "Red"
 		[ Color r: 0 g: self zValue / 256 b: 0 ]. "Green"
 		[ Color r: 0 g: 0 b: self zValue / 256 ]. "Blue"
-		[ Color h: self zValue s: 0 v: 0 ]. "Hue -- Nota Bene: 0..360.0 NOT 0..1.0"
-		[ Color h: 0 s: self zValue / 100 v: 0 ]. "Saturation"
-		[ Color h: 0 s: 0 v: self zValue / 100 ]. "Brightness"
+		[ nil ]. "Hue"
+		[ nil ]. "Saturation"
+		[ nil ]. "Brightness"
 	}.
-	self image: (self zeroPlaneForm copy). "(x,y,0)"
-	plane := ((colorMaker at: self zIndex) value) 
-				iconOrThumbnailOfSize: 256@256. "(0,0,z)"
-	self form copy: (0@0 corner: 256@256) from: plane to: 0@0 rule: 20 "rgbAdd"
+
+	^ (colorMaker at: self zIndex) value iconOrThumbnailOfSize: 256@256
+	
 ! !
+
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/29/2013 14:47'!
+refreshForm
+	"Create color pane from x,y base blending in z"
+
+	| formMaker |
+	formMaker := {
+		[  "Red"
+				self image: (self class gbForm copy). "(x,y,0)"
+				self form 
+					copy: (0@0 corner: 256@256) 
+					from: self rORgORbForm "(0,0,z)"
+					to: 0@0 
+					rule: 20. "rgbAdd (x,y,0) to (0,0,z)"
+		].
+		[  "Green"
+				self image: (self class rbForm copy). "(x,y,0)"
+				self form 
+					copy: (0@0 corner: 256@256) 
+					from: self rORgORbForm "(0,0,z)"
+					to: 0@0 
+					rule: 20. "rgbAdd (x,y,0) to (0,0,z)"
+		]. 
+		[  "Blue"
+				self image: (self class rgForm copy). "(x,y,0)"
+				self form 
+					copy: (0@0 corner: 256@256) 
+					from: self rORgORbForm "(0,0,z)"
+					to: 0@0 
+					rule: 20. "rgbAdd (x,y,0) to (0,0,z)"
+		]. 
+		[  "Hue"
+			self image: ((Color h: zValue s:1 v: 1) iconOrThumbnailOfSize: 256@256). 
+			self form 
+				copy: (0@0 corner: 256@256) 
+				from: self class hueOverlay copy
+				to: 0@0 
+				rule: Form blend.		
+		].
+		[  "Saturation"
+			self image: self class saturationForm copy.
+			self form 
+				copyBits: self class saturationOverlay 
+				at: 0@0 
+				translucent: (100 - zValue  / 100) asFloat
+		].
+		[  "Brightness"
+			self image: self class brightnessForm copy.
+			self form 
+				copyBits:  (Color black iconOrThumbnailOfSize: 256@256)
+				at: 0@0 
+				translucent: (100 - zValue / 100) asFloat
+		].
+	}.
+	(formMaker at: zIndex) value
+	! !
 
 !ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/27/2013 14:54'!
 resetFocus
@@ -940,7 +1003,7 @@ resetFocus
 	self focusMorph morphPosition: (colorPoint - (self focusMorphDiameter / 2))
 	! !
 
-!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 14:56'!
+!ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/29/2013 00:08'!
 updateColorFromModel: model
 	"No selector change, but color changed"
 	
@@ -949,10 +1012,17 @@ updateColorFromModel: model
 		[ zValue := model red. colorPoint := model green @ model blue ].
 		[ zValue := model green. colorPoint := model red @ model blue ].
 		[ zValue := model blue. colorPoint := model red @ model green ].
-		[ zValue := model hue. colorPoint := model saturation @ model brightness ].
-		[ zValue := model saturation. colorPoint := model hue @ model brightness ].
-		[ zValue := model brightness. colorPoint := model hue @ model saturation ].
+		[ zValue := model hue.
+			colorPoint := (255* (model saturationFactor)) rounded 
+				@ (255* (model brightnessFactor)) rounded ].
+		[ zValue := model saturation. 
+			colorPoint := (255* (model hueFactor)) rounded
+				@ (255* (model brightnessFactor)) rounded ].
+		[ zValue := model brightness. 
+			colorPoint := (255* (model hueFactor)) rounded 
+				@ (255* (model saturationFactor)) rounded ].
 	}.
+
 	(updateFuns at: self zIndex) value.
 	self refreshForm.
 	self resetFocus.
@@ -964,14 +1034,13 @@ zIndex
 	^ zIndex
 ! !
 
-!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/26/2013 21:35'!
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/29/2013 00:03'!
 zIndex: oneTo6 zValue: anInteger colorPoint: aPoint
 
 	zIndex := oneTo6.
 	zValue := anInteger.
 	colorPoint := aPoint.
 	self focusMorph morphPosition: (aPoint - (self focusMorphDiameter / 2)).
-	self makeBaseForm.
 	self refreshForm.
 ! !
 
@@ -987,8 +1056,8 @@ zValue
 
 	^ zValue ! !
 
-!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/26/2013 13:31'!
-zValue: zeroTo255
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 21:12'!
+zValue: zeroTo255 "or ..100 or ..360"
 
 	zValue := zeroTo255.  "Does NOT change colorPoint"
 ! !
@@ -1003,10 +1072,25 @@ blueIndex
 
 	^ BlueIndex ! !
 
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 23:12'!
+brightnessForm
+
+	^ BrightnessForm! !
+
 !ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:34'!
 brightnessIndex
 
 	^ BrightnessIndex ! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 23:13'!
+brightnessOverlay
+
+	^ BrightnessOverlay ! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 22:59'!
+gbForm
+
+	^ GBForm! !
 
 !ColorPaneMorph class methodsFor: 'examples' stamp: 'KenD 11/26/2013 18:22'!
 greenExample
@@ -1030,9 +1114,16 @@ hueIndex
 
 	^ HueIndex ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/26/2013 18:04'!
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 23:11'!
+hueOverlay
+
+	^ HueOverlay! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 15:18'!
 initialize
-	"self initialize"
+"	
+	self initialize.
+"
 	
 	"See usage in ColorPaneMorph>>makeBaseForm"
 	RedIndex := 1. 
@@ -1040,17 +1131,148 @@ initialize
 	BlueIndex := 3.
 	HueIndex := 4.
 	SaturationIndex := 5.
-	BrightnessIndex := 6.! !
+	BrightnessIndex := 6.
+	
+	SaturationForm := self makeSaturationForm.
+	SaturationOverlay := self makeSaturationOverlay.
+	BrightnessForm := self makeBrightnessForm.
+	RBForm := self makeRBForm.
+	RGForm := self makeRGForm.
+	GBForm := self makeGBForm.
+	HueOverlay := self makeHueOverlay.
+	! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 14:54'!
+makeBrightnessForm
+
+	| hueFactor briteForm |
+	hueFactor := 256 / 360.
+	briteForm := Form extent: 256@256 depth:  32.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			briteForm colorAt: x @ y put: (Color h: (x / hueFactor) s: (y / 256) v: 1.0)
+		]
+	].
+
+	^ briteForm
+! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:35'!
+makeGBForm
+
+	| rbForm |
+	rbForm := Form extent: 256@256 depth:  32.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			rbForm colorAt: x @ y put: (Color r: 0 g: x/256 b: y/256)
+		]
+	].
+
+	^ rbForm
+! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 18:12'!
+makeHueOverlay
+
+	| hueForm radius |
+	hueForm := Form extent: 256@256 depth:  32.
+	radius := [ :x :y | ((256-x/256) squared) + ((256-y/200) squared) sqrt ].
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			 hueForm colorAt: x @ y 
+						put: ((Color h: 0 s: 0 v: y/256) alpha: ((radius value: x value: y) min: 1))
+		]
+	].
+
+	^ hueForm
+! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:35'!
+makeRBForm
+
+	| rbForm |
+	rbForm := Form extent: 256@256 depth:  32.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			rbForm colorAt: x @ y put: (Color r: x/256 g: 0 b: y/256)
+		]
+	].
+
+	^ rbForm
+! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:36'!
+makeRGForm
+
+	| rbForm |
+	rbForm := Form extent: 256@256 depth:  32.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			rbForm colorAt: x @ y put: (Color r: x/256 g: y/256 b: 0)
+		]
+	].
+
+	^ rbForm
+! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 14:50'!
+makeSaturationForm
+
+	| hueFactor satForm |
+	hueFactor := 256 / 360.
+	satForm := Form extent: 256@256 depth:  32.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			satForm colorAt: x @ y put: (Color h: (x / hueFactor) s: 1.0 v: (y / 256))
+		]
+	].
+
+	^ satForm
+! !
+
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:15'!
+makeSaturationOverlay
+
+	| satOverlay |
+	satOverlay := Form extent: 256@256 depth:  32.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y | 
+			satOverlay colorAt: x @ y put: (Color h: 0 s: 0 v: (y / 256))
+		]
+	].
+
+	^ satOverlay
+! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 22:59'!
+rbForm
+
+	^ RBForm! !
 
 !ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:33'!
 redIndex
 
 	^ RedIndex ! !
 
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 22:59'!
+rgForm
+
+	^ RGForm! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 23:12'!
+saturationForm
+
+	^ SaturationForm! !
+
 !ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/26/2013 14:34'!
 saturationIndex
 
 	^ SaturationIndex ! !
+
+!ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 23:13'!
+saturationOverlay
+
+	^ SaturationOverlay! !
 
 !ColorPaneMorph class methodsFor: 'instance creation' stamp: 'KenD 11/26/2013 18:14'!
 zSelector: aSymbol zValue: anInteger colorPoint: aPoint
