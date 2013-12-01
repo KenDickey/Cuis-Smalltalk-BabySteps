@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 29 November 2013 at 6:23:40.695586001 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 1 December 2013 at 10:32:12.471685 am'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 30!
+!provides: 'Morphic-ColorEditor' 1 34!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
 	instanceVariableNames: 'color'
@@ -51,6 +51,16 @@ ImageMorph subclass: #ColorPaneMorph
 ColorPaneMorph class
 	instanceVariableNames: ''!
 
+!classDefinition: #DropColorMorph category: #'Morphic-ColorEditor'!
+ImageMorph subclass: #DropColorMorph
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-ColorEditor'!
+!classDefinition: 'DropColorMorph class' category: #'Morphic-ColorEditor'!
+DropColorMorph class
+	instanceVariableNames: ''!
+
 !classDefinition: #RadioGroup category: #'Morphic-ColorEditor'!
 LayoutMorph subclass: #RadioGroup
 	instanceVariableNames: 'list font buttonOnLeft buttons'
@@ -87,11 +97,24 @@ I present the ColorEditor UI!
 !ColorPaneMorph commentStamp: '<historical>' prior: 0!
 I present a plane in a color cube.
 
-The x and y selectors map to a 256 x 256 plane with a constant z.
-The z value is "mixed in" to give a (x,y,z) color plane. [ see #refreshForm]
+The x and y selectors map to a 256 x 256 plane (slice of a 3d cube) with a constant z.
+The z value is "mixed in" to give a (x,y,z) color plane. [see #refreshForm]
 The selected color point (x,y) is visually noted by a focusMorph "ring".
 One may click on the pane to update the colorPoint.
-!
+
+Note that RGB are additive colors.   
+  For (x,y)=(red,blue);z=green 
+  The "background" varies over r&b and g overlay is added.
+HSV is more complex
+  Basically an alpha is used to blend background and overlay.
+
+See ColorPaneMorph>>refreshForm and 
+	ColorPaneMorph class>>make*Form and >>make*Overlay methods for details!
+
+!DropColorMorph commentStamp: '<historical>' prior: 0!
+I am picked up to be dropped on another morph.
+
+I change that morph's color to my color.!
 
 !RadioGroup commentStamp: '<historical>' prior: 0!
 I manage a RadioGroup -- a Group of RadioButtons, each with a label.
@@ -629,12 +652,12 @@ hsvRadio
 
 	^ hsvRadio! !
 
-!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 11/24/2013 17:07'!
+!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 11/30/2013 19:40'!
 initialize
 
 	super initialize.
 	model := ColorEditorModel new.
-	colorSwatch := ImageMorph new.
+	colorSwatch := DropColorMorph fromColor: model color.
 	rgbString := StringMorph new.
 	self refreshColorSwatch; refreshRGBString.
 
@@ -671,11 +694,12 @@ refreshColorPane
 
 	self colorPane updateColorFromModel: self model.! !
 
-!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/27/2013 14:43'!
+!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/30/2013 19:38'!
 refreshColorSwatch
 	"When color changes"
 	
-	colorSwatch image: (model color iconOrThumbnailOfSize: self colorSwatchExtent)! !
+	colorSwatch image: (model color iconOrThumbnailOfSize: self colorSwatchExtent).
+	colorSwatch color: self model color! !
 
 !ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/24/2013 08:51'!
 refreshRGBString
@@ -788,6 +812,23 @@ openColor: aColor
 		openInWorld: self runningWorld extent: self defaultExtent;
 		yourself
 ! !
+
+!ColorPaneMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:33'!
+aboutToGrab: aMorph
+	"submorph is being grabbed by a hand.
+	Perform necessary adjustments (if any) and return the actual morph
+	that should be added to the hand.
+	Answer nil to reject the drag."
+
+	^ DropColorMorph fromColor: self focusColor! !
+
+!ColorPaneMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:35'!
+allowsSubmorphDrag
+	"Answer whether our morphs can just be grabbed with the hand, instead of requiring the use of the halo. Redefined to answer true."
+	
+	"Click and hold"
+
+	^ true! !
 
 !ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 15:48'!
 colorPoint
@@ -941,7 +982,7 @@ rORgORbForm
 	
 ! !
 
-!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/29/2013 14:47'!
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/30/2013 18:48'!
 refreshForm
 	"Create color pane from x,y base blending in z"
 
@@ -997,10 +1038,11 @@ refreshForm
 	(formMaker at: zIndex) value
 	! !
 
-!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/27/2013 14:54'!
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/30/2013 18:57'!
 resetFocus
 
-	self focusMorph morphPosition: (colorPoint - (self focusMorphDiameter / 2))
+	self focusMorph morphPosition: (colorPoint - (self focusMorphDiameter / 2)).
+	self focusMorph borderColor: self focusColor negated. "Show up against background"
 	! !
 
 !ColorPaneMorph methodsFor: 'events-processing' stamp: 'KenD 11/29/2013 00:08'!
@@ -1171,19 +1213,31 @@ makeGBForm
 	^ rbForm
 ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 18:12'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 10:31'!
 makeHueOverlay
 
-	| hueForm radius |
-	hueForm := Form extent: 256@256 depth:  32.
-	radius := [ :x :y | ((256-x/256) squared) + ((256-y/200) squared) sqrt ].
+	| hueForm valForm satForm |
+	"Brightness (Value) component [y] from Black to White"
+	valForm := Form extent: 256@256 depth:  32.
 	1 to: 256 do: [ :x |
 		1 to: 256 do:  [ :y | 
-			 hueForm colorAt: x @ y 
-						put: ((Color h: 0 s: 0 v: y/256) alpha: ((radius value: x value: y) min: 1))
+			valForm colorAt: x @ y put: ((Color h: 0 s: 0 v: (y/256)) alpha: (256-y)/256)
 		]
 	].
-
+	"Saturation component [x] white mixed in from full to none"
+	satForm := Form extent: 256@256 depth:  32.
+	1 to: 256 do: [ :x |
+		1 to: 256 do:  [ :y |
+			satForm colorAt: x @ y put: (Color white alpha: (256-x)/256)
+		]
+	].
+	hueForm := satForm.
+	hueForm 
+		copy: (0@0 corner: 256@256) 
+		from: valForm 
+		to: 0@0
+		rule: Form blend.  "Mix S and V"
+	
 	^ hueForm
 ! !
 
@@ -1283,6 +1337,70 @@ zSelector: aSymbol zValue: anInteger colorPoint: aPoint
 						 ifAbsent: [ self error: 'Invalid selector' , aSymbol asString ])
 			zValue: anInteger 
 			colorPoint: aPoint! !
+
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 20:07'!
+aboutToBeGrabbedBy: aHand
+	"The receiver is being grabbed by a hand.
+	Perform necessary adjustments (if any) and return the actual morph
+	that should be added to the hand.
+	Answer nil to reject the drag."
+	"This message is sent to the dragged morph, not to the owner.
+	It is included here just for reference."
+
+	^ self class fromColor: self color "Grab a new sibling of me"! !
+
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 20:15'!
+aboutToGrab: aMorph
+	"submorph is being grabbed by a hand.
+	Perform necessary adjustments (if any) and return the actual morph
+	that should be added to the hand.
+	Answer nil to reject the drag."
+
+	^ self class fromColor: aMorph color   "Pick up a copy of me"! !
+
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:41'!
+allowsSubmorphDrag
+	"Answer whether our morphs can just be grabbed with the hand, instead of requiring the use of the halo. Redefined to answer true."
+	
+	"Click and hold"
+
+	^ true! !
+
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:22'!
+droppedOn: aMorph
+	"I have been dropped on aMorph.  Change its color."
+	"Note that this is a direct action.  I am never added to a Morph."
+	
+	aMorph color: self color ! !
+
+!DropColorMorph methodsFor: 'initialization' stamp: 'KenD 11/30/2013 19:23'!
+fromColor: aColor
+
+	self color: aColor.
+	self image: (self color icon magnifyTo: 32@32).! !
+
+!DropColorMorph methodsFor: 'accessing' stamp: 'KenD 11/30/2013 19:16'!
+myColor
+
+	^ myColor! !
+
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:27'!
+rejectDropMorphEvent: evt
+	"Rejected drop of me.  Remove me from the hand."
+	
+	self world activeHand removeMorph: self
+! !
+
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 20:10'!
+wantsToBeDroppedInto: aMorph
+	"Return true if it's okay to drop the receiver into aMorph. This check is symmetric to #wantsDroppedMorph:event: to give both parties a chance of figuring out whether they like each other."
+
+	^ true "Drop me onto any morph"! !
+
+!DropColorMorph class methodsFor: 'instance creation' stamp: 'KenD 11/30/2013 19:24'!
+fromColor: aColor
+
+	^ self new fromColor: aColor ! !
 
 !RadioGroup methodsFor: 'accessing' stamp: 'KenD 11/24/2013 16:55'!
 buttonFor: aSymbol
