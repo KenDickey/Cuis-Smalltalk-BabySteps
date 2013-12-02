@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 1 December 2013 at 10:32:12.471685 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 1 December 2013 at 6:33:04.891483 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 34!
+!provides: 'Morphic-ColorEditor' 1 36!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
 	instanceVariableNames: 'color'
@@ -101,15 +101,21 @@ The x and y selectors map to a 256 x 256 plane (slice of a 3d cube) with a const
 The z value is "mixed in" to give a (x,y,z) color plane. [see #refreshForm]
 The selected color point (x,y) is visually noted by a focusMorph "ring".
 One may click on the pane to update the colorPoint.
+Click and hold to pick up a color swatch.
+The z value corresponds to the slider/scroller position mapped to the range:
+	R/G/B       0..255
+	Hue          0..360 (degrees)
+	Sat/Bright 0..100 (%).
 
 Note that RGB are additive colors.   
-  For (x,y)=(red,blue);z=green 
-  The "background" varies over r&b and g overlay is added.
+  E.g. for (x,y)=(red,blue);z=green 
+  The "background" varies over r&b and a fixed g overlay is added.
 HSV is more complex
   Basically an alpha is used to blend background and overlay.
 
 See ColorPaneMorph>>refreshForm and 
-	ColorPaneMorph class>>make*Form and >>make*Overlay methods for details!
+	ColorPaneMorph class>>make*Form  and 
+	>>make*Overlay  methods for details!
 
 !DropColorMorph commentStamp: '<historical>' prior: 0!
 I am picked up to be dropped on another morph.
@@ -877,16 +883,16 @@ fromModel: model selector: aSelector
 	self updateColorFromModel: model
 ! !
 
-!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/28/2013 14:51'!
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 12/1/2013 10:52'!
 hackHSVform
-	"answer a base form for color plane with (x,y,0)"
+	"answer a base form for color plane with (x,y,0)  == Turtle slow, but accurate"
 
 	| colorConstructors colorMaker displayForm |
 	displayForm := Form extent: 256@256 depth:  32.
 	colorConstructors := {
-		[ :x :y :z | ^self  ] . "Red"
-		[ :x :y :z | ^self ] . "Green"
-		[ :x :y :z | ^self ] . "Blue"
+		[ :x :y :z | ^self  ] . "ignore Red"
+		[ :x :y :z | ^self ] . "ignore Green"
+		[ :x :y :z | ^self ] . "ignore Blue"
 		[ :x :y :z | Color h: z s: x/256 v: y/256 ]. "Hue"
 		[ :x :y :z | Color h: x/256*360 s: z/256 v: y/256 ]. "Saturation"
 		[ :x :y :z | Color h: x/256*360 s: x/256 v: z/256]. "Brightness"
@@ -982,7 +988,7 @@ rORgORbForm
 	
 ! !
 
-!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 11/30/2013 18:48'!
+!ColorPaneMorph methodsFor: 'change processing' stamp: 'KenD 12/1/2013 18:15'!
 refreshForm
 	"Create color pane from x,y base blending in z"
 
@@ -1161,13 +1167,13 @@ hueOverlay
 
 	^ HueOverlay! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 15:18'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 16:13'!
 initialize
 "	
 	self initialize.
 "
 	
-	"See usage in ColorPaneMorph>>makeBaseForm"
+	"This is the index of the z dimension -- the selected slider"
 	RedIndex := 1. 
 	GreenIndex := 2.
 	BlueIndex := 3.
@@ -1184,8 +1190,9 @@ initialize
 	HueOverlay := self makeHueOverlay.
 	! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 14:54'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 16:12'!
 makeBrightnessForm
+	"Briightness is the slider; This is a background/base slice of hue and value"
 
 	| hueFactor briteForm |
 	hueFactor := 256 / 360.
@@ -1199,13 +1206,16 @@ makeBrightnessForm
 	^ briteForm
 ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:35'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 18:28'!
 makeGBForm
-
+	"(x,y)=(g,b), slider value adds z=red"
+"
+	(ImageMorph new image: ColorPaneMorph makeGBForm) openInWorld.
+"
 	| rbForm |
 	rbForm := Form extent: 256@256 depth:  32.
-	1 to: 256 do: [ :x |
-		1 to: 256 do:  [ :y | 
+	0 to: 256 do: [ :x |
+		0 to: 256 do:  [ :y | 
 			rbForm colorAt: x @ y put: (Color r: 0 g: x/256 b: y/256)
 		]
 	].
@@ -1213,14 +1223,17 @@ makeGBForm
 	^ rbForm
 ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 10:31'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 18:29'!
 makeHueOverlay
-
+	"This is a combination of Saturation+Brightness which is mixed with a Hue"
+"
+	(ImageMorph new image: ColorPaneMorph makeHueOverlay) openInWorld.
+"
 	| hueForm valForm satForm |
 	"Brightness (Value) component [y] from Black to White"
 	valForm := Form extent: 256@256 depth:  32.
-	1 to: 256 do: [ :x |
-		1 to: 256 do:  [ :y | 
+	0 to: 256 do: [ :x |
+		0 to: 256 do:  [ :y | 
 			valForm colorAt: x @ y put: ((Color h: 0 s: 0 v: (y/256)) alpha: (256-y)/256)
 		]
 	].
@@ -1241,13 +1254,16 @@ makeHueOverlay
 	^ hueForm
 ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:35'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 18:29'!
 makeRBForm
-
+	"(x,y)=(r,b), slider value adds z=green"
+"
+	(ImageMorph new image: ColorPaneMorph makeRBForm) openInWorld.
+"
 	| rbForm |
 	rbForm := Form extent: 256@256 depth:  32.
-	1 to: 256 do: [ :x |
-		1 to: 256 do:  [ :y | 
+	0 to: 256 do: [ :x |
+		0 to: 256 do:  [ :y | 
 			rbForm colorAt: x @ y put: (Color r: x/256 g: 0 b: y/256)
 		]
 	].
@@ -1255,13 +1271,16 @@ makeRBForm
 	^ rbForm
 ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:36'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 18:29'!
 makeRGForm
-
+	"(x,y)=(r,g), slider value adds z=blue"
+"
+	(ImageMorph new image: ColorPaneMorph makeRGForm) openInWorld.
+"
 	| rbForm |
 	rbForm := Form extent: 256@256 depth:  32.
-	1 to: 256 do: [ :x |
-		1 to: 256 do:  [ :y | 
+	0 to: 256 do: [ :x |
+		0 to: 256 do:  [ :y | 
 			rbForm colorAt: x @ y put: (Color r: x/256 g: y/256 b: 0)
 		]
 	].
@@ -1269,14 +1288,17 @@ makeRGForm
 	^ rbForm
 ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/29/2013 14:50'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 18:29'!
 makeSaturationForm
-
+	"Saturation is the slider.  Hue is the base and Brightness/Value the overlay"
+"
+	(ImageMorph new image: ColorPaneMorph makeSaturationForm) openInWorld.
+"
 	| hueFactor satForm |
 	hueFactor := 256 / 360.
 	satForm := Form extent: 256@256 depth:  32.
-	1 to: 256 do: [ :x |
-		1 to: 256 do:  [ :y | 
+	0 to: 256 do: [ :x |
+		0 to: 256 do:  [ :y | 
 			satForm colorAt: x @ y put: (Color h: (x / hueFactor) s: 1.0 v: (y / 256))
 		]
 	].
@@ -1284,13 +1306,16 @@ makeSaturationForm
 	^ satForm
 ! !
 
-!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 11/28/2013 22:15'!
+!ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 18:29'!
 makeSaturationOverlay
-
+	"Overlay is Value/Brightness"
+"
+	(ImageMorph new image: ColorPaneMorph makeSaturationOverlay) openInWorld.
+"
 	| satOverlay |
 	satOverlay := Form extent: 256@256 depth:  32.
-	1 to: 256 do: [ :x |
-		1 to: 256 do:  [ :y | 
+	0 to: 256 do: [ :x |
+		0 to: 256 do:  [ :y | 
 			satOverlay colorAt: x @ y put: (Color h: 0 s: 0 v: (y / 256))
 		]
 	].
