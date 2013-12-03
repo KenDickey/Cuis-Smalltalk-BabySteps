@@ -1,6 +1,7 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 1 December 2013 at 6:33:04.891483 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 2 December 2013 at 5:02:36.703437 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 36!
+!provides: 'Morphic-ColorEditor' 1 43!
+!requires: 'Graphics-Files-Additional' nil nil nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
 	instanceVariableNames: 'color'
@@ -98,7 +99,13 @@ I present the ColorEditor UI!
 I present a plane in a color cube.
 
 The x and y selectors map to a 256 x 256 plane (slice of a 3d cube) with a constant z.
+	o-------> X
+	|
+	|				X and Y coordinates are as per Smalltalk view coordinates 
+	v                    (y increasing downward)
+	Y
 The z value is "mixed in" to give a (x,y,z) color plane. [see #refreshForm]
+
 The selected color point (x,y) is visually noted by a focusMorph "ring".
 One may click on the pane to update the colorPoint.
 Click and hold to pick up a color swatch.
@@ -291,9 +298,9 @@ greenFactor: zeroToOne
 		g: (zeroToOne * 255 / 255) asFloat 
 		b: self color blue)! !
 
-!ColorEditorModel methodsFor: 'printing' stamp: 'KenD 11/27/2013 20:13'!
+!ColorEditorModel methodsFor: 'printing' stamp: 'KenD 12/2/2013 15:14'!
 hexStringRGB
-	"Answer mu RGB as hex but with no 16r prefix"
+	"Answer my RGB as hex but with no 16r prefix"
 
 	^ (self red    printPaddedWith: $0 to: 2 base: 16) , 
 	  (self green printPaddedWith: $0 to: 2 base: 16) , 
@@ -362,6 +369,15 @@ redFactor: zeroToOne
 		g: self color green 
 		b: self color blue)! !
 
+!ColorEditorModel methodsFor: 'printing' stamp: 'KenD 12/2/2013 15:36'!
+rgbValue
+	"Answer my RGB as an integer"
+
+	^ ( '16r', 
+	    (self red    printPaddedWith: $0 to: 2 base: 16) ,
+	    (self green printPaddedWith: $0 to: 2 base: 16) , 
+	    (self blue   printPaddedWith: $0 to: 2 base: 16) ) asNumber! !
+
 !ColorEditorModel methodsFor: 'accessing' stamp: 'KenD 11/23/2013 16:45'!
 saturation
 	"Answer my percent saturation"
@@ -398,6 +414,20 @@ setColor: aColor
 	color := aColor.
 	self triggerEvent: #colorChanged with: self.
 	^ self
+
+! !
+
+!ColorEditorModel methodsFor: 'accessing' stamp: 'KenD 12/2/2013 16:24'!
+setRGBColorFromInteger: anInteger
+	"Set my color from integer interpreted as RGB value"
+	
+	| aColor |
+	aColor := Color 
+					r: ((anInteger bitShift: -16) bitAnd: 255)	/ 255
+					g: ((anInteger bitShift: -8) bitAnd: 255) / 255
+					b: (anInteger bitAnd: 255) / 255.
+			
+	^ self setColor: aColor
 
 ! !
 
@@ -567,17 +597,17 @@ buildMorphicWindow
 	^ self
 ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/24/2013 18:49'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/2/2013 17:00'!
 buildRadioButtonColumn
 
-	| radioCol setupEntryMorph valueEntryMorph |
+	| radioCol setupEntryMorph valueEntryMorph hexDisplayLayout |
 	rgbRadio := RadioGroup fromList: #(Red Green Blue).
 	hsvRadio := RadioGroup fromList: #(Hue Saturation Brightness).
 	rgbRadio when: #informRadioSelection send: #newRadioSelection: to: self.
 	hsvRadio when: #informRadioSelection send: #newRadioSelection: to: self.
 	setupEntryMorph := [ :sym :entryMorph | | selector |
 		selector := sym asLowercase asSymbol.
-		entryMorph valueAccessor: [ :model | model perform: selector ].
+		entryMorph valueAccessor: [ :myModel | myModel perform: selector ].
 		entryMorph valueUpdator: [ :myValue | 
 					self model perform: ( selector , ':' ) asSymbol with: myValue ].
 		entryMorph refreshValueFrom: self model.
@@ -612,6 +642,22 @@ buildRadioButtonColumn
 	].
 
 	(rgbRadio buttonFor: #Green) select.
+	
+	hexDisplayLayout := LayoutMorph newRow.
+	hexDisplayLayout 
+		addMorph: (StringMorph new contents: '16r') 
+			layoutSpec: (LayoutSpec keepMorphExtent);
+		addMorph: self rgbString 
+			layoutSpec: (LayoutSpec keepMorphExtent);
+		addMorph: (StringMorph new contents: ' hexRGB') 
+			layoutSpec: (LayoutSpec keepMorphExtent).
+
+	self rgbString 
+		valueAccessor: [ :myModel | myModel rgbValue ];
+		valueUpdator: [ :myValue | self model setRGBColorFromInteger: myValue ];
+		refreshValueFrom: self model.
+	self model when: #colorChanged send: #refreshValueFrom: to: rgbString.
+
 
 	radioCol := LayoutMorph newColumn.
 	^ radioCol 
@@ -619,7 +665,10 @@ buildRadioButtonColumn
 		addMorph: rgbRadio;
 		addMorph: hsvRadio;
 		addMorph: self colorSwatch;
-		addMorph: self rgbString;
+		addMorph: hexDisplayLayout 
+		    layoutSpec: (LayoutSpec fixedWidth: 300 
+											fixedHeight: 20
+											minorDirectionPadding: #center)
 		yourself
 	! !
 
@@ -658,14 +707,14 @@ hsvRadio
 
 	^ hsvRadio! !
 
-!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 11/30/2013 19:40'!
+!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/2/2013 16:40'!
 initialize
 
 	super initialize.
 	model := ColorEditorModel new.
 	colorSwatch := DropColorMorph fromColor: model color.
-	rgbString := StringMorph new.
-	self refreshColorSwatch; refreshRGBString.
+	rgbString := SimpleNumberEntryMorph hexRGBEntry.
+	self refreshColorSwatch.
 
 	! !
 
@@ -685,13 +734,12 @@ newRadioSelection: selectionSymbol
 	
 	! !
 
-!ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 11/26/2013 21:28'!
+!ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 12/2/2013 16:40'!
 refreshColor
 	"model color has changed.  Refresh my views."
 	
 	self 
 		refreshColorSwatch;
-		refreshRGBString;
 		refreshColorPane! !
 
 !ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/27/2013 14:43'!
@@ -707,17 +755,11 @@ refreshColorSwatch
 	colorSwatch image: (model color iconOrThumbnailOfSize: self colorSwatchExtent).
 	colorSwatch color: self model color! !
 
-!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 11/24/2013 08:51'!
-refreshRGBString
-	"Reset my rgbString from current model color"
-
-	self rgbString contents: '16r' , self model hexStringRGB! !
-
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 11/27/2013 15:20'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/2/2013 15:02'!
 resetSliderColumn: sliderSym
 	"Radio selector changed.."
 
-	| scrollBar labelString |
+	| scrollBar sliderLabel |
 	"#(Red Green Blue Hue Saturation Brightness) inclides: sliderSym"
 	scrollBar := PluggableScrollBar new.
 	scrollBar
@@ -737,7 +779,7 @@ resetSliderColumn: sliderSym
 	self model when: #colorChanged send: #refreshValueFromModel to: scrollBar.
 	scrollBar refreshValueFromModel.
 
-	labelString := sliderSym asString.
+	sliderLabel := sliderSym asString.
 	
 	^self sliderColumn 
 		removeAllMorphs;
@@ -748,10 +790,10 @@ resetSliderColumn: sliderSym
 						proportionalHeight: 1 
 						minorDirectionPadding: #center);
 		addMorph: scrollBar;
-		addMorph: (StringMorph contents: labelString font: AbstractFont default)
+		addMorph: (StringMorph contents: sliderLabel font: AbstractFont default)
 			layoutSpec: (LayoutSpec 
 								fixedWidth: (AbstractFont default 
-												widthOfString: labelString) + 2
+												widthOfString: sliderLabel) + 2
 								proportionalHeight: 1.0  
 								minorDirectionPadding: #center);
 		yourself
@@ -1404,11 +1446,6 @@ fromColor: aColor
 	self color: aColor.
 	self image: (self color icon magnifyTo: 32@32).! !
 
-!DropColorMorph methodsFor: 'accessing' stamp: 'KenD 11/30/2013 19:16'!
-myColor
-
-	^ myColor! !
-
 !DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:27'!
 rejectDropMorphEvent: evt
 	"Rejected drop of me.  Remove me from the hand."
@@ -1576,7 +1613,7 @@ fromList: buttonLables
 	
 	^ self newColumn fromList: listOfSymbols asArray ! !
 
-!SimpleNumberEntryMorph methodsFor: 'drawing' stamp: 'KenD 11/21/2013 19:11'!
+!SimpleNumberEntryMorph methodsFor: 'drawing' stamp: 'KenD 12/2/2013 16:33'!
 drawOn: aCanvas
 
 	self hasSelection ifTrue: [ self drawSelectionOn: aCanvas ].
@@ -1588,7 +1625,7 @@ drawOn: aCanvas
 		color: color.
 		
 	aCanvas
-		frameRectangle: (0@0  extent: self morphExtent)
+		frameRectangle: (0@0 extent: self morphExtent)
 		color: Color black
 		borderWidth: 2
 		borderStyleSymbol: #simple
@@ -1599,14 +1636,15 @@ entryChars
 
 	^ entryChars! !
 
-!SimpleNumberEntryMorph methodsFor: 'events' stamp: 'KenD 11/23/2013 19:54'!
+!SimpleNumberEntryMorph methodsFor: 'events' stamp: 'KenD 12/2/2013 16:31'!
 keyStroke: aKeyboardEvent
 	"Check for legal char if in ASCII range, else let super so it"
 	
 	(aKeyboardEvent isKeystroke) ifTrue: [ | keyChar |
 		keyChar := aKeyboardEvent keyCharacter.
 		((keyChar asciiValue between: 32 and: 126) "space .. ~"
-			and: [(self entryChars includes: keyChar) not])
+			and: [((self entryChars includes: keyChar) not)
+					or: [self contents size >= self numCharsToHold]])
 			ifTrue: [ "reject"
 				self flash.
 				^ self
@@ -1615,7 +1653,7 @@ keyStroke: aKeyboardEvent
 
 	super keyStroke: aKeyboardEvent! !
 
-!SimpleNumberEntryMorph methodsFor: 'initialization' stamp: 'KenD 11/23/2013 19:57'!
+!SimpleNumberEntryMorph methodsFor: 'initialization' stamp: 'KenD 12/2/2013 16:47'!
 legalChars: legalEntryChars numCharsToHold: nilOrInteger value: initialValue validator: aClosureToValidate toString: aClosureForString
 
 	entryChars := legalEntryChars.
@@ -1636,7 +1674,7 @@ legalChars: legalEntryChars numCharsToHold: nilOrInteger value: initialValue val
 	].
 	self numCharsToHold 
 		ifNotNil: [ | desiredExtent |
-			desiredExtent := self measureContents.
+			desiredExtent := self measureContents + 4.
 			self layoutSpec: (LayoutSpec 
 				fixedWidth: desiredExtent x 
 				fixedHeight: desiredExtent y
@@ -1644,36 +1682,39 @@ legalChars: legalEntryChars numCharsToHold: nilOrInteger value: initialValue val
 	].
 ! !
 
-!SimpleNumberEntryMorph methodsFor: 'accessing' stamp: 'KenD 11/21/2013 16:48'!
+!SimpleNumberEntryMorph methodsFor: 'accessing' stamp: 'KenD 12/2/2013 16:56'!
 measureContents
-	| font |
+	| myFont |
 
 	(self numCharsToHold) ifNil: [ ^ super measureContents ].
 	
-	font _ self fontToUse.
-	^ (4 + (((font widthOfString: '0') * self numCharsToHold) max: 3)  @ font height).! !
+	myFont := self fontToUse.
+	"Use a wide character as sample for the character width"
+	^ (4 + (((font widthOfString: 'A') * self numCharsToHold) max: 3)  @ myFont height).! !
 
 !SimpleNumberEntryMorph methodsFor: 'accessing' stamp: 'KenD 11/21/2013 15:06'!
 numCharsToHold
 
 	^ numCharsToHold! !
 
-!SimpleNumberEntryMorph methodsFor: 'events' stamp: 'KenD 11/22/2013 20:55'!
+!SimpleNumberEntryMorph methodsFor: 'events' stamp: 'KenD 12/2/2013 16:52'!
 refreshValueFrom: model
 	"Refresh my value from model"
 	
 	self valueAccessor ifNotNil: [ :accessor | 
 				theValue := accessor value: model.
 				self contents: (self toString value: self value).
+				self morphExtent: self measureContents + 4.
 				self redrawNeeded
 	]! !
 
-!SimpleNumberEntryMorph methodsFor: 'accessing' stamp: 'KenD 11/23/2013 19:55'!
+!SimpleNumberEntryMorph methodsFor: 'accessing' stamp: 'KenD 12/2/2013 16:53'!
 setValue: newValue
 
 	(theValue == newValue) ifTrue: [ ^self ].
 	theValue := newValue.
 	self contents: (self toString value: self value).
+	self morphExtent: self measureContents + 4.
 	self valueUpdator ifNotNil: [ :update | update value: newValue]! !
 
 !SimpleNumberEntryMorph methodsFor: 'accessing' stamp: 'KenD 11/21/2013 15:08'!
@@ -1727,7 +1768,7 @@ circleDegrees
 			]
 			toString: [ :n | n printString ]! !
 
-!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 11/23/2013 20:03'!
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/2/2013 16:23'!
 circleDegreesExact
 	"Answer 0..360 or nil"
 
@@ -1743,9 +1784,9 @@ circleDegreesExact
 			]
 			toString: [ :n | n printString ]! !
 
-!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 11/23/2013 20:03'!
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/2/2013 16:23'!
 circleDegreesRounded
-	"Answer 0..360 or nil"
+	"Answer 0..360.0 or nil"
 
 	^ self new
 			legalChars: '12345.67890' "Includes $. "
@@ -1773,6 +1814,20 @@ hexEntryOfSize: numChars
 				ifTrue: [[ ('16r', str asUppercase) asNumber ] on: Error do: [ nil ]]
 				ifFalse: [ nil ]]
 			toString: [ :n | n printStringHex ]! !
+
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/2/2013 16:18'!
+hexRGBEntry
+	"Answer 0.FFFFFF or nil"
+
+	^ self new
+			legalChars: '1234567890ABCDEFabcdef'
+		     numCharsToHold: 6 
+			value: 0 
+			validator: [ :str | 
+				(str size <= 6)
+				ifTrue: [[ ('16r', str asUppercase) asNumber ] on: Error do: [ nil ]]
+				ifFalse: [ nil ]]
+			toString: [ :n | n printPaddedWith: $0 to: 6 base: 16 ]! !
 
 !SimpleNumberEntryMorph class methodsFor: 'instance creation' stamp: 'KenD 11/21/2013 14:35'!
 legalChars: entryChars numCharsToHold: nilOrInteger value: initialValue validator: aClosureToValidate toString: aClosureForString
