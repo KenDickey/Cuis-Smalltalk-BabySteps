@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 2 December 2013 at 5:02:36.703437 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 3 December 2013 at 9:37:22.939713 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 43!
+!provides: 'Morphic-ColorEditor' 1 46!
 !requires: 'Graphics-Files-Additional' nil nil nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
@@ -40,6 +40,16 @@ SystemWindow subclass: #ColorEditorWindow
 	category: 'Morphic-ColorEditor'!
 !classDefinition: 'ColorEditorWindow class' category: #'Morphic-ColorEditor'!
 ColorEditorWindow class
+	instanceVariableNames: ''!
+
+!classDefinition: #DropTargetMorph category: #'Morphic-ColorEditor'!
+SystemWindow subclass: #DropTargetMorph
+	instanceVariableNames: 'targetMorph'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-ColorEditor'!
+!classDefinition: 'DropTargetMorph class' category: #'Morphic-ColorEditor'!
+DropTargetMorph class
 	instanceVariableNames: ''!
 
 !classDefinition: #ColorPaneMorph category: #'Morphic-ColorEditor'!
@@ -95,6 +105,13 @@ I am a ScrollBar which can get new values from my model.!
 !ColorEditorWindow commentStamp: '<historical>' prior: 0!
 I present the ColorEditor UI!
 
+!DropTargetMorph commentStamp: '<historical>' prior: 0!
+I am a transcient drop target for a morph.
+
+I allow one to drop morphs which make changes to myMorph.
+Each such morph has property DropActionMorph set to true.
+!
+
 !ColorPaneMorph commentStamp: '<historical>' prior: 0!
 I present a plane in a color cube.
 
@@ -127,7 +144,9 @@ See ColorPaneMorph>>refreshForm and
 !DropColorMorph commentStamp: '<historical>' prior: 0!
 I am picked up to be dropped on another morph.
 
-I change that morph's color to my color.!
+I change that morph's color to my color.
+
+See method #dropAction:!
 
 !RadioGroup commentStamp: '<historical>' prior: 0!
 I manage a RadioGroup -- a Group of RadioButtons, each with a label.
@@ -159,49 +178,19 @@ iVars
 The validator is applied on return and if nil, the old value is redisplayed and the field flashed,
 else the new value is remembered and displayed.!
 
-!LayoutMorph methodsFor: '*morphic-coloreditor' stamp: 'KenD 11/23/2013 20:15'!
-shrinkWrap
-	"Resize self to minimally contain submorphs with specified separation"
-	
-	| width height sep |
-	((self direction) = #horizontal) "(a row)"
-		ifTrue:  [
-			sep := self xSeparation.
-			width := sep + 
-				(self submorphs 
-					inject: 0 
-					into: [ :subTotal :m |  subTotal + (m morphExtent x) + sep ]).
-			sep := 2 * self ySeparation.
-			height := 
-				(self submorphs 
-					inject: 10 
-					into: [ :maxHeight :m |  maxHeight max: (m morphExtent y) + sep ]).
-			self layoutSpec: 
-					(LayoutSpec 
-							fixedWidth: width
-							proportionalHeight: 1.0 
-							minorDirectionPadding: #left)
-		]
-		ifFalse: [ " vertical  (a column)"
-			sep := 2 * self xSeparation.
-			width := 
-				(self submorphs 
-					inject: 10 
-					into: [ :maxWidth :m |  maxWidth max: (m morphExtent x) + sep ]).
-			sep := self ySeparation.
-			height := sep + 
-				(self submorphs 
-					inject: 0 
-					into: [ :subTotal :m |  subTotal + (m morphExtent y) + sep ]).
-			self layoutSpec: 
-					(LayoutSpec 
-							proportionalWidth: 1.0 
-							fixedHeight: height
-							minorDirectionPadding: #top)
-		].
+!Morph methodsFor: '*morphic-coloreditor' stamp: 'KenD 12/3/2013 17:34'!
+addCustomMenuItems: aCustomMenu hand: aHandMorph
+	"Add morph-specific items to the given menu which was invoked by the given hand.  This method provides is invoked both from the halo-menu and from the control-menu regimes."
 
-	self morphExtent: width @ height.
-	self layoutSubmorphs.! !
+	aCustomMenu 
+		addLine;
+		add: 'Show my Drop Target' action: #showDropTarget! !
+
+!Morph methodsFor: '*morphic-coloreditor' stamp: 'KenD 12/3/2013 18:33'!
+showDropTarget
+	"Display a DropTargetMorph for me"
+
+	DropTargetMorph openFor: self! !
 
 !ColorEditorModel methodsFor: 'accessing' stamp: 'KenD 11/22/2013 20:53'!
 blue
@@ -597,7 +586,7 @@ buildMorphicWindow
 	^ self
 ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/2/2013 17:00'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/3/2013 17:07'!
 buildRadioButtonColumn
 
 	| radioCol setupEntryMorph valueEntryMorph hexDisplayLayout |
@@ -668,7 +657,7 @@ buildRadioButtonColumn
 		addMorph: hexDisplayLayout 
 		    layoutSpec: (LayoutSpec fixedWidth: 300 
 											fixedHeight: 20
-											minorDirectionPadding: #center)
+											minorDirectionPadding: #center);
 		yourself
 	! !
 
@@ -707,7 +696,7 @@ hsvRadio
 
 	^ hsvRadio! !
 
-!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/2/2013 16:40'!
+!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/3/2013 21:37'!
 initialize
 
 	super initialize.
@@ -860,6 +849,63 @@ openColor: aColor
 		openInWorld: self runningWorld extent: self defaultExtent;
 		yourself
 ! !
+
+!DropTargetMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 12/3/2013 19:33'!
+allowsMorphDrop
+	"Answer whether we accept dropping morphs. By default answer false."
+
+	^ true! !
+
+!DropTargetMorph methodsFor: 'initialization' stamp: 'KenD 12/3/2013 18:25'!
+defaultBorderColor
+
+	^ Color orange! !
+
+!DropTargetMorph methodsFor: 'initialization' stamp: 'KenD 12/3/2013 18:25'!
+defaultColor
+	"See through me"
+
+	^ Color transparent! !
+
+!DropTargetMorph methodsFor: 'initialization' stamp: 'KenD 12/3/2013 19:16'!
+initialize
+
+	super initialize.
+	self widgetsColor: self defaultBorderColor.
+
+! !
+
+!DropTargetMorph methodsFor: 'initialization' stamp: 'KenD 12/3/2013 19:26'!
+openFor: aMorph
+
+	targetMorph := aMorph.
+	"Nota Bene: must set my extent before asking about label"
+	self 
+		morphExtent: aMorph morphExtent + self boxExtent;
+		setLabel: ('DropTarget for: ', (aMorph printStringLimitedTo: 64));
+		openInWorld; "Ignores settings; RESET them!!!!"
+		morphPosition: aMorph morphPositionInWorld - self boxExtent ;
+		morphExtent: aMorph morphExtent + self boxExtent;
+		color: (Color teal alpha: 0.3);
+		yourself
+	
+! !
+
+!DropTargetMorph methodsFor: 'access' stamp: 'KenD 12/3/2013 19:25'!
+targetMorph
+
+	^ targetMorph! !
+
+!DropTargetMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 12/3/2013 19:32'!
+wantsDroppedMorph: aMorph event: evt
+	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
+
+	^ (aMorph hasProperty: #DropActionMorph)! !
+
+!DropTargetMorph class methodsFor: 'instance creation' stamp: 'KenD 12/3/2013 18:40'!
+openFor: aMorph
+
+	^ self basicNew initialize openFor: aMorph ! !
 
 !ColorPaneMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:33'!
 aboutToGrab: aMorph
@@ -1177,6 +1223,11 @@ brightnessOverlay
 
 	^ BrightnessOverlay ! !
 
+!ColorPaneMorph class methodsFor: 'initialization' stamp: 'KenD 12/3/2013 21:28'!
+defaultColor
+
+	^ Color transparent! !
+
 !ColorPaneMorph class methodsFor: 'accessing' stamp: 'KenD 11/28/2013 22:59'!
 gbForm
 
@@ -1433,31 +1484,54 @@ allowsSubmorphDrag
 
 	^ true! !
 
-!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:22'!
-droppedOn: aMorph
-	"I have been dropped on aMorph.  Change its color."
-	"Note that this is a direct action.  I am never added to a Morph."
-	
-	aMorph color: self color ! !
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 12/3/2013 20:13'!
+dropAction: aDropTargetMorph
+	"Set a color"
 
-!DropColorMorph methodsFor: 'initialization' stamp: 'KenD 11/30/2013 19:23'!
+	| colorSetters choices |
+	colorSetters := (((aDropTargetMorph targetMorph class withAllSuperclasses 
+		collect: [ :c | c selectors ] andFold: [ :a :b | a union: b]) "all selectors"
+			select: [ :s | ('*color*:' match: s) and: [('*:*:' match: s) not]] ) asArray).
+			
+	(colorSetters size = 1)
+		ifTrue: [ aDropTargetMorph targetMorph perform: (colorSetters at: 1) with: self color ]
+		ifFalse: [ | selection |
+			choices := OrderedCollection with: #Cancel.
+			choices addAll: colorSetters.
+			self delete. "Remove me from hand so user can choose"
+			selection := PopUpMenu withCaption: 'Choose color setter' 
+											chooseFrom: choices.
+			(selection = 1) ifFalse: [ "1 -> Cancel"
+				aDropTargetMorph targetMorph 
+						perform: (colorSetters at: selection - 1) 
+						with: self color
+			]
+		].
+	aDropTargetMorph delete. "Remove the DropTargetMorph. It's job is done!!"! !
+
+!DropColorMorph methodsFor: 'initialization' stamp: 'KenD 12/3/2013 19:29'!
 fromColor: aColor
 
-	self color: aColor.
-	self image: (self color icon magnifyTo: 32@32).! !
+	self 
+		color: aColor;
+		image: (self color icon magnifyTo: 32@32);
+		setProperty: #DropActionMorph toValue: #setColor
+	! !
 
-!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 19:27'!
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 12/3/2013 20:03'!
 rejectDropMorphEvent: evt
 	"Rejected drop of me.  Remove me from the hand."
 	
-	self world activeHand removeMorph: self
+	self world ifNotNil: [ :w | w activeHand removeMorph: self ]
 ! !
 
-!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 20:10'!
+!DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 12/3/2013 19:52'!
 wantsToBeDroppedInto: aMorph
-	"Return true if it's okay to drop the receiver into aMorph. This check is symmetric to #wantsDroppedMorph:event: to give both parties a chance of figuring out whether they like each other."
+	"I wish to be dropped on a DropTargeMorph"
 
-	^ true "Drop me onto any morph"! !
+	(aMorph isKindOf: DropTargetMorph)
+		ifTrue: [ self dropAction: aMorph ].
+	^ false  "Always be rejected after doing the drop action"! !
 
 !DropColorMorph class methodsFor: 'instance creation' stamp: 'KenD 11/30/2013 19:24'!
 fromColor: aColor
