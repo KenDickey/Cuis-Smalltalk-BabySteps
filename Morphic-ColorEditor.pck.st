@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 5 December 2013 at 10:23:07.542828 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 6 December 2013 at 7:10:50.628375 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 49!
+!provides: 'Morphic-ColorEditor' 1 51!
 !requires: 'CSS3-NamedColors' 1 0 nil!
 !requires: 'Graphics-Files-Additional' nil nil nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
@@ -35,7 +35,7 @@ PluggableScrollBar class
 
 !classDefinition: #ColorEditorWindow category: #'Morphic-ColorEditor'!
 SystemWindow subclass: #ColorEditorWindow
-	instanceVariableNames: 'colorPane colorSwatch sliderColumn closeColorSwatch closeColorLabel radioSelection rgbRadio hsvRadio closestColordictColor rgbString'
+	instanceVariableNames: 'colorPane colorSwatch sliderColumn closeColorSwatch closeColorLabel closestRGB radioSelection rgbRadio hsvRadio closestColordictColor rgbString'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Morphic-ColorEditor'!
@@ -443,6 +443,14 @@ color: aColor
 
 	^ self new setColor: aColor! !
 
+!ColorEditorModel class methodsFor: 'printing' stamp: 'KenD 12/6/2013 18:51'!
+hexStringRGB: aColor
+	"Answer aColor RGB as hex but with no 16r prefix"
+
+	^ (((aColor red    * 255) rounded)  printPaddedWith: $0 to: 2 base: 16) , 
+	  (((aColor green * 255) rounded)  printPaddedWith: $0 to: 2 base: 16) , 
+	  (((aColor blue   * 255) rounded)   printPaddedWith: $0 to: 2 base: 16)! !
+
 !RadioButtonMorph methodsFor: 'initialization' stamp: 'KenD 11/20/2013 14:05'!
 defaultDiameter
 
@@ -533,6 +541,12 @@ defaultDiameter
 
 	^ DefaultDiameter ! !
 
+!RadioButtonMorph class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:06'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
+
 !RadioButtonMorph class methodsFor: 'class initialization' stamp: 'KenD 11/20/2013 14:09'!
 initialize
 "
@@ -565,6 +579,12 @@ refreshValueFromModel
 
 	refreshValueSelector ifNotNil: [
 		self value:  (model perform: refreshValueSelector) ]! !
+
+!PluggableScrollBar class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:06'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
 
 !ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/5/2013 19:56'!
 buildColorPaneColumn
@@ -614,7 +634,7 @@ buildMorphicWindow
 	^ self
 ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/5/2013 22:21'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/6/2013 19:02'!
 buildRadioButtonColumn
 
 	| radioCol setupEntryMorph valueEntryMorph hexDisplayLayout swatchLayout aLayout |
@@ -681,7 +701,8 @@ buildRadioButtonColumn
 	closeColorLabel	:= StringMorph new contents: ''.
 	aLayout
 		addMorph: closeColorSwatch;
-		addMorph: closeColorLabel.
+		addMorph: closestRGB layoutSpec: (LayoutSpec 	keepMorphExtent);
+		addMorph: closeColorLabel layoutSpec: (LayoutSpec 	keepMorphExtent).
 
 	swatchLayout 
 		addMorph: self colorSwatch;
@@ -739,13 +760,14 @@ hsvRadio
 
 	^ hsvRadio! !
 
-!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/3/2013 21:37'!
+!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/6/2013 18:44'!
 initialize
 
 	super initialize.
 	model := ColorEditorModel new.
 	colorSwatch := DropColorMorph fromColor: model color.
 	rgbString := SimpleNumberEntryMorph hexRGBEntry.
+	closestRGB := StringMorph new contents: ''.
 	self refreshColorSwatch.
 
 	! !
@@ -766,14 +788,15 @@ newRadioSelection: selectionSymbol
 	
 	! !
 
-!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 12/5/2013 22:07'!
+!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 12/6/2013 18:51'!
 refreshCloseColor
 	"model color has changed.  Refresh my views."
 	
 	| closeAssoc |
 	closeAssoc := self model color closestAssocFrom: Color css3ColorDictionary.
 	closeColorSwatch image: (closeAssoc value iconOrThumbnailOfSize: 32).
-	closeColorLabel contents: closeAssoc key asString.! !
+	closeColorLabel contents: closeAssoc key asString.
+	closestRGB contents: '16r', (ColorEditorModel hexStringRGB: closeAssoc value).! !
 
 !ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 12/5/2013 21:57'!
 refreshColor
@@ -871,6 +894,26 @@ defaultExtent
 
 	^ 556@340! !
 
+!ColorEditorWindow class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:09'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ true! !
+
+!ColorEditorWindow class methodsFor: 'instance creation' stamp: 'KenD 12/6/2013 19:10'!
+initializedInstance
+
+	|  window |
+	window _ self new.
+	^ window
+		model: (ColorEditorModel new);
+		buildMorphicWindow;
+		setLabel: 'Color Editor';
+		setColor: self defaultColor ;
+		morphExtent: self defaultExtent;
+		yourself
+! !
+
 !ColorEditorWindow class methodsFor: 'instance creation' stamp: 'KenD 11/24/2013 16:47'!
 open
 "
@@ -946,6 +989,12 @@ wantsDroppedMorph: aMorph event: evt
 	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
 
 	^ (aMorph hasProperty: #DropActionMorph)! !
+
+!DropTargetMorph class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:06'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
 
 !DropTargetMorph class methodsFor: 'instance creation' stamp: 'KenD 12/3/2013 18:40'!
 openFor: aMorph
@@ -1318,6 +1367,12 @@ hueOverlay
 
 	^ HueOverlay! !
 
+!ColorPaneMorph class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:05'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
+
 !ColorPaneMorph class methodsFor: 'class initialization' stamp: 'KenD 12/1/2013 16:13'!
 initialize
 "	
@@ -1645,6 +1700,12 @@ colorPane: aColorPaneMorph
 
 	^ self new colorPane: aColorPaneMorph! !
 
+!ColorSliderMorph class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:06'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
+
 !DropColorMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 11/30/2013 20:07'!
 aboutToBeGrabbedBy: aHand
 	"The receiver is being grabbed by a hand.
@@ -1726,6 +1787,12 @@ wantsToBeDroppedInto: aMorph
 fromColor: aColor
 
 	^ self new fromColor: aColor ! !
+
+!DropColorMorph class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:06'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
 
 !RadioGroup methodsFor: 'accessing' stamp: 'KenD 11/24/2013 16:55'!
 buttonFor: aSymbol
@@ -1875,6 +1942,12 @@ fromList: buttonLables
 	buttonLables do: [ :each | listOfSymbols add: each asSymbol ].
 	
 	^ self newColumn fromList: listOfSymbols asArray ! !
+
+!RadioGroup class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:07'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
 
 !SimpleNumberEntryMorph methodsFor: 'drawing' stamp: 'KenD 12/2/2013 16:33'!
 drawOn: aCanvas
@@ -2091,6 +2164,12 @@ hexRGBEntry
 				ifTrue: [[ ('16r', str asUppercase) asNumber ] on: Error do: [ nil ]]
 				ifFalse: [ nil ]]
 			toString: [ :n | n printPaddedWith: $0 to: 6 base: 16 ]! !
+
+!SimpleNumberEntryMorph class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:07'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ false! !
 
 !SimpleNumberEntryMorph class methodsFor: 'instance creation' stamp: 'KenD 11/21/2013 14:35'!
 legalChars: entryChars numCharsToHold: nilOrInteger value: initialValue validator: aClosureToValidate toString: aClosureForString
