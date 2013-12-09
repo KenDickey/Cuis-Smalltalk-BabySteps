@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 6 December 2013 at 7:10:50.628375 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 8 December 2013 at 9:17:18.332419 am'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 51!
+!provides: 'Morphic-ColorEditor' 1 53!
 !requires: 'CSS3-NamedColors' 1 0 nil!
 !requires: 'Graphics-Files-Additional' nil nil nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
@@ -305,13 +305,15 @@ greenFactor: zeroToOne
 		g: (zeroToOne * 255 / 255) asFloat 
 		b: self color blue)! !
 
-!ColorEditorModel methodsFor: 'printing' stamp: 'KenD 12/2/2013 15:14'!
+!ColorEditorModel methodsFor: 'printing' stamp: 'KenD 12/8/2013 09:16'!
 hexStringRGB
 	"Answer my RGB as hex but with no 16r prefix"
 
-	^ (self red    printPaddedWith: $0 to: 2 base: 16) , 
+"	^ (self red    printPaddedWith: $0 to: 2 base: 16) , 
 	  (self green printPaddedWith: $0 to: 2 base: 16) , 
-	  (self blue   printPaddedWith: $0 to: 2 base: 16)! !
+	  (self blue   printPaddedWith: $0 to: 2 base: 16)
+	"
+	^ self class hexStringRGB: self color! !
 
 !ColorEditorModel methodsFor: 'accessing' stamp: 'KenD 11/23/2013 16:44'!
 hue
@@ -607,7 +609,7 @@ buildColorPaneColumn
 	
 	^ colorPaneColumn ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/5/2013 19:59'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/8/2013 08:03'!
 buildMorphicWindow
 	"Create a useful ColorEditor window"
 	
@@ -627,7 +629,8 @@ buildMorphicWindow
 			 layoutSpec: (LayoutSpec 
 							proportionalWidth: 0.7
 							proportionalHeight: 1 
-							minorDirectionPadding: #center).
+							minorDirectionPadding: #center);
+		layoutSpec: (LayoutSpec keepMorphExtent).
 		
 	self model when: #colorChanged send: #refreshColor to: self.
 	
@@ -788,7 +791,7 @@ newRadioSelection: selectionSymbol
 	
 	! !
 
-!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 12/6/2013 18:51'!
+!ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 12/7/2013 15:24'!
 refreshCloseColor
 	"model color has changed.  Refresh my views."
 	
@@ -796,7 +799,8 @@ refreshCloseColor
 	closeAssoc := self model color closestAssocFrom: Color css3ColorDictionary.
 	closeColorSwatch image: (closeAssoc value iconOrThumbnailOfSize: 32).
 	closeColorLabel contents: closeAssoc key asString.
-	closestRGB contents: '16r', (ColorEditorModel hexStringRGB: closeAssoc value).! !
+	closestRGB contents: '16r', (ColorEditorModel hexStringRGB: closeAssoc value).
+! !
 
 !ColorEditorWindow methodsFor: 'color updating' stamp: 'KenD 12/5/2013 21:57'!
 refreshColor
@@ -1042,13 +1046,13 @@ colorPoint
 
 	^ colorPoint ! !
 
-!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 12/5/2013 18:52'!
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 12/7/2013 15:17'!
 colorPoint: aPoint
 
 	(colorPoint = aPoint)
 		ifFalse: [ 
 			colorPoint := aPoint.
-			self triggerEvent: #colorChanged 
+			self triggerEvent: #colorChanged with: self
 		]! !
 
 !ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 11/27/2013 14:58'!
@@ -1273,14 +1277,15 @@ zIndex
 	^ zIndex
 ! !
 
-!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/29/2013 00:03'!
+!ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 12/8/2013 08:07'!
 zIndex: oneTo6 zValue: anInteger colorPoint: aPoint
 
 	zIndex := oneTo6.
 	zValue := anInteger.
 	colorPoint := aPoint.
 	self focusMorph morphPosition: (aPoint - (self focusMorphDiameter / 2)).
-	self refreshForm.
+	self refreshForm;
+		 triggerEvent: #colorChanged
 ! !
 
 !ColorPaneMorph methodsFor: 'initialization' stamp: 'KenD 11/27/2013 09:21'!
@@ -1295,13 +1300,13 @@ zValue
 
 	^ zValue ! !
 
-!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 12/5/2013 18:53'!
+!ColorPaneMorph methodsFor: 'accessing' stamp: 'KenD 12/7/2013 15:16'!
 zValue: zeroTo255 "or ..100 or ..360"
 
 	(zValue = zeroTo255)
 		ifFalse: [ 
 			zValue := zeroTo255.  "Does NOT change colorPoint"
-			self triggerEvent: #colorChanged.
+			self triggerEvent: #colorChanged with: self.
 		]
 ! !
 
