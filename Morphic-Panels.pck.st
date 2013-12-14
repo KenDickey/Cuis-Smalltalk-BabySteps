@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 9 December 2013 at 7:32:38.124287 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 11 December 2013 at 3:29:02.083222 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Morphic-Panels' 1 3!
+!provides: 'Morphic-Panels' 1 6!
 !classDefinition: #Panel category: #'Morphic-Panels'!
 PluggableMorph subclass: #Panel
 	instanceVariableNames: 'labelString widgetsColor layoutMorph'
@@ -9,6 +9,26 @@ PluggableMorph subclass: #Panel
 	category: 'Morphic-Panels'!
 !classDefinition: 'Panel class' category: #'Morphic-Panels'!
 Panel class
+	instanceVariableNames: ''!
+
+!classDefinition: #LayoutMorphEditPanel category: #'Morphic-Panels'!
+Panel subclass: #LayoutMorphEditPanel
+	instanceVariableNames: 'layoutPutty paddingLayout rowPad colPad'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Panels'!
+!classDefinition: 'LayoutMorphEditPanel class' category: #'Morphic-Panels'!
+LayoutMorphEditPanel class
+	instanceVariableNames: ''!
+
+!classDefinition: #LayoutSpecEditPanel category: #'Morphic-Panels'!
+Panel subclass: #LayoutSpecEditPanel
+	instanceVariableNames: 'theLayoutSpec extentSelect widthSelect heightSelect widthAux heightAux'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Panels'!
+!classDefinition: 'LayoutSpecEditPanel class' category: #'Morphic-Panels'!
+LayoutSpecEditPanel class
 	instanceVariableNames: ''!
 
 !classDefinition: #TestPanel category: #'Morphic-Panels'!
@@ -21,6 +41,26 @@ Panel subclass: #TestPanel
 TestPanel class
 	instanceVariableNames: ''!
 
+!classDefinition: #FramedLayoutMorph category: #'Morphic-Panels'!
+LayoutMorph subclass: #FramedLayoutMorph
+	instanceVariableNames: 'borderWidth borderColor frameSelector'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Panels'!
+!classDefinition: 'FramedLayoutMorph class' category: #'Morphic-Panels'!
+FramedLayoutMorph class
+	instanceVariableNames: ''!
+
+!classDefinition: #LabelMorph category: #'Morphic-Panels'!
+StringMorph subclass: #LabelMorph
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Panels'!
+!classDefinition: 'LabelMorph class' category: #'Morphic-Panels'!
+LabelMorph class
+	instanceVariableNames: ''!
+
 
 !Panel commentStamp: '<historical>' prior: 0!
 I am a very simple window with a label.
@@ -28,11 +68,32 @@ I am a very simple window with a label.
 You need to add buttons, drop-downs, fill-ins to make me useful 
 !
 
+!LayoutMorphEditPanel commentStamp: '<historical>' prior: 0!
+I am a simple editor for a LayoutMorph.
+
+iVars:
+  model (inherited) -- the LayoutMorph being 'edited'  -- unchanged until user OKs
+  layoutPutty -- clone of theLayoutMorph which holds edit state
+  rowPad, colPad -- hold parts for paddingLayout
+
+LayoutMorphEditPanel open: (LayoutMorph newRow).!
+
+!LayoutSpecEditPanel commentStamp: '<historical>' prior: 0!
+I am a simple editor for a LayoutSpec.
+
+!
+
 !TestPanel commentStamp: '<historical>' prior: 0!
 A Panel with a close button
 
 
 TestPanel open: nil label: 'Test Panel'.!
+
+!FramedLayoutMorph commentStamp: '<historical>' prior: 0!
+I add a simple frame to a LayoutMorph!
+
+!LabelMorph commentStamp: '<historical>' prior: 0!
+I am a StringMorph used as a label!
 
 !Panel methodsFor: 'submorphs-add/remove' stamp: 'KenD 12/9/2013 16:44'!
 addMorph: aMorph 
@@ -415,6 +476,78 @@ open: model label: aString
 		openInWorld;
 		yourself! !
 
+!LayoutMorphEditPanel methodsFor: 'GUI building' stamp: 'KenD 12/11/2013 15:28'!
+buildMorphicWindow
+	
+	| leftCol rightCol rowColRadio separationLayout colorLayout |
+	self layoutMorph beRow. "A row of two columns"
+	labelString := 'LayoutMorph'.
+	rowColRadio := FramedLayoutMorph newColumn.
+	rowColRadio 
+		addMorph: (LabelMorph contents: 'Direction')
+			layoutSpec: (LayoutSpec keepMorphExtent); 
+		addMorph: (RadioGroup fromList: #( Row Column )).
+		
+	paddingLayout := FramedLayoutMorph newColumn.
+	paddingLayout 
+		addMorph: (LabelMorph contents: 'Padding')
+			layoutSpec: (LayoutSpec keepMorphExtent);
+		addMorph: (RadioGroup fromList: #(Top Center Bottom Specify)). "@@@"
+		
+	leftCol := LayoutMorph newColumn.
+	leftCol 
+		separation: 4;
+		addMorph: rowColRadio;
+		addMorph: paddingLayout.
+	self layoutMorph addMorph: leftCol.
+
+	separationLayout := FramedLayoutMorph newColumn.
+	separationLayout 
+		separation: 4;
+		addMorph: (LabelMorph contents: 'Separation')  
+			layoutSpec: (LayoutSpec keepMorphExtent);
+		addMorph: (RadioGroup fromList: #(X Y)). "@@@"
+		
+	colorLayout := FramedLayoutMorph newRow.
+	colorLayout
+		addMorph: (LabelMorph contents: 'Color')  
+			layoutSpec: (LayoutSpec keepMorphExtent).
+	"@@add color@@"
+	
+	rightCol := LayoutMorph newColumn.
+	rightCol 
+		separation: 4;
+		addMorph: separationLayout;
+		addMorph: colorLayout.
+		
+	self layoutMorph addMorph: rightCol.
+	
+	"init self state from model=LayourMorph"
+! !
+
+!LayoutMorphEditPanel methodsFor: 'initialization' stamp: 'KenD 12/10/2013 21:09'!
+defaultExtent
+
+	^ 350 @ 310! !
+
+!LayoutMorphEditPanel methodsFor: 'initialization' stamp: 'KenD 12/11/2013 15:02'!
+initialize
+
+	super initialize.
+	layoutPutty := self model copy.
+	self layoutMorph separation: 4.
+! !
+
+!LayoutSpecEditPanel methodsFor: 'GUI building' stamp: 'KenD 12/10/2013 18:48'!
+buildMorphicWindow
+	
+	self notYetImplemented;
+		addMorph: (PluggableButtonMorph model: self action: #close label: 'Close Me')
+		layoutSpec: (LayoutSpec 
+							proportionalWidth: 0.3
+		 					proportionalHeight: 0.3 
+							minorDirectionPadding: #center).! !
+
 !TestPanel methodsFor: 'GUI building' stamp: 'KenD 12/9/2013 19:06'!
 buildMorphicWindow
 
@@ -431,3 +564,113 @@ close
 	self setProperty: #userSelection toValue: #cancel.
 	self delete.
 ! !
+
+!FramedLayoutMorph methodsFor: 'accessing' stamp: 'KenD 12/11/2013 14:33'!
+borderColor
+
+	^ borderColor! !
+
+!FramedLayoutMorph methodsFor: 'accessing' stamp: 'KenD 12/11/2013 14:33'!
+borderColor: aColor
+
+	borderColor = aColor ifFalse: [
+		borderColor _ aColor.
+		self redrawNeeded]! !
+
+!FramedLayoutMorph methodsFor: 'accessing' stamp: 'KenD 12/11/2013 14:34'!
+borderWidth
+
+	^ borderWidth! !
+
+!FramedLayoutMorph methodsFor: 'accessing' stamp: 'KenD 12/11/2013 14:33'!
+borderWidth: anInteger
+
+	borderWidth = anInteger ifFalse: [
+		borderColor ifNil: [ borderColor _ Color black ].
+		borderWidth _ anInteger max: 0.
+		self redrawNeeded ]! !
+
+!FramedLayoutMorph methodsFor: 'geometry' stamp: 'KenD 12/11/2013 14:45'!
+clippingRect
+	"In own coordinates!!
+	Return the bounds to which any submorphs should be clipped if the property is set"
+	"Should be a region, like our shadow"
+
+	self flag: #jmvVer2.
+	^ super clippingRect insetBy: borderWidth! !
+
+!FramedLayoutMorph methodsFor: 'initialization' stamp: 'KenD 12/11/2013 14:40'!
+defaultBorderColor
+
+	^ Color black! !
+
+!FramedLayoutMorph methodsFor: 'initialization' stamp: 'KenD 12/11/2013 14:40'!
+defaultBorderWidth
+
+	^ 2 "pixels"! !
+
+!FramedLayoutMorph methodsFor: 'initialization' stamp: 'KenD 12/11/2013 14:39'!
+defaultFrameSelector
+
+	^ #simple "or inset or raised"
+	! !
+
+!FramedLayoutMorph methodsFor: 'drawing' stamp: 'KenD 12/11/2013 14:42'!
+drawOn: aCanvas
+	"A canvas is already set with a proper transformation from our coordinates to those of the Canvas target."
+	"If you redefine this method in a subclass, please take a look at the comment at #isOpaqueMorph"
+	super drawOn: aCanvas.
+	aCanvas
+		frameRectangle: (0@0 extent: extent) 
+		color: borderColor 
+		borderWidth: borderWidth 
+		borderStyleSymbol: frameSelector! !
+
+!FramedLayoutMorph methodsFor: 'accessing' stamp: 'KenD 12/11/2013 14:36'!
+frameSelector
+
+	^ frameSelector! !
+
+!FramedLayoutMorph methodsFor: 'accessing' stamp: 'KenD 12/11/2013 14:38'!
+frameSelector: simpleInsetOrRaised
+
+	(frameSelector = simpleInsetOrRaised)
+		ifFalse: [
+			frameSelector := simpleInsetOrRaised.
+			self redrawNeeded
+		]! !
+
+!FramedLayoutMorph methodsFor: 'initialization' stamp: 'KenD 12/11/2013 14:41'!
+initialize
+	"Set harmless defaults"
+	
+	super initialize.
+	borderColor     := self defaultBorderColor.
+	borderWidth    := self defaultBorderWidth.
+	frameSelector := self defaultFrameSelector.! !
+
+!FramedLayoutMorph methodsFor: 'geometry' stamp: 'KenD 12/11/2013 14:44'!
+layoutBounds
+	"Return the bounds for laying out children of the receiver"
+	
+	self flag: #jmvVer2.
+	^ super layoutBounds insetBy: borderWidth! !
+
+!LabelMorph methodsFor: 'accessing' stamp: 'KenD 12/11/2013 15:27'!
+initWithContents: aString font: aFont emphasis: emphasisCode 
+	self initialize.
+	
+	aFont ifNotNil: [ font := aFont ] ifNil: [ font := AbstractFont default ].
+	(emphasisCode = 0) 
+		ifTrue: [ emphasis := AbstractFont boldCode ] 
+		ifFalse: [ emphasis := emphasisCode ].
+	self contents: aString! !
+
+!LabelMorph methodsFor: 'initialization' stamp: 'KenD 12/11/2013 15:16'!
+initialize
+
+	super initialize.
+	self
+		font: (AbstractFont default);
+		emphasis: AbstractFont boldCode;
+		layoutSpec: (LayoutSpec keepMorphExtent).! !
