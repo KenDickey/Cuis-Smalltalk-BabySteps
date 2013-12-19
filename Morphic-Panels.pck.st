@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1880] on 17 December 2013 at 3:10:57.548584 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1880] on 18 December 2013 at 10:00:12.702043 pm'!
 'Description Please enter a description for this package'!
-!provides: 'Morphic-Panels' 1 17!
+!provides: 'Morphic-Panels' 1 27!
 !requires: 'Morphic-ColorEditor' 1 53 nil!
 !classDefinition: #Panel category: #'Morphic-Panels'!
 PluggableMorph subclass: #Panel
@@ -12,9 +12,19 @@ PluggableMorph subclass: #Panel
 Panel class
 	instanceVariableNames: ''!
 
+!classDefinition: #EditPanel category: #'Morphic-Panels'!
+Panel subclass: #EditPanel
+	instanceVariableNames: 'editModel'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Morphic-Panels'!
+!classDefinition: 'EditPanel class' category: #'Morphic-Panels'!
+EditPanel class
+	instanceVariableNames: ''!
+
 !classDefinition: #LayoutMorphEditPanel category: #'Morphic-Panels'!
-Panel subclass: #LayoutMorphEditPanel
-	instanceVariableNames: 'editModel directionArea paddingArea separationArea colorArea padRadio padEntry'
+EditPanel subclass: #LayoutMorphEditPanel
+	instanceVariableNames: 'directionArea paddingArea separationArea colorArea padRadio padEntry'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Morphic-Panels'!
@@ -23,8 +33,8 @@ LayoutMorphEditPanel class
 	instanceVariableNames: ''!
 
 !classDefinition: #LayoutSpecEditPanel category: #'Morphic-Panels'!
-Panel subclass: #LayoutSpecEditPanel
-	instanceVariableNames: 'theLayoutSpec extentSelect widthSelect heightSelect widthAux heightAux'
+EditPanel subclass: #LayoutSpecEditPanel
+	instanceVariableNames: 'widthArea heightArea paddingArea padRadio padEntry'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Morphic-Panels'!
@@ -69,12 +79,23 @@ I am a very simple window with a label.
 You need to add buttons, drop-downs, fill-ins to make me useful 
 !
 
+!EditPanel commentStamp: '<historical>' prior: 0!
+I abstract common edit methods for my concrete subclasses.
+
+The gist is that my model is a reference to the original object.
+My editModel is a "putty" or "shadow" copy to which all edit operations are applied.
+If the user Update's then the changes are propagated from the editModel to the model.
+
+Examples:
+  LayoutMorphEditPanel open:  (LayoutMorph newRow).
+  LayoutSpecEditPanel open: (LayoutSpec useAll).!
+
 !LayoutMorphEditPanel commentStamp: '<historical>' prior: 0!
 I am a simple editor for a LayoutMorph.
 
 iVars:
   model (inherited) -- the LayoutMorph being 'edited'  -- unchanged until user OKs
-  editModel -- clone of theLayoutMorp; holds edit state until saved to original
+  editModel (inherited) -- clone of theLayoutMorp; holds edit state until saved to original
   directionArea paddingArea separationArea colorArea -- are layouts for controls.
 
 LayoutMorphEditPanel open: (LayoutMorph newRow).!
@@ -96,10 +117,46 @@ I add a simple frame to a LayoutMorph!
 !LabelMorph commentStamp: '<historical>' prior: 0!
 I am a StringMorph used as a label!
 
-!LayoutMorph methodsFor: '*morphic-panels' stamp: 'KenD 12/17/2013 15:00'!
+!LayoutSpec methodsFor: '*morphic-panels' stamp: 'KenD 12/17/2013 20:40'!
+privateFixedHeight
+
+	^ fixedHeight! !
+
+!LayoutSpec methodsFor: '*morphic-panels' stamp: 'KenD 12/17/2013 20:39'!
+privateFixedWidth
+
+	^ fixedWidth! !
+
+!LayoutSpec methodsFor: '*morphic-panels' stamp: 'KenD 12/17/2013 20:40'!
+privateProportionalHeight
+
+	^ proportionalHeight! !
+
+!LayoutSpec methodsFor: '*morphic-panels' stamp: 'KenD 12/17/2013 20:40'!
+privateProportionalWidth
+
+	^ proportionalWidth ! !
+
+!Morph methodsFor: '*morphic-panels' stamp: 'KenD 12/18/2013 21:37'!
 addCustomMenuItems: aCustomMenu hand: aHandMorph
 	"Add morph-specific items to the given menu which was invoked by the given hand.  This method provides is invoked both from the halo-menu and from the control-menu regimes."
 
+	aCustomMenu 
+		addLine;
+		add: 'Show my Drop Target' action: #showDropTarget;
+		add: 'Edit my layoutSpec' action: #editMyLayoutSpec! !
+
+!Morph methodsFor: '*morphic-panels' stamp: 'KenD 12/18/2013 21:39'!
+editMyLayoutSpec
+
+	self layoutSpec ifNil: [ self layoutSpec: LayoutSpec keepMorphExtent ].
+	LayoutSpecEditPanel open: self layoutSpec! !
+
+!LayoutMorph methodsFor: '*morphic-panels' stamp: 'KenD 12/18/2013 21:47'!
+addCustomMenuItems: aCustomMenu hand: aHandMorph
+	"Add morph-specific items to the given menu which was invoked by the given hand.  This method provides is invoked both from the halo-menu and from the control-menu regimes."
+
+	super addCustomMenuItems: aCustomMenu hand: aHandMorph.
 	aCustomMenu 
 		addLine;
 		add: 'Edit me' action: #editMe! !
@@ -282,13 +339,12 @@ drawRoundedFrameOn: aCanvas color: widgetsColor
 		gradientBottom: bottomFactor
 		insideColor: color! !
 
-!Panel methodsFor: 'initialization' stamp: 'KenD 12/9/2013 17:04'!
+!Panel methodsFor: 'initialization' stamp: 'KenD 12/17/2013 19:20'!
 initialize
 	"Initialize a system window. Add label, stripes, etc., if desired"
 
 	super initialize.
 	labelString ifNil: [ labelString _ 'Untitled Window'].
-	
 	extent := self defaultExtent.
 
 	"by default"
@@ -443,13 +499,18 @@ relabel
 	newLabel isEmpty ifTrue: [^self].
 	self setLabel: newLabel! !
 
-!Panel methodsFor: 'submorphs-add/remove' stamp: 'KenD 12/17/2013 11:32'!
+!Panel methodsFor: 'submorphs-add/remove' stamp: 'KenD 12/18/2013 19:36'!
 replaceArea: oldArea with: newArea
 	"Replace oldArea in its container with newArea and clean up any ActionMaps"
 	
 	oldArea owner replaceSubmorph: oldArea by: newArea.
 	oldArea releaseActionMap.
 	self model removeActionsWithReceiver: oldArea.
+	oldArea submorphsDo: [ :sm | 
+		sm releaseActionMap.
+		self model removeActionsWithReceiver: sm
+	].
+
 ! !
 
 !Panel methodsFor: 'label' stamp: 'KenD 12/9/2013 16:49'!
@@ -519,13 +580,79 @@ open: model label: aString
 		openInWorld;
 		yourself! !
 
-!LayoutMorphEditPanel methodsFor: 'GUI building' stamp: 'KenD 12/16/2013 21:08'!
+!EditPanel methodsFor: 'event handling' stamp: 'KenD 12/17/2013 19:00'!
+cancelAndForgetEverything
+
+	self delete! !
+
+!EditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:25'!
+editModel
+	"A subclass may wish to supply a custom editModel rather than model clone"
+	
+	editModel ifNil: [	editModel := self model clone ].
+	
+	^ editModel! !
+
+!EditPanel methodsFor: 'initialization' stamp: 'KenD 12/17/2013 19:02'!
+editModel: anObject
+
+	editModel := anObject! !
+
+!EditPanel methodsFor: 'area layouts' stamp: 'KenD 12/17/2013 19:54'!
+newButtonArea
+	"Answer a LayoutMorph with Update and Cancel buttons"
+	
+	| buttonArea |
+	buttonArea := LayoutMorph newRow.
+	^ buttonArea 
+		separation: 8@0;
+		addMorph: (PluggableButtonMorph 
+				model: self 
+				action:  #updateMasterFromCopy
+				label: 'Update')
+			layoutSpec: (LayoutSpec 
+							proportionalWidth: 0.3 
+							proportionalHeight:  1 
+							minorDirectionPadding: #center);
+		addMorph: (PluggableButtonMorph 
+				model: self 
+				action:  #cancelAndForgetEverything
+				label: 'Cancel')
+			layoutSpec: (LayoutSpec 
+							proportionalWidth: 0.3 
+							proportionalHeight:  1 
+							minorDirectionPadding: #center);
+		layoutSpec: (LayoutSpec 
+							proportionalWidth: 1 
+							fixedHeight: 36
+							minorDirectionPadding: #center);
+		padding: #center;
+		yourself
+
+	! !
+
+!EditPanel methodsFor: 'event handling' stamp: 'KenD 12/18/2013 19:38'!
+replaceArea: oldArea with: newArea
+	"Replace oldArea in its container with newArea and clean up any ActionMaps"
+	
+	super replaceArea: oldArea with: newArea.
+	oldArea submorphsDo: [ :sm | 
+		self editModel removeActionsWithReceiver: sm
+	].
+! !
+
+!EditPanel methodsFor: 'event handling' stamp: 'KenD 12/17/2013 19:01'!
+updateMasterFromCopy
+	"Update model from editModel"
+	
+	self subclassResponsibility ! !
+
+!LayoutMorphEditPanel methodsFor: 'GUI building' stamp: 'KenD 12/17/2013 19:23'!
 buildMorphicWindow
 	
-	| controlArea leftCol rightCol  |
-
+	| controlArea leftCol rightCol  |	
 	labelString := self model printStringLimitedTo: 30.
-	
+		
 	directionArea    := self newDirectionArea.
 	paddingArea     := self newPaddingArea.
 	separationArea := self newSeparationtionArea.
@@ -549,16 +676,12 @@ buildMorphicWindow
 	controlArea addMorph: rightCol.
 	
 	self layoutMorph 
+		separation: self defaultSeparation;
 		addMorph: controlArea;
 		addMorph: self newButtonArea;
 		padding: #center.
 
 ! !
-
-!LayoutMorphEditPanel methodsFor: 'event handling' stamp: 'KenD 12/16/2013 21:00'!
-cancelAndForgetEverything
-
-	self delete! !
 
 !LayoutMorphEditPanel methodsFor: 'accessing' stamp: 'KenD 12/16/2013 15:29'!
 colorArea
@@ -584,24 +707,6 @@ directionArea
 directionArea: newDirectonArea
 
 	directionArea := newDirectonArea! !
-
-!LayoutMorphEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 15:09'!
-editModel
-
-	editModel ifNil: [	editModel := self model clone ].
-	^ editModel! !
-
-!LayoutMorphEditPanel methodsFor: 'initialization' stamp: 'KenD 12/16/2013 16:50'!
-editModel: anObject
-
-	editModel := anObject! !
-
-!LayoutMorphEditPanel methodsFor: 'initialization' stamp: 'KenD 12/16/2013 16:49'!
-initialize
-
-	super initialize.
-	self layoutMorph separation: (self defaultSeparation).
-! !
 
 !LayoutMorphEditPanel methodsFor: 'event handling' stamp: 'KenD 12/17/2013 12:35'!
 modelBeColumn
@@ -642,39 +747,6 @@ modelYSeparation: numPixels
 
 	self editModel separation: (self editModel xSeparation @ numPixels).
 	self refreshSeparationtionArea.! !
-
-!LayoutMorphEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/16/2013 21:17'!
-newButtonArea
-	"Answer a LayoutMorph with Update and Cancel buttons"
-	
-	| buttonArea |
-	buttonArea := LayoutMorph newRow.
-	^ buttonArea 
-		separation: 8@0;
-		addMorph: (PluggableButtonMorph 
-				model: self 
-				action:  #updateMasterFromCopy
-				label: 'Update')
-			layoutSpec: (LayoutSpec 
-							proportionalWidth: 0.3 
-							proportionalHeight:  1 
-							minorDirectionPadding: #center);
-		addMorph: (PluggableButtonMorph 
-				model: self 
-				action:  #cancelAndForgetEverything
-				label: 'Cancel')
-			layoutSpec: (LayoutSpec 
-							proportionalWidth: 0.3 
-							proportionalHeight:  1 
-							minorDirectionPadding: #center);
-		layoutSpec: (LayoutSpec 
-							proportionalWidth: 1 
-							fixedHeight: 36
-							minorDirectionPadding: #center);
-		padding: #center;
-		yourself
-
-	! !
 
 !LayoutMorphEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/17/2013 14:07'!
 newColorArea
@@ -953,7 +1025,7 @@ setPadRadio: radio fromPadFactor: factor
 		[1.0] -> [ (radio buttons at: 3) select ].
 	} otherwise: [ (radio buttons at: 4) select ]! !
 
-!LayoutMorphEditPanel methodsFor: 'event handling' stamp: 'KenD 12/17/2013 14:57'!
+!LayoutMorphEditPanel methodsFor: 'event handling' stamp: 'KenD 12/18/2013 21:57'!
 updateMasterFromCopy
 	"Update model from editModel"
 	
@@ -964,18 +1036,527 @@ updateMasterFromCopy
 	original padding: editCopy padding.
 	original separation: ( editCopy xSeparation @ editCopy ySeparation ).
 	original color: editCopy color.
+	original layoutSubmorphs; redrawNeeded.
 	
 	self delete! !
 
-!LayoutSpecEditPanel methodsFor: 'GUI building' stamp: 'KenD 12/10/2013 18:48'!
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 20:41'!
+addFixedHeightEntryMorphTo: radio
+	"Add entry field to #Fixed radioButton row"
+
+	| fixEntry spec layout rowForFixed | 
+	spec :=  self editModel.
+	fixEntry := SimpleNumberEntryMorph 
+						integerRangeFrom: 0 
+						to: DisplayScreen actualScreenSize y 
+						maxNumChars: 4.
+	fixEntry valueAccessor: [ :model | model privateFixedHeight ].
+	fixEntry valueUpdator: [ :newFixPix | spec fixedHeight: newFixPix ].
+	fixEntry refreshValueFrom: spec.
+	"Do layout surgery to make room for added field"
+	rowForFixed := (radio rowFor: #Fixed).
+	layout := LayoutSpec 
+			proportionalWidth: 0.4
+			fixedHeight: rowForFixed layoutSpec privateFixedHeight
+			minorDirectionPadding:  #left.
+	rowForFixed
+		layoutSpec: layout;
+		addMorph: fixEntry.
+"		addMorph: (StringMorph contents: 'pixels') 
+			layoutSpec: (LayoutSpec keepMorphExtent)"! !
+
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 20:41'!
+addFixedWidthEntryMorphTo: radio
+	"Add entry field to #Fixed radioButton row"
+
+	| fixEntry spec layout rowForFixed | 
+	spec :=  self editModel.
+	fixEntry := SimpleNumberEntryMorph 
+						integerRangeFrom: 0 
+						to: DisplayScreen actualScreenSize x 
+						maxNumChars: 4.
+	fixEntry valueAccessor: [ :model | model privateFixedWidth ].
+	fixEntry valueUpdator: [ :newFixPix | spec fixedWidth: newFixPix ].
+	fixEntry refreshValueFrom: spec.
+	"Do layout surgery to make room for added field"
+	rowForFixed := (radio rowFor: #Fixed).
+	layout := LayoutSpec 
+			proportionalWidth: 0.4
+			fixedHeight: rowForFixed layoutSpec privateFixedHeight
+			minorDirectionPadding:  #left.
+	rowForFixed
+		layoutSpec: layout;
+		addMorph: fixEntry.
+"		addMorph: (StringMorph contents: 'pixels') 
+			layoutSpec: (LayoutSpec keepMorphExtent)"! !
+
+!LayoutSpecEditPanel methodsFor: 'initialization' stamp: 'KenD 12/18/2013 21:03'!
+auxHeight
+
+	^ 48 "pixels"! !
+
+!LayoutSpecEditPanel methodsFor: 'GUI building' stamp: 'KenD 12/18/2013 19:24'!
 buildMorphicWindow
+
+	| controlsArea |
+	labelString := self model printStringLimitedTo: 30.
+		
+	widthArea     := self newWidthArea.
+	heightArea    := self newHeightArea.
+	paddingArea  := self newPaddingArea.
 	
-	self notYetImplemented;
-		addMorph: (PluggableButtonMorph model: self action: #close label: 'Close Me')
+	controlsArea := LayoutMorph newRow.
+	controlsArea 
+		separation: self defaultSeparation;
+		addMorph: widthArea;
+		addMorph: heightArea;
+		addMorph: paddingArea.
+
+	"Setup is done in area creation methods"	
+
+	self layoutMorph 
+		separation: self defaultSeparation;
+		addMorph: controlsArea;
+		addMorph: self newButtonArea;
+		padding: #center.
+
+! !
+
+!LayoutSpecEditPanel methodsFor: 'initialization' stamp: 'KenD 12/18/2013 21:03'!
+defaultExtent
+
+	^ 550@240! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:50'!
+heightArea
+
+	^ heightArea! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:51'!
+heightArea: newHeightArea
+
+	heightArea := newHeightArea! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/18/2013 18:21'!
+heightSelectionSymbol
+
+	| fix prop |
+	fix    := self editModel privateFixedHeight.
+	prop := self editModel privateProportionalHeight.
+	
+	^ prop 
+		ifNil: [
+			fix ifNil: [ #'use morph height' ] 
+				ifNotNil: [ #Fixed ]
+		]
+		ifNotNil: [ #Proportional ].! !
+
+!LayoutSpecEditPanel methodsFor: 'event handling' stamp: 'KenD 12/17/2013 20:22'!
+modelPadding: numPixels
+	
+	self editModel minorDirectionPadding: numPixels.
+	self refreshPaddingArea.! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/18/2013 19:53'!
+newEmptyAuxArea
+
+	| aux |
+	aux := LayoutMorph newColumn.
+	^ aux
+		color: Theme current background;
 		layoutSpec: (LayoutSpec 
-							proportionalWidth: 0.3
-		 					proportionalHeight: 0.3 
-							minorDirectionPadding: #center).! !
+					proportionalWidth: 1.0 
+					fixedHeight: self auxHeight
+					minorDirectionPadding: #center);
+		separation: self defaultSeparation;
+		yourself! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/18/2013 21:14'!
+newHeightArea
+	"Answer a FramedLayoutMorph with controls for Height"
+	
+	| heightArea label spec radio selected |
+	heightArea := FramedLayoutMorph newColumn.
+	label := LabelMorph contents: 'Height'.
+	radio := RadioGroup fromList: #( 'use morph height' Fixed Proportional ).
+	selected := self heightSelectionSymbol.
+
+	spec := LayoutSpec fixedHeight:
+		(2 * heightArea borderWidth)
+		+ (label naturalHeight)
+		+ (radio naturalHeight)
+		+ (self auxHeight)
+		+ 4.
+		
+	"Setup"
+	self setRadioSelection: radio selectSym: selected.
+	(selected == #Fixed) ifTrue: [ self addFixedHeightEntryMorphTo: radio ].
+	"Nota Bene: be sure to setRadioSelection:selectSym: BEFORE when:send:to:"
+	radio when: #informRadioSelection send: #newHeightSelection: to: self.
+		
+	^ heightArea
+		layoutSpec: spec;
+		addMorph: label;
+		addMorph: radio;
+		addMorph: ((selected == #Proportional)
+			ifTrue: [self newProportionalHeightAuxArea]
+			ifFalse: [self newEmptyAuxArea]);
+		yourself 
+! !
+
+!LayoutSpecEditPanel methodsFor: 'event handling' stamp: 'KenD 12/18/2013 19:44'!
+newHeightSelection: selectSym
+
+	| spec origFix origProp |
+	spec := self editModel.
+	origFix   := spec privateFixedHeight.
+	origProp := spec privateProportionalHeight.
+	
+	selectSym caseOf: {
+		[ #Fixed ] -> [ 
+			spec fixedHeight: (origFix ifNil: [ 0 ] ifNotNil: [ origFix ]) 
+		].
+		[ #Proportional ] -> [ 
+			spec setProportionalHeight: (origProp ifNil: [ 1.0 ] ifNotNil: [ origProp ])
+		].
+		[ #'use morph height' ] -> [ self editModel useMorphHeight ].
+	}.	
+	
+	self refreshHeightArea ! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/18/2013 20:29'!
+newPaddingArea
+	"Answer a FramedLayoutMorph with controls for Padding"
+	
+	| padArea label spec row |
+	padArea := FramedLayoutMorph newColumn.
+	label := LabelMorph contents: 'Padding'.
+	padRadio := RadioGroup fromList:  #('Left/Top' Center 'Right/Bottom' Specify) .
+	
+	spec := LayoutSpec fixedHeight:
+		(2 * padArea borderWidth)
+		+ (label naturalHeight)
+		+ (padRadio naturalHeight)
+		+ 4.
+		
+	"Setup"
+	padEntry := SimpleNumberEntryMorph realFactor: 1.0 maxNumChars: 3.
+	row := (padRadio rowFor: #Specify).
+	"Do layout surgery on row to make room for padEntry"
+	row
+		layoutSpec: (LayoutSpec proportionalWidth: 0.5
+						fixedHeight: row layoutSpec privateFixedHeight
+						minorDirectionPadding:  #left);
+		addMorph: padEntry.
+	padEntry valueAccessor: [ :model | model minorDirectionPadding ].
+	padEntry valueUpdator: [ :newPad | self modelPadding: newPad ].
+	padEntry refreshValueFrom: self editModel.
+	self setPadRadio: padRadio fromPadFactor: padEntry value.
+	
+	padRadio when: #informRadioSelection send: #newPaddingSelection: to: self.
+		
+	^ padArea
+		layoutSpec: spec;
+		addMorph: label;
+		addMorph: padRadio;
+		yourself 
+! !
+
+!LayoutSpecEditPanel methodsFor: 'event handling' stamp: 'KenD 12/17/2013 20:24'!
+newPaddingSelection: padSym
+
+	| radio |
+	radio := self padRadio.
+	padSym caseOf: {
+		[ #'Left/Top' ] -> [ (radio buttons at: 1) select. self padEntry setValue: 0.0 ].
+		[ #Center ] -> [ (radio buttons at: 2) select. self padEntry setValue: 0.5 ].
+		[ #'Right/Bottom' ] -> [ (radio buttons at: 3) select. self padEntry setValue: 1.0 ].
+		[ #Specify ] ->  [ (radio buttons at: 4) select ].
+	}.
+
+! !
+
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 21:13'!
+newProportionalHeightAuxArea
+	"Add proportion factor and minSize fields"
+
+	| aux |
+	aux := LayoutMorph newColumn.
+	^ aux
+		color: Theme current background;
+		layoutSpec: (LayoutSpec 
+					proportionalWidth: 1.0 
+					fixedHeight: self auxHeight
+					minorDirectionPadding: #center);
+		separation: self defaultSeparation;
+		addMorph: self propHeightPercent;
+		addMorph: self propHeightMinimum;
+		yourself! !
+
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 21:15'!
+newProportionalWidthAuxArea
+	"Add proportion factor and minSize fields"
+
+	| aux |
+	aux := LayoutMorph newColumn.
+	^ aux
+		color: Theme current background;
+		layoutSpec: (LayoutSpec 
+					proportionalWidth: 1.0 
+					fixedHeight: self auxHeight
+					minorDirectionPadding: #center);
+		separation: self defaultSeparation;
+		addMorph: self propWidthPercent;
+		addMorph: self propWidthMinimum;
+		yourself! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/18/2013 21:19'!
+newWidthArea
+	"Answer a FramedLayoutMorph with controls for Width"
+	
+	| widthArea label spec radio selected |
+	widthArea := FramedLayoutMorph newColumn.
+	label := LabelMorph contents: 'Width'.
+	radio := RadioGroup fromList: #( 'use morph width' Fixed Proportional ).
+	selected := self widthSelectionSymbol.
+
+	spec := LayoutSpec fixedHeight:
+		(2 * widthArea borderWidth)
+		+ (label naturalHeight)
+		+ (radio naturalHeight)
+		+ (self auxHeight)
+		+ 4.
+		
+	"Setup"
+	self setRadioSelection: radio selectSym: selected.	
+	(selected == #Fixed) ifTrue: [ self addFixedWidthEntryMorphTo: radio ].
+	"Nota Bene: be sure to setRadioSelection:selectSym: BEFORE when:send:to:"
+	radio when: #informRadioSelection send: #newWidthSelection: to: self.
+		
+	^ widthArea
+		layoutSpec: spec;
+		addMorph: label;
+		addMorph: radio;
+		addMorph: ((selected == #Proportional)
+			ifTrue: [self newProportionalWidthAuxArea]
+			ifFalse: [self newEmptyAuxArea]);
+		yourself 
+! !
+
+!LayoutSpecEditPanel methodsFor: 'event handling' stamp: 'KenD 12/18/2013 19:46'!
+newWidthSelection: selectSym
+
+	| spec origFix origProp |
+	spec := self editModel.
+	origFix   := spec privateFixedWidth.
+	origProp := spec privateProportionalWidth.
+	
+	selectSym caseOf: {
+		[ #Fixed ] -> [ 
+			spec fixedWidth: (origFix ifNil: [ 0 ] ifNotNil: [ origFix ]) 
+		].
+		[ #Proportional ] -> [ 
+			spec setProportionalWidth: (origProp ifNil: [ 1.0 ] ifNotNil: [ origProp ])
+		].
+		[ #'use morph width' ] -> [ self editModel useMorphWidth ].
+	}.	
+	
+	self refreshWidthArea.
+	
+! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:49'!
+padEntry
+
+	^ padEntry! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:48'!
+padRadio
+
+	^ padRadio! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:49'!
+paddingArea
+
+	^ paddingArea! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:49'!
+paddingArea: newPaddingArea
+
+	paddingArea := newPaddingArea! !
+
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 21:12'!
+propHeightMinimum
+	"proportion percent"
+
+	| row minEntry |
+	row := LayoutMorph newRow.
+	minEntry := SimpleNumberEntryMorph 
+						integerRangeFrom: 0 
+						to: DisplayScreen actualScreenSize y 
+						maxNumChars: 4.
+	minEntry valueAccessor: [ :model | 
+		model privateFixedHeight ifNil: [ 0 ] ifNotNil: [ :height | height rounded ]
+	].
+	minEntry valueUpdator: [ :newMinPixels | 
+		self editModel proportionalHeight: self editModel privateProportionalHeight
+						  minimum: newMinPixels ].
+	minEntry refreshValueFrom: self editModel.
+	^ row
+		addMorph: (StringMorph contents: 'minimum  ');
+		addMorph: minEntry;
+		addMorph: (StringMorph contents: ' pixels');
+		yourself! !
+
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 21:34'!
+propHeightPercent
+	"proportion percent"
+
+	| row propEntry |
+	row := LayoutMorph newRow.
+	propEntry := SimpleNumberEntryMorph percentForRealFactor: 1.0.
+	propEntry valueAccessor: [ :model | 
+		model privateProportionalHeight ifNil: [ 0 ] ifNotNil: [ :height | height ]
+	].
+	propEntry valueUpdator: [ :newFactor | 
+		self editModel proportionalHeight: newFactor 
+						  minimum: self editModel privateFixedHeight ].
+	propEntry refreshValueFrom: self editModel.
+	^ row
+		addMorph: (StringMorph contents: '        ');
+		addMorph: propEntry;
+		addMorph: (StringMorph contents: '%');
+		yourself! !
+
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 21:12'!
+propWidthMinimum
+	"proportion percent"
+
+	| row minEntry |
+	row := LayoutMorph newRow.
+	minEntry := SimpleNumberEntryMorph 
+						integerRangeFrom: 0 
+						to: DisplayScreen actualScreenSize y 
+						maxNumChars: 4.
+	minEntry valueAccessor: [ :model | 
+		model privateFixedWidth ifNil: [ 0 ] ifNotNil: [ :width | width rounded ]
+	].
+	minEntry valueUpdator: [ :newMinPixels | 
+		self editModel proportionalWidth: self editModel privateProportionalWidth
+						  minimum: newMinPixels ].
+	minEntry refreshValueFrom: self editModel.
+	^ row
+		addMorph: (StringMorph contents: 'minimum  ');
+		addMorph: minEntry;
+		addMorph: (StringMorph contents: ' pixels');
+		yourself! !
+
+!LayoutSpecEditPanel methodsFor: 'entry morphs' stamp: 'KenD 12/18/2013 21:17'!
+propWidthPercent
+	"proportion percent"
+
+	| row propEntry |
+	row := LayoutMorph newRow.
+	propEntry := SimpleNumberEntryMorph percentForRealFactor: 1.0.
+	propEntry valueAccessor: [ :model | 
+		model privateProportionalWidth ifNil: [ 1.0 ] ifNotNil: [ :width | width ]
+	].
+	propEntry valueUpdator: [ :newFactor | 
+		self editModel proportionalWidth: newFactor 
+						  minimum: self editModel privateFixedWidth ].
+	propEntry refreshValueFrom: self editModel.
+	^ row
+		addMorph: (StringMorph contents: '        ');
+		addMorph: propEntry;
+		addMorph: (StringMorph contents: '%');
+		yourself! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/17/2013 20:36'!
+refreshHeightArea
+	"Update my view"
+	
+	| oldArea newArea |
+	oldArea := self heightArea.
+	newArea := self newHeightArea.
+	self replaceArea: oldArea with: newArea.
+	self heightArea: newArea 
+	! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/17/2013 19:55'!
+refreshPaddingArea
+	"Update my view"
+	
+	| oldArea newArea |
+	oldArea := self paddingArea.
+	newArea := self newPaddingArea.
+	self replaceArea: oldArea with: newArea.
+	self paddingArea: newArea 
+	! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/17/2013 20:35'!
+refreshWidthArea
+	"Update my view"
+	
+	| oldArea newArea |
+	oldArea := self widthArea.
+	newArea := self newWidthArea.
+	self replaceArea: oldArea with: newArea.
+	self widthArea: newArea 
+	! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/17/2013 19:55'!
+setPadRadio: radio fromPadFactor: factor
+
+	factor caseOf: {
+		[0.0] -> [ (radio buttons at: 1) select ].
+		[0.5] -> [ (radio buttons at: 2) select ].
+		[1.0] -> [ (radio buttons at: 3) select ].
+	} otherwise: [ (radio buttons at: 4) select ]! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/18/2013 19:45'!
+setRadioSelection: radio selectSym: newSelectSym
+
+	(radio buttonFor: newSelectSym) select! !
+
+!LayoutSpecEditPanel methodsFor: 'event handling' stamp: 'KenD 12/18/2013 21:59'!
+updateMasterFromCopy
+	"Update model from editModel"
+	
+	| original editCopy |
+	original := self model.
+	editCopy := self editModel.
+	original proportionalHeight: editCopy privateProportionalHeight 
+			  minimum: editCopy privateFixedHeight.
+	original proportionalWidth: editCopy privateProportionalWidth 
+			  minimum: editCopy privateFixedWidth.
+	original minorDirectionPadding: editCopy minorDirectionPadding.
+	self owner ifNotNil: [ self owner layoutSubmorphs. self owner redrawNeeded ].
+	
+	self delete    "My job is done"! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:50'!
+widthArea
+
+	^ widthArea! !
+
+!LayoutSpecEditPanel methodsFor: 'accessing' stamp: 'KenD 12/17/2013 19:51'!
+widthArea: newWidthArea
+
+	widthArea := newWidthArea ! !
+
+!LayoutSpecEditPanel methodsFor: 'area layouts' stamp: 'KenD 12/18/2013 18:22'!
+widthSelectionSymbol
+
+	| fix prop |
+	fix    := self editModel privateFixedWidth.
+	prop := self editModel privateProportionalWidth.
+	
+	^ prop 
+		ifNil: [
+			fix ifNil: [ #'use morph width' ] 
+				ifNotNil: [ #Fixed ]
+		]
+		ifNotNil: [ #Proportional ].! !
 
 !TestPanel methodsFor: 'GUI building' stamp: 'KenD 12/9/2013 19:06'!
 buildMorphicWindow
