@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1867] on 8 December 2013 at 9:17:18.332419 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1880] on 19 December 2013 at 9:03:06.622872 am'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 53!
+!provides: 'Morphic-ColorEditor' 1 58!
 !requires: 'CSS3-NamedColors' 1 0 nil!
-!requires: 'Graphics-Files-Additional' nil nil nil!
+!requires: 'Graphics-Files-Additional' 1 nil nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
 	instanceVariableNames: 'color'
@@ -1860,7 +1860,7 @@ list
 
 	^ list! !
 
-!RadioGroup methodsFor: 'accessing' stamp: 'KenD 11/24/2013 09:18'!
+!RadioGroup methodsFor: 'accessing' stamp: 'KenD 12/15/2013 21:56'!
 list: arrayOfSymbols
 	"Set up my submorphs from arrayOfSymbols"
 
@@ -1896,8 +1896,15 @@ list: arrayOfSymbols
 			fixedHeight: self font height
 			minorDirectionPadding: #center.
 	labelList do: [ :label | label layoutSpec: labelLayout ].
+	self layoutSpec: (LayoutSpec fixedHeight: self naturalHeight).
 
 ! !
+
+!RadioGroup methodsFor: 'geometry' stamp: 'KenD 12/15/2013 21:57'!
+naturalHeight
+	"Answer the combined heights of my elements"
+	
+	^ 4 + (self list size * ((self font height max: RadioButtonMorph defaultDiameter) + 2))! !
 
 !RadioGroup methodsFor: 'events-processing' stamp: 'KenD 11/20/2013 15:11'!
 newSelection: radioButton
@@ -2038,7 +2045,7 @@ numCharsToHold
 
 	^ numCharsToHold! !
 
-!SimpleNumberEntryMorph methodsFor: 'events' stamp: 'KenD 12/2/2013 16:52'!
+!SimpleNumberEntryMorph methodsFor: 'events' stamp: 'KenD 12/17/2013 14:03'!
 refreshValueFrom: model
 	"Refresh my value from model"
 	
@@ -2176,6 +2183,20 @@ includeInNewMorphMenu
 	
 	^ false! !
 
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/16/2013 17:20'!
+integerRangeFrom: min to: max maxNumChars: numChars
+	"min..max"
+
+	^ self new
+			legalChars: '1234567890'  
+		     numCharsToHold: numChars
+			value: min
+			validator: [ :str | | val | 
+				val := [ str asNumber ] on: Error do: [ -1 ].
+				(val between: min and: max) ifFalse: [ nil ] ifTrue: [ val ]
+			] 
+			toString: [ :n | n printString ]! !
+
 !SimpleNumberEntryMorph class methodsFor: 'instance creation' stamp: 'KenD 11/21/2013 14:35'!
 legalChars: entryChars numCharsToHold: nilOrInteger value: initialValue validator: aClosureToValidate toString: aClosureForString
 
@@ -2208,6 +2229,76 @@ percentExact
 				(val between: 0 and: 100) ifFalse: [ nil ] ifTrue: [ val ]
 			] 
 			toString: [ :n | n printString ]! !
+
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/15/2013 19:57'!
+percentForFixedFactor: factorMax
+	"Entry and display as 0..100; internal value as 0.0..factorMax
+	where factorMax is an integer."
+"
+	SimpleNumberEntryMorph percentForFixedFactor: 255.
+	100% -> 255
+"
+	| ratio |
+	ratio := 100 / factorMax.
+	^ self new
+			legalChars: '1234567890'  "No $. "
+		     numCharsToHold: 3 
+			value: 0 
+			validator: [ :str | | val | 
+				val := [ str asNumber ] on: Error do: [ -1 ].
+				(val between: 0 and: 100) ifFalse: [ nil ] ifTrue: [ (val / ratio) rounded ]
+			] 
+			toString: [ :n | (n * ratio) rounded printString ]! !
+
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/15/2013 19:58'!
+percentForRealFactor: factorMax
+	"Entry and display as 0..100; internal value as 0.0..factorMax
+	where factorMax is a float."
+"
+	SimpleNumberEntryMorph percentForRealFactor: 1.0
+	40% -> 0.4
+"
+	| ratio |
+	ratio := 100 / factorMax.
+	^ self new
+			legalChars: '1234567890'  "No $. "
+		     numCharsToHold: 3 
+			value: 0 
+			validator: [ :str | | val | 
+				val := [ str asNumber ] on: Error do: [ -1 ].
+				(val between: 0 and: 100) ifFalse: [ nil ] ifTrue: [ val / ratio ]
+			] 
+			toString: [ :n | (n * ratio) rounded printString ]! !
+
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/16/2013 17:08'!
+realFactor: factorMax
+	"0.0..factorMax
+	where factorMax is a float."
+
+	^ self new
+			legalChars: '12345.67890'  
+		     numCharsToHold: 3 
+			value: 0 
+			validator: [ :str | | val | 
+				val := [ str asNumber ] on: Error do: [ -1 ].
+				(val between: 0 and: 1.0) ifFalse: [ nil ] ifTrue: [ val ]
+			] 
+			toString: [ :n | n asFloat printString ]! !
+
+!SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 12/16/2013 17:09'!
+realFactor: factorMax maxNumChars: numChars
+	"0.0..factorMax
+	where factorMax is a float."
+
+	^ self new
+			legalChars: '12345.67890'  
+		     numCharsToHold: numChars
+			value: 0 
+			validator: [ :str | | val | 
+				val := [ str asNumber ] on: Error do: [ -1 ].
+				(val between: 0 and: 1.0) ifFalse: [ nil ] ifTrue: [ val ]
+			] 
+			toString: [ :n | n asFloat printString ]! !
 
 !SimpleNumberEntryMorph class methodsFor: 'examples' stamp: 'KenD 11/23/2013 20:02'!
 rgbOneOf
