@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1880] on 19 December 2013 at 9:03:06.622872 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1880] on 19 December 2013 at 5:15:31.166688 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 58!
-!requires: 'CSS3-NamedColors' 1 0 nil!
+!provides: 'Morphic-ColorEditor' 1 59!
 !requires: 'Graphics-Files-Additional' 1 nil nil!
+!requires: 'CSS3-NamedColors' 1 0 nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
 Object subclass: #ColorEditorModel
 	instanceVariableNames: 'color'
@@ -2000,6 +2000,12 @@ keyStroke: aKeyboardEvent
 	].
 
 	super keyStroke: aKeyboardEvent! !
+
+!SimpleNumberEntryMorph methodsFor: 'events' stamp: 'KenD 12/19/2013 17:14'!
+keyboardFocusChange: aBoolean 
+
+	super keyboardFocusChange: aBoolean.
+	aBoolean ifFalse: [ self crAction ifNotNil: [ :thunk | thunk value ]].! !
 
 !SimpleNumberEntryMorph methodsFor: 'initialization' stamp: 'KenD 12/2/2013 16:47'!
 legalChars: legalEntryChars numCharsToHold: nilOrInteger value: initialValue validator: aClosureToValidate toString: aClosureForString
