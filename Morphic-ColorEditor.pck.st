@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 23 December 2013 at 4:35:27.315766 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1899] on 24 December 2013 at 9:27:35.139922 am'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 61!
+!provides: 'Morphic-ColorEditor' 1 62!
 !requires: 'Graphics-Files-Additional' 1 nil nil!
 !requires: 'CSS3-NamedColors' 1 0 nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
@@ -609,12 +609,12 @@ buildColorPaneColumn
 	
 	^ colorPaneColumn ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/23/2013 13:22'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/24/2013 08:43'!
 buildMorphicWindow
 	"Create a useful ColorEditor window"
 	
 	self layoutMorph beRow; " A row of columns"
-		 separation: 6;
+		 separation: 2;
 		 addMorph: self buildColorPaneColumn;
 			 layoutSpec: (LayoutSpec 
 							fixedWidth: 256 
@@ -638,7 +638,7 @@ buildMorphicWindow
 	^ self
 ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/23/2013 13:21'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/24/2013 09:00'!
 buildRadioButtonColumn
 
 	| radioCol setupEntryMorph valueEntryMorph hexDisplayLayout swatchLayout aLayout |
@@ -682,7 +682,7 @@ buildRadioButtonColumn
 					minorDirectionPadding: #center).
 	].
 
-	(rgbRadio buttonFor: #Green) select.
+	(rgbRadio buttonFor: self defaultRadioSelector) select.
 	
 	hexDisplayLayout := LayoutMorph newRow.
 	hexDisplayLayout 
@@ -706,10 +706,18 @@ buildRadioButtonColumn
 	aLayout
 		addMorph: closeColorSwatch;
 		addMorph: closestRGB layoutSpec: (LayoutSpec 	keepMorphExtent);
-		addMorph: closeColorLabel layoutSpec: (LayoutSpec keepMorphExtent).
+		addMorph: closeColorLabel layoutSpec: (LayoutSpec keepMorphExtent);
+		layoutSpec: (LayoutSpec
+						 proportionalWidth: 0.6
+						 proportionalHeight: 1.0
+						 minorDirectionPadding: #left).
 
 	swatchLayout 
-		addMorph: self colorSwatch;
+		addMorph: self colorSwatch 
+			layoutSpec:  (LayoutSpec
+						 proportionalWidth: 0.4
+						 proportionalHeight: 1.0
+						 minorDirectionPadding: #left);
 		addMorph: aLayout;
 		layoutSpec: (LayoutSpec
 						 proportionalWidth: 1.0
@@ -751,10 +759,10 @@ colorSwatchExtent
 
 	^ 64 @ 64! !
 
-!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/23/2013 13:12'!
+!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/24/2013 08:48'!
 defaultExtent
 
-	^ 570@315! !
+	^ 570@330! !
 
 !ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 11/24/2013 18:58'!
 defaultRadioSelector
@@ -777,6 +785,11 @@ initialize
 	self refreshColorSwatch.
 
 	! !
+
+!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/24/2013 08:36'!
+minimumExtent
+
+	^ 570@330! !
 
 !ColorEditorWindow methodsFor: 'events-processing' stamp: 'KenD 11/27/2013 15:00'!
 newRadioSelection: selectionSymbol
@@ -827,7 +840,7 @@ refreshColorSwatch
 	colorSwatch image: (model color iconOrThumbnailOfSize: self colorSwatchExtent).
 	colorSwatch color: self model color! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/23/2013 13:23'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/24/2013 08:44'!
 resetSliderColumn: sliderSym
 	"Radio selector changed.."
 
@@ -849,7 +862,7 @@ resetSliderColumn: sliderSym
 		removeAllMorphs;
 		separation: 6;
 		layoutSpec: (LayoutSpec 
-						fixedWidth: 2 + (AbstractFont default 
+						fixedWidth: 4 + (AbstractFont default 
 												widthOfString: 'brightness') "longest string"
 						fixedHeight: 256  
 						minorDirectionPadding: #center);
@@ -887,15 +900,15 @@ updateColorFromPane
 	
 	self model setColor: self colorPane focusColor! !
 
-!ColorEditorWindow class methodsFor: 'initialization' stamp: 'KenD 11/24/2013 16:47'!
+!ColorEditorWindow class methodsFor: 'initialization' stamp: 'KenD 12/24/2013 09:26'!
 defaultColor
 
-	^ Color periwinkle ! !
+	^ Color  r: 16r40/255 g: 16rA5/255 b: 16rD0/255.! !
 
-!ColorEditorWindow class methodsFor: 'initialization' stamp: 'KenD 11/25/2013 19:49'!
+!ColorEditorWindow class methodsFor: 'initialization' stamp: 'KenD 12/24/2013 09:04'!
 defaultExtent
 
-	^ 556@340! !
+	^ 570@330! !
 
 !ColorEditorWindow class methodsFor: 'new-morph participation' stamp: 'KenD 12/6/2013 19:09'!
 includeInNewMorphMenu
