@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1880] on 19 December 2013 at 5:15:31.166688 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #1898] on 23 December 2013 at 4:35:27.315766 pm'!
 'Description A ColorEditor'!
-!provides: 'Morphic-ColorEditor' 1 59!
+!provides: 'Morphic-ColorEditor' 1 61!
 !requires: 'Graphics-Files-Additional' 1 nil nil!
 !requires: 'CSS3-NamedColors' 1 0 nil!
 !classDefinition: #ColorEditorModel category: #'Morphic-ColorEditor'!
@@ -588,7 +588,7 @@ includeInNewMorphMenu
 	
 	^ false! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/5/2013 19:56'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/23/2013 13:20'!
 buildColorPaneColumn
 
 	| colorPaneColumn selector |
@@ -600,7 +600,7 @@ buildColorPaneColumn
 	colorPane updateColorFromModel: self model;
 		layoutSpec: (LayoutSpec fixedWidth: 256 
 										fixedHeight: 256 
-										minorDirectionPadding: #center).
+										minorDirectionPadding: #top).
 	colorPane when: #colorChanged send: #updateColorFromPane to: self.
 	colorPaneColumn := LayoutMorph newColumn.
 	colorPaneColumn 
@@ -609,7 +609,7 @@ buildColorPaneColumn
 	
 	^ colorPaneColumn ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/8/2013 08:03'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/23/2013 13:22'!
 buildMorphicWindow
 	"Create a useful ColorEditor window"
 	
@@ -619,15 +619,16 @@ buildMorphicWindow
 			 layoutSpec: (LayoutSpec 
 							fixedWidth: 256 
 							fixedHeight: 256 
-							minorDirectionPadding: #center);
+							minorDirectionPadding: #top);
 		 addMorph: self buildSliderColumn
 			 layoutSpec: (LayoutSpec 
-							proportionalWidth: 0.05
-							proportionalHeight: 1 
+							fixedWidth: 2 + (AbstractFont default 
+												widthOfString: 'brightness') "longest string"
+							fixedHeight: 256 
 							minorDirectionPadding: #center);
 		 addMorph: self buildRadioButtonColumn
 			 layoutSpec: (LayoutSpec 
-							proportionalWidth: 0.7
+							fixedWidth: 200
 							proportionalHeight: 1 
 							minorDirectionPadding: #center);
 		layoutSpec: (LayoutSpec keepMorphExtent).
@@ -637,7 +638,7 @@ buildMorphicWindow
 	^ self
 ! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/6/2013 19:02'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/23/2013 13:21'!
 buildRadioButtonColumn
 
 	| radioCol setupEntryMorph valueEntryMorph hexDisplayLayout swatchLayout aLayout |
@@ -705,7 +706,7 @@ buildRadioButtonColumn
 	aLayout
 		addMorph: closeColorSwatch;
 		addMorph: closestRGB layoutSpec: (LayoutSpec 	keepMorphExtent);
-		addMorph: closeColorLabel layoutSpec: (LayoutSpec 	keepMorphExtent).
+		addMorph: closeColorLabel layoutSpec: (LayoutSpec keepMorphExtent).
 
 	swatchLayout 
 		addMorph: self colorSwatch;
@@ -721,10 +722,7 @@ buildRadioButtonColumn
 		addMorph: rgbRadio;
 		addMorph: hsvRadio;
 		addMorph: swatchLayout;
-		addMorph: hexDisplayLayout 
-		    layoutSpec: (LayoutSpec fixedWidth: 300 
-											fixedHeight: 20
-											minorDirectionPadding: #center);
+		addMorph: hexDisplayLayout;
 		yourself
 	! !
 
@@ -752,6 +750,11 @@ colorSwatch
 colorSwatchExtent
 
 	^ 64 @ 64! !
+
+!ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 12/23/2013 13:12'!
+defaultExtent
+
+	^ 570@315! !
 
 !ColorEditorWindow methodsFor: 'initialization' stamp: 'KenD 11/24/2013 18:58'!
 defaultRadioSelector
@@ -824,7 +827,7 @@ refreshColorSwatch
 	colorSwatch image: (model color iconOrThumbnailOfSize: self colorSwatchExtent).
 	colorSwatch color: self model color! !
 
-!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/5/2013 19:48'!
+!ColorEditorWindow methodsFor: 'GUI building' stamp: 'KenD 12/23/2013 13:23'!
 resetSliderColumn: sliderSym
 	"Radio selector changed.."
 
@@ -846,17 +849,13 @@ resetSliderColumn: sliderSym
 		removeAllMorphs;
 		separation: 6;
 		layoutSpec: (LayoutSpec 
-						fixedWidth:  12 + (AbstractFont default 
+						fixedWidth: 2 + (AbstractFont default 
 												widthOfString: 'brightness') "longest string"
-						proportionalHeight: 1 
+						fixedHeight: 256  
 						minorDirectionPadding: #center);
 		addMorph: scrollBar;
 		addMorph: (StringMorph contents: sliderLabel font: AbstractFont default)
-			layoutSpec: (LayoutSpec 
-								fixedWidth: (AbstractFont default 
-												widthOfString: sliderLabel) + 2
-								proportionalHeight: 1.0  
-								minorDirectionPadding: #center);
+			layoutSpec: (LayoutSpec keepMorphExtent);
 		yourself
 	! !
 
