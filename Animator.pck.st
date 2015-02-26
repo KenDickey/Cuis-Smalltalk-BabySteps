@@ -1,6 +1,7 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1832] on 27 September 2013 at 3:26:42.11968 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2198] on 26 February 2015 at 9:08:27.575885 am'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 8!
+!provides: 'Animator' 1 9!
+!requires: 'Cuis-Base' 42 2198 nil!
 !classDefinition: #Animator category: #Animator!
 Object subclass: #Animator
 	instanceVariableNames: 'actor action stepTime'
@@ -50,7 +51,7 @@ shouldGetStepsFrom: aWorld
 
 	^ true! !
 
-!Animator methodsFor: 'stepping' stamp: 'KenD 9/20/2013 05:26'!
+!Animator methodsFor: 'stepping' stamp: 'KenD 2/26/2015 08:49'!
 startStepping
 	"Start stepping the receiver"
 	| w |
@@ -59,7 +60,6 @@ startStepping
 		  w startStepping: self 
 		   	at: Time localMillisecondClock 
 			selector: #step 
-			arguments: nil 
 			stepTime: self stepTime]! !
 
 !Animator methodsFor: 'stepping' stamp: 'KenD 9/20/2013 04:55'!
@@ -77,13 +77,13 @@ stepTime: millisecondsToNextStep
 
 	stepTime := millisecondsToNextStep! !
 
-!Animator methodsFor: 'stepping' stamp: 'KenD 9/20/2013 05:23'!
+!Animator methodsFor: 'stepping' stamp: 'KenD 2/26/2015 08:52'!
 stopStepping
 	"Stop getting sent the 'step' message."
 
 	| w |
 	w _ self runningWorld.
-	w ifNotNil: [w stopStepping: self].
+	w ifNotNil: [w stopSteppingMorph: self].
 ! !
 
 !Animator methodsFor: 'as yet unclassified'!
