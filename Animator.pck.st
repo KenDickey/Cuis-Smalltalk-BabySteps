@@ -1,10 +1,10 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2198] on 26 February 2015 at 9:08:27.575885 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2198] on 28 February 2015 at 10:57:13.332343 am'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 9!
+!provides: 'Animator' 1 10!
 !requires: 'Cuis-Base' 42 2198 nil!
 !classDefinition: #Animator category: #Animator!
 Object subclass: #Animator
-	instanceVariableNames: 'actor action stepTime'
+	instanceVariableNames: 'actor action stepTime doneProc'
 	classVariableNames: 'Animators'
 	poolDictionaries: ''
 	category: 'Animator'!
@@ -14,7 +14,13 @@ Animator class
 
 
 !Animator commentStamp: '<historical>' prior: 0!
-My inatances animate individual Morphs without subclassing
+My instances animate individual Morphs without subclassing via stepping.
+This means animations are asynchronous/non-blocking.
+
+actor -- the morph acted upon
+action -- a one argument closure which gets the actor morph as an argument
+stepTime -- the step time increment
+doneProc -- a one arg closure which answers false if animation is to continue
 
 -- see examples in class siide!
 
@@ -38,22 +44,42 @@ actor: aMorph
 
 	actor := aMorph! !
 
-!Animator methodsFor: 'initialize-release' stamp: 'KenD 9/20/2013 05:01'!
+!Animator methodsFor: 'initialize-release' stamp: 'KenD 2/27/2015 15:07'!
 actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps
 
+	^self actor: aMorph
+	       action: aOneArgClosure
+	       stepTime: milllisecondsBetweenSteps
+	       doneProc: [ :iaMorph | false ]  "never done -> loops continuously"! !
+
+!Animator methodsFor: 'initialize-release' stamp: 'KenD 2/27/2015 15:22'!
+actor: aMorph action: oneArgClosure stepTime: milllisecondsBetweenSteps doneProc: predicateClosure
+
 	self actor: aMorph;
-	      action: aOneArgClosure;
+	      action: oneArgClosure;
 	      stepTime: milllisecondsBetweenSteps;
+		 doneProc: predicateClosure;
 	      yourself! !
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
+doneProc
+
+	^doneProc! !
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
+doneProc: aOneArgClosure
+
+	doneProc := aOneArgClosure! !
 
 !Animator methodsFor: 'stepping' stamp: 'KenD 9/20/2013 05:27'!
 shouldGetStepsFrom: aWorld
 
 	^ true! !
 
-!Animator methodsFor: 'stepping' stamp: 'KenD 2/26/2015 08:49'!
+!Animator methodsFor: 'stepping' stamp: 'KenD 2/27/2015 14:40'!
 startStepping
 	"Start stepping the receiver"
+	
 	| w |
 	w _ self runningWorld.
 	w ifNotNil: [
@@ -62,10 +88,12 @@ startStepping
 			selector: #step 
 			stepTime: self stepTime]! !
 
-!Animator methodsFor: 'stepping' stamp: 'KenD 9/20/2013 04:55'!
+!Animator methodsFor: 'stepping' stamp: 'KenD 2/27/2015 14:50'!
 step
 
-	self action value: self actor ! !
+	self action value: self actor.
+	(self doneProc value: self actor)
+		ifTrue: [self stopStepping].! !
 
 !Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:53'!
 stepTime
@@ -95,14 +123,27 @@ actor: aMorph action: aOneArgClosure
 
 	^ self new actor: aMorph action: aOneArgClosure stepTime: self defaultStepTime ! !
 
-!Animator class methodsFor: 'instance creation' stamp: 'KenD 9/20/2013 05:02'!
+!Animator class methodsFor: 'instance creation' stamp: 'KenD 2/27/2015 15:25'!
 actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps
 
-	^ self new actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps! !
+	^ self new actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps doneProc: self alwaysFalse! !
 
-!Animator class methodsFor: 'actions' stamp: 'KenD 9/20/2013 09:10'!
+!Animator class methodsFor: 'instance creation' stamp: 'KenD 2/27/2015 15:23'!
+actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps doneProc: predicateClosure
+
+	^ self new actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps doneProc: predicateClosure! !
+
+!Animator class methodsFor: 'doneTestProc' stamp: 'KenD 2/27/2015 15:24'!
+alwaysFalse
+	"Answer a closure which takes a morph and always answers false.
+	 Used for continuous loop animations."
+	
+	^ [ :aMorph | false ]! !
+
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:05'!
 blinkAction
-	"blink"
+	"Answers a closure which takes a morph and makes it blink
+	 by hiding ans showing it."
 	
 	| toggle |
 	toggle := true.
@@ -112,29 +153,12 @@ blinkAction
 					ifFalse: [ aMorph show ]
 	  ]! !
 
-!Animator class methodsFor: 'actions' stamp: 'KenD 9/27/2013 15:22'!
-cycleColors: aColorCollection forSelector: collorSetter
-	"Follow a path"
-	
-	| colorIndex |
-	colorIndex := 0.
-	^ [ :aMorph | 
-			colorIndex := colorIndex + 1.
-			colorIndex > aColorCollection size ifTrue:  [ colorIndex := 1 ].
-			aMorph perform: collorSetter with: (aColorCollection at: colorIndex).
-			aMorph redrawNeeded.
-	  ]! !
-
-!Animator class methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:57'!
-defaultStepTime
-	"Twice a second"
-
-	^ 500 "milliSeconds"! !
-
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:23'!
-example1    "Blinking"
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/26/2015 14:47'!
+blinkingExample    "Blinking"
 "
-	self example1.
+	self blinkingExample.
+	
+	Animator stopStepping.
 "
 	| morph animator |
 	morph := ImageMorph initializedInstance openInWorld.
@@ -144,43 +168,10 @@ example1    "Blinking"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:24'!
-example2    "Grow &Shrink"
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/26/2015 14:48'!
+bouncingBallExample    "Bounces off walls of container"
 "
-	self example2.
-	
-	Animator stopStepping.
-"
-	| morph animator |
-	morph := BorderedRectMorph initializedInstance openInWorld.
-	morph morphPosition: 200 @ 100.
-	animator := self actor: morph 
-						 action: (self growShrinkAction: 20 numSteps: 6)
-						 stepTime: 100.
-	animator startStepping.
-	^ animator ! !
-
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:24'!
-example3    "Follow a path, repeatedly"
-"
-	self example3.
-	
-	Animator stopStepping.
-"
-	
-	| morph animator |
-	morph := ImageMorph initializedInstance openInWorld.
-	animator := self actor: morph 
-						 action: (self followPathAction: 
-			{ 20@20. 40@26. 80@30. 90@40. 90@80. 70@100.  40@90.  30@60. 34@40. } )
-						 stepTime: 100.
-	animator startStepping.
-	^ animator ! !
-
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:24'!
-example4    "Bounces off walls of container"
-"
-	self example4.
+	self bouncingBallExample.
 	
 	Animator stopStepping.
 "
@@ -193,10 +184,29 @@ example4    "Bounces off walls of container"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:25'!
-example5  "Compose actions:  grow&shring + path"
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/27/2015 15:14'!
+colorCyclingExample  "Color Cycling"
 "
-	self example5.  
+	self colorCyclingExample.  
+"
+	| morph colors animator |
+	morph := BorderedRectMorph initializedInstance.
+	morph borderWidth: 6;
+		      morphPosition: 100@200.
+	colors := { Color green. Color lightGreen. Color brightGreen. Color forestGreen.  }.
+	animator :=  
+		Animator actor: morph 
+					   action: (Animator cycleColors: colors 
+											  forSelector: #borderColor:)
+					   stepTime: 300.
+	morph openInWorld.
+	animator startStepping.
+	^ animator ! !
+
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/26/2015 14:50'!
+composedActionExample1  "Compose actions:  grow&shring + path"
+"
+	self composedActionExample1.  
 	
 	Animator stopStepping.
 "
@@ -216,10 +226,10 @@ example5  "Compose actions:  grow&shring + path"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:25'!
-example6  "Compose actions -- alternative:  grow&shring + path"
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/27/2015 15:15'!
+composedActionExample2  "Compose actions -- alternative:  grow&shring + path"
 "
-	self example6.  
+	self composedActionExample2.  
 	
 	Animator stopStepping.
 "
@@ -242,28 +252,42 @@ example6  "Compose actions -- alternative:  grow&shring + path"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 9/27/2013 15:23'!
-example7  "Color Cycling"
-"
-	self example7.  
-"
-	| morph colors animator |
-	morph := BorderedRectMorph initializedInstance.
-	morph borderWidth: 4;
-		      morphPosition: 100@200.
-	colors := { Color green. Color brightGreen.}.
-	animator :=  
-		Animator actor: morph 
-					   action: (Animator cycleColors: colors 
-											  forSelector: #borderColor:)
-					   stepTime: 300.
-	morph openInWorld.
-	animator startStepping.
-	^ animator ! !
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:04'!
+cycleColors: aColorCollection forSelector: collorSetter
+	"Answers a closure which takes a morph and cycles the
+	 morph's Color through aColorCollection"
+	
+	| colorIndex |
+	colorIndex := 0.
+	^ [ :aMorph | 
+			colorIndex := colorIndex + 1.
+			colorIndex > aColorCollection size ifTrue:  [ colorIndex := 1 ].
+			aMorph perform: collorSetter with: (aColorCollection at: colorIndex).
+			aMorph redrawNeeded.
+	  ]! !
 
-!Animator class methodsFor: 'actions' stamp: 'KenD 9/20/2013 11:53'!
+!Animator class methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:57'!
+defaultStepTime
+	"Twice a second"
+
+	^ 500 "milliSeconds"! !
+
+!Animator class methodsFor: 'doneTestProc' stamp: 'KenD 2/27/2015 15:27'!
+doneAfterNTimes: anInteger
+	"Answers a closure which reduces a counter by 1 each time called.
+	The closure answers false if counter > 0"
+
+	| counter |
+	counter := anInteger.
+	^ [ :aMorph | 
+		counter := counter - 1.
+		counter <= 0 "true when count exhausted"
+	  ]! !
+
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:01'!
 followPathAction: aPointCollection
-	"Follow a path"
+	"Answers a closure which takes a morph and sets its morphPosition
+	to each point in aPointCollection, circularly"
 	
 	| pathIndex |
 	pathIndex := 0.
@@ -274,9 +298,27 @@ followPathAction: aPointCollection
 			aMorph redrawNeeded.
 	  ]! !
 
-!Animator class methodsFor: 'actions' stamp: 'KenD 9/20/2013 11:58'!
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/26/2015 14:52'!
+growAndShrinkExample    "Grow &Shrink"
+"
+	self growAndShrinkExample.
+	
+	Animator stopStepping.
+"
+	| morph animator |
+	morph := BorderedRectMorph initializedInstance openInWorld.
+	morph morphPosition: 200 @ 100.
+	animator := self actor: morph 
+						 action: (self growShrinkAction: 20 numSteps: 6)
+						 stepTime: 100.
+	animator startStepping.
+	^ animator ! !
+
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:03'!
 growShrinkAction: growSizeinPixels numSteps: numSteps
-	"grow then shrink"
+	"Answers a closure which takes a morph and sets its morphExtent 
+	 to grow then shrink in numSteps, keeping the morph centered on
+	 its original morphPosition."
 	
 	| count isGrowing delta  |
 	count := 0.
@@ -299,6 +341,55 @@ growShrinkAction: growSizeinPixels numSteps: numSteps
 			]
 	  ]! !
 
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/28/2015 10:55'!
+moveMorphExample
+	"Nota Bene: Asynchronous"
+"
+	Animator moveMorphExample.
+"
+	Animator 
+		slide: (ImageMorph initializedInstance openInWorld) 
+		from: (10@10) "Origin initially at 0@0"
+		to: (200@400)
+		nSteps: 10
+		delay: 20. "milliseconds"! !
+
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/27/2015 15:18'!
+pathExample    "Follow a path, once"
+"
+	self pathExample.
+	
+	Animator stopStepping.
+"
+	
+	| morph pathPoints animator |
+	morph := ImageMorph initializedInstance openInWorld.
+	pathPoints := { 20@20. 40@26. 80@30. 90@40. 90@80. 
+						70@100.  40@90.  30@60. 34@40. }.
+	animator := self actor: morph 
+						 action: (self followPathAction: pathPoints)
+						 stepTime: 100
+						 doneProc: (self doneAfterNTimes: (pathPoints size)).
+	animator startStepping.
+	^ animator ! !
+
+!Animator class methodsFor: 'examples' stamp: 'KenD 2/26/2015 14:55'!
+pathLoopExample    "Follow a path, repeatedly"
+"
+	self pathLoopExample.
+	
+	Animator stopStepping.
+"
+	
+	| morph animator |
+	morph := ImageMorph initializedInstance openInWorld.
+	animator := self actor: morph 
+						 action: (self followPathAction: 
+			{ 20@20. 40@26. 80@30. 90@40. 90@80. 70@100.  40@90.  30@60. 34@40. } )
+						 stepTime: 100.
+	animator startStepping.
+	^ animator ! !
+
 !Animator class methodsFor: 'stepping' stamp: 'KenD 9/20/2013 15:57'!
 restartStepping
 	"Start all my instances"
@@ -306,7 +397,7 @@ restartStepping
 	Smalltalk garbageCollectMost. "Clean out stale instances"
 	self allInstancesDo: [ :a | a startStepping ].! !
 
-!Animator class methodsFor: 'actions' stamp: 'KenD 9/20/2013 15:26'!
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 9/20/2013 15:26'!
 simpleMoveBounceAction: aPoint
 	"Move around and vector off container edges"
 	
@@ -340,6 +431,23 @@ simpleMoveBounceAction: aPoint
 		].
 	]
 ! !
+
+!Animator class methodsFor: 'moveMorph' stamp: 'KenD 2/27/2015 20:02'!
+slide: aMorph from: startPoint to: endPoint nSteps: numberOfMoveSteps delay: milliSeconds
+	"Move aMorph along a straightline path from startPoint to endPoint"
+
+	| delta point pathPoints animator  | 
+	point := startPoint.
+	delta := (endPoint - startPoint) / numberOfMoveSteps.
+	pathPoints := OrderedCollection new.
+	numberOfMoveSteps timesRepeat: [ pathPoints add: (point := point + delta)].
+	pathPoints := pathPoints collect: [ :pt | pt rounded ].
+	animator := Animator 
+						actor: aMorph
+						action: (Animator followPathAction: pathPoints)
+						stepTime: milliSeconds 
+						doneProc: (Animator doneAfterNTimes: numberOfMoveSteps).
+	animator startStepping.! !
 
 !Animator class methodsFor: 'stepping' stamp: 'KenD 9/20/2013 12:04'!
 stopStepping
