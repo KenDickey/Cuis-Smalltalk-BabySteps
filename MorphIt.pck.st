@@ -1,23 +1,24 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 17 October 2013 at 5:53:30.286000163 pm'!
-'Description MorphIt is a morphic construction kit/system.'!
-!provides: 'MorphIt' 1 50!
-!requires: 'Graphics-Files-Additional' nil nil nil!
-!requires: 'ValueHolder' 1 17 1!
-!requires: 'Morphic-Display-Pallet' nil nil nil!
-!requires: 'Morphic-Widget-Weaver' nil nil nil!
-!classDefinition: #BorderedImageMorph category: #MorphIt!
-ImageMorph subclass: #BorderedImageMorph
-	instanceVariableNames: 'borderWidth borderColor borderStyle'
+'From Cuis 4.2 of 25 July 2013 [latest update: #2400] on 5 July 2015 at 3:40:23.960974 pm'!
+'Description MorphMorphs change/add state/behavior of other morphs.'!
+!provides: 'MorphIt' 1 18!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'ValueHolder' 1 20 nil!
+!requires: 'Value-Constraints' 1 5 nil!
+!requires: 'Morphic-Misc1' 1 45 nil!
+!requires: 'Animator' 1 11 nil!
+!classDefinition: #MorphModifierPallet category: #MorphIt!
+Morph subclass: #MorphModifierPallet
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'BorderedImageMorph class' category: #MorphIt!
-BorderedImageMorph class
+!classDefinition: 'MorphModifierPallet class' category: #MorphIt!
+MorphModifierPallet class
 	instanceVariableNames: ''!
 
 !classDefinition: #MorphMorph category: #MorphIt!
 BorderedImageMorph subclass: #MorphMorph
-	instanceVariableNames: 'name'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
@@ -57,7 +58,7 @@ MorphTheColor class
 
 !classDefinition: #MorphValueHolder category: #MorphIt!
 MorphMorph subclass: #MorphValueHolder
-	instanceVariableNames: 'valueHolder balloonText icon'
+	instanceVariableNames: 'valueHolder icon'
 	classVariableNames: 'ColorIcon FloatIcon IntegerIcon PointIcon RangeIcon StringIcon'
 	poolDictionaries: ''
 	category: 'MorphIt'!
@@ -65,11 +66,19 @@ MorphMorph subclass: #MorphValueHolder
 MorphValueHolder class
 	instanceVariableNames: ''!
 
+!classDefinition: #UserActionMorph category: #MorphIt!
+MorphMorph subclass: #UserActionMorph
+	instanceVariableNames: 'addActionProc removeActionProc icon'
+	classVariableNames: 'BounceIcon ColorCycleIcon GrowShrinkIcon HandlesKeyboardSelectors HandlesMouseDownSelectors HandlesMouseOverSelectors HandlesMouseStillDownSelectors PathIcon'
+	poolDictionaries: ''
+	category: 'MorphIt'!
+!classDefinition: 'UserActionMorph class' category: #MorphIt!
+UserActionMorph class
+	instanceVariableNames: ''!
 
-!BorderedImageMorph commentStamp: '<historical>' prior: 0!
-I supply a border to an ImageMorph.
 
-borderStyle is one of #simple #raised #inset!
+!MorphModifierPallet commentStamp: '<historical>' prior: 0!
+I am just a way to get a Morph Modifier Pattet [see my class side]!
 
 !MorphMorph commentStamp: '<historical>' prior: 0!
 I am part of Morphit -- a package to author largely via drag 'n drop.
@@ -94,85 +103,28 @@ Drop an instance of me to change a Morph's color.!
 !MorphValueHolder commentStamp: '<historical>' prior: 0!
 My instances represent ValueHolders!
 
+!UserActionMorph commentStamp: '<historical>' prior: 0!
+This class adds mouse or keyboard actions to Morph instances.!
+
 !Form methodsFor: '*morphit' stamp: 'KenD 10/12/2013 16:39'!
 icon32
 	"Answer a 32 x 32 icon of myself"
 	
 	^self magnifyTo: 32 @ 32! !
 
-!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:10'!
+!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 7/5/2015 15:08'!
 morphModifierPallet
+	"Answer a morphModifier pallet for testing"
 "
-	ImagePallet morphModifierPallet.
+	self morphModifierPallet  openInWorld morphExtent:  (690 @ 84).
 "
-	| pallet savedExtent |
-	pallet := MorphModifierPallet initializedInstance.
-	savedExtent := pallet morphExtent.
-	pallet openInWorld.
-	"openInWorld changes extent; change it back"
-	pallet morphExtent: savedExtent.! !
-
-!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:19'!
-namedColorsPalette
-"
-	self useCSS3ColorDict.                    "" To get CSS3/Web color names""
-	self useXKCDColorDict.                    "" To get XKCD color names""
-	ImagePallet namedColorsPalette.
-"
-	| pallet savedExtent |
-	pallet := MorphColorPallet initializedInstance.
-	savedExtent := pallet morphExtent.
-	pallet openInWorld.
-	"openInWorld changes extent; change it back"
-	pallet morphExtent: savedExtent.
-! !
-
-!MorphColorPallet class methodsFor: '*morphit' stamp: 'KenD 10/12/2013 17:09'!
-includeInNewMorphMenu
-
-	^ true! !
-
-!MorphColorPallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:13'!
-initializedInstance 
-
-	| colorPallet sortedColors a b imagePallet savedExtent extraExtent |
-	sortedColors := SortedCollection sortBlock: 
-		 [ :aAssoc :bAssoc |
-			a := aAssoc value.
-			b := bAssoc value.
-			(a hue < b hue) or: [(a hue = b hue) and: [a saturation < b saturation ]]
-		].
-	Color colorNamesDict associationsDo: [ :assoc | sortedColors add: assoc ].
-
-	imagePallet := ImagePallet 
-						fromCollection: sortedColors
-						imageFilter: [:color | MorphTheColor forColor: color].
-	savedExtent := imagePallet morphExtent.
-	
-	colorPallet := SystemWindow new.
-	colorPallet 	
-		setLabel: 'Color Modifiers';
-		addMorph: imagePallet.
-		
-	extraExtent := ScrollBar scrollbarThickness + 4
-					 @ (ScrollBar scrollbarThickness + 4 
-							+ colorPallet labelRectangle height).
-	colorPallet morphExtent: (savedExtent + extraExtent   "But don't be too big to display!!"
-								min: ((DisplayScreen actualScreenSize) // 1.1)).
-			
-	^ colorPallet! !
-
-!MorphModifierPallet class methodsFor: '*morphit' stamp: 'KenD 10/12/2013 16:27'!
-includeInNewMorphMenu
-
-	^ true! !
-
-!MorphModifierPallet class methodsFor: '*morphit' stamp: 'KenD 10/17/2013 17:14'!
-initializedInstance
-
 	| morphMorphs imagePallet modifierPallet savedExtent extraExtent |
 	morphMorphs := 
 		{ 'Action'->(MorphAction new).
+		  'Bounce'->(UserActionMorph bouncingMorphExample).
+		  'Grow and Shrink'->(UserActionMorph growShrinkExample).
+		  'Follow a Path'->(UserActionMorph pathExample).
+		  'Color Cycle'->(UserActionMorph colorCycleExample).
 		  'Graphic Modifier'->(MorphGraphic new).
 		  'Color blue'->(MorphTheColor forColor: Color blue).
 		  'Color green'->(MorphTheColor forColor: Color green).
@@ -196,7 +148,7 @@ initializedInstance
 
 	extraExtent := ScrollBar scrollbarThickness + 4
 					 @ (ScrollBar scrollbarThickness + 4 
-							+ modifierPallet labelRectangle height).
+							+ modifierPallet labelHeight).
 	modifierPallet morphExtent: (savedExtent + extraExtent
 			 "But don't be too big to display!!"
 			min: ((DisplayScreen actualScreenSize) // 1.1)). 
@@ -206,74 +158,25 @@ initializedInstance
 
 ! !
 
-!BorderedImageMorph methodsFor: 'private' stamp: 'KenD 10/12/2013 17:06'!
-basicExtent: aPoint
+!Theme methodsFor: '*morphIt' stamp: 'KenD 5/10/2015 16:47'!
+showHaloIcon
+"
+	Theme current haloIcon explore.
+"
+	"^ self fetch: #( '16x16' 'emotes' 'face-angel')"
+	^ self fetch: #( '16x16' 'smalltalk' 'do-it' )! !
 
-	extent := aPoint! !
+!MorphModifierPallet class methodsFor: 'new-morph participation' stamp: 'KenD 7/5/2015 15:30'!
+includeInNewMorphMenu 
 
-!BorderedImageMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:36'!
-borderColor
+	^ true! !
 
-	^ borderColor! !
+!MorphModifierPallet class methodsFor: 'instance creation' stamp: 'KenD 7/5/2015 15:29'!
+initializedInstance
 
-!BorderedImageMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:35'!
-borderColor: aColor
-	borderColor = aColor ifFalse: [
-		borderColor _ aColor.
-		self redrawNeeded]! !
+	^ ImagePallet morphModifierPallet morphExtent:  (690 @ 84).! !
 
-!BorderedImageMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:36'!
-borderWidth: anInteger
-	borderWidth = anInteger ifFalse: [
-		borderColor ifNil: [ borderColor _ Color black ].
-		borderWidth _ anInteger max: 0.
-		self redrawNeeded ]! !
-
-!BorderedImageMorph methodsFor: 'geometry' stamp: 'KenD 10/12/2013 16:36'!
-clippingRect
-	"In own coordinates!!
-	Return the bounds to which any submorphs should be clipped if the property is set"
-	"Should be a region, like our shadow"
-	self flag: #jmvVer2.
-	^ super clippingRect insetBy: borderWidth! !
-
-!BorderedImageMorph methodsFor: 'drawing' stamp: 'KenD 10/12/2013 16:31'!
-drawOn: aCanvas
-	"A canvas is already set with a proper transformation from our coordinates to those of the Canvas target."
-
-	aCanvas  "My image is inset from the border."
-	     image: image
-		at: borderWidth @ borderWidth.
-
-	aCanvas "The border is drawn around the image."
-		frameRectangle: (0@0  extent: self morphExtent) 
-		color: borderColor 
-		borderWidth: borderWidth 
-		borderStyleSymbol: borderStyle! !
-
-!BorderedImageMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 17:12'!
-initialize
-	"Set my defaults"
-
-	self basicExtent: 32@32. "Not nil"
-	borderWidth := 4.
-	super initialize.
-	borderColor := Color orange.
-	borderStyle := #raised.! !
-
-!BorderedImageMorph methodsFor: 'geometry' stamp: 'KenD 10/12/2013 16:37'!
-layoutBounds
-	"Return the bounds for laying out children of the receiver"
-	self flag: #jmvVer2.
-	^ super layoutBounds insetBy: borderWidth! !
-
-!BorderedImageMorph methodsFor: 'geometry' stamp: 'KenD 10/12/2013 17:07'!
-morphExtent
-	"Answer an extent which includes me, taking into account my borderWidth"
-
-	^ extent + borderWidth + borderWidth ! !
-
-!MorphMorph methodsFor: 'morph interactions' stamp: 'KenD 10/2/2013 17:30'!
+!MorphMorph methodsFor: 'morph interactions' stamp: 'KenD 5/8/2015 22:02'!
 addToModifiersOf: aMorph
 	"Add me to aMorph morphModifiers"
 	
@@ -281,18 +184,32 @@ addToModifiersOf: aMorph
 	morphModifiers := aMorph valueOfProperty: #morphModifiers
 									 ifAbsent: [ Set new ].
 	morphModifiers add: self.
-	aMorph setProperty: #morphModifiers toValue: morphModifiers 
-	! !
+	aMorph setProperty: #morphModifiers toValue: morphModifiers.
+! !
 
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:24'!
-balloonText
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 09:58'!
+balloonText: aString
 
-	self subclassResponsibility ! !
+ 	self setProperty: #balloonText toValue: aString
+! !
+
+!MorphMorph methodsFor: 'copying' stamp: 'KenD 7/5/2015 15:38'!
+copy
+
+	^ self shallowCopy postCopy! !
 
 !MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:27'!
 defaultName
 
 	^ self class printString withFirstCharacterDownshifted ! !
+
+!MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 5/10/2015 15:34'!
+dropAction: aDropTargetMorph
+	"I have been dropped on aDropTargetMorph.  
+	 Do my initialization action on its targetMorph."
+
+	self droppedOn: aDropTargetMorph targetMorph.
+	aDropTargetMorph refreshSubmorphs.! !
 
 !MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/2/2013 17:17'!
 droppedOn: aMorph
@@ -300,19 +217,24 @@ droppedOn: aMorph
 	
 	self subclassResponsibility ! !
 
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:15'!
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 08:16'!
 icon
 
 	self subclassResponsibility ! !
 
-!MorphMorph methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:49'!
+!MorphMorph methodsFor: 'initialization' stamp: 'KenD 5/13/2015 11:16'!
 initialize
 	"Set my defaults"
 
+	| extent |
 	super initialize.
+	self setProperty: #DropActionMorph toValue: true.
 	(self class includesSelector: #icon32)
 		ifTrue: [ self image: self icon32 ]
 	 	ifFalse: [ self image: (self icon magnifyTo: 32@32) ].
+	extent := self morphExtent.
+	self layoutSpec: (LayoutSpec fixedWidth: extent x fixedHeight: extent y  minorDirectionPadding: 0.5);
+	yourself
 
 ! !
 
@@ -323,20 +245,19 @@ modifiersOf: aMorph
 	^ aMorph valueOfProperty: #morphModifiers  ifAbsent: [ nil ]
 	! !
 
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:51'!
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 10:00'!
 name
 
-	^name 
+	^ super name 
 		ifNotNil: [ :myName |  myName ]
 		ifNil: [ self defaultName ]
 ! !
 
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:49'!
-name: aString
+!MorphMorph methodsFor: 'copying' stamp: 'KenD 7/5/2015 15:39'!
+postCopy
+	"After a clone or shallow copy, one needs an unshared location"
 
-	(aString isKindOf: String)
-		ifFalse: [ Error signal: 'Name must be a string ', aString printString ]
-		ifTrue: [ name := aString ]! !
+	location _ MorphicTranslation new! !
 
 !MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:13'!
 rejectDropMorphEvent: evt
@@ -371,13 +292,13 @@ removedFrom: aMorph
 	
 	self subclassResponsibility ! !
 
-!MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:10'!
+!MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 5/9/2015 15:17'!
 wantsToBeDroppedInto: aMorph
-	"Return true if it's okay to drop the receiver into aMorph. This check is symmetric to #wantsDroppedMorph:event: to give both parties a chance of figuring out whether they like each other."
-	"This message is sent to the dragged morph, not to the owner.
-	It is included here just for reference."
+	"I wish to be dropped on a DropTargeMorph"
 
-	^ (aMorph isKindOf: FramedWidget) " or: [ aMorph isKindOf: PasteUpMorph ]"! !
+	(aMorph isKindOf: DropTargetMorph)
+		ifTrue: [ self dropAction: aMorph ].
+	^ false  "Always be rejected after doing the drop action"! !
 
 !MorphMorph class methodsFor: 'new-morph participation' stamp: 'KenD 10/12/2013 17:12'!
 includeInNewMorphMenu
@@ -515,10 +436,11 @@ with: otherArgs
 	self removeAction.
 	with := otherArgs! !
 
-!MorphAction class methodsFor: 'examples' stamp: 'KenD 10/12/2013 17:02'!
+!MorphAction class methodsFor: 'examples' stamp: 'KenD 5/8/2015 21:30'!
 example1
 "
 	self example1.
+	self example1 openInWorld.
 "
 	| cm ma |
 	cm := ImageMorph new image: Color red icon.
@@ -529,7 +451,8 @@ example1
 	ma with: 'Log My Success!!!!!!'.
 	ma droppedOn: cm.
 	Transcript display. 
-	cm triggerEvent: #logMe.! !
+	cm triggerEvent: #logMe.
+	^ cm! !
 
 !MorphGraphic methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:27'!
 balloonText
@@ -542,9 +465,10 @@ defaultName
 	^ 'GraphicModifier'.
 ! !
 
-!MorphGraphic methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:16'!
-droppedOn: aMorph
-	"I have been dropped on aMorph.  Do my initialization action."
+!MorphGraphic methodsFor: 'dropping/grabbing' stamp: 'KenD 5/10/2015 15:28'!
+dropedOn: aMorph
+	"I have been dropped on aMorph.  
+	 Do my initialization action."
 
 	self notYetImplemented ! !
 
@@ -588,12 +512,87 @@ defaultName
 
 		^ 'Color', self color name asString capitalized.! !
 
-!MorphTheColor methodsFor: 'dropping/grabbing' stamp: 'KenD 10/2/2013 16:41'!
+!MorphTheColor methodsFor: 'dropping/grabbing' stamp: 'KenD 5/10/2015 15:21'!
+dropAction: aDropTargetMorph
+	"Set a color"
+
+	| colorSetters aMorph choices |
+	aMorph := aDropTargetMorph targetMorph.
+	colorSetters := (((aMorph class withAllSuperclasses 
+		collect: [ :c | c selectors ] andFold: [ :a :b | a union: b]) "all selectors"
+			select: [ :s | ('*color*:' match: s) and: [('*:*:' match: s) not]] ) asArray).
+			
+	(colorSetters size = 1)
+		ifTrue: [ aMorph perform: (colorSetters at: 1) with: self color ]
+		ifFalse: [ | selection |
+			choices := OrderedCollection with: #Cancel.
+			choices addAll: colorSetters.
+			self delete. "Remove me from hand so user can choose"
+			selection := PopUpMenu withCaption: 'Choose color setter' 
+											chooseFrom: choices.
+			(selection = 1) ifFalse: [ "1 -> Cancel"
+				aMorph
+						perform: (colorSetters at: selection - 1) 
+						with: self color
+			]
+		].
+
+	aDropTargetMorph refreshSubmorphs. ! !
+
+!MorphTheColor methodsFor: 'dropping/grabbing' stamp: 'KenD 5/10/2015 15:32'!
+droppedOn: aMorph
+	"I have been dropped on aMorph.  Change its color."
+	"Note that this is a direct action.  I am never added to a Morph."
+
+	| colorSetters choices |
+	colorSetters := (((aMorph class withAllSuperclasses 
+		collect: [ :c | c selectors ] andFold: [ :a :b | a union: b]) "all selectors"
+			select: [ :s | ('*color*:' match: s) and: [('*:*:' match: s) not]] ) asArray).
+			
+	(colorSetters size = 1)
+		ifTrue: [ aMorph perform: (colorSetters at: 1) with: self color ]
+		ifFalse: [ | selection |
+			choices := OrderedCollection with: #Cancel.
+			choices addAll: colorSetters.
+			self delete. "Remove me from hand so user can choose"
+			selection := PopUpMenu withCaption: 'Choose color setter' 
+											chooseFrom: choices.
+			(selection = 1) ifFalse: [ "1 -> Cancel"
+				aMorph
+						perform: (colorSetters at: selection - 1) 
+						with: self color
+			]
+		].
+! !
+
+!MorphTheColor methodsFor: 'dropping/grabbing' stamp: 'KenD 5/10/2015 15:32'!
 droppedOn: aMorph
 	"I have been dropped on aMorph.  Change its color."
 	"Note that this is a direct action.  I am never added to a Morph."
 	
-	aMorph color: self color ! !
+dropAction: aDropTargetMorph
+	"Set a color"
+
+	| colorSetters choices |
+	colorSetters := (((aMorph class withAllSuperclasses 
+		collect: [ :c | c selectors ] andFold: [ :a :b | a union: b]) "all selectors"
+			select: [ :s | ('*color*:' match: s) and: [('*:*:' match: s) not]] ) asArray).
+			
+	(colorSetters size = 1)
+		ifTrue: [ aMorph perform: (colorSetters at: 1) with: self color ]
+		ifFalse: [ | selection |
+			choices := OrderedCollection with: #Cancel.
+			choices addAll: colorSetters.
+			self delete. "Remove me from hand so user can choose"
+			selection := PopUpMenu withCaption: 'Choose color setter' 
+											chooseFrom: choices.
+			(selection = 1) ifFalse: [ "1 -> Cancel"
+				aMorph
+						perform: (colorSetters at: selection - 1) 
+						with: self color
+			]
+		].
+! !
 
 !MorphTheColor methodsFor: 'initialization' stamp: 'KenD 10/12/2013 17:30'!
 forColor: aColor
@@ -616,6 +615,14 @@ removedFrom: aMorph
 	
 	Error signal: 'Implementation error: should never happen!!' ! !
 
+!MorphTheColor methodsFor: 'dropping/grabbing' stamp: 'KenD 5/10/2015 15:14'!
+wantsToBeDroppedInto: aMorph
+	"I wish to be dropped on a DropTargeMorph"
+
+	(aMorph isKindOf: DropTargetMorph)
+		ifTrue: [ self dropAction: aMorph ].
+	^ false  "Always be rejected after doing the drop action"! !
+
 !MorphTheColor class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 16:32'!
 forColor: aColor
 
@@ -623,15 +630,13 @@ forColor: aColor
 	
 	^ self new forColor: aColor! !
 
-!MorphTheColor class methodsFor: 'new-morph participation' stamp: 'KenD 10/2/2013 16:30'!
+!MorphTheColor class methodsFor: 'new-morph participation' stamp: 'KenD 5/8/2015 16:24'!
 initializedInstance
+"
+	self initializedInstance openInWorld.
+"
 
 	^ self forColor: Color blue! !
-
-!MorphValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:48'!
-balloonText
-
-	^ balloonText ! !
 
 !MorphValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:52'!
 defaultName
@@ -639,7 +644,7 @@ defaultName
 	^ self valueHolder defaultName.
 ! !
 
-!MorphValueHolder methodsFor: 'dropping/grabbing' stamp: 'KenD 10/12/2013 17:14'!
+!MorphValueHolder methodsFor: 'dropping/grabbing' stamp: 'KenD 5/13/2015 11:37'!
 droppedOn: aMorph
 	"Add self as property to aMorph"
 	
@@ -652,7 +657,7 @@ droppedOn: aMorph
 		]
 		ifFalse: [ 
 			aMorph setProperty: propSym toValue: self valueHolder.
-			self addToModifiersOf: aMorph. "So I show up in FrameMorphs"
+			self addToModifiersOf: aMorph. "So I show up in DropTargetMorphs"
 		].
 ! !
 
@@ -820,4 +825,389 @@ rangeIcon
 stringIcon
 
 	^ StringIcon! !
+
+!UserActionMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 07:22'!
+addActionProc
+
+	^ addActionProc ! !
+
+!UserActionMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 07:46'!
+addActionProc: aTwoArgClosure
+	"[ :morphUserAction :aMorph |  .. ]"
+
+	addActionProc := aTwoArgClosure ! !
+
+!UserActionMorph methodsFor: 'add/remove' stamp: 'KenD 5/13/2015 07:24'!
+addActionToMorph: aMorph
+	"Use my addActionProc to add an action to a Morph"
+	
+	self addActionProc ifNotNil: [ :addAction | addAction value: self value: aMorph ] ! !
+
+!UserActionMorph methodsFor: 'add/remove' stamp: 'KenD 5/14/2015 07:40'!
+addHandler: aClosure propName: aSelector toMorph: aMorph
+	"User actions have enablers.  E.g. to get a #mouseEnter: event
+	the property #handlesMouseOver must exist.
+	Make it so."
+
+	(UserActionMorph enablerForSelector: aSelector)
+		ifNil: [ self error: 'bad user interaction selector: #', aSelector asString ]
+		ifNotNil: [ :enabler | 
+			aMorph setProperty: enabler toValue: true.
+			aMorph setProperty: aSelector toValue: aClosure
+		]
+! !
+
+!UserActionMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 5/13/2015 11:38'!
+droppedOn: aMorph
+	"Add self as property to aMorph"
+	
+	self 
+		addActionToMorph: aMorph;
+		addToModifiersOf: aMorph. "So I show up in DropTargetMorphs"
+! !
+
+!UserActionMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 14:48'!
+icon
+
+	^ icon ifNotNil: [ icon ] ifNil: [self class defaultIcon ]! !
+
+!UserActionMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 14:47'!
+icon: aForm 
+	"change the the receiver's icon"
+	
+	icon := aForm magnifyTo: 16@16..
+	self image: (aForm magnifyTo: 32@32).! !
+
+!UserActionMorph methodsFor: 'initialization' stamp: 'KenD 5/13/2015 11:17'!
+icon: anIcon addProc: addActionClosure  removeProc: removeActionClosure
+
+	self 
+		icon: anIcon;
+		addActionProc: addActionClosure;
+		removeActionProc: removeActionClosure;
+		yourself! !
+
+!UserActionMorph methodsFor: 'add/remove' stamp: 'KenD 5/13/2015 07:24'!
+removeActionFromMorph: aMorph
+	"Use my addActionProc to add an action to a Morph"
+	
+	self removeActionProc ifNotNil: [ :removeAction | removeAction value: self value: aMorph ] ! !
+
+!UserActionMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 07:22'!
+removeActionProc
+
+	^ removeActionProc ! !
+
+!UserActionMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 07:46'!
+removeActionProc: aTwoArgClosure
+	"[ :morphUserAction :aMorph |  .. ]"
+
+	removeActionProc := aTwoArgClosure ! !
+
+!UserActionMorph methodsFor: 'add/remove' stamp: 'KenD 5/14/2015 07:40'!
+removeHandlerProperty: aSelector fromMorph: aMorph
+
+	| enablingSelector |
+	(aMorph hasProperty: aSelector) ifFalse: [ ^nil ]. "done"
+	aMorph removeProperty: aSelector.
+	
+	"If the selector's enabler is not required by other selectors,
+	remove it as well."
+	enablingSelector := UserActionMorph enablerForSelector: aSelector.
+	enablingSelector ifNotNil: [ :enabler |
+		((UserActionMorph selectorForEnabler: enabler)
+			anySatisfy: [ :propName | aMorph hasProperty: propName ])
+		ifFalse: [ aMorph removeProperty: enabler ]
+	].
+! !
+
+!UserActionMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 5/13/2015 07:26'!
+removedFrom: aMorph
+	"remove self as property from aMorph"
+	
+	self removeActionFromMorph: aMorph ! !
+
+!UserActionMorph class methodsFor: 'instance creation' stamp: 'KenD 5/13/2015 07:55'!
+addProc: addActionClosure  removeProc: removeActionClosure
+
+	^ self new 
+		icon: self defaultIcon 
+		addProc: addActionClosure  
+		removeProc: removeActionClosure! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/13/2015 12:49'!
+bounceIcon
+
+	^ BounceIcon ! !
+
+!UserActionMorph class methodsFor: 'examples' stamp: 'jmv 5/14/2015 17:33'!
+bouncingMorphExample
+	"Answer a UserActionMorph whose target moves,
+	bouncing off 'walls' of its container.
+	 Start/stop when the mouse button is released (cheap click test)"
+"
+	self bouncingMorphExample openInWorld.
+"
+	| actionMorph |
+	actionMorph := UserActionMorph 
+		icon: UserActionMorph bounceIcon 
+		addProc:  [ :userActionMorph :targetMorph | |bouncingAnimator|
+				bouncingAnimator :=  Animator 
+								actor: targetMorph
+								action: (Animator simpleMoveBounceAction: 20@30)  
+								stepTime: 60.
+				userActionMorph 
+					addHandler: [ :ignore1 :ignore2 |
+						bouncingAnimator isStepping not
+							ifTrue: [ bouncingAnimator startStepping ]
+							ifFalse: [ bouncingAnimator stopStepping ]
+					]
+					propName: #'mouseButton1Up:localPosition:' 
+					toMorph: targetMorph.
+			]
+		removeProc: [ :userActionMorph :targetMorph |
+				userActionMorph 
+					removeHandlerProperty: #'mouseButton1Up:localPosition:' 
+					fromMorph: targetMorph.
+			].
+		
+	actionMorph name: 'MoveAndBounce'.
+		
+	^ actionMorph
+! !
+
+!UserActionMorph class methodsFor: 'examples' stamp: 'KenD 5/14/2015 07:41'!
+colorCycleExample
+	"Answer a UserActionMorph which color cycles its target
+	 while the mouse is over it"
+"
+	self colorCycleExample openInWorld.
+"
+	| colorAnimator colors colorCycleActionMorph |
+	colors := { Color green. Color blue. Color red. Color yellow.  }.
+	
+	colorCycleActionMorph := UserActionMorph 
+		icon: UserActionMorph colorCycleIcon
+		addProc:  [ :userActionMorph :targetMorph |
+				colorAnimator :=  Animator 
+					actor: targetMorph 
+					action: (Animator cycleColors: colors forSelector: #color:)
+					stepTime: 300.
+				userActionMorph 
+					addHandler: [ :ignoredArg | colorAnimator startStepping. ] 
+					propName: #'mouseEnter:' 
+					toMorph: targetMorph.
+				userActionMorph 
+					addHandler: [ :ignoredArg | colorAnimator stopStepping. ] 
+					propName: #'mouseLeave:'
+					toMorph: targetMorph
+			]
+		removeProc: [ :userActionMorph :targetMorph |
+				userActionMorph 
+					removeHandlerProperty: #'mouseEnter:' 
+					fromMorph: targetMorph.
+				userActionMorph 
+					removeHandlerProperty: #'mouseLeave:' 
+					fromMorph: targetMorph.
+			].
+		
+	colorCycleActionMorph name: 'Color Cycle'.
+		
+	^ colorCycleActionMorph
+! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/13/2015 12:49'!
+colorCycleIcon
+
+	^ ColorCycleIcon ! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/13/2015 07:55'!
+defaultIcon
+
+	^ Theme content get: #( 'Theme' '16x16' 'devices' 'input-mouse.png' )! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/13/2015 11:46'!
+enablerForSelector: actionSelector
+	"To get action messages, an enabler property must be set.
+	Answer, for a given action selector, the associated enabler selector"
+
+	(self handlesMouseOverSelectors includes: actionSelector)
+	ifTrue: [ ^ #'handlesMouseOver:' ].
+
+	(self handlesMouseDownSelectors includes: actionSelector)
+	ifTrue: [ ^ #'handlesMouseDown:' ].
+	
+	(self handlesKeyboardSelectors includes: actionSelector)
+	ifTrue: [ ^ #'handlesKeyboard' ].
+	
+	(self handlesMouseStillDownSelectors includes: actionSelector)
+	ifTrue: [ ^ #'handlesMouseStillDown:' ].
+
+	^ nil! !
+
+!UserActionMorph class methodsFor: 'examples' stamp: 'KenD 5/14/2015 07:41'!
+growShrinkExample
+	"Answer a UserActionMorph whose target grows and shrinks
+	 when the mouse button is released (cheap click test)"
+"
+	self growShrinkExample openInWorld.
+"
+	| growShrinkAnimator actionMorph isStepping |
+	isStepping := false.
+	actionMorph := UserActionMorph 
+		icon: UserActionMorph growShrinkIcon 
+		addProc:  [ :userActionMorph :targetMorph |
+				growShrinkAnimator :=  Animator 
+								actor: targetMorph
+								action: (Animator growShrinkAction: 20 numSteps: 6)  
+								stepTime: 100.
+				userActionMorph 
+					addHandler: [ :ignore1 :ignore2 |
+						isStepping := isStepping not.
+						(isStepping)
+						ifTrue: [ growShrinkAnimator startStepping ]
+						ifFalse: [ growShrinkAnimator stopStepping ]
+					]
+					propName: #'mouseButton1Up:localPosition:' 
+					toMorph: targetMorph.
+			]
+		removeProc: [ :userActionMorph :targetMorph |
+				userActionMorph 
+					removeHandlerProperty: #'mouseButton1Up:localPosition:' 
+					fromMorph: targetMorph.
+			].
+		
+	actionMorph name: 'GrowAndShrink'.
+		
+	^ actionMorph
+! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/13/2015 12:49'!
+growShrinkIcon
+
+	^ GrowShrinkIcon ! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/12/2015 20:25'!
+handlesKeyboardSelectors
+"
+	self handlesKeyboardSelectors.
+"
+
+	^ HandlesKeyboardSelectors! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/12/2015 20:25'!
+handlesMouseDownSelectors
+
+	^ HandlesMouseDownSelectors! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/12/2015 20:25'!
+handlesMouseOverSelectors
+
+	^ HandlesMouseOverSelectors! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/12/2015 20:29'!
+handlesMouseStillDownSelectors
+
+	^ HandlesMouseStillDownSelectors! !
+
+!UserActionMorph class methodsFor: 'instance creation' stamp: 'KenD 5/13/2015 07:56'!
+icon: anIcon addProc: addActionClosure  removeProc: removeActionClosure
+
+	^ self new 
+		icon: anIcon 
+		addProc: addActionClosure  
+		removeProc: removeActionClosure! !
+
+!UserActionMorph class methodsFor: 'class initialization' stamp: 'KenD 5/13/2015 12:48'!
+initialize
+"
+	self initialize.
+"
+	HandlesMouseOverSelectors :=
+		#( mouseEnter:  mouseLeave: ).
+		
+	HandlesMouseDownSelectors := 
+		#( mouseButton1Down:localPosition:
+			mouseButton1Up:localPosition:
+			mouseButton2Down:localPosition:
+			mouseButton2Up:localPosition:
+			mouseButton3Down:localPosition:
+			mouseButton3Up:localPosition:
+			mouseMove:localPosition:
+			mouseButton2Activity
+		 ).
+	HandlesKeyboardSelectors :=
+	#( keyDown keyStroke keyUp ).
+	
+	HandlesMouseStillDownSelectors := #( mouseStillDown: ).
+	
+	ColorCycleIcon 	:= Form fromFileNamed: 'Icons/ColorCycle.png'.
+	PathIcon 	:= Form fromFileNamed: 'Icons/Path.png'.
+	GrowShrinkIcon 	:= Form fromFileNamed: 'Icons/GrowShrink2.png'.
+	BounceIcon 	:= Form fromFileNamed: 'Icons/Bounce.png'.
+
+	! !
+
+!UserActionMorph class methodsFor: 'examples' stamp: 'KenD 5/14/2015 07:41'!
+pathExample
+	"Answer a UserActionMorph whose target follows a simple path
+	 when the mouse button is released (cheap click test)"
+"
+	self pathExample openInWorld.
+"
+	| pathAnimator pathPoints pathActionMorph |
+	pathPoints := { 20@20. 40@26. 80@30. 90@40. 90@80. 
+						70@100.  40@90.  30@60. 34@40. 0@0. }.
+	
+	pathActionMorph := UserActionMorph 
+		icon: UserActionMorph pathIcon
+		addProc:  [ :userActionMorph :targetMorph |
+				pathAnimator :=  Animator 
+					actor: targetMorph 
+					action: (Animator 
+								followPathAction: 
+									(pathPoints collect: [ :pt | pt + targetMorph morphPosition]))
+					stepTime: 100
+					doneProc: (Animator doneAfterNTimes: (pathPoints size)).
+				userActionMorph 
+					addHandler: [ :ignore1 :ignore2 | pathAnimator startStepping. ] 
+					propName: #'mouseButton1Up:localPosition:' 
+					toMorph: targetMorph.
+			]
+		removeProc: [ :userActionMorph :targetMorph |
+				userActionMorph 
+					removeHandlerProperty: #'mouseButton1Up:localPosition:' 
+					fromMorph: targetMorph.
+			].
+		
+	pathActionMorph name: 'RetracePath'.
+		
+	^ pathActionMorph
+! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/13/2015 12:50'!
+pathIcon
+
+	^ PathIcon ! !
+
+!UserActionMorph class methodsFor: 'accessing' stamp: 'KenD 5/12/2015 20:57'!
+selectorForEnabler: enabeingSelector
+	"To get action messages, an enabler property must be set.
+	Answer, for a given action selector, the associated enabler selector"
+	
+"@@FIXME: dictionary"
+	(enabeingSelector = #handlesMouseOver)
+	ifTrue: [ ^ self handlesMouseOverSelectors ].
+
+	(enabeingSelector = #handlesMouseDown)
+	ifTrue: [ ^ self handlesMouseDownSelectors i].
+	
+	(enabeingSelector = #handlesKeyboard)
+	ifTrue: [ ^ self handlesKeyboardSelectors ].
+	
+	(enabeingSelector = #handlesMouseStillDown)
+	ifTrue: [ ^ self handlesMouseStillDownSelectors  ].
+
+	^ nil! !
 MorphValueHolder initialize!
+UserActionMorph initialize!

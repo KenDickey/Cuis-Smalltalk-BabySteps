@@ -1,16 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1851] on 12 October 2013 at 9:37:33.582000107 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2280] on 8 May 2015 at 4:27:56.588698 pm'!
 'Description Widget Composition Package'!
-!provides: 'Morphic-Widget-Weaver' 1 50!
-!classDefinition: #AddedCursors category: #'Morphic-Widget-Weaver'!
-CursorWithMask subclass: #AddedCursors
-	instanceVariableNames: ''
-	classVariableNames: 'ClosedHand OpenHand'
-	poolDictionaries: ''
-	category: 'Morphic-Widget-Weaver'!
-!classDefinition: 'AddedCursors class' category: #'Morphic-Widget-Weaver'!
-AddedCursors class
-	instanceVariableNames: ''!
-
+!provides: 'Morphic-Widget-Weaver' 1 51!
 !classDefinition: #LineMorph category: #'Morphic-Widget-Weaver'!
 Morph subclass: #LineMorph
 	instanceVariableNames: 'color extent startPointSelector endPointSelector lineWidth'
@@ -82,9 +72,6 @@ SignMorph class
 	instanceVariableNames: ''!
 
 
-!AddedCursors commentStamp: '<historical>' prior: 0!
-Additional Cursors -- see class side!
-
 !LineMorph commentStamp: '<historical>' prior: 0!
 I am a line from startPoint to endPoint!
 
@@ -118,144 +105,6 @@ A sign by its nature points to something else.  Use:
 ivar:
    object - the object I point-to/denote/stand-for
 !
-
-!AddedCursors class methodsFor: 'constants' stamp: 'KenD 9/23/2013 20:17'!
-closedHand
-"
-	self closedHand show.
-"
-	^ ClosedHand ! !
-
-!AddedCursors class methodsFor: 'private' stamp: 'KenD 9/22/2013 19:23'!
-historicalCruft
-"
-	self historicalCruft.
-"
-
-	| openHand openHandMask closedHand closedHandMask openHandCursor closedHandCursor |
-	openHand := Form fromFileNamed: 'handOpen2.png'.
-	openHandMask  := Form fromFileNamed: 'handOpen2-mask.png'.
-	closedHand  :=  Form fromFileNamed: 'handClosed2.png'.
-	closedHandMask  := Form fromFileNamed: 'handClosed2-mask.png'.
-
-	openHandCursor := (CursorWithMask derivedFrom: openHand)  setMaskForm: openHandMask.
-	closedHandCursor := (CursorWithMask derivedFrom: closedHand)  setMaskForm: closedHandMask.
-
-	OpenHand := openHandCursor.
-	ClosedHand := closedHandCursor.
-
-	^ openHandCursor! !
-
-!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/22/2013 19:35'!
-initClosedHand
-"
-	self initClosedHand.
-"
-	ClosedHand := ((CursorWithMask
-	extent: 16@16
-	depth: 1
-	fromArray: #(
-		2r0000000000000000
-		2r0000000000000000
-		2r0000000000000000
-		2r0000000000000000
-		2r110110110100000000000000000
-		2r1001001001010000000000000000
-		2r1000000000010000000000000000
-		2r111000000000010000000000000000
-		2r1001000000000010000000000000000
-		2r1000000000000010000000000000000
-		2r1000000000000010000000000000000
-		2r1000000000000110000000000000000
-		2r100000000001110000000000000000
-		2r10000000011100000000000000000
-		2r1000000011000000000000000000
-		2r100000011000000000000000000)
-	offset: -1@-1) setMaskForm: (Form
-	extent: 16@16
-	depth: 1
-	fromArray: #(
-		2r0000000000000000
-		2r0000000000000000
-		2r0000000000000000
-		2r1101101101000000000000000000
-		2r11111111111100000000000000000
-		2r11111111111110000000000000000
-		2r1111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r1111111111111100000000000000000
-		2r111111111111000000000000000000
-		2r11111111110000000000000000000
-		2r1111111110000000000000000000
-		2r1111111110000000000000000000)
-	offset: 0@0)).! !
-
-!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/28/2013 17:26'!
-initOpenHand
-"
-	self initOpenHand.
-"
-
-	OpenHand :=  ((CursorWithMask
-	extent: 16@16
-	depth: 1
-	fromArray: #(
-		2r0000000000000000
-		2r110110110000000000000000000
-		2r1001001001100000000000000000
-		2r1001001001010000000000000000
-		2r1001001001010000000000000000
-		2r1101001001001010000000000000000
-		2r1011001001001010000000000000000
-		2r1001001001001010000000000000000
-		2r1001000000000010000000000000000
-		2r1000100000000010000000000000000
-		2r1000000000000010000000000000000
-		2r1000000000000110000000000000000
-		2r100000000001110000000000000000
-		2r10000000011100000000000000000
-		2r1000000011000000000000000000
-		2r100000011000000000000000000)
-	offset: -1@-1) setMaskForm: (Form
-	extent: 16@16
-	depth: 1
-	fromArray: #(
-		2r1101101100000000000000000000
-		2r11111111111000000000000000000
-		2r11111111111100000000000000000
-		2r11111111111100000000000000000
-		2r11011111111111100000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r11111111111111110000000000000000
-		2r1111111111111100000000000000000
-		2r111111111111000000000000000000
-		2r11111111110000000000000000000
-		2r1111111110000000000000000000
-		2r1111111110000000000000000000)
-	offset: 0@0))! !
-
-!AddedCursors class methodsFor: 'class initialization' stamp: 'KenD 9/22/2013 17:16'!
-initialize
-"
-	self initialize.
-"
-	self initOpenHand.
-	self initClosedHand.! !
-
-!AddedCursors class methodsFor: 'constants' stamp: 'KenD 9/23/2013 20:17'!
-openHand
-"
-	self openHand show.
-"
-
-	^ OpenHand ! !
 
 !LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 15:36'!
 basicExtent: aPoint
@@ -315,6 +164,11 @@ initialize
 	color := Color cyan.
 	! !
 
+!LineMorph methodsFor: 'geometry testing' stamp: 'KenD 9/26/2013 15:39'!
+isOrthoRectangularMorph
+
+	^ false! !
+
 !LineMorph methodsFor: 'accessing' stamp: 'KenD 9/26/2013 18:55'!
 length
 
@@ -353,6 +207,12 @@ morphExtent: aPoint
 	self redrawNeeded.
 	extent _ (innerExtent max: self minimumExtent).
 	self redrawNeeded! !
+
+!LineMorph methodsFor: 'geometry' stamp: 'KenD 2/28/2015 11:31'!
+morphExtentInWorld: newExtent
+	"world coordinates"
+	self flag: #jmvVer2.
+	self morphExtent: (self internalizeDistanceFromWorld: newExtent)! !
 
 !LineMorph methodsFor: 'private' stamp: 'KenD 9/27/2013 15:45'!
 rect
@@ -758,6 +618,11 @@ step
 
 	self cycleBorderColor ! !
 
+!FrameMorph methodsFor: 'events-processing' stamp: 'jmv 2/13/2014 14:24'!
+stepAt: millisecondClockValue
+
+	self cycleBorderColor ! !
+
 !FrameMorph methodsFor: 'events' stamp: 'KenD 9/15/2013 21:35'!
 stopStepping
 
@@ -938,7 +803,7 @@ aboutToBeGrabbedBy: aHand
 
 	^ self "Grab me"! !
 
-!ViewLens methodsFor: 'GUI building' stamp: 'KenD 10/2/2013 10:18'!
+!ViewLens methodsFor: 'GUI building' stamp: 'KenD 5/8/2015 11:22'!
 buildMorphicWindow
 
 	| layout "propTitle" |
@@ -957,8 +822,9 @@ buildMorphicWindow
 "
 	layout := self layoutMorph.
 
-	layout beRow.
 	layout
+		beRow; color: 
+		Color transparent;
 		addMorph: viewPort
 		layoutSpec: (LayoutSpec
 							proportionalWidth: 1.0
@@ -985,10 +851,10 @@ defaultColor
 
 	^ Color transparent! !
 
-!ViewLens methodsFor: 'initialization' stamp: 'KenD 10/12/2013 16:39'!
+!ViewLens methodsFor: 'initialization' stamp: 'KenD 5/8/2015 11:23'!
 defaultExtent
 
-	^ 260@300! !
+	^ 286@300! !
 
 !ViewLens methodsFor: 'initialization' stamp: 'KenD 10/2/2013 15:21'!
 initialize
@@ -1276,6 +1142,18 @@ example3
 	
 	^ newInst ! !
 
+!SignMorph class methodsFor: 'examples' stamp: 'KenD 11/14/2013 14:35'!
+example4
+"
+	self example4
+"
+	| newInst rect |
+	rect := Rectangle origin: 1@2 corner: 2@3.
+	newInst := SignMorph forObject: rect .
+	newInst openInWorld.
+	
+	^ newInst ! !
+
 !SignMorph class methodsFor: 'instance creation' stamp: 'KenD 10/5/2013 16:52'!
 forObject: anObject
 
@@ -1296,5 +1174,4 @@ new
 
 	Error signal: 'USE: ', self name asString, ' forObject: anObject'
 	! !
-AddedCursors initialize!
 FrameMorph initialize!
