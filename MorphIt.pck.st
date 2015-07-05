@@ -1,11 +1,11 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2400] on 5 July 2015 at 3:40:23.960974 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2402] on 5 July 2015 at 4:50:27.311322 pm'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 18!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
-!requires: 'ValueHolder' 1 20 nil!
+!provides: 'MorphIt' 1 19!
 !requires: 'Value-Constraints' 1 5 nil!
-!requires: 'Morphic-Misc1' 1 45 nil!
+!requires: 'ValueHolder' 1 20 nil!
 !requires: 'Animator' 1 11 nil!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'Morphic-Misc1' 1 45 nil!
 !classDefinition: #MorphModifierPallet category: #MorphIt!
 Morph subclass: #MorphModifierPallet
 	instanceVariableNames: ''
@@ -78,7 +78,11 @@ UserActionMorph class
 
 
 !MorphModifierPallet commentStamp: '<historical>' prior: 0!
-I am just a way to get a Morph Modifier Pattet [see my class side]!
+I am just a way to get a Morph Modifier Pattet [see my class side].
+
+
+MorphModifierPallet initializedInstance openInWorld morphExtent: (690 @ 84).
+!
 
 !MorphMorph commentStamp: '<historical>' prior: 0!
 I am part of Morphit -- a package to author largely via drag 'n drop.
