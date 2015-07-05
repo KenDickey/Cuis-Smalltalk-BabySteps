@@ -23,4 +23,6 @@ Now select a Morph, from the halo's Menu select 'show drop target for me'
 Then click+drag from the MorphModifierPallet to the DropTarget.
 
 E.g. drag the Color Cycle icon (tool help will show this) to the drop target; move the DropTarget aside; move the mouse over the original morph.
-OA
+
+Drop "Follow a Path" onto the DropTarget.  When clicked, the target morph will do a little dance as it follows a path.
+
