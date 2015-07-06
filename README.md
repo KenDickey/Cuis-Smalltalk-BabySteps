@@ -33,7 +33,7 @@ MorphIt is my start at moving UI building to be more media centric.  It ia a pro
 
 The basic idea is that there are a bunch of pallets which allow one to add and compose individual  morphs, their properties and behaviors.  More direct authoring.  
 
-Ideas are inspired from multimedia authoring environments like SK8 and MTropolis.
+Ideas are inspired from multimedia authoring environments like SK8 and mTropolis (RIP; Note files in directory IdeaMine).
 
 The observation is that UI events are rare and don't have to be especially fast.
 
@@ -61,6 +61,5 @@ How best to add constraints to properties/ivars?  Property sheet metadata?  Phar
 
 Can one use Scratch-like script elements to maximise the "direct construction" experience and minimise typing?  What is the most clear separation between adding/specializing scripts and Smalltalk code components?
 
+
 Lots of fun here!  ;^)
-
-
