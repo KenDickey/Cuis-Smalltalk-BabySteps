@@ -59,7 +59,7 @@ Can one hide the differences between properties and ivars and basically treat th
 
 How best to add constraints to properties/ivars?  Property sheet metadata?  Pharo-like first class slots?
 
-Can one use Scratch-like script elements to maximise the "directy construction" experience and minimise typing?  What is the most clear separation between adding/specializing scripts and Smalltalk code components?
+Can one use Scratch-like script elements to maximise the "direct construction" experience and minimise typing?  What is the most clear separation between adding/specializing scripts and Smalltalk code components?
 
 Lots of fun here!  ;^)
 
