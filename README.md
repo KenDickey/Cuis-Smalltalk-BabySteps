@@ -26,6 +26,7 @@ E.g. drag the Color Cycle icon (tool help will show this) to the drop target; mo
 
 Drop "Follow a Path" onto the DropTarget.  When clicked, the target morph will do a little dance as it follows a path.
 
+![MorphModifier Pallet in Cuis](IdeaMine/MorphIt-July2015.png)
 
 WHERE AM I GOING WITH THIS?
 
