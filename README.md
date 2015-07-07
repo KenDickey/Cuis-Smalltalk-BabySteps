@@ -38,7 +38,7 @@ Ideas are inspired from multimedia authoring environments like SK8 and mTropolis
 
 The observation is that UI events are rare and don't have to be especially fast.
 
-The current implementation is just a sketch and uses Morph properties.
+The current implementation is just a sketch and uses Morph properties.  A DropTarget is used to add (and eventually remove) MorphActions and so forth.  This keeps Morps themselves free of editing entanglements.
 
 
 DIRECTIONS / ROAD MAP
