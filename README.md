@@ -19,6 +19,8 @@ Of possible interest is the MorphIt package, which is a start at drag-n-drop beh
 ````
 File in '2400-CuisCore-ForMorphIt-2015Jul05-15h34m-KenD.2.cs.st'
 
+Note: Requires Morphic-Misc1 and Morphic-ColorEditor.
+
 Now select a Morph, from the halo's Menu select 'show drop target for me'
 Then click+drag from the MorphModifierPallet to the DropTarget.
 
