@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 11 July 2015 at 7:49:22.043629 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 11 July 2015 at 2:49:17.267711 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 6!
+!provides: 'PropertyEditor' 1 8!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -85,6 +85,29 @@ Ranges are constrained to be >= minValue and <= maxValue.
 
 Note that kind may be constrained as well.!
 
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 10:46'!
+metaProperties
+	"Answer a Dictionary of propName->PropertyDecsription"
+	
+	^ self valueOfProperty: #'metaProperties' 
+		ifAbsent: [ | newDict |
+			newDict := IdentityDictionary new.
+			self setProperty: #'metaProperties' toValue: newDict.
+			newDict 
+		]! !
+
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 14:40'!
+setMetaProperty: propSym toValue: aPropertyDescription
+
+	self metaProperties at: propSym put: aPropertyDescription 
+	! !
+
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 14:41'!
+valueOfMetaProperty: propSym
+
+	^ self metaProperties at: propSym ifAbsent: [ nil ]
+	! !
+
 !PropertyEditor methodsFor: 'GUI building' stamp: 'KenD 7/10/2015 12:57'!
 buildMorphicWindow
 	
@@ -109,13 +132,22 @@ kind
 
 	^ kind! !
 
-!PropertyDescription methodsFor: 'initialization' stamp: 'KenD 7/10/2015 15:22'!
-kind: aClass editor: editorClass dropAcceptor: aOneArgClosure
+!PropertyDescription methodsFor: 'initialization' stamp: 'KenD 7/11/2015 14:44'!
+kind: aClass editor: aEditClass dropAcceptor: aOneArgClosure
 
 	kind := aClass.
-	editor := editorClass.
+	editorClass := aEditClass.
 	dropAcceptor := aOneArgClosure.
 ! !
+
+!PropertyDescription class methodsFor: 'instance creation' stamp: 'KenD 7/11/2015 11:02'!
+kind: aClass editor: editorClass dropAcceptor: aOneArgClosure
+
+	| newInstance |
+	newInstance := self basicNew kind: aClass editor: editorClass dropAcceptor: aOneArgClosure.
+	"Reuse old instance if we already have one"
+	self allInstancesDo: [ :oldInstance | (oldInstance = newInstance) ifTrue: [ ^ oldInstance ] ].
+	^ newInstance ! !
 
 !ClosurePropertyDescription methodsFor: 'initialization' stamp: 'KenD 7/11/2015 07:47'!
 kind: aClass editor: editorClass dropAcceptor: aOneArgClosure numArguments: numArgs
