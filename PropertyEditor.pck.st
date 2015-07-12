@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 12 July 2015 at 9:03:22.954 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 12 July 2015 at 6:16:13.680649 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 9!
+!provides: 'PropertyEditor' 1 12!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -63,6 +63,16 @@ PropertyMeta subclass: #RangePropertyMeta
 RangePropertyMeta class
 	instanceVariableNames: ''!
 
+!classDefinition: #PropertyMetaTests category: #PropertyEditor!
+TestCase subclass: #PropertyMetaTests
+	instanceVariableNames: 'morph1 morph2 objPropMeta charPropMeta colorPropMeta stringPropMeta rangePropMeta oneOfPropMeta closurePropMeta passValue'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PropertyEditor'!
+!classDefinition: 'PropertyMetaTests class' category: #PropertyEditor!
+PropertyMetaTests class
+	instanceVariableNames: ''!
+
 
 !PropertyEditor commentStamp: '<historical>' prior: 0!
 I am used to edit a Morph's properties.!
@@ -102,6 +112,9 @@ Ranges are constrained to be >= minValue and <= maxValue.
 
 Note that kind may be constrained as well.!
 
+!PropertyMetaTests commentStamp: '<historical>' prior: 0!
+Unit tests for PropertyEditor support.!
+
 !Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 10:46'!
 metaProperties
 	"Answer a Dictionary of propName->PropertyDecsription"
@@ -113,16 +126,23 @@ metaProperties
 			newDict 
 		]! !
 
-!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 14:40'!
-setMetaProperty: propSym toValue: aPropertyDescription
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 18:14'!
+setMetaProperty: propSym toValue: aPropertyMeta
 
-	self metaProperties at: propSym put: aPropertyDescription 
+	| propVal |
+	propVal := self valueOfProperty: propSym 
+				ifAbsent: [ nil ].
+
+	(aPropertyMeta accepts: propVal)
+		  ifFalse: [ self error: 'Property value does not conform to specification' ].
+	
+	self metaProperties at: propSym put: aPropertyMeta 
 	! !
 
-!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 14:41'!
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 15:56'!
 valueOfMetaProperty: propSym
 
-	^ self metaProperties at: propSym ifAbsent: [ nil ]
+	^ self metaProperties at: propSym ifAbsent: [ PropertyMeta default ]
 	! !
 
 !PropertyMorph methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:46'!
@@ -190,7 +210,19 @@ propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 	^self new propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 ! !
 
-!PropertyMeta methodsFor: 'access' stamp: 'KenD 7/12/2015 08:43'!
+!PropertyMeta methodsFor: 'comparing' stamp: 'KenD 7/12/2015 16:02'!
+= other
+	"I am equak to other if I have the same class and ivar values"
+	
+	^(self class = other class)
+		and: [(self kind = other kind)
+			and: [(self editorClass = other editorClass)
+				and: [self dropAcceptor = other dropAcceptor]
+			]
+	      ]  
+! !
+
+!PropertyMeta methodsFor: 'testing' stamp: 'KenD 7/12/2015 15:57'!
 accepts: aValue
 
 	^ aValue isKindOf: self kind! !
@@ -240,6 +272,14 @@ kind: aClass editor: editorClass dropAcceptor: aOneArgClosure
 	self allInstancesDo: [ :oldInstance | (oldInstance = newInstance) ifTrue: [ ^ oldInstance ] ].
 	^ newInstance ! !
 
+!ClosurePropertyMeta methodsFor: 'comparing' stamp: 'KenD 7/12/2015 16:04'!
+= other
+	"I am equak to other if I have the same class and ivar values"
+	
+	^(super = other)
+		and: [ self numberOfArguments = other numberOfArguments ]  
+! !
+
 !ClosurePropertyMeta methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:49'!
 accepts: aValue
 
@@ -257,6 +297,24 @@ numberOfArguments
 
 	^ numberOfArguments! !
 
+!ClosurePropertyMeta class methodsFor: 'instance creation' stamp: 'KenD 7/12/2015 16:51'!
+kind: aClass editor: editorClass dropAcceptor: aOneArgClosure numArguments: anInteger
+
+	| newInstance |
+	newInstance := self basicNew kind: aClass editor: editorClass dropAcceptor: aOneArgClosure 
+						numArguments: anInteger.
+	"Reuse old instance if we already have one"
+	self allInstancesDo: [ :oldInstance | (oldInstance = newInstance) ifTrue: [ ^ oldInstance ] ].
+	^ newInstance ! !
+
+!OneOfPropertyMeta methodsFor: 'comparing' stamp: 'KenD 7/12/2015 16:03'!
+= other
+	"I am equak to other if I have the same class and ivar values"
+	
+	^(super = other)
+		and: [ self collectionToSelectFrom = other collectionToSelectFrom ]  
+! !
+
 !OneOfPropertyMeta methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:48'!
 accepts: aValue
 
@@ -272,6 +330,26 @@ kind: aClass editor: editorClass dropAcceptor: aOneArgClosure selections: aColle
 
 	super kind: aClass editor: editorClass dropAcceptor: aOneArgClosure.
 	collectionToSelectFrom := aCollection 
+! !
+
+!OneOfPropertyMeta class methodsFor: 'instance creation' stamp: 'KenD 7/12/2015 16:50'!
+kind: aClass editor: editorClass dropAcceptor: aOneArgClosure selections: aCollection
+
+	| newInstance |
+	newInstance := self basicNew kind: aClass editor: editorClass dropAcceptor: aOneArgClosure 
+						selections: aCollection.
+	"Reuse old instance if we already have one"
+	self allInstancesDo: [ :oldInstance | (oldInstance = newInstance) ifTrue: [ ^ oldInstance ] ].
+	^ newInstance ! !
+
+!RangePropertyMeta methodsFor: 'comparing' stamp: 'KenD 7/12/2015 16:06'!
+= other
+	"I am equak to other if I have the same class and ivar values"
+	
+	^(super = other)
+		and: [ (self maximumValue = other maximumValue)
+			and: [ self minimumValue = other minimumValue ]
+		]  
 ! !
 
 !RangePropertyMeta methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:50'!
@@ -296,4 +374,146 @@ maximumValue
 minimumValue
 
 	^minValue ! !
+
+!RangePropertyMeta class methodsFor: 'instance creation' stamp: 'KenD 7/12/2015 16:49'!
+kind: aClass editor: editorClass dropAcceptor: aOneArgClosure minValue: low maxValue: high
+
+	| newInstance |
+	newInstance := self basicNew kind: aClass editor: editorClass dropAcceptor: aOneArgClosure 
+						minValue: low maxValue: high.
+	"Reuse old instance if we already have one"
+	self allInstancesDo: [ :oldInstance | (oldInstance = newInstance) ifTrue: [ ^ oldInstance ] ].
+	^ newInstance ! !
+
+!PropertyMetaTests methodsFor: 'initialization' stamp: 'KenD 7/12/2015 16:35'!
+setUp
+	"Set up class variables before each test"
+	
+	passValue := [ :whatever |   "Just pass value through"
+		(whatever isKindOf: SignMorph) ifTrue: [ whatever object ] ifFalse: [ whatever ] 
+	]. 
+	
+	self setUpMorphs.
+	self setUpProperties.
+	self setUpMetaProperties.
+	
+	
+
+	! !
+
+!PropertyMetaTests methodsFor: 'initialization' stamp: 'KenD 7/12/2015 16:33'!
+setUpMetaProperties
+
+	objPropMeta := PropertyMeta default.
+	charPropMeta := PropertyMeta kind: Character editor: nil dropAcceptor: passValue.
+	colorPropMeta  := PropertyMeta kind: Color editor: nil dropAcceptor: passValue.
+	stringPropMeta  := PropertyMeta kind: String editor: nil dropAcceptor: passValue.
+	rangePropMeta  := RangePropertyMeta kind: Number editor: nil dropAcceptor: passValue 
+						minValue: 2 maxValue: 15.7.
+	oneOfPropMeta  := OneOfPropertyMeta kind: Symbol editor: nil dropAcceptor: passValue 
+						selections: #(one two three four five).
+	closurePropMeta := ClosurePropertyMeta kind: BlockClosure editor: nil dropAcceptor: passValue 
+						numArguments: 1.
+	morph1 setMetaProperty: #object toValue: objPropMeta.
+	morph1 setMetaProperty: #float toValue: rangePropMeta.
+	morph1 setMetaProperty: #string toValue: stringPropMeta.
+	morph1 setMetaProperty: #char toValue: charPropMeta.
+	morph1 setMetaProperty: #color toValue: colorPropMeta.
+	morph1 setMetaProperty: #bool 
+			toValue: (PropertyMeta kind: Boolean editor: nil dropAcceptor: passValue).
+	morph1 setMetaProperty: #oneOf toValue: oneOfPropMeta.
+	morph1 setMetaProperty: #range 
+			toValue: (RangePropertyMeta kind: Number editor: nil dropAcceptor: passValue 
+						minValue: 2 maxValue: 15.7).
+	morph1 setMetaProperty: #alwaysTrue toValue: closurePropMeta.
+
+	! !
+
+!PropertyMetaTests methodsFor: 'initialization' stamp: 'KenD 7/12/2015 16:54'!
+setUpMorphs
+
+	morph1 := EllipseMorph initializedInstance.
+	morph2 := BorderedRectMorph initializedInstance.
+! !
+
+!PropertyMetaTests methodsFor: 'initialization' stamp: 'KenD 7/12/2015 16:32'!
+setUpProperties
+
+	morph1 setProperty: #object toValue: nil.
+	morph1 setProperty: #float toValue: 2.3.
+	morph1 setProperty: #range toValue: 5.
+	morph1 setProperty: #string toValue: 'Silly little string'.
+	morph1 setProperty: #char toValue: $c.
+	morph1 setProperty: #color toValue: Color red.
+	morph1 setProperty: #bool toValue: true.
+	morph1 setProperty: #oneOf toValue: #three. "#(one two three four five)"
+	morph1 setProperty: #symbol toValue: #'MySymbol'.
+	morph1 setProperty: #alwaysTrue toValue: [ :ignored | true ].
+! !
+
+!PropertyMetaTests methodsFor: 'testing' stamp: 'KenD 7/12/2015 18:15'!
+testAcceptance
+	"Are constraints properly tested for?"
+	
+	self assert: ( 2.3 = (morph1 valueOfProperty: #float) ).
+	self assert: ( ( morph1 valueOfMetaProperty: #float ) accepts: 2.3 ).
+	self deny: ( ( morph1 valueOfMetaProperty: #float ) accepts: 45 ).
+	self deny: ( ( morph1 valueOfMetaProperty: #float ) accepts: 'String' ).
+	self assert: ( #three = (morph1 valueOfProperty: #oneOf) ).
+	self assert: ( ( morph1 valueOfMetaProperty: #oneOf ) accepts: #two ).
+	self assert: ( ( morph1 valueOfMetaProperty: #oneOf ) accepts: #five ).
+	self deny: ( ( morph1 valueOfMetaProperty: #oneOf ) accepts: 5 ).
+	self deny: ( ( morph1 valueOfMetaProperty: #oneOf ) accepts: 'five' ).
+	self assert: ( ( morph1 valueOfMetaProperty: #alwaysTrue ) accepts: [ :ignore | false ] ).
+	self deny: ( ( morph1 valueOfMetaProperty: #alwaysTrue ) accepts: [ :one :two | one + two ] ).
+	self assert: true.
+	self assert: true.
+	self assert: true.
+	self assert: true.
+	self assert: true.
+	self assert: true.
+	self deny: false.
+	self deny: false.
+	self deny: false.
+	self deny: false.
+	self deny: false.
+	! !
+
+!PropertyMetaTests methodsFor: 'testing' stamp: 'KenD 7/12/2015 16:45'!
+testAccess
+	"Can we get there from here?"
+	
+	self assert: ((morph1 valueOfMetaProperty: #string) == stringPropMeta).
+	self assert: ((morph1 valueOfProperty: #string) = 'Silly little string').
+	self deny: false.
+	! !
+
+!PropertyMetaTests methodsFor: 'testing' stamp: 'KenD 7/12/2015 16:42'!
+testComparison
+	"Do we compare properly?"
+	
+	self assert: (colorPropMeta = colorPropMeta).
+	self deny: (colorPropMeta = objPropMeta).
+	self assert: (colorPropMeta = 
+		(PropertyMeta kind: Color editor: nil dropAcceptor: passValue)
+	).
+	self assert: (oneOfPropMeta = 
+		(OneOfPropertyMeta kind: Symbol editor: nil dropAcceptor: passValue 
+						selections: #(one two three four five))
+	).
+	self assert: (rangePropMeta =
+		(RangePropertyMeta kind: Number editor: nil dropAcceptor: passValue 
+						minValue: 2 maxValue: 15.7)
+	).
+	self deny: (rangePropMeta = 
+		(PropertyMeta kind: Color editor: nil dropAcceptor: passValue)
+	).
+	self deny: (rangePropMeta = 
+		(OneOfPropertyMeta kind: Symbol editor: nil dropAcceptor: passValue 
+						selections: #(one two three four five))
+	).
+	self deny: (oneOfPropMeta =
+		(RangePropertyMeta kind: Number editor: nil dropAcceptor: passValue 
+						minValue: 2 maxValue: 15.7)
+	).! !
 PropertyMeta initialize!
