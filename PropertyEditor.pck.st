@@ -1,11 +1,11 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 11 July 2015 at 2:49:17.267711 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 12 July 2015 at 9:03:22.954 am'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 8!
-!requires: 'Morphic-Misc1' 1 49 nil!
+!provides: 'PropertyEditor' 1 9!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
-Panel subclass: #PropertyEditor
-	instanceVariableNames: ''
+MenuMorph subclass: #PropertyEditor
+	instanceVariableNames: 'morph'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PropertyEditor'!
@@ -13,53 +13,70 @@ Panel subclass: #PropertyEditor
 PropertyEditor class
 	instanceVariableNames: ''!
 
-!classDefinition: #PropertyDescription category: #PropertyEditor!
-Object subclass: #PropertyDescription
-	instanceVariableNames: 'kind editorClass dropAcceptor'
+!classDefinition: #PropertyMorph category: #PropertyEditor!
+MenuItemMorph subclass: #PropertyMorph
+	instanceVariableNames: 'metaProperty morph name value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PropertyEditor'!
-!classDefinition: 'PropertyDescription class' category: #PropertyEditor!
-PropertyDescription class
+!classDefinition: 'PropertyMorph class' category: #PropertyEditor!
+PropertyMorph class
 	instanceVariableNames: ''!
 
-!classDefinition: #ClosurePropertyDescription category: #PropertyEditor!
-PropertyDescription subclass: #ClosurePropertyDescription
+!classDefinition: #PropertyMeta category: #PropertyEditor!
+Object subclass: #PropertyMeta
+	instanceVariableNames: 'kind editorClass dropAcceptor'
+	classVariableNames: 'DefaultPropDescription'
+	poolDictionaries: ''
+	category: 'PropertyEditor'!
+!classDefinition: 'PropertyMeta class' category: #PropertyEditor!
+PropertyMeta class
+	instanceVariableNames: ''!
+
+!classDefinition: #ClosurePropertyMeta category: #PropertyEditor!
+PropertyMeta subclass: #ClosurePropertyMeta
 	instanceVariableNames: 'numberOfArguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PropertyEditor'!
-!classDefinition: 'ClosurePropertyDescription class' category: #PropertyEditor!
-ClosurePropertyDescription class
+!classDefinition: 'ClosurePropertyMeta class' category: #PropertyEditor!
+ClosurePropertyMeta class
 	instanceVariableNames: ''!
 
-!classDefinition: #OneOfPropertyDescription category: #PropertyEditor!
-PropertyDescription subclass: #OneOfPropertyDescription
+!classDefinition: #OneOfPropertyMeta category: #PropertyEditor!
+PropertyMeta subclass: #OneOfPropertyMeta
 	instanceVariableNames: 'collectionToSelectFrom'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PropertyEditor'!
-!classDefinition: 'OneOfPropertyDescription class' category: #PropertyEditor!
-OneOfPropertyDescription class
+!classDefinition: 'OneOfPropertyMeta class' category: #PropertyEditor!
+OneOfPropertyMeta class
 	instanceVariableNames: ''!
 
-!classDefinition: #RangePropertyDescription category: #PropertyEditor!
-PropertyDescription subclass: #RangePropertyDescription
+!classDefinition: #RangePropertyMeta category: #PropertyEditor!
+PropertyMeta subclass: #RangePropertyMeta
 	instanceVariableNames: 'minValue maxValue'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PropertyEditor'!
-!classDefinition: 'RangePropertyDescription class' category: #PropertyEditor!
-RangePropertyDescription class
+!classDefinition: 'RangePropertyMeta class' category: #PropertyEditor!
+RangePropertyMeta class
 	instanceVariableNames: ''!
 
 
 !PropertyEditor commentStamp: '<historical>' prior: 0!
-I display a Morp's properties for edit.
+I am used to edit a Morph's properties.!
 
-My model is the Morph which is being edited.!
+!PropertyMorph commentStamp: '<historical>' prior: 0!
+I display a selection for a Morph property.
 
-!PropertyDescription commentStamp: '<historical>' prior: 0!
+ivars:
+  metaProperty -- a PropertyMeta
+  name -- property name (a symbol)
+  value -- cached property value (used for undo)
+!
+
+!PropertyMeta commentStamp: '<historical>' prior: 0!
 I am metaData for a Morph Property.  
 
 I am frequently shared, so my ivars are immutable (not meant to be changed).
@@ -70,17 +87,17 @@ ivars:
   dropAcceptor -- when a Morph is dropped on a property displayed in a PropertyEditor, this does any transform required for the value to be placed in the property.  E.g. a prop holding a Color may take a color swatch, color name, ...
 !
 
-!ClosurePropertyDescription commentStamp: '<historical>' prior: 0!
+!ClosurePropertyMeta commentStamp: '<historical>' prior: 0!
 My kind is BlockClosure.
 
 I add the constraint that the number of arguments for the closure must be numberOfArguments!
 
-!OneOfPropertyDescription commentStamp: '<historical>' prior: 0!
+!OneOfPropertyMeta commentStamp: '<historical>' prior: 0!
 My property values are constrained to be one member of the contained collection.
 
 Note that Kind may also be constrained.!
 
-!RangePropertyDescription commentStamp: '<historical>' prior: 0!
+!RangePropertyMeta commentStamp: '<historical>' prior: 0!
 Ranges are constrained to be >= minValue and <= maxValue.
 
 Note that kind may be constrained as well.!
@@ -108,31 +125,92 @@ valueOfMetaProperty: propSym
 	^ self metaProperties at: propSym ifAbsent: [ nil ]
 	! !
 
-!PropertyEditor methodsFor: 'GUI building' stamp: 'KenD 7/10/2015 12:57'!
-buildMorphicWindow
-	
-	|  |	
-	self setLabel: (self model printStringLimitedTo: 30).
-	self titleMorph showButtonsNamed: #( close collapse showHalo ).
+!PropertyMorph methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:46'!
+allowsValue: aValue
+
+	^ self metaProperties accepts: aValue! !
+
+!PropertyMorph methodsFor: 'editing' stamp: 'KenD 7/12/2015 08:12'!
+edit
 
 	self notYetImplemented ! !
 
-!PropertyDescription methodsFor: 'access' stamp: 'KenD 7/11/2015 07:37'!
+!PropertyMorph methodsFor: 'initialization' stamp: 'KenD 7/12/2015 08:11'!
+propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
+
+	super initialize.
+	name := aSymbol.
+	morph := aMorph.
+	metaProperty := aPropertyDescriptor.
+	value := aMorph valueOfProperty: aSymbol.	
+	"@@@ ICON @@@"
+	self contents: name asString , ':  ', (value printStringLimitedTo: 20);
+		 target: self;
+		 selector: #edit
+
+	
+	! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/12/2015 08:18'!
+propertyDescriptor
+
+	^ metaProperty ! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/12/2015 08:18'!
+propertyName
+
+	^ name ! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/12/2015 08:19'!
+propertyValue
+
+	^ self morph valueOfProperty: self name! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/12/2015 08:21'!
+propertyValue: newValue
+	"Assumed checking already done.  Does NOT change cashed value"
+	
+	^ self morph setProperty: self name toValue: newValue! !
+
+!PropertyMorph methodsFor: 'editing' stamp: 'KenD 7/12/2015 08:22'!
+undo
+	"Reset value from remembered value"
+
+	self morph setProperty: self name  toValue: self value! !
+
+!PropertyMorph class methodsFor: 'instance creation' stamp: 'KenD 7/12/2015 09:01'!
+propName: aSymbol morph: aMorph
+
+	^ self propName: aSymbol morph: aMorph propMeta: PropertyMeta default
+! !
+
+!PropertyMorph class methodsFor: 'instance creation' stamp: 'KenD 7/12/2015 08:13'!
+propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
+
+	^self new propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
+! !
+
+!PropertyMeta methodsFor: 'access' stamp: 'KenD 7/12/2015 08:43'!
+accepts: aValue
+
+	^ aValue isKindOf: self kind! !
+
+!PropertyMeta methodsFor: 'access' stamp: 'KenD 7/11/2015 07:37'!
 dropAcceptor
 
 	^ dropAcceptor! !
 
-!PropertyDescription methodsFor: 'access' stamp: 'KenD 7/11/2015 07:40'!
+!PropertyMeta methodsFor: 'access' stamp: 'KenD 7/11/2015 07:40'!
 editorClass
 
 	^ editorClass! !
 
-!PropertyDescription methodsFor: 'access' stamp: 'KenD 7/11/2015 07:36'!
+!PropertyMeta methodsFor: 'access' stamp: 'KenD 7/11/2015 07:36'!
 kind
 
 	^ kind! !
 
-!PropertyDescription methodsFor: 'initialization' stamp: 'KenD 7/11/2015 14:44'!
+!PropertyMeta methodsFor: 'initialization' stamp: 'KenD 7/11/2015 14:44'!
 kind: aClass editor: aEditClass dropAcceptor: aOneArgClosure
 
 	kind := aClass.
@@ -140,7 +218,20 @@ kind: aClass editor: aEditClass dropAcceptor: aOneArgClosure
 	dropAcceptor := aOneArgClosure.
 ! !
 
-!PropertyDescription class methodsFor: 'instance creation' stamp: 'KenD 7/11/2015 11:02'!
+!PropertyMeta class methodsFor: 'instance creation' stamp: 'KenD 7/12/2015 08:56'!
+default
+
+	^ DefaultPropDescription ! !
+
+!PropertyMeta class methodsFor: 'class initialization' stamp: 'KenD 7/12/2015 08:57'!
+initialize
+"
+	PropertyDescription initialize.
+"
+	"The default accepts any value without change"
+	DefaultPropDescription := self kind: Object editor: Inspector dropAcceptor: [ : any | any ].! !
+
+!PropertyMeta class methodsFor: 'instance creation' stamp: 'KenD 7/11/2015 11:02'!
 kind: aClass editor: editorClass dropAcceptor: aOneArgClosure
 
 	| newInstance |
@@ -149,31 +240,46 @@ kind: aClass editor: editorClass dropAcceptor: aOneArgClosure
 	self allInstancesDo: [ :oldInstance | (oldInstance = newInstance) ifTrue: [ ^ oldInstance ] ].
 	^ newInstance ! !
 
-!ClosurePropertyDescription methodsFor: 'initialization' stamp: 'KenD 7/11/2015 07:47'!
+!ClosurePropertyMeta methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:49'!
+accepts: aValue
+
+	^ (super accepts: aValue) and: [ self numberOfArguments = aValue numArgs ]! !
+
+!ClosurePropertyMeta methodsFor: 'initialization' stamp: 'KenD 7/11/2015 07:47'!
 kind: aClass editor: editorClass dropAcceptor: aOneArgClosure numArguments: numArgs
 
 	super kind: aClass editor: editorClass dropAcceptor: aOneArgClosure.
 	numberOfArguments := numArgs 
 ! !
 
-!ClosurePropertyDescription methodsFor: 'access' stamp: 'KenD 7/11/2015 07:41'!
+!ClosurePropertyMeta methodsFor: 'access' stamp: 'KenD 7/11/2015 07:41'!
 numberOfArguments
 
 	^ numberOfArguments! !
 
-!OneOfPropertyDescription methodsFor: 'access' stamp: 'KenD 7/11/2015 07:43'!
+!OneOfPropertyMeta methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:48'!
+accepts: aValue
+
+	^ (super accepts: aValue) and: [ self collectionToSelectFrom includes: aValue ]! !
+
+!OneOfPropertyMeta methodsFor: 'access' stamp: 'KenD 7/11/2015 07:43'!
 collectionToSelectFrom
 
 	^ collectionToSelectFrom! !
 
-!OneOfPropertyDescription methodsFor: 'initialization' stamp: 'KenD 7/11/2015 07:46'!
+!OneOfPropertyMeta methodsFor: 'initialization' stamp: 'KenD 7/11/2015 07:46'!
 kind: aClass editor: editorClass dropAcceptor: aOneArgClosure selections: aCollection
 
 	super kind: aClass editor: editorClass dropAcceptor: aOneArgClosure.
 	collectionToSelectFrom := aCollection 
 ! !
 
-!RangePropertyDescription methodsFor: 'initialization' stamp: 'KenD 7/11/2015 07:48'!
+!RangePropertyMeta methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:50'!
+accepts: aValue
+
+	^ (super accepts: aValue) and: [ (self minimumValue <= aValue) and: [ aValue <= self maximumValue ] ]! !
+
+!RangePropertyMeta methodsFor: 'initialization' stamp: 'KenD 7/11/2015 07:48'!
 kind: aClass editor: editorClass dropAcceptor: aOneArgClosure minValue: low maxValue: high
 
 	super kind: aClass editor: editorClass dropAcceptor: aOneArgClosure.
@@ -181,12 +287,13 @@ kind: aClass editor: editorClass dropAcceptor: aOneArgClosure minValue: low maxV
 	maxValue := high
 ! !
 
-!RangePropertyDescription methodsFor: 'access' stamp: 'KenD 7/11/2015 07:49'!
+!RangePropertyMeta methodsFor: 'access' stamp: 'KenD 7/11/2015 07:49'!
 maximumValue
 
 	^maxValue ! !
 
-!RangePropertyDescription methodsFor: 'access' stamp: 'KenD 7/11/2015 07:48'!
+!RangePropertyMeta methodsFor: 'access' stamp: 'KenD 7/11/2015 07:48'!
 minimumValue
 
 	^minValue ! !
+PropertyMeta initialize!
