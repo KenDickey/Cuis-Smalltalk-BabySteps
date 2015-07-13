@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 11:05:21.051094 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 2:39:59.527926 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 16!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
+!provides: 'PropertyEditor' 1 17!
 !requires: 'Morphic-Misc1' 1 49 nil!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph'
@@ -280,10 +280,10 @@ icon
 
 	^ PropertyMorph fileIcon ! !
 
-!UndefinedObject methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:51'!
+!UndefinedObject methodsFor: '*propertyeditor' stamp: 'KenD 7/13/2015 14:38'!
 icon
 
-	^ PropertyMorph nilIcon ! !
+	^ PropertyMorph blankIcon ! !
 
 !PropertyMorph methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:46'!
 allowsValue: aValue
