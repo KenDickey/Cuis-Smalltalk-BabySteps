@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 12 July 2015 at 6:16:13.680649 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 12 July 2015 at 10:53:41.746409 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 12!
+!provides: 'PropertyEditor' 1 15!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -16,7 +16,7 @@ PropertyEditor class
 !classDefinition: #PropertyMorph category: #PropertyEditor!
 MenuItemMorph subclass: #PropertyMorph
 	instanceVariableNames: 'metaProperty morph name value'
-	classVariableNames: ''
+	classVariableNames: 'BlankIcon BoolIcon CharIcon ChronIcon ClassIcon ClosureIcon CollectIcon CpxIcon FalseIcon FileIcon FloatIcon FolderIcon FontIcon FracIcon IntIcon NilIcon ObjIcon OneOfIcon PtIcon RngIcon StrIcon StreamIcon SymIcon TrueIcon WindowIcon'
 	poolDictionaries: ''
 	category: 'PropertyEditor'!
 !classDefinition: 'PropertyMorph class' category: #PropertyEditor!
@@ -115,6 +115,121 @@ Note that kind may be constrained as well.!
 !PropertyMetaTests commentStamp: '<historical>' prior: 0!
 Unit tests for PropertyEditor support.!
 
+!ProtoObject methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:30'!
+icon
+
+	^ PropertyMorph blankIcon ! !
+
+!Object methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:49'!
+icon
+
+	^ PropertyMorph objectIcon ! !
+
+!AbstractFont methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:06'!
+icon
+
+	^ PropertyMorph fontIcon ! !
+
+!Class methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:02'!
+icon
+
+	^ PropertyMorph classIcon ! !
+
+!BlockClosure methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:00'!
+icon
+
+	^ PropertyMorph closureIcon ! !
+
+!Boolean methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:50'!
+icon
+
+	^ PropertyMorph booleanIcon ! !
+
+!False methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:50'!
+icon
+
+	^ PropertyMorph falseIcon ! !
+
+!True methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:51'!
+icon
+
+	^ PropertyMorph trueIcon ! !
+
+!Collection methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:13'!
+icon
+
+	^ PropertyMorph collectionIcon ! !
+
+!String methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:53'!
+icon
+
+	^ PropertyMorph stringIcon ! !
+
+!Symbol methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:54'!
+icon
+
+	^ PropertyMorph symbolIcon ! !
+
+!Interval methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:09'!
+icon
+
+	^ PropertyMorph rangeIcon ! !
+
+!Complex methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:05'!
+icon
+
+	^ PropertyMorph complexIcon ! !
+
+!Editor methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:56'!
+icon
+
+	^ PropertyMorph windowIcon ! !
+
+!FileDirectory methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:10'!
+icon
+
+	^ PropertyMorph folderIcon ! !
+
+!Magnitude methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:03'!
+icon
+
+	^ PropertyMorph integerIcon ! !
+
+!Character methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:53'!
+icon
+
+	^ PropertyMorph charIcon ! !
+
+!Float methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:05'!
+icon
+
+	^ PropertyMorph floatIcon ! !
+
+!Fraction methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:04'!
+icon
+
+	^ PropertyMorph fractionIcon ! !
+
+!Integer methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:04'!
+icon
+
+	^ PropertyMorph integerIcon ! !
+
+!Time methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:00'!
+icon
+
+	^ PropertyMorph chronIcon ! !
+
+!Timespan methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:01'!
+icon
+
+	^ PropertyMorph chronIcon ! !
+
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:47'!
+icon
+	
+	^ (self imageForm: 32)  magnifyTo: 16 @ 16! !
+
 !Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 10:46'!
 metaProperties
 	"Answer a Dictionary of propName->PropertyDecsription"
@@ -145,6 +260,31 @@ valueOfMetaProperty: propSym
 	^ self metaProperties at: propSym ifAbsent: [ PropertyMeta default ]
 	! !
 
+!ImagePallet methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:58'!
+icon
+
+	^ PropertyMorph windowIcon ! !
+
+!Point methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:07'!
+icon
+
+	^ PropertyMorph pointIcon ! !
+
+!Stream methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:55'!
+icon
+
+	^ PropertyMorph stringIcon ! !
+
+!FileStream methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:12'!
+icon
+
+	^ PropertyMorph fileIcon ! !
+
+!UndefinedObject methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:51'!
+icon
+
+	^ PropertyMorph nilIcon ! !
+
 !PropertyMorph methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:46'!
 allowsValue: aValue
 
@@ -155,7 +295,7 @@ edit
 
 	self notYetImplemented ! !
 
-!PropertyMorph methodsFor: 'initialization' stamp: 'KenD 7/12/2015 08:11'!
+!PropertyMorph methodsFor: 'initialization' stamp: 'KenD 7/12/2015 22:24'!
 propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 
 	super initialize.
@@ -163,9 +303,9 @@ propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 	morph := aMorph.
 	metaProperty := aPropertyDescriptor.
 	value := aMorph valueOfProperty: aSymbol.	
-	"@@@ ICON @@@"
 	self contents: name asString , ':  ', (value printStringLimitedTo: 20);
 		 target: self;
+		 icon: value icon; 
 		 selector: #edit
 
 	
@@ -198,6 +338,137 @@ undo
 
 	self morph setProperty: self name  toValue: self value! !
 
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:33'!
+blankIcon
+
+	^BlankIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:14'!
+booleanIcon
+
+	^BoolIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:33'!
+charIcon
+
+	^CharIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:33'!
+chronIcon
+
+	^ChronIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:33'!
+classIcon
+
+	^ClassIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:34'!
+closureIcon
+
+	^ClosureIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:34'!
+collectionIcon
+
+	^CollectIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:34'!
+complexIcon
+
+	^CpxIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:35'!
+falseIcon
+
+	^FalseIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:35'!
+fileIcon
+
+	^FileIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:35'!
+floatIcon
+
+	^FloatIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:35'!
+folderIcon
+
+	^FolderIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:36'!
+fontIcon
+
+	^FontIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:36'!
+fractionIcon
+
+	^FracIcon! !
+
+!PropertyMorph class methodsFor: 'class initialization' stamp: 'KenD 7/12/2015 22:13'!
+initialize
+"
+	PropertyMorph initialize..
+"
+	| dirName |
+	dirName :=   FmFileIOAccessor default imageDirectoryPath , '../Cuis-Smalltalk-Babysteps/Icons/'.
+
+	BlankIcon := ImageReadWriter formFromFileNamed: dirName , 'Blank.png'.
+	BoolIcon := ImageReadWriter formFromFileNamed: dirName , 'Bool.png'.
+	CharIcon := ImageReadWriter formFromFileNamed: dirName , 'Char.png'.
+	ChronIcon := ImageReadWriter formFromFileNamed: dirName , 'Chron.png'.
+	ClassIcon := ImageReadWriter formFromFileNamed: dirName , 'Class.png'.
+	ClosureIcon := ImageReadWriter formFromFileNamed: dirName , 'Closure.png'.
+	CollectIcon := ImageReadWriter formFromFileNamed: dirName , 'Collect.png'.
+	CpxIcon := ImageReadWriter formFromFileNamed: dirName , 'Cpx.png'.
+	FalseIcon := ImageReadWriter formFromFileNamed: dirName , 'False.png'.
+	FileIcon := ImageReadWriter formFromFileNamed: dirName , 'File.png'.
+	FloatIcon := ImageReadWriter formFromFileNamed: dirName , 'Float.png'.
+	FolderIcon := ImageReadWriter formFromFileNamed: dirName , 'Folder.png'.
+	FontIcon := ImageReadWriter formFromFileNamed: dirName , 'Font.png'.
+	FracIcon := ImageReadWriter formFromFileNamed: dirName , 'Frac.png'.
+	IntIcon := ImageReadWriter formFromFileNamed: dirName , 'Int.png'.
+	NilIcon := ImageReadWriter formFromFileNamed: dirName , 'Nil.png'.
+	ObjIcon := ImageReadWriter formFromFileNamed: dirName , 'Obj.png'.
+	OneOfIcon := ImageReadWriter formFromFileNamed: dirName , 'OneOf.png'.
+	PtIcon := ImageReadWriter formFromFileNamed: dirName , 'Pt.png'.
+	RngIcon := ImageReadWriter formFromFileNamed: dirName , 'Rng.png'.
+	StrIcon := ImageReadWriter formFromFileNamed: dirName , 'Str.png'.
+	StreamIcon := ImageReadWriter formFromFileNamed: dirName , 'Stream.png'.
+	SymIcon := ImageReadWriter formFromFileNamed: dirName , 'Sym.png'.
+	TrueIcon := ImageReadWriter formFromFileNamed: dirName , 'True.png'.
+	WindowIcon := ImageReadWriter formFromFileNamed: dirName , 'Window.png'.
+	
+! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:36'!
+integerIcon
+
+	^IntIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:36'!
+nilIcon
+
+	^NilIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:37'!
+objectIcon
+
+	^ObjIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:37'!
+oneOfIcon
+
+	^OneOfIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:37'!
+pointIcon
+
+	^PtIcon! !
+
 !PropertyMorph class methodsFor: 'instance creation' stamp: 'KenD 7/12/2015 09:01'!
 propName: aSymbol morph: aMorph
 
@@ -209,6 +480,36 @@ propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 
 	^self new propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 ! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:38'!
+rangeIcon
+
+	^RngIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:38'!
+streamIcon
+
+	^StreamIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:38'!
+stringIcon
+
+	^StrIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:38'!
+symbolIcon
+
+	^SymIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:39'!
+trueIcon
+
+	^TrueIcon! !
+
+!PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:39'!
+windowIcon
+
+	^WindowIcon! !
 
 !PropertyMeta methodsFor: 'comparing' stamp: 'KenD 7/12/2015 16:02'!
 = other
@@ -516,4 +817,5 @@ testComparison
 		(RangePropertyMeta kind: Number editor: nil dropAcceptor: passValue 
 						minValue: 2 maxValue: 15.7)
 	).! !
+PropertyMorph initialize!
 PropertyMeta initialize!
