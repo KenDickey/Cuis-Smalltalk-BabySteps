@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 12 July 2015 at 10:53:41.746409 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 11:05:21.051094 am'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 15!
+!provides: 'PropertyEditor' 1 16!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -408,13 +408,13 @@ fractionIcon
 
 	^FracIcon! !
 
-!PropertyMorph class methodsFor: 'class initialization' stamp: 'KenD 7/12/2015 22:13'!
+!PropertyMorph class methodsFor: 'class initialization' stamp: 'KenD 7/13/2015 11:03'!
 initialize
 "
 	PropertyMorph initialize..
 "
 	| dirName |
-	dirName :=   FmFileIOAccessor default imageDirectoryPath , '../Cuis-Smalltalk-Babysteps/Icons/'.
+	dirName :=   FmFileIOAccessor default imageDirectoryPath , '../Cuis-Smalltalk-BabySteps/Icons/'.
 
 	BlankIcon := ImageReadWriter formFromFileNamed: dirName , 'Blank.png'.
 	BoolIcon := ImageReadWriter formFromFileNamed: dirName , 'Bool.png'.
