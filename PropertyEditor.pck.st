@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 2:39:59.527926 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 4:48:07.044014 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 17!
+!provides: 'PropertyEditor' 1 19!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -225,10 +225,12 @@ icon
 
 	^ PropertyMorph chronIcon ! !
 
-!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:47'!
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/13/2015 16:47'!
 icon
 	
-	^ (self imageForm: 32)  magnifyTo: 16 @ 16! !
+	^ (self imageForm: 32)
+		 ifNotNil: [ :form | form magnifyTo: 16 @ 16 ]
+		 ifNil: [ Theme current morphsIcon ]! !
 
 !Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/11/2015 10:46'!
 metaProperties
@@ -240,6 +242,11 @@ metaProperties
 			self setProperty: #'metaProperties' toValue: newDict.
 			newDict 
 		]! !
+
+!Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/13/2015 15:53'!
+propertiesDict
+
+	^ properties! !
 
 !Morph methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 18:14'!
 setMetaProperty: propSym toValue: aPropertyMeta
@@ -284,6 +291,52 @@ icon
 icon
 
 	^ PropertyMorph blankIcon ! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/13/2015 16:19'!
+edit: propName
+
+	(HoverHelpMorph contents: 'Need editor for ' , propName asString)
+		popUpForHand: self targetMorph world activeHand! !
+
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/13/2015 16:35'!
+forMorph: aMorph
+
+	| propNames |
+	morph := aMorph.
+	self defaultTarget: self.
+	self addTitle: (aMorph printStringLimitedTo: 60).
+	self stayUp: true.
+
+	propNames := SortedCollection sortBlock: [ :sym1 :sym2 | sym1 < sym2 ].
+	aMorph propertiesDict keysDo: [ :propName | propNames add: propName ].
+	
+	"add operations"
+	"@@@<NYI>@@@"
+
+	self addLine.
+	
+	"add properties"
+	propNames do: [ :name | 
+		self addMorphBack: (PropertyMorph 
+					propName: name 
+					morph: aMorph 
+					propMeta: (aMorph valueOfMetaProperty: name) ) 
+	].
+
+	self addLine.
+	
+	"add ivars"
+	"@@@<NYI>@@@"! !
+
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 16:19'!
+targetMorph
+
+	^ morph! !
+
+!PropertyEditor class methodsFor: 'instance creation' stamp: 'KenD 7/13/2015 16:01'!
+forMorph: aMorph
+
+	^ self new forMorph: aMorph ! !
 
 !PropertyMorph methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:46'!
 allowsValue: aValue
