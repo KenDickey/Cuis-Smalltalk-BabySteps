@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 4:48:07.044014 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 6:32:49.332026 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 19!
+!provides: 'PropertyEditor' 1 20!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -298,7 +298,7 @@ edit: propName
 	(HoverHelpMorph contents: 'Need editor for ' , propName asString)
 		popUpForHand: self targetMorph world activeHand! !
 
-!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/13/2015 16:35'!
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/13/2015 18:12'!
 forMorph: aMorph
 
 	| propNames |
@@ -308,7 +308,10 @@ forMorph: aMorph
 	self stayUp: true.
 
 	propNames := SortedCollection sortBlock: [ :sym1 :sym2 | sym1 < sym2 ].
-	aMorph propertiesDict keysDo: [ :propName | propNames add: propName ].
+	aMorph propertiesDict keysDo: [ :propName | 
+		(propName = #metaProperties)
+			ifFalse: [ propNames add: propName ] 
+	].
 	
 	"add operations"
 	"@@@<NYI>@@@"
