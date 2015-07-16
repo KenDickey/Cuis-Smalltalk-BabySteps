@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 3:10:45.356619 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 4:52:22.282944 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 29!
+!provides: 'PropertyEditor' 1 31!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -41,6 +41,16 @@ PropertyMeta subclass: #ClosurePropertyMeta
 	category: 'PropertyEditor'!
 !classDefinition: 'ClosurePropertyMeta class' category: #PropertyEditor!
 ClosurePropertyMeta class
+	instanceVariableNames: ''!
+
+!classDefinition: #ColorPropertyMeta category: #PropertyEditor!
+PropertyMeta subclass: #ColorPropertyMeta
+	instanceVariableNames: ''
+	classVariableNames: 'DefaultDropAcceptor'
+	poolDictionaries: ''
+	category: 'PropertyEditor'!
+!classDefinition: 'ColorPropertyMeta class' category: #PropertyEditor!
+ColorPropertyMeta class
 	instanceVariableNames: ''!
 
 !classDefinition: #OneOfPropertyMeta category: #PropertyEditor!
@@ -102,10 +112,13 @@ My kind is BlockClosure.
 
 I add the constraint that the number of arguments for the closure must be numberOfArguments!
 
-!OneOfPropertyMeta commentStamp: '<historical>' prior: 0!
-My property values are constrained to be one member of the contained collection.
+!ColorPropertyMeta commentStamp: '<historical>' prior: 0!
+I describe proerties of Color.!
 
-Note that Kind may also be constrained.!
+!OneOfPropertyMeta commentStamp: '<historical>' prior: 0!
+My property values are constrained to be one element of a collection.
+
+Note that my Kind may be constrained as well.!
 
 !RangePropertyMeta commentStamp: '<historical>' prior: 0!
 Ranges are constrained to be >= minValue and <= maxValue.
@@ -174,6 +187,11 @@ icon
 icon
 
 	^ PropertyMorph rangeIcon ! !
+
+!Color methodsFor: '*propertyeditor' stamp: 'KenD 7/16/2015 16:10'!
+color
+
+	^ self! !
 
 !Complex methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:05'!
 icon
@@ -405,7 +423,7 @@ titleMorph
 
 	^ titleMorph ! !
 
-!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/16/2015 12:42'!
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/16/2015 16:24'!
 example1
 "
 	self example1.
@@ -440,7 +458,7 @@ example1
 	aMorph setMetaProperty: #char 
 			toValue: (PropertyMeta kind: Character editor: nil dropAcceptor: passValue).
 	aMorph setMetaProperty: #color 
-			toValue: (PropertyMeta kind: Color editor: nil dropAcceptor: passValue).
+			toValue: (ColorPropertyMeta new).
 	aMorph setMetaProperty: #bool 
 			toValue: (PropertyMeta kind: Boolean editor: nil dropAcceptor: passValue).
 	aMorph setMetaProperty: #oneOf 
@@ -539,11 +557,11 @@ propertyValue
 
 	^ self targetMorph valueOfProperty: self name! !
 
-!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 13:27'!
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 16:43'!
 propertyValue: newValue
 	"Assumed checking already done.  Does NOT change cashed value"
-	
-	self targetMorph setProperty: self name toValue: newValue.
+
+	self targetMorph setProperty: self name toValue: (self metaProperty dropAcceptor value: newValue).
 	self setContents.
 	self owner ifNotNil: [ self owner adjustSubmorphsLayout ].
 ! !
@@ -866,6 +884,51 @@ kind: aClass editor: editorClass dropAcceptor: aOneArgClosure numArguments: anIn
 	self allInstancesDo: [ :oldInstance | (oldInstance = newInstance) ifTrue: [ ^ oldInstance ] ].
 	^ newInstance ! !
 
+!ColorPropertyMeta methodsFor: 'testing' stamp: 'KenD 7/16/2015 16:28'!
+accepts: aValue
+
+	| dropValue |
+	dropValue :=
+		(aValue isKindOf: SignMorph)
+			ifTrue: [ aValue object ]
+			ifFalse: [ aValue ].
+	^ (dropValue respondsTo: #color) 
+		or: [ dropValue isKindOf: Color ]! !
+
+!ColorPropertyMeta methodsFor: 'initialization' stamp: 'KenD 7/16/2015 16:49'!
+initialize
+
+	super initialize.
+	kind := Object.
+	editorClass := ColorEditorPanel.
+	dropAcceptor := self class defaultDropAcceptor.
+	
+	! !
+
+!ColorPropertyMeta class methodsFor: 'accessing' stamp: 'KenD 7/16/2015 16:33'!
+defaultDropAcceptor
+
+	^ DefaultDropAcceptor! !
+
+!ColorPropertyMeta class methodsFor: 'class initialization' stamp: 'KenD 7/16/2015 16:47'!
+initialize
+"
+	self initialize.
+"
+	DefaultDropAcceptor := [ :aValue |
+		| dropValue |
+		dropValue :=
+			(aValue isKindOf: SignMorph)
+				ifTrue: [ aValue object ]
+				ifFalse: [ aValue ].
+		(dropValue respondsTo: #color) 
+			ifTrue: [ dropValue color ]
+			ifFalse: [ (dropValue isKindOf: Color) 
+				ifTrue: [ dropValue ]
+				ifFalse: [ Color white ]
+			]
+	].! !
+
 !OneOfPropertyMeta methodsFor: 'comparing' stamp: 'KenD 7/12/2015 16:03'!
 = other
 	"I am equak to other if I have the same class and ivar values"
@@ -1077,3 +1140,4 @@ testComparison
 	).! !
 PropertyMorph initialize!
 PropertyMeta initialize!
+ColorPropertyMeta initialize!
