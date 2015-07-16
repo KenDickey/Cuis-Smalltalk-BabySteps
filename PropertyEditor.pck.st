@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 14 July 2015 at 9:34:53.839278 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 11:00:30.887799 am'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 22!
+!provides: 'PropertyEditor' 1 23!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -292,6 +292,17 @@ icon
 
 	^ PropertyMorph blankIcon ! !
 
+!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 07:36'!
+aboutToGrab: aMorph
+	"submorph is being grabbed by a hand.
+	Perform necessary adjustments (if any) and return the actual morph
+	that should be added to the hand.
+	Answer nil to reject the drag."
+
+	^ (aMorph isKindOf: PropertyMorph)
+		ifTrue: [ SignMorph forObject: aMorph propertyValue ]
+		ifFalse: [ nil ]! !
+
 !PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/14/2015 21:09'!
 addTitle: aString
 
@@ -299,6 +310,12 @@ addTitle: aString
 	titleMorph color: Theme current menuTitleBar.
 	self addMorphFront: titleMorph.
 	! !
+
+!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 07:37'!
+allowsSubmorphDrag
+	"Answer whether our morphs can just be grabbed with the hand, instead of requiring the use of the halo. Redefined to answer true."
+
+	^ true! !
 
 !PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:19'!
 closeButtonClicked
@@ -443,17 +460,47 @@ forMorph: aMorph
 
 	^ self new forMorph: aMorph ! !
 
-!PropertyMorph methodsFor: 'testing' stamp: 'KenD 7/12/2015 08:46'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 10:02'!
+aboutToBeGrabbedBy: aHand
+	"The receiver is being grabbed by a hand.
+	Perform necessary adjustments (if any) and return the actual morph
+	that should be added to the hand.
+	Answer nil to reject the drag."
+
+	^ SignMorph forObject: self propertyValue  "Grab my property value"! !
+
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 09:59'!
+allowsMorphDrop
+	"Answer whether we accept dropping morphs. Redefined to answer true."
+
+	^ true! !
+
+!PropertyMorph methodsFor: 'testing' stamp: 'KenD 7/16/2015 10:21'!
 allowsValue: aValue
 
-	^ self metaProperties accepts: aValue! !
+	^ self metaProperty accepts: aValue! !
 
 !PropertyMorph methodsFor: 'editing' stamp: 'KenD 7/12/2015 08:12'!
 edit
 
 	self notYetImplemented ! !
 
-!PropertyMorph methodsFor: 'initialization' stamp: 'KenD 7/12/2015 22:24'!
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:21'!
+metaProperty
+
+	^ metaProperty! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:24'!
+name
+
+	^ name! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:24'!
+originalValue
+
+	^ value! !
+
+!PropertyMorph methodsFor: 'initialization' stamp: 'KenD 7/16/2015 10:17'!
 propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 
 	super initialize.
@@ -461,7 +508,7 @@ propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 	morph := aMorph.
 	metaProperty := aPropertyDescriptor.
 	value := aMorph valueOfProperty: aSymbol.	
-	self contents: name asString , ':  ', (value printStringLimitedTo: 20);
+	self setContents;
 		 target: self;
 		 icon: value icon; 
 		 selector: #edit
@@ -479,22 +526,60 @@ propertyName
 
 	^ name ! !
 
-!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/12/2015 08:19'!
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:30'!
 propertyValue
 
-	^ self morph valueOfProperty: self name! !
+	^ self targetMorph valueOfProperty: self name! !
 
-!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/12/2015 08:21'!
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:48'!
 propertyValue: newValue
 	"Assumed checking already done.  Does NOT change cashed value"
 	
-	^ self morph setProperty: self name toValue: newValue! !
+	self targetMorph setProperty: self name toValue: newValue.
+	self setContents.
+	self owner ifNotNil: [ self owner adjustSubmorphsLayout ].
+! !
+
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 10:04'!
+rejectDropMorphEvent: dropEvent
+	"The receiver has been rejected.  Disappear"
+
+	self world ifNotNil: [ :w | w activeHand removeMorph: self ]
+! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:29'!
+setContents
+
+	"(re)set my content string"
+	self contents: name asString , ':  ', (self propertyValue printStringLimitedTo: 20).
+	self icon: (self propertyValue icon)! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:22'!
+targetMorph
+
+	^ morph! !
 
 !PropertyMorph methodsFor: 'editing' stamp: 'KenD 7/12/2015 08:22'!
 undo
 	"Reset value from remembered value"
 
 	self morph setProperty: self name  toValue: self value! !
+
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 10:51'!
+wantsDroppedMorph: aMorph event: evt
+	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
+
+	| dropValue |
+	(aMorph isKindOf: SignMorph)
+		ifTrue: [ dropValue := aMorph object ]
+		ifFalse: [ dropValue := aMorph ].
+	(self allowsValue: dropValue)
+		ifTrue: [ self propertyValue: dropValue ].
+	
+	aMorph world ifNotNil: [ :w | w activeHand removeMorph: aMorph ].
+	aMorph delete.
+		
+	^ false  "Always reject drop, even when we accept the value"! !
 
 !PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:33'!
 blankIcon
