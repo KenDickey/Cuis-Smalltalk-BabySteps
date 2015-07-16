@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 2:33:44.705605 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 3:10:45.356619 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 27!
+!provides: 'PropertyEditor' 1 29!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -483,6 +483,11 @@ allowsValue: aValue
 
 	^ self metaProperty accepts: aValue! !
 
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 14:54'!
+cleanUpForMorph: aMorph.
+
+	aMorph delete.! !
+
 !PropertyMorph methodsFor: 'editing' stamp: 'KenD 7/12/2015 08:12'!
 edit
 
@@ -543,11 +548,17 @@ propertyValue: newValue
 	self owner ifNotNil: [ self owner adjustSubmorphsLayout ].
 ! !
 
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 10:04'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 15:08'!
 rejectDropMorphEvent: dropEvent
 	"The receiver has been rejected.  Disappear"
 
-	self world ifNotNil: [ :w | w activeHand removeMorph: self ]
+	self delete
+! !
+
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 14:59'!
+schedulePostRemovalOf: aMorph
+
+	self addAlarm: #cleanUpForMorph: with: aMorph after: 0.1.
 ! !
 
 !PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:29'!
@@ -568,7 +579,7 @@ undo
 
 	self morph setProperty: self name  toValue: self value! !
 
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 10:51'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 15:09'!
 wantsDroppedMorph: aMorph event: evt
 	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
 
@@ -579,10 +590,11 @@ wantsDroppedMorph: aMorph event: evt
 	(self allowsValue: dropValue)
 		ifTrue: [ self propertyValue: dropValue ].
 	
-	aMorph world ifNotNil: [ :w | w activeHand removeMorph: aMorph ].
-	aMorph delete.
+	"We can't just delet aMorph as rejecting the drop adds it to tis old owner at 0@0.
+	 So we accept the drop, but then delete aMorph."
+	self schedulePostRemovalOf: aMorph.  "@@@FIXME: this is ugly!!@@@"
 		
-	^ false  "Always reject drop, even when we accept the value"! !
+	^ true  "Always accept drop -- even if we reject the value, then delete the morph"! !
 
 !PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:33'!
 blankIcon
