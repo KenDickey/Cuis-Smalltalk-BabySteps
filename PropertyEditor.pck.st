@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 11:00:30.887799 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 2:33:44.705605 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 23!
+!provides: 'PropertyEditor' 1 27!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -292,7 +292,7 @@ icon
 
 	^ PropertyMorph blankIcon ! !
 
-!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 07:36'!
+!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 14:32'!
 aboutToGrab: aMorph
 	"submorph is being grabbed by a hand.
 	Perform necessary adjustments (if any) and return the actual morph
@@ -300,10 +300,10 @@ aboutToGrab: aMorph
 	Answer nil to reject the drag."
 
 	^ (aMorph isKindOf: PropertyMorph)
-		ifTrue: [ SignMorph forObject: aMorph propertyValue ]
-		ifFalse: [ nil ]! !
+		ifTrue: [ SignMorph forObject: aMorph propertyValue ] 
+		ifFalse: [ self ] "Title selected. User wants to move me. Pick me up"! !
 
-!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/14/2015 21:09'!
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/16/2015 14:27'!
 addTitle: aString
 
 	titleMorph := WindowTitleMorph title: aString  buttonsNamed: #( close collapse showHalo ).
@@ -338,7 +338,7 @@ edit: propName
 	(HoverHelpMorph contents: 'Need editor for ' , propName asString)
 		popUpForHand: self targetMorph world activeHand! !
 
-!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/13/2015 19:12'!
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/16/2015 14:29'!
 forMorph: aMorph
 
 	morph := aMorph.
@@ -367,7 +367,12 @@ forMorph: aMorph
 	self addLine.
 	
 	"add ivars"
-	"@@@<NYI>@@@"! !
+	"@@@<NYI>@@@"
+	
+	self titleMorph morphExtent: (self morphExtent x) @ (Preferences windowTitleFont height).
+	self adjustSubmorphsLayout.
+	self titleMorph reset;
+		yourself! !
 
 !PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 18:39'!
 propertyNames
@@ -383,9 +388,9 @@ propertyNames
 
 	^ propNames ! !
 
-!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:23'!
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/16/2015 12:37'!
 showHaloButtonClicked
-
+	"Show my targetMorph's halo"
 	| aMorph |
 	aMorph := self targetMorph.
 	aMorph isInWorld ifTrue: [aMorph addHalo ]! !
@@ -400,12 +405,12 @@ titleMorph
 
 	^ titleMorph ! !
 
-!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/14/2015 21:29'!
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/16/2015 12:42'!
 example1
 "
 	self example1.
 "
-	| aMorph passValue newSelf |
+	| aMorph passValue |
 	
 	aMorph := EllipseMorph initializedInstance.
 	
@@ -449,9 +454,7 @@ example1
 								dropAcceptor: passValue 
 								minValue: 2 maxValue: 15.7).
 	
-	newSelf := self forMorph: aMorph.
-	newSelf adjustSubmorphsLayout openInWorld.
-	newSelf titleMorph reset
+	(self forMorph: aMorph) openInWorld.
 
 ! !
 
@@ -460,7 +463,7 @@ forMorph: aMorph
 
 	^ self new forMorph: aMorph ! !
 
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 10:02'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 13:30'!
 aboutToBeGrabbedBy: aHand
 	"The receiver is being grabbed by a hand.
 	Perform necessary adjustments (if any) and return the actual morph
@@ -531,7 +534,7 @@ propertyValue
 
 	^ self targetMorph valueOfProperty: self name! !
 
-!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:48'!
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 13:27'!
 propertyValue: newValue
 	"Assumed checking already done.  Does NOT change cashed value"
 	
