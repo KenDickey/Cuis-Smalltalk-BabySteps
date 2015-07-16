@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 13 July 2015 at 6:32:49.332026 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 14 July 2015 at 9:34:53.839278 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 20!
-!requires: 'Morphic-Misc1' 1 49 nil!
+!provides: 'PropertyEditor' 1 22!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'Morphic-Misc1' 1 49 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph'
@@ -292,38 +292,59 @@ icon
 
 	^ PropertyMorph blankIcon ! !
 
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/14/2015 21:09'!
+addTitle: aString
+
+	titleMorph := WindowTitleMorph title: aString  buttonsNamed: #( close collapse showHalo ).
+	titleMorph color: Theme current menuTitleBar.
+	self addMorphFront: titleMorph.
+	! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:19'!
+closeButtonClicked
+	"The user clicked on the close-box control in the window title.  For Mac users only, the Mac convention of option-click-on-close-box is obeyed if the mac option key is down."
+
+	Preferences dismissAllOnOptionClose ifTrue:
+		[Sensor rawMacOptionKeyPressed ifTrue:
+			[^ self world closeUnchangedWindows]].
+	self delete  "closeBox overrides stayUp"! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:20'!
+collapseButtonClicked
+	
+	self collapse
+! !
+
 !PropertyEditor methodsFor: 'events' stamp: 'KenD 7/13/2015 16:19'!
 edit: propName
 
 	(HoverHelpMorph contents: 'Need editor for ' , propName asString)
 		popUpForHand: self targetMorph world activeHand! !
 
-!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/13/2015 18:12'!
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/13/2015 19:12'!
 forMorph: aMorph
 
-	| propNames |
 	morph := aMorph.
 	self defaultTarget: self.
 	self addTitle: (aMorph printStringLimitedTo: 60).
 	self stayUp: true.
 
-	propNames := SortedCollection sortBlock: [ :sym1 :sym2 | sym1 < sym2 ].
-	aMorph propertiesDict keysDo: [ :propName | 
-		(propName = #metaProperties)
-			ifFalse: [ propNames add: propName ] 
-	].
-	
 	"add operations"
 	"@@@<NYI>@@@"
 
 	self addLine.
 	
 	"add properties"
-	propNames do: [ :name | 
-		self addMorphBack: (PropertyMorph 
+	self propertyNames do: [ :name | | propMorph |
+		propMorph := 
+			PropertyMorph 
 					propName: name 
 					morph: aMorph 
-					propMeta: (aMorph valueOfMetaProperty: name) ) 
+					propMeta: (aMorph valueOfMetaProperty: name).
+		propMorph  target: self;
+					selector: #edit: ;
+					arguments: { name. }.
+		self addMorphBack: propMorph
 	].
 
 	self addLine.
@@ -331,10 +352,91 @@ forMorph: aMorph
 	"add ivars"
 	"@@@<NYI>@@@"! !
 
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 18:39'!
+propertyNames
+	"Answer an alpha-sorted collection of property names less #metaProperties"
+
+	| propNames |
+	propNames := SortedCollection sortBlock: [ :sym1 :sym2 | sym1 < sym2 ].
+	
+	self targetMorph propertiesDict keysDo: [ :propName | 
+		(propName = #metaProperties)
+			ifFalse: [ propNames add: propName ] 
+	].
+
+	^ propNames ! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:23'!
+showHaloButtonClicked
+
+	| aMorph |
+	aMorph := self targetMorph.
+	aMorph isInWorld ifTrue: [aMorph addHalo ]! !
+
 !PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 16:19'!
 targetMorph
 
 	^ morph! !
+
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/14/2015 21:28'!
+titleMorph
+
+	^ titleMorph ! !
+
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/14/2015 21:29'!
+example1
+"
+	self example1.
+"
+	| aMorph passValue newSelf |
+	
+	aMorph := EllipseMorph initializedInstance.
+	
+	aMorph setProperty: #object toValue: nil.
+	aMorph setProperty: #float toValue: 2.3.
+	aMorph setProperty: #range toValue: 5.
+	aMorph setProperty: #string toValue: 'Silly little string'.
+	aMorph setProperty: #char toValue: $c.
+	aMorph setProperty: #color toValue: Color red.
+	aMorph setProperty: #bool toValue: true.
+	aMorph setProperty: #oneOf toValue: #three. "#(one two three four five)"
+	aMorph setProperty: #symbol toValue: #'MySymbol'.
+	aMorph setProperty: #alwaysTrue toValue: [ :ignored | true ].
+	
+	passValue := [ :whatever |   "Just pass value through"
+		(whatever isKindOf: SignMorph) 
+			ifTrue: [ whatever object ] ifFalse: [ whatever ] 
+	]. 
+
+	aMorph setMetaProperty: #float 
+			toValue:  (RangePropertyMeta 
+						kind: Number editor: nil 
+						dropAcceptor: passValue
+						minValue: 2 maxValue: 15.7). 
+	aMorph setMetaProperty: #string 
+			toValue: (PropertyMeta kind: String editor: nil dropAcceptor: passValue).
+	aMorph setMetaProperty: #char 
+			toValue: (PropertyMeta kind: Character editor: nil dropAcceptor: passValue).
+	aMorph setMetaProperty: #color 
+			toValue: (PropertyMeta kind: Color editor: nil dropAcceptor: passValue).
+	aMorph setMetaProperty: #bool 
+			toValue: (PropertyMeta kind: Boolean editor: nil dropAcceptor: passValue).
+	aMorph setMetaProperty: #oneOf 
+			toValue: (OneOfPropertyMeta
+						kind: Symbol editor: nil 
+						dropAcceptor: passValue
+						selections: #(one two three four five)).
+	aMorph setMetaProperty: #range 
+			toValue: (RangePropertyMeta 
+								kind: Number editor: nil 
+								dropAcceptor: passValue 
+								minValue: 2 maxValue: 15.7).
+	
+	newSelf := self forMorph: aMorph.
+	newSelf adjustSubmorphsLayout openInWorld.
+	newSelf titleMorph reset
+
+! !
 
 !PropertyEditor class methodsFor: 'instance creation' stamp: 'KenD 7/13/2015 16:01'!
 forMorph: aMorph
