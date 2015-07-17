@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 17 July 2015 at 3:17:08.624265 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 17 July 2015 at 4:31:23.778268 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 34!
+!provides: 'PropertyEditor' 1 35!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -408,12 +408,22 @@ propertyNames
 
 	^ propNames ! !
 
-!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/16/2015 12:37'!
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/17/2015 16:24'!
 showHaloButtonClicked
 	"Show my targetMorph's halo"
 	| aMorph |
 	aMorph := self targetMorph.
-	aMorph isInWorld ifTrue: [aMorph addHalo ]! !
+	aMorph isInWorld 
+		ifTrue: [ aMorph show; addHalo ]
+		ifFalse: [
+"			(HoverHelpMorph 
+			contents: aMorph printString , ' not shown in world')
+				popUpForHand: self  world activeHand
+"			aMorph openInWorld; 
+				show;
+				morphPosition: 200@100;
+				addHalo   
+		]! !
 
 !PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 16:19'!
 targetMorph
