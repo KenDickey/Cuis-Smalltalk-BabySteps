@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 16 July 2015 at 4:52:22.282944 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 17 July 2015 at 3:17:08.624265 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 31!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
+!provides: 'PropertyEditor' 1 34!
 !requires: 'Morphic-Misc1' 1 49 nil!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph'
@@ -310,12 +310,14 @@ icon
 
 	^ PropertyMorph blankIcon ! !
 
-!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 14:32'!
+!PropertyEditor methodsFor: 'dropping/grabbing'!
 aboutToGrab: aMorph
 	"submorph is being grabbed by a hand.
 	Perform necessary adjustments (if any) and return the actual morph
 	that should be added to the hand.
 	Answer nil to reject the drag."
+
+	Transcript show: 'PropertyEditor aboutToGrab: ' ; newLine.
 
 	^ (aMorph isKindOf: PropertyMorph)
 		ifTrue: [ SignMorph forObject: aMorph propertyValue ] 
@@ -423,7 +425,7 @@ titleMorph
 
 	^ titleMorph ! !
 
-!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/16/2015 16:24'!
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/16/2015 17:59'!
 example1
 "
 	self example1.
@@ -455,6 +457,8 @@ example1
 						minValue: 2 maxValue: 15.7). 
 	aMorph setMetaProperty: #string 
 			toValue: (PropertyMeta kind: String editor: nil dropAcceptor: passValue).
+	aMorph setMetaProperty: #symbol 
+			toValue: (PropertyMeta kind: Symbol editor: nil dropAcceptor: passValue).
 	aMorph setMetaProperty: #char 
 			toValue: (PropertyMeta kind: Character editor: nil dropAcceptor: passValue).
 	aMorph setMetaProperty: #color 
@@ -480,15 +484,6 @@ example1
 forMorph: aMorph
 
 	^ self new forMorph: aMorph ! !
-
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 13:30'!
-aboutToBeGrabbedBy: aHand
-	"The receiver is being grabbed by a hand.
-	Perform necessary adjustments (if any) and return the actual morph
-	that should be added to the hand.
-	Answer nil to reject the drag."
-
-	^ SignMorph forObject: self propertyValue  "Grab my property value"! !
 
 !PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 09:59'!
 allowsMorphDrop
@@ -526,6 +521,21 @@ originalValue
 
 	^ value! !
 
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/17/2015 14:57'!
+processMouseDown: evt localPosition: localEventPosition
+	"Do nothing upon mouse-down except inform the hand to watch for a 
+	click; wait until an ensuing #click: message gets dispatched"
+"
+	Transcript newLine; show: (self name , ' got #processMouseDown:localPosition:').  
+"
+	evt wasHandled: true.
+	evt hand waitForClicksOrDrag: self
+				event: evt
+				dragSel: #dragEvent:localPosition:
+				clkSel: #mouseButton1Down:localPosition:
+
+! !
+
 !PropertyMorph methodsFor: 'initialization' stamp: 'KenD 7/16/2015 10:17'!
 propName: aSymbol morph: aMorph propMeta: aPropertyDescriptor
 
@@ -547,10 +557,10 @@ propertyDescriptor
 
 	^ metaProperty ! !
 
-!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/12/2015 08:18'!
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/17/2015 14:58'!
 propertyName
 
-	^ name ! !
+	^ self name ! !
 
 !PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:30'!
 propertyValue
@@ -566,17 +576,10 @@ propertyValue: newValue
 	self owner ifNotNil: [ self owner adjustSubmorphsLayout ].
 ! !
 
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 15:08'!
-rejectDropMorphEvent: dropEvent
-	"The receiver has been rejected.  Disappear"
-
-	self delete
-! !
-
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 14:59'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/17/2015 14:29'!
 schedulePostRemovalOf: aMorph
 
-	self addAlarm: #cleanUpForMorph: with: aMorph after: 0.1.
+	self addAlarm: #cleanUpForMorph: with: aMorph after: 0.1
 ! !
 
 !PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:29'!
@@ -596,6 +599,11 @@ undo
 	"Reset value from remembered value"
 
 	self morph setProperty: self name  toValue: self value! !
+
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/17/2015 13:00'!
+valueMorph
+
+	^ SignMorph forObject: self propertyValue! !
 
 !PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 15:09'!
 wantsDroppedMorph: aMorph event: evt
