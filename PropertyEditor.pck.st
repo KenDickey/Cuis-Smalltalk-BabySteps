@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 17 July 2015 at 4:31:23.778268 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 17 July 2015 at 6:37:10.993313 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 35!
+!provides: 'PropertyEditor' 1 36!
 !requires: 'Morphic-Misc1' 1 49 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
@@ -435,7 +435,7 @@ titleMorph
 
 	^ titleMorph ! !
 
-!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/16/2015 17:59'!
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/17/2015 18:19'!
 example1
 "
 	self example1.
@@ -444,7 +444,7 @@ example1
 	
 	aMorph := EllipseMorph initializedInstance.
 	
-	aMorph setProperty: #object toValue: nil.
+	aMorph setProperty: #object toValue: false.
 	aMorph setProperty: #float toValue: 2.3.
 	aMorph setProperty: #range toValue: 5.
 	aMorph setProperty: #string toValue: 'Silly little string'.
