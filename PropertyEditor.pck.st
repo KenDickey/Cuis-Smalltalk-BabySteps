@@ -1,12 +1,12 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2424] on 24 July 2015 at 1:31:59.760434 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2424] on 24 July 2015 at 4:07:53.945405 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 38!
-!requires: 'Cuis-Base' 42 2424 nil!
-!requires: 'Morphic-Misc1' 1 54 nil!
+!provides: 'PropertyEditor' 1 39!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'Morphic-Misc1' 1 54 nil!
+!requires: 'Cuis-Base' 42 2424 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
-	instanceVariableNames: 'morph'
+	instanceVariableNames: 'morph showIVars'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PropertyEditor'!
@@ -311,18 +311,23 @@ icon
 
 	^ PropertyMorph blankIcon ! !
 
-!PropertyEditor methodsFor: 'dropping/grabbing'!
+!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/24/2015 14:55'!
 aboutToGrab: aMorph
 	"submorph is being grabbed by a hand.
 	Perform necessary adjustments (if any) and return the actual morph
 	that should be added to the hand.
 	Answer nil to reject the drag."
-
-	Transcript show: 'PropertyEditor aboutToGrab: ' ; newLine.
-
+"
+	Transcript show: 'PropertyEditor aboutToGrab: ', aMorph printString ; newLine.
+"
 	^ (aMorph isKindOf: PropertyMorph)
 		ifTrue: [ SignMorph forObject: aMorph propertyValue ] 
 		ifFalse: [ self ] "Title selected. User wants to move me. Pick me up"! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/24/2015 15:50'!
+addProperty
+
+	self notYetImplemented ! !
 
 !PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/16/2015 14:27'!
 addTitle: aString
@@ -344,6 +349,12 @@ allowsSubmorphDrag
 
 	^ true! !
 
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/24/2015 14:50'!
+changed: myMorph
+
+	"@@@FIXME: my target morph has changed; need to update display@@@"
+	Transcript newLine; show: self printString , ' target changed'! !
+
 !PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:19'!
 closeButtonClicked
 	"The user clicked on the close-box control in the window title.  For Mac users only, the Mac convention of option-click-on-close-box is obeyed if the mac option key is down."
@@ -359,9 +370,16 @@ collapseButtonClicked
 	self collapse
 ! !
 
-!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/13/2015 16:19'!
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/24/2015 15:14'!
 edit: propName
-
+"
+	Remove
+	Rename
+	Edit Value
+	Reset  to old Value
+	Cancel
+"
+	"@@@FIXME: NYI @@@"
 	(HoverHelpMorph contents: 'Need editor for ' , propName asString)
 		popUpForHand: self targetMorph world activeHand! !
 
@@ -371,18 +389,47 @@ editIvar: ivarName
 	(HoverHelpMorph contents: 'Need editor for: ' , ivarName asString)
 		popUpForHand: self targetMorph world activeHand! !
 
-!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/24/2015 13:26'!
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/24/2015 15:59'!
 forMorph: aMorph
-"
-	PropertyEditor example1.
-"
+
+	"Answer a Property Editor for aMorph"
+
 	morph := aMorph.
-	self defaultTarget: self.
+	self defaultTarget: self;
+		 stayUp: true;
+		 showIVars: false;
+		 refreshView;
+	 	 yourself
+! !
+
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 18:39'!
+propertyNames
+	"Answer an alpha-sorted collection of property names less #metaProperties"
+
+	| propNames |
+	propNames := SortedCollection sortBlock: [ :sym1 :sym2 | sym1 < sym2 ].
+	
+	self targetMorph propertiesDict keysDo: [ :propName | 
+		(propName = #metaProperties)
+			ifFalse: [ propNames add: propName ] 
+	].
+
+	^ propNames ! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/24/2015 16:06'!
+refreshView
+
+	"Something may have changed.."
+	| aMorph |
+	aMorph := self targetMorph.
+	self removeAllMorphs.
+	
 	self addTitle: (aMorph printStringLimitedTo: 60).
-	self stayUp: true.
 
 	"add operations"
-	"@@@<NYI>@@@"
+	self add: 'Refresh Me'    target: self selector: #refreshView.
+	self add: 'Add Property' target: self selector: #addProperty.
+	self add: 'Toggle IVar Display' target: self selector: #toggleIVarView.
 
 	self addLine.
 	
@@ -399,41 +446,28 @@ forMorph: aMorph
 		self addMorphBack: propMorph
 	].
 
-	self addLine.
+	(self showIVars)  ifTrue: [ "add ivars"
+		
+		self addLine.
 	
-	"add ivars"
 		aMorph class allInstVarNames do: [ :ivarName | | displayString |
-		displayString := 
-			(ivarName, ': ', 
-				((aMorph instVarNamed: ivarName) printString) )
-						truncateWithElipsisTo: 40.
-		(ivarName asString = 'properties')
-		ifFalse: [
-			self add: displayString 
-				  target: self 
-				  selector: #editIvar: 
-				  argument: ivarName
+			displayString := 
+				(ivarName, ': ', 
+					((aMorph instVarNamed: ivarName) printString) )
+							truncateWithElipsisTo: 40.
+			(ivarName asString = 'properties')
+			ifFalse: [
+				self add: displayString 
+					  target: self 
+				  	  selector: #editIvar: 
+					  argument: ivarName
+			]
 		]
 	].
 	
-	self titleMorph morphExtent: (self morphExtent x) @ (Preferences windowTitleFont height).
-	self adjustSubmorphsLayout.
-	self titleMorph reset;
+	self titleMorph morphExtent: (self titleMorph morphExtent x) @ (Preferences windowTitleFont height).
+	self adjustSubmorphsLayout;
 		yourself! !
-
-!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 18:39'!
-propertyNames
-	"Answer an alpha-sorted collection of property names less #metaProperties"
-
-	| propNames |
-	propNames := SortedCollection sortBlock: [ :sym1 :sym2 | sym1 < sym2 ].
-	
-	self targetMorph propertiesDict keysDo: [ :propName | 
-		(propName = #metaProperties)
-			ifFalse: [ propNames add: propName ] 
-	].
-
-	^ propNames ! !
 
 !PropertyEditor methodsFor: 'events' stamp: 'KenD 7/17/2015 16:24'!
 showHaloButtonClicked
@@ -452,6 +486,16 @@ showHaloButtonClicked
 				addHalo   
 		]! !
 
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/24/2015 15:56'!
+showIVars
+
+	^ showIVars! !
+
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/24/2015 15:56'!
+showIVars: aBool
+
+	showIVars := aBool! !
+
 !PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 16:19'!
 targetMorph
 
@@ -461,6 +505,16 @@ targetMorph
 titleMorph
 
 	^ titleMorph ! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/24/2015 16:02'!
+toggleIVarView
+
+	self toggleIVars; refreshView! !
+
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/24/2015 15:57'!
+toggleIVars
+
+	self showIVars: (self showIVars not)! !
 
 !PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/17/2015 18:19'!
 example1
