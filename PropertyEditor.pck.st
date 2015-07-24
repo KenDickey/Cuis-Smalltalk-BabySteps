@@ -1,8 +1,9 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2404] on 17 July 2015 at 6:37:10.993313 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2424] on 23 July 2015 at 8:45:10.743489 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 36!
-!requires: 'Morphic-Misc1' 1 49 nil!
+!provides: 'PropertyEditor' 1 38!
+!requires: 'Cuis-Base' 42 2424 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'Morphic-Misc1' 1 53 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph'
@@ -331,6 +332,12 @@ addTitle: aString
 	self addMorphFront: titleMorph.
 	! !
 
+!PropertyEditor methodsFor: 'construction' stamp: 'KenD 7/19/2015 16:10'!
+adjustSubmorphsLayout
+
+	super adjustSubmorphsLayout.
+	self titleMorph reset.  "Needed after adjustSubmorphsLayout"! !
+
 !PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 07:37'!
 allowsSubmorphDrag
 	"Answer whether our morphs can just be grabbed with the hand, instead of requiring the use of the halo. Redefined to answer true."
@@ -358,7 +365,13 @@ edit: propName
 	(HoverHelpMorph contents: 'Need editor for ' , propName asString)
 		popUpForHand: self targetMorph world activeHand! !
 
-!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/16/2015 14:29'!
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/19/2015 17:04'!
+editIvar: ivarName
+
+	(HoverHelpMorph contents: 'Need editor for: ' , ivarName asString)
+		popUpForHand: self targetMorph world activeHand! !
+
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/19/2015 17:05'!
 forMorph: aMorph
 
 	morph := aMorph.
@@ -387,12 +400,24 @@ forMorph: aMorph
 	self addLine.
 	
 	"add ivars"
-	"@@@<NYI>@@@"
+	aMorph class allInstVarNames do: [ :ivarName | | displayString |
+		displayString := 
+			(ivarName, ': ', 
+				((aMorph instVarNamed: ivarName) printString) )
+						truncateWithElipsisTo: 40.
+		(ivarName asString = 'properties')
+		ifFalse: [
+			self add: displayString 
+				  target: self 
+				  selector: #editIvar: 
+				  argument: ivarName
+		]
+	].
 	
-	self titleMorph morphExtent: (self morphExtent x) @ (Preferences windowTitleFont height).
-	self adjustSubmorphsLayout.
-	self titleMorph reset;
-		yourself! !
+	self titleMorph 
+		morphExtent: (self morphExtent x) @ (Preferences windowTitleFont height).
+
+! !
 
 !PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 18:39'!
 propertyNames
@@ -531,7 +556,7 @@ originalValue
 
 	^ value! !
 
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/17/2015 14:57'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/21/2015 20:39'!
 processMouseDown: evt localPosition: localEventPosition
 	"Do nothing upon mouse-down except inform the hand to watch for a 
 	click; wait until an ensuing #click: message gets dispatched"
@@ -592,11 +617,12 @@ schedulePostRemovalOf: aMorph
 	self addAlarm: #cleanUpForMorph: with: aMorph after: 0.1
 ! !
 
-!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:29'!
+!PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/19/2015 16:04'!
 setContents
 
 	"(re)set my content string"
-	self contents: name asString , ':  ', (self propertyValue printStringLimitedTo: 20).
+	self contents: ( (name asString , ':  ', (self propertyValue printString))
+						truncateWithElipsisTo: 40 ).
 	self icon: (self propertyValue icon)! !
 
 !PropertyMorph methodsFor: 'accessing' stamp: 'KenD 7/16/2015 10:22'!
@@ -615,7 +641,7 @@ valueMorph
 
 	^ SignMorph forObject: self propertyValue! !
 
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/16/2015 15:09'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/21/2015 20:28'!
 wantsDroppedMorph: aMorph event: evt
 	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
 
@@ -628,9 +654,9 @@ wantsDroppedMorph: aMorph event: evt
 	
 	"We can't just delet aMorph as rejecting the drop adds it to tis old owner at 0@0.
 	 So we accept the drop, but then delete aMorph."
-	self schedulePostRemovalOf: aMorph.  "@@@FIXME: this is ugly!!@@@"
+"	self schedulePostRemovalOf: aMorph. " "@@@FIXME: this is ugly!!@@@"
 		
-	^ true  "Always accept drop -- even if we reject the value, then delete the morph"! !
+	^ false  "Always deny drop -- even if we accept the value, then delete the morph"! !
 
 !PropertyMorph class methodsFor: 'accessing' stamp: 'KenD 7/12/2015 21:33'!
 blankIcon
