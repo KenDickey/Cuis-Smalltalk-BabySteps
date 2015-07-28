@@ -1,9 +1,9 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2424] on 24 July 2015 at 4:07:53.945405 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2439] on 28 July 2015 at 8:22:29.157063 am'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 39!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
+!provides: 'PropertyEditor' 1 40!
+!requires: 'Cuis-Base' 42 2439 nil!
 !requires: 'Morphic-Misc1' 1 54 nil!
-!requires: 'Cuis-Base' 42 2424 nil!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph showIVars'
