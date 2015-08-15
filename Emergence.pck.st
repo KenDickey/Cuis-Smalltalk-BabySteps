@@ -1,10 +1,10 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2449] on 14 August 2015 at 10:42:36.935622 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2449] on 15 August 2015 at 4:20:04.110016 pm'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 21!
-!requires: 'Cuis-Base' 42 2439 nil!
+!provides: 'Emergence' 1 22!
 !requires: 'Morphic-Misc1' 1 57 nil!
+!requires: 'Cuis-Base' 42 2439 nil!
 !classDefinition: #Emergence category: #Emergence!
 ProtoObject subclass: #Emergence
 	instanceVariableNames: ''
@@ -337,7 +337,7 @@ morphExtent: newExtent
 	super morphExtent: newExtent.
 	self resetDropShadowMorph  "size/shape changed; shadow should too"! !
 
-!BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/14/2015 15:20'!
+!BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/15/2015 16:18'!
 mouseEnter: evt
 	"Handle a mouseEnter event, meaning the mouse just entered my bounds with no button pressed."
 	
@@ -356,7 +356,7 @@ mouseEnter: evt
 	
 	heldMorph ifNotNil: [ :held |
 		((held isKindOf: BlockMorph) and: [ held acceptsPlugTab ])
-			ifTrue: [ self invertColor; showTabBar ]
+			ifTrue: [ self indicateDropTarget: evt ]
 	]! !
 
 !BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/14/2015 15:20'!
@@ -557,7 +557,7 @@ minimumExtent
 
 	^ (14 + self tabWidth + self tabIndent + self labelMorph morphExtent x) @ (6 * self tabHeight)! !
 
-!ContainingBlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/14/2015 22:31'!
+!ContainingBlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/15/2015 16:19'!
 showTabBar
 	"Draw a white bar near where a BlockMorph can be plugged into a tab"
 	
@@ -565,7 +565,7 @@ showTabBar
 	| bar2 |
 	super showTabBar.
 	bar2 := TabBarMorph 
-					startPos: (self tabIndent) @ (2 * self tabHeight)
+					startPos: (self tabWidth) @ (2 * self tabHeight)
 					length: (self morphExtent x - self tabWidth).
 	self setProperty: #tabBar2 toValue: bar2.
 	self addMorphBack: bar2! !
