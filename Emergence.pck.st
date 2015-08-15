@@ -1,10 +1,10 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2439] on 14 August 2015 at 3:22:16.236941 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2449] on 14 August 2015 at 10:32:27.035171 pm'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 18!
-!requires: 'Morphic-Misc1' 1 57 nil!
+!provides: 'Emergence' 1 20!
 !requires: 'Cuis-Base' 42 2439 nil!
+!requires: 'Morphic-Misc1' 1 57 nil!
 !classDefinition: #Emergence category: #Emergence!
 ProtoObject subclass: #Emergence
 	instanceVariableNames: ''
@@ -45,6 +45,16 @@ BlockMorph subclass: #HatBlockMorph
 HatBlockMorph class
 	instanceVariableNames: ''!
 
+!classDefinition: #TabBarMorph category: #Emergence!
+RectangleLikeMorph subclass: #TabBarMorph
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Emergence'!
+!classDefinition: 'TabBarMorph class' category: #Emergence!
+TabBarMorph class
+	instanceVariableNames: ''!
+
 
 !Emergence commentStamp: '<historical>' prior: 0!
 Documentation Class
@@ -64,6 +74,9 @@ I hold/contain other BlockMorphs, e.g. for repeated invocations.!
 
 !HatBlockMorph commentStamp: '<historical>' prior: 0!
 I represent the entrypoint into a Script!
+
+!TabBarMorph commentStamp: '<historical>' prior: 0!
+I am a white bar which indicates that a user may drop a BlockMorph onto a tab.!
 
 !Emergence methodsFor: 'as yet unclassified' stamp: 'KenD 8/2/2015 15:07'!
 seeClassSide
@@ -165,13 +178,13 @@ drawBodyOn: aCanvas
 		baseColorForBorder: color.
 ! !
 
-!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/10/2015 13:14'!
+!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/14/2015 22:20'!
 drawBottomPartOn: aCanvas
 	
 	"Bottom tab"
 	aCanvas
-		fillRectangle: (self tabIndent @ ((self morphExtent y) - self tabHeight) 
-		extent: (self tabWidth @ self tabHeight))
+		fillRectangle: ( self tabIndent @ ((self morphExtent y) - self tabHeight) 
+		                      extent: (self tabWidth @ self tabHeight) )
 		color: color.
 ! !
 
@@ -265,7 +278,7 @@ hideDropShadow
 	self dropShadowShown
 		ifTrue: [ self removeMorph: self dropShadowMorph ]! !
 
-!BlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/14/2015 15:12'!
+!BlockMorph methodsFor: 'plugTabs' stamp: 'KenD 8/14/2015 21:54'!
 hideTabBar
 
 	"remove my tabBar, if any"
@@ -432,34 +445,31 @@ showDropShadow
 			self addMorphBack: self dropShadowMorph 
 		]! !
 
-!BlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/14/2015 15:21'!
+!BlockMorph methodsFor: 'plugTabs' stamp: 'KenD 8/14/2015 21:53'!
 showTabBar
 
 	"Draw a white bar near where a BlockMorph can be plugged into a tab"
-	| bar tabStartX |
-	bar := RectangleLikeMorph new.
-	tabStartX :=  (self tabIndent  + self tabWidth).
-	bar morphExtent: (self morphExtent x - tabStartX)
-					@ (self tabHeight / 2);
-		morphPosition: tabStartX @ (self morphExtent y - self tabHeight);
-		color: Color white.
+	| bar |
+	bar := TabBarMorph 
+				startPos: 0 @ (self morphExtent y - self tabHeight) 
+				length: self morphExtent x.
 	self setProperty: #tabBar toValue: bar.
 	self addMorphBack: bar! !
 
-!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/10/2015 13:06'!
+!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/14/2015 21:26'!
 tabHeight
 
-	^ 14! !
+	^ self class tabHeight ! !
 
-!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/10/2015 13:07'!
+!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/14/2015 21:27'!
 tabIndent
 
-	^ 24! !
+	^ self class tabIndent ! !
 
-!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/10/2015 13:07'!
+!BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/14/2015 21:29'!
 tabWidth
 
-	^ 18! !
+	^ self class tabWidth ! !
 
 !BlockMorph class methodsFor: 'colors' stamp: 'KenD 8/14/2015 11:25'!
 blockMorphColor
@@ -470,6 +480,21 @@ blockMorphColor
 defaultColor
 
 	^ Color green! !
+
+!BlockMorph class methodsFor: 'accessing' stamp: 'KenD 8/14/2015 21:32'!
+tabHeight
+
+	^ 14! !
+
+!BlockMorph class methodsFor: 'accessing' stamp: 'KenD 8/14/2015 21:31'!
+tabIndent
+
+	^ 24! !
+
+!BlockMorph class methodsFor: 'accessing' stamp: 'KenD 8/14/2015 21:28'!
+tabWidth
+
+	^ 18! !
 
 !ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/13/2015 16:01'!
 defaultExtent
@@ -516,10 +541,34 @@ drawBodyOn: aCanvas
 		extent: (self tabWidth @ self tabHeight))
 		color: color.! !
 
+!ContainingBlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/14/2015 21:09'!
+hideTabBar
+	"remove my tabBar(s), if any"
+	
+	"I use a second tab bar"
+	super hideTabBar.
+	self valueOfProperty: #tabBar2 ifPresentDo: [ :bar | 
+		self removeMorph: bar. 
+		self removeProperty: #tabBar2
+	]! !
+
 !ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/13/2015 16:04'!
 minimumExtent
 
 	^ (14 + self tabWidth + self tabIndent + self labelMorph morphExtent x) @ (6 * self tabHeight)! !
+
+!ContainingBlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/14/2015 22:31'!
+showTabBar
+	"Draw a white bar near where a BlockMorph can be plugged into a tab"
+	
+	"I have two such locations"
+	| bar2 |
+	super showTabBar.
+	bar2 := TabBarMorph 
+					startPos: (self tabIndent) @ (2 * self tabHeight)
+					length: (self morphExtent x - self tabWidth).
+	self setProperty: #tabBar2 toValue: bar2.
+	self addMorphBack: bar2! !
 
 !ContainingBlockMorph class methodsFor: 'colors' stamp: 'KenD 8/14/2015 13:16'!
 defaultColor
@@ -564,3 +613,38 @@ minimumExtent
 defaultColor
 
 	^ Color h: 41 s:  0.85 v:  0.9! !
+
+!TabBarMorph methodsFor: 'drawing' stamp: 'KenD 8/14/2015 22:26'!
+drawOn: aCanvas
+	
+	| extent tabIndent tabWidth |
+	extent := self morphExtent.
+	tabIndent := BlockMorph tabIndent.
+	tabWidth  := BlockMorph tabWidth.
+
+	"Left of tab"
+	aCanvas
+		fillRectangle: (0@0 extent: (tabIndent @ extent y))
+		color: color.
+
+	"Right of tab"
+	aCanvas
+		fillRectangle: ( ((tabIndent + tabWidth) @ 0)
+							extent: (extent x - (tabIndent + tabWidth)) @ extent y )
+		color: color.! !
+
+!TabBarMorph methodsFor: 'initialization' stamp: 'KenD 8/14/2015 22:25'!
+startPos: upperLeftPoint length: xExtent
+
+	self 
+		color: Color white;
+		morphExtent: xExtent @ 6;   "about (aBlockMorph tabHeight / 2)"
+		morphPosition: upperLeftPoint;
+		yourself! !
+
+!TabBarMorph class methodsFor: 'instance creation' stamp: 'KenD 8/14/2015 22:22'!
+startPos: upperLeftPoint length: xExtent
+
+	| newInst |
+	newInst := self new.
+	^ newInst startPos: upperLeftPoint length: xExtent! !
