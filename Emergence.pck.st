@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2449] on 14 August 2015 at 10:32:27.035171 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2449] on 14 August 2015 at 10:42:36.935622 pm'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 20!
+!provides: 'Emergence' 1 21!
 !requires: 'Cuis-Base' 42 2439 nil!
 !requires: 'Morphic-Misc1' 1 57 nil!
 !classDefinition: #Emergence category: #Emergence!
@@ -633,12 +633,12 @@ drawOn: aCanvas
 							extent: (extent x - (tabIndent + tabWidth)) @ extent y )
 		color: color.! !
 
-!TabBarMorph methodsFor: 'initialization' stamp: 'KenD 8/14/2015 22:25'!
+!TabBarMorph methodsFor: 'initialization' stamp: 'KenD 8/14/2015 22:41'!
 startPos: upperLeftPoint length: xExtent
 
 	self 
 		color: Color white;
-		morphExtent: xExtent @ 6;   "about (aBlockMorph tabHeight / 2)"
+		morphExtent: xExtent @ 4;
 		morphPosition: upperLeftPoint;
 		yourself! !
 
