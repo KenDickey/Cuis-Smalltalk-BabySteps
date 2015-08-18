@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 18 August 2015 at 1:51:39.749768 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 18 August 2015 at 2:36:21.507272 pm'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 25!
+!provides: 'Emergence' 1 27!
 !requires: 'Morphic-Misc1' 1 57 nil!
 !requires: 'Cuis-Base' 42 2439 nil!
 !classDefinition: #Emergence category: #Emergence!
@@ -130,13 +130,16 @@ Goals include
 	- Simple gateway to usefulness
 '! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/12/2015 06:32'!
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 14:29'!
 aboutToBeGrabbedBy: aHand
 
 	super aboutToBeGrabbedBy: aHand.
-	self showDropShadow! !
+	self 
+		showDropShadow;
+		yourself
+! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:50'!
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 14:33'!
 aboutToGrab: aSubMorph
 	"Can't just grab any submorph; must be a BlockMorph.
 	If I reject the grab, e.g. of an inner label, the user can't pick me up.
@@ -148,7 +151,8 @@ aboutToGrab: aSubMorph
 			aSubMorph ]
 		ifFalse: [
 			"Remove me"
-			 (self owner isKindOf: BlockMorph) ifTrue: [ self owner removeBlock: self ].
+			 (self owner isKindOf: BlockMorph) 
+				ifTrue: [ self owner removeBlock: self ].
 			self
 		]! !
 
@@ -381,14 +385,14 @@ morphExtent: newExtent
 	super morphExtent: newExtent.
 	self resetDropShadowMorph  "size/shape changed; shadow should too"! !
 
-!BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/15/2015 16:18'!
+!BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/18/2015 13:59'!
 mouseEnter: evt
-	"Handle a mouseEnter event, meaning the mouse just entered my bounds with no button pressed."
+	"Handle a mouseEnter event, meaning the mouse just entered my bounds."
 	
 	"Hilight if hand has BlockMorph that we will accepr"
 	| heldMorph |
 	(evt isDraggingEvent) ifFalse: [ ^ self ].
-	(self hasPlugTab) ifFalse: [ ^ self ].
+	(self hasPlugTab) ifFalse: [ ^ self ]. "No place to plug a block"
 	
 	heldMorph := evt hand ifNotNil:
 		 [ :aHand | |heldMorphs | 
@@ -606,7 +610,7 @@ tabWidth
 
 	^ 18! !
 
-!ContainingBlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:51'!
+!ContainingBlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 14:07'!
 acceptDroppingMorph: aBlockMorph event: evt 
 	"Add aBlockMorph to me as the next block to be executed"
 	"I have two places
@@ -618,10 +622,13 @@ acceptDroppingMorph: aBlockMorph event: evt
 	blocLocation := evt eventPosition "Hand world position"
 		+ aBlockMorph morphPosition "block pos relative to hand"
 		- self morphPositionInWorld. "block pos relative to me"
-
+		
+	self hideTabBar.
+	
 	(blocLocation y > (self morphExtent y - (2 * self tabHeight)))
 	ifTrue: [ self nextBlock: aBlockMorph ]
 	ifFalse: [ self containedBlock: aBlockMorph ].
+
 
 ! !
 
