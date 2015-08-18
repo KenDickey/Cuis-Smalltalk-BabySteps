@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2449] on 15 August 2015 at 4:20:04.110016 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 18 August 2015 at 1:51:39.749768 pm'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 22!
+!provides: 'Emergence' 1 25!
 !requires: 'Morphic-Misc1' 1 57 nil!
 !requires: 'Cuis-Base' 42 2439 nil!
 !classDefinition: #Emergence category: #Emergence!
@@ -17,7 +17,7 @@ Emergence class
 
 !classDefinition: #BlockMorph category: #Emergence!
 RectangleLikeMorph subclass: #BlockMorph
-	instanceVariableNames: 'labelMorph dropShadowMorph'
+	instanceVariableNames: 'labelMorph dropShadowMorph nextBlock'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Emergence'!
@@ -27,7 +27,7 @@ BlockMorph class
 
 !classDefinition: #ContainingBlockMorph category: #Emergence!
 BlockMorph subclass: #ContainingBlockMorph
-	instanceVariableNames: ''
+	instanceVariableNames: 'containedBlock'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Emergence'!
@@ -67,7 +67,9 @@ See Class side for notes.
 !
 
 !BlockMorph commentStamp: '<historical>' prior: 0!
-I am the base class of all BlockMorphs.!
+I am the base class of all BlockMorphs.
+
+I and my subclasses represent statements in a block-based graphical programming language inspired by Scratch/Snap!!/BYOB.  Note: Emergence class>>seeAlso!
 
 !ContainingBlockMorph commentStamp: '<historical>' prior: 0!
 I hold/contain other BlockMorphs, e.g. for repeated invocations.!
@@ -134,8 +136,42 @@ aboutToBeGrabbedBy: aHand
 	super aboutToBeGrabbedBy: aHand.
 	self showDropShadow! !
 
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:50'!
+aboutToGrab: aSubMorph
+	"Can't just grab any submorph; must be a BlockMorph.
+	If I reject the grab, e.g. of an inner label, the user can't pick me up.
+	In this case, let the hand grab me."
+
+	^ (aSubMorph isKindOf: BlockMorph)
+		ifTrue: [ 
+			self removeBlock: aSubMorph.
+			aSubMorph ]
+		ifFalse: [
+			"Remove me"
+			 (self owner isKindOf: BlockMorph) ifTrue: [ self owner removeBlock: self ].
+			self
+		]! !
+
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:50'!
+acceptDroppingMorph: aBlockMorph event: evt 
+	"Add aBlockMorph to me as the next block to be executed"
+
+	self nextBlock: aBlockMorph! !
+
 !BlockMorph methodsFor: 'plugTabs' stamp: 'KenD 8/14/2015 14:29'!
 acceptsPlugTab
+
+	^ true! !
+
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:02'!
+allowsMorphDrop
+	"Answer whether we accept dropping morphs. By default answer false."
+
+	^ true! !
+
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:27'!
+allowsSubmorphDrag
+	"Answer whether our morphs can just be grabbed with the hand, instead of requiring the use of the halo. By default answer false."
 
 	^ true! !
 
@@ -149,6 +185,13 @@ brightenColor
 	"Hilight myself"
 	
 	self color: self class defaultColor veryMuchLighter ! !
+
+!BlockMorph methodsFor: 'geometry' stamp: 'KenD 8/18/2015 13:44'!
+combinedNextBlockHeights
+
+	^(self nextBlock)
+		ifNil: [ 0 ]
+		ifNotNil: [ :nb | (nb morphExtent y - nb tabHeight) + (nb combinedNextBlockHeights) ]! !
 
 !BlockMorph methodsFor: 'initialization' stamp: 'KenD 8/14/2015 11:27'!
 defaultColor
@@ -326,10 +369,11 @@ labelMorph
 
 	^ labelMorph! !
 
-!BlockMorph methodsFor: 'geometry' stamp: 'KenD 8/13/2015 15:54'!
+!BlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 19:51'!
 minimumExtent
 
-	^ (14 + self tabWidth + self tabIndent + self labelMorph morphExtent x) @ (3 * self tabHeight)! !
+	^ (14 + self tabWidth + self tabIndent + self labelMorph morphExtent x) 
+		@ (3 * self tabHeight)! !
 
 !BlockMorph methodsFor: 'geometry' stamp: 'KenD 8/12/2015 06:24'!
 morphExtent: newExtent
@@ -365,10 +409,48 @@ mouseLeave: evt
 	
 	self normalColor; hideTabBar ! !
 
+!BlockMorph methodsFor: 'accessing' stamp: 'KenD 8/17/2015 18:54'!
+nextBlock
+	"Answer the block myself in the block sequence or nil if I am the last block in the sequence. Each block is a submorph of the previous block."
+
+	^ nextBlock
+! !
+
+!BlockMorph methodsFor: 'accessing' stamp: 'KenD 8/18/2015 07:50'!
+nextBlock: aBlockMorphOrNil
+	"Add the given block to this stack."
+
+	self nextBlock ifNotNil: [ :nb | self removeMorph: nb ].
+	nextBlock := aBlockMorphOrNil.
+	aBlockMorphOrNil ifNotNil: [ :aBlockMorph |
+		self addMorphFront: aBlockMorph.
+		aBlockMorph morphPosition: self nextBlockPosition
+	].
+	self addAlarm: #resizeContainmentArea after: 0.1.
+! !
+
+!BlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 19:47'!
+nextBlockCount
+
+	^(self nextBlock)
+		ifNil: [ 0 ]
+		ifNotNil: [ : nb | 1 + nb nextBlockCount ]! !
+
+!BlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 16:15'!
+nextBlockPosition
+	"Answer location in self in which to place upper left corner of block which follows me".
+	
+	^ 0 @ (self morphExtent y - self tabHeight) ! !
+
 !BlockMorph methodsFor: 'colors' stamp: 'KenD 8/14/2015 14:31'!
 normalColor
 
 	self color: self class defaultColor ! !
+
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:29'!
+okToPickUp: aSubMorph
+
+	^ aSubMorph isKindOf: BlockMorph ! !
 
 !BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/14/2015 14:17'!
 processMouseEnter: aMouseEvent localPosition: localEventPosition
@@ -401,6 +483,12 @@ rejectDropMorphEvent: dropEvent
 	super rejectDropMorphEvent: dropEvent.
 	self hideDropShadow ! !
 
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:30'!
+removeBlock: aBlockMorph
+
+	(aBlockMorph == self nextBlock)
+		ifTrue: [ self nextBlock: nil ]! !
+
 !BlockMorph methodsFor: 'dropShadow' stamp: 'KenD 8/12/2015 06:28'!
 resetDropShadowMorph
 	"(Re)set dropShadowMorph done when size changes "
@@ -422,6 +510,14 @@ resetDropShadowMorph
 
 		
 ! !
+
+!BlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 19:00'!
+resizeContainmentArea
+	"I don't have such an area, so do nothing.
+	However, I may have an owner who does."
+	
+	(self owner isKindOf: BlockMorph)
+		ifTrue: [ self owner resizeContainmentArea ]! !
 
 !BlockMorph methodsFor: 'drawing' stamp: 'KenD 8/13/2015 15:30'!
 shadowForm
@@ -471,6 +567,20 @@ tabWidth
 
 	^ self class tabWidth ! !
 
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:18'!
+wantsDroppedMorph: aMorph event: evt
+	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
+
+	^ (aMorph isKindOf: BlockMorph) or: [aMorph isKindOf: PasteUpMorph ]! !
+
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:26'!
+wantsToBeDroppedInto: aMorph
+	"I may to be dropped on a BlockMorph with a tab, if I have a slot for a tab"
+
+	(aMorph isKindOf: BlockMorph)
+		ifTrue: [ ^ self acceptsPlugTab ].
+	^ aMorph isKindOf: PasteUpMorph ! !
+
 !BlockMorph class methodsFor: 'colors' stamp: 'KenD 8/14/2015 11:25'!
 blockMorphColor
 
@@ -495,6 +605,50 @@ tabIndent
 tabWidth
 
 	^ 18! !
+
+!ContainingBlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:51'!
+acceptDroppingMorph: aBlockMorph event: evt 
+	"Add aBlockMorph to me as the next block to be executed"
+	"I have two places
+	    inside -> innerBlock
+	    below -> nextBlock (in sequence)
+	"
+	"Who is closer?"
+	| blocLocation |
+	blocLocation := evt eventPosition "Hand world position"
+		+ aBlockMorph morphPosition "block pos relative to hand"
+		- self morphPositionInWorld. "block pos relative to me"
+
+	(blocLocation y > (self morphExtent y - (2 * self tabHeight)))
+	ifTrue: [ self nextBlock: aBlockMorph ]
+	ifFalse: [ self containedBlock: aBlockMorph ].
+
+! !
+
+!ContainingBlockMorph methodsFor: 'accessing' stamp: 'KenD 8/17/2015 15:49'!
+containedBlock
+
+	^ containedBlock! !
+
+!ContainingBlockMorph methodsFor: 'accessing' stamp: 'KenD 8/18/2015 07:48'!
+containedBlock: aBlockMorphOrNil
+
+	containedBlock ifNotNil: [ :old | self removeMorph: old ].
+	containedBlock := aBlockMorphOrNil.
+	aBlockMorphOrNil
+		ifNotNil: [ :aBlockMorph |
+			self addMorphFront: aBlockMorph.
+			aBlockMorph morphPosition: self containedBlockPosition
+	].
+	self addAlarm: #resizeContainmentArea after: 0.1.
+
+! !
+
+!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 18:20'!
+containedBlockPosition
+	"Answer location of upperLeft point for a contained block (inside my 'c')"
+	
+	^ self tabWidth @ (2 * self tabHeight)! !
 
 !ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/13/2015 16:01'!
 defaultExtent
@@ -552,10 +706,46 @@ hideTabBar
 		self removeProperty: #tabBar2
 	]! !
 
-!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/13/2015 16:04'!
+!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 18:04'!
+innerBlockPosition
+	"Answer location in self in which to place upper left corner of inner block".
+	
+	^ 0 @ self morphExtent y - self tabHeight ! !
+
+!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/18/2015 13:48'!
 minimumExtent
 
-	^ (14 + self tabWidth + self tabIndent + self labelMorph morphExtent x) @ (6 * self tabHeight)! !
+	| width height |
+	width := 14 + self tabWidth + self tabIndent + self labelMorph morphExtent x.
+	height := (6 * self tabHeight) 
+			+ ((self containedBlock) 
+					ifNil: [ 0 ] 
+					ifNotNil: [ :cb | self tabHeight + cb combinedNextBlockHeights]).
+	^ width @ height! !
+
+!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 18:45'!
+nextBlockPosition
+	"Answer location in self in which to place upper left corner of block following me".
+	
+	^ 0 @ (self morphExtent y - self tabHeight)! !
+
+!ContainingBlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:33'!
+removeBlock: aBlockMorph
+	
+	(aBlockMorph == self nextBlock)
+		ifTrue: [ self nextBlock: nil ]. 
+		
+	(aBlockMorph == self containedBlock)
+		ifTrue: [ self containedBlock: nil ]! !
+
+!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/18/2015 07:52'!
+resizeContainmentArea
+
+	self morphExtent: (self minimumExtent).
+	self nextBlock ifNotNil: [ :nb | nb morphPosition: self nextBlockPosition ].
+	
+	(self owner isKindOf: BlockMorph)
+		ifTrue: [ self owner resizeContainmentArea ]! !
 
 !ContainingBlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/15/2015 16:19'!
 showTabBar
