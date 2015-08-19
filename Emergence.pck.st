@@ -1,10 +1,10 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 18 August 2015 at 2:36:21.507272 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 19 August 2015 at 7:12:13.482228 am'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 27!
-!requires: 'Morphic-Misc1' 1 57 nil!
+!provides: 'Emergence' 1 30!
 !requires: 'Cuis-Base' 42 2439 nil!
+!requires: 'Morphic-Misc1' 1 57 nil!
 !classDefinition: #Emergence category: #Emergence!
 ProtoObject subclass: #Emergence
 	instanceVariableNames: ''
@@ -101,12 +101,14 @@ gamePlan
 	- External Device presentation/interfacing/control
 '! !
 
-!Emergence class methodsFor: 'documentation' stamp: 'KenD 8/10/2015 13:29'!
+!Emergence class methodsFor: 'documentation' stamp: 'KenD 8/19/2015 06:49'!
 notes
 
 	^
-'	Current "drawOn: aCanvas" assumes BitBltCanvas but this is 
-	expected to change to M3Canvas.
+'	
+* Nota Bene: Current "drawOn: aCanvas" assumes BitBltCanvas but this is expected to change to M3Canvas.
+
++ When a block is removed from a stack, its containers are informed recursively to allow for resizing.  See methods:  #resizeContainmentArea
 '! !
 
 !Emergence class methodsFor: 'documentation' stamp: 'KenD 8/2/2015 15:20'!
@@ -139,7 +141,7 @@ aboutToBeGrabbedBy: aHand
 		yourself
 ! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 14:33'!
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/19/2015 06:52'!
 aboutToGrab: aSubMorph
 	"Can't just grab any submorph; must be a BlockMorph.
 	If I reject the grab, e.g. of an inner label, the user can't pick me up.
@@ -147,12 +149,12 @@ aboutToGrab: aSubMorph
 
 	^ (aSubMorph isKindOf: BlockMorph)
 		ifTrue: [ 
-			self removeBlock: aSubMorph.
+			self removeGrabbedBlock: aSubMorph.
 			aSubMorph ]
 		ifFalse: [
 			"Remove me"
 			 (self owner isKindOf: BlockMorph) 
-				ifTrue: [ self owner removeBlock: self ].
+				ifTrue: [ self owner removeGrabbedBlock: self ].
 			self
 		]! !
 
@@ -487,9 +489,10 @@ rejectDropMorphEvent: dropEvent
 	super rejectDropMorphEvent: dropEvent.
 	self hideDropShadow ! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:30'!
-removeBlock: aBlockMorph
-
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/19/2015 06:51'!
+removeGrabbedBlock: aBlockMorph
+	"A hand is (probably) removing nextBlock"
+	
 	(aBlockMorph == self nextBlock)
 		ifTrue: [ self nextBlock: nil ]! !
 
@@ -657,10 +660,15 @@ containedBlockPosition
 	
 	^ self tabWidth @ (2 * self tabHeight)! !
 
-!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/13/2015 16:01'!
+!ContainingBlockMorph methodsFor: 'initialization' stamp: 'KenD 8/19/2015 07:06'!
 defaultExtent
 
-	^ 200 @ (6 * self tabHeight)! !
+	| width height lableWidth |
+	 lableWidth := 
+		(self labelMorph ifNil: [ self defaultLabel ] ifNotNil: [ :lm | lm ]) morphExtent x.
+	width := 10 + self tabWidth + self tabIndent + lableWidth.
+	height := (6 * self tabHeight).
+	^ width @ height! !
 
 !ContainingBlockMorph methodsFor: 'initialization' stamp: 'KenD 8/13/2015 15:53'!
 defaultLabel
@@ -719,16 +727,16 @@ innerBlockPosition
 	
 	^ 0 @ self morphExtent y - self tabHeight ! !
 
-!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/18/2015 13:48'!
+!ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/19/2015 07:10'!
 minimumExtent
 
-	| width height |
-	width := 14 + self tabWidth + self tabIndent + self labelMorph morphExtent x.
-	height := (6 * self tabHeight) 
-			+ ((self containedBlock) 
+	| baseExtent |
+	baseExtent := self defaultExtent.
+	^ (baseExtent x) 
+		@ ((baseExtent y) +
+			(self containedBlock
 					ifNil: [ 0 ] 
-					ifNotNil: [ :cb | self tabHeight + cb combinedNextBlockHeights]).
-	^ width @ height! !
+					ifNotNil: [ :cb | self tabHeight + cb combinedNextBlockHeights]))! !
 
 !ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 18:45'!
 nextBlockPosition
@@ -736,9 +744,10 @@ nextBlockPosition
 	
 	^ 0 @ (self morphExtent y - self tabHeight)! !
 
-!ContainingBlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:33'!
-removeBlock: aBlockMorph
-	
+!ContainingBlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/19/2015 06:52'!
+removeGrabbedBlock: aBlockMorph
+	"A hand is (probably) removing nextBlock or containedBlock"
+
 	(aBlockMorph == self nextBlock)
 		ifTrue: [ self nextBlock: nil ]. 
 		
