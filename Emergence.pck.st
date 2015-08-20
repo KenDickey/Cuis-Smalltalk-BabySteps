@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 19 August 2015 at 7:12:13.482228 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 20 August 2015 at 8:47:19.863399 am'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 30!
+!provides: 'Emergence' 1 31!
 !requires: 'Cuis-Base' 42 2439 nil!
 !requires: 'Morphic-Misc1' 1 57 nil!
 !classDefinition: #Emergence category: #Emergence!
@@ -164,7 +164,7 @@ acceptDroppingMorph: aBlockMorph event: evt
 
 	self nextBlock: aBlockMorph! !
 
-!BlockMorph methodsFor: 'plugTabs' stamp: 'KenD 8/14/2015 14:29'!
+!BlockMorph methodsFor: 'plugTabs' stamp: 'KenD 8/20/2015 08:36'!
 acceptsPlugTab
 
 	^ true! !
@@ -387,14 +387,17 @@ morphExtent: newExtent
 	super morphExtent: newExtent.
 	self resetDropShadowMorph  "size/shape changed; shadow should too"! !
 
-!BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/18/2015 13:59'!
+!BlockMorph methodsFor: 'event handling' stamp: 'KenD 8/20/2015 08:39'!
 mouseEnter: evt
 	"Handle a mouseEnter event, meaning the mouse just entered my bounds."
 	
 	"Hilight if hand has BlockMorph that we will accepr"
 	| heldMorph |
 	(evt isDraggingEvent) ifFalse: [ ^ self ].
-	(self hasPlugTab) ifFalse: [ ^ self ]. "No place to plug a block"
+	(self nextBlock)
+		ifNotNil: [ ^ self ].  "No place to plug a block"
+	(self hasPlugTab) 
+		ifFalse: [ ^ self ]. "No place to plug a block"
 	
 	heldMorph := evt hand ifNotNil:
 		 [ :aHand | |heldMorphs | 
@@ -574,11 +577,11 @@ tabWidth
 
 	^ self class tabWidth ! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:18'!
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/20/2015 08:35'!
 wantsDroppedMorph: aMorph event: evt
 	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
 
-	^ (aMorph isKindOf: BlockMorph) or: [aMorph isKindOf: PasteUpMorph ]! !
+	^ (aMorph isKindOf: BlockMorph) and: [ self acceptsPlugTab ]! !
 
 !BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:26'!
 wantsToBeDroppedInto: aMorph
@@ -738,6 +741,32 @@ minimumExtent
 					ifNil: [ 0 ] 
 					ifNotNil: [ :cb | self tabHeight + cb combinedNextBlockHeights]))! !
 
+!ContainingBlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/20/2015 08:43'!
+mouseEnter: evt
+	"Handle a mouseEnter event, meaning the mouse just entered my bounds."
+	
+	"Hilight if hand has BlockMorph that we will accepr"
+	| heldMorph |
+	(evt isDraggingEvent) ifFalse: [ ^ self ].
+	(self nextBlock)
+		ifNotNil: [ (self containedBlock)
+			ifNotNil: [ ^ self ] ].  "No place to plug a block"
+	(self hasPlugTab) 
+		ifFalse: [ ^ self ]. "No place to plug a block"
+	
+	heldMorph := evt hand ifNotNil:
+		 [ :aHand | |heldMorphs | 
+			heldMorphs := aHand submorphs.
+			(heldMorphs size > 0) 
+				ifTrue: [ heldMorphs at: 1 ]
+				ifFalse: [ nil ]
+	].
+	
+	heldMorph ifNotNil: [ :held |
+		((held isKindOf: BlockMorph) and: [ held acceptsPlugTab ])
+			ifTrue: [ self indicateDropTarget: evt ]
+	]! !
+
 !ContainingBlockMorph methodsFor: 'geometry' stamp: 'KenD 8/17/2015 18:45'!
 nextBlockPosition
 	"Answer location in self in which to place upper left corner of block following me".
@@ -763,18 +792,21 @@ resizeContainmentArea
 	(self owner isKindOf: BlockMorph)
 		ifTrue: [ self owner resizeContainmentArea ]! !
 
-!ContainingBlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/15/2015 16:19'!
+!ContainingBlockMorph methodsFor: 'user feedback' stamp: 'KenD 8/20/2015 08:46'!
 showTabBar
 	"Draw a white bar near where a BlockMorph can be plugged into a tab"
 	
 	"I have two such locations"
 	| bar2 |
 	super showTabBar.
-	bar2 := TabBarMorph 
+	(self containedBlock)
+		ifNil: [
+			bar2 := TabBarMorph 
 					startPos: (self tabWidth) @ (2 * self tabHeight)
 					length: (self morphExtent x - self tabWidth).
-	self setProperty: #tabBar2 toValue: bar2.
-	self addMorphBack: bar2! !
+		self setProperty: #tabBar2 toValue: bar2.
+		self addMorphBack: bar2
+	]! !
 
 !ContainingBlockMorph class methodsFor: 'colors' stamp: 'KenD 8/14/2015 13:16'!
 defaultColor
