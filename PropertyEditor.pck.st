@@ -1,9 +1,9 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2439] on 28 July 2015 at 8:22:29.157063 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 20 August 2015 at 8:47:11.583879 am'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 40!
-!requires: 'Cuis-Base' 42 2439 nil!
-!requires: 'Morphic-Misc1' 1 54 nil!
+!provides: 'PropertyEditor' 1 41!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'Morphic-Misc1' 1 54 nil!
+!requires: 'Cuis-Base' 42 2439 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph showIVars'
@@ -402,7 +402,7 @@ forMorph: aMorph
 	 	 yourself
 ! !
 
-!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 7/13/2015 18:39'!
+!PropertyEditor methodsFor: 'accessing' stamp: 'KenD 8/20/2015 08:24'!
 propertyNames
 	"Answer an alpha-sorted collection of property names less #metaProperties"
 
@@ -410,7 +410,8 @@ propertyNames
 	propNames := SortedCollection sortBlock: [ :sym1 :sym2 | sym1 < sym2 ].
 	
 	self targetMorph propertiesDict keysDo: [ :propName | 
-		(propName = #metaProperties)
+		((propName = #metaProperties)
+			or: [propName = #morphModifiers])
 			ifFalse: [ propNames add: propName ] 
 	].
 
@@ -516,7 +517,7 @@ toggleIVars
 
 	self showIVars: (self showIVars not)! !
 
-!PropertyEditor class methodsFor: 'example' stamp: 'KenD 7/17/2015 18:19'!
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 8/20/2015 08:18'!
 example1
 "
 	self example1.
@@ -530,7 +531,7 @@ example1
 	aMorph setProperty: #range toValue: 5.
 	aMorph setProperty: #string toValue: 'Silly little string'.
 	aMorph setProperty: #char toValue: $c.
-	aMorph setProperty: #color toValue: Color red.
+	aMorph setProperty: #someColor toValue: Color red.
 	aMorph setProperty: #bool toValue: true.
 	aMorph setProperty: #oneOf toValue: #three. "#(one two three four five)"
 	aMorph setProperty: #symbol toValue: #'MySymbol'.
@@ -552,7 +553,7 @@ example1
 			toValue: (PropertyMeta kind: Symbol editor: nil dropAcceptor: passValue).
 	aMorph setMetaProperty: #char 
 			toValue: (PropertyMeta kind: Character editor: nil dropAcceptor: passValue).
-	aMorph setMetaProperty: #color 
+	aMorph setMetaProperty: #someColor 
 			toValue: (ColorPropertyMeta new).
 	aMorph setMetaProperty: #bool 
 			toValue: (PropertyMeta kind: Boolean editor: nil dropAcceptor: passValue).
