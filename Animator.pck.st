@@ -1,6 +1,6 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2322] on 18 May 2015 at 9:44:45.68877 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 20 August 2015 at 5:18:18.972991 pm'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 15!
+!provides: 'Animator' 1 16!
 !requires: 'Cuis-Base' 42 2198 nil!
 !classDefinition: #Animator category: #Animator!
 Object subclass: #Animator
@@ -120,6 +120,12 @@ stopStepping
 	w _ self runningWorld.
 	w ifNotNil: [w stopSteppingMorph: self].
 	stepping _ false! !
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 8/20/2015 17:18'!
+world
+	"I am not directly associated with any particular world"
+	
+	^ nil ! !
 
 !Animator class methodsFor: 'instance creation' stamp: 'KenD 9/20/2013 05:01'!
 actor: aMorph action: aOneArgClosure
