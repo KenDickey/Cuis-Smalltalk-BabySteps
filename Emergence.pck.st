@@ -1,8 +1,8 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 20 August 2015 at 8:47:19.863399 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 21 August 2015 at 9:46:06.177126 am'!
 'Description I am a construction kit in the lineage of Scratch/BYOB/Snap!!
 
 "Emergence is the process of complex pattern formation from simple rules."'!
-!provides: 'Emergence' 1 31!
+!provides: 'Emergence' 1 32!
 !requires: 'Cuis-Base' 42 2439 nil!
 !requires: 'Morphic-Misc1' 1 57 nil!
 !classDefinition: #Emergence category: #Emergence!
@@ -158,7 +158,7 @@ aboutToGrab: aSubMorph
 			self
 		]! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/18/2015 13:50'!
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/21/2015 09:17'!
 acceptDroppingMorph: aBlockMorph event: evt 
 	"Add aBlockMorph to me as the next block to be executed"
 
@@ -577,11 +577,11 @@ tabWidth
 
 	^ self class tabWidth ! !
 
-!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/20/2015 08:35'!
+!BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/21/2015 09:17'!
 wantsDroppedMorph: aMorph event: evt
 	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
 
-	^ (aMorph isKindOf: BlockMorph) and: [ self acceptsPlugTab ]! !
+	^ (aMorph isKindOf: BlockMorph) and: [ aMorph acceptsPlugTab ]! !
 
 !BlockMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 8/17/2015 16:26'!
 wantsToBeDroppedInto: aMorph
