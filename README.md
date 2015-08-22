@@ -44,20 +44,20 @@ The current implementation is just a sketch and uses Morph properties.  A DropTa
 
 DIRECTIONS / ROAD MAP
 
-Property sheets -- Edit a Morph's properties.  This could be constrained to allow one to drop a morph or type a name/value or select from a list or pop-up a specialized editor.  For example, a property constrained to hold colors would accept a color swatch, color name, or pop-up a color editor or color pallet.
+**Property sheets** -- Edit a Morph's properties.  This could be constrained to allow one to drop a morph or type a name/value or select from a list or pop-up a specialized editor.  For example, a property constrained to hold colors would accept a color swatch, color name, or pop-up a color editor or color pallet.
 ````Smalltalk
 	Feature require: #'PropertyEditor'.
 	PropertyEditor example1..
 ````
 
 
-Morph environment -- I would like to add UI behaviors to individual morphs.  The idea is to add event/message handlers for drop-actions in an editor which could constrain/check arguments.  Method variables not local would be looked up in the Morph's UI environment -- stored in a #MorphEnv property.  Think Workspace environments.  This would allow sharing between different handlers in an individual morph.
+**Morph environment** -- I would like to add UI behaviors to individual morphs.  The idea is to add event/message handlers for drop-actions in an editor which could constrain/check arguments.  Method variables not local would be looked up in the Morph's UI environment -- stored in a #MorphEnv property.  Think Workspace environments.  This would allow sharing between different handlers in an individual morph.
 
-Save / Clone Composits -- I would like to be able to build things like scroll bars, 'fuse' the result into a Composit, then add that new composit to a PartsBin Pallet to clone copies for further editing.
+**Save / Clone Composits** -- I would like to be able to build things like scroll bars, 'fuse' the result into a Composit, then add that new composit to a PartsBin Pallet to clone copies for further editing.
 
-Scene based Asset Management -- When your actor goes through that door the scene changes.  In a media rich environment, memory large media should be cached and flushed or staged in as required.
+**Scene based Asset Management** -- When your actor goes through that door the scene changes.  In a media rich environment, memory large media should be cached and flushed or staged in as required.
 
-StoryBord Editor -- To manage rooms/scenes/locales and the portals and transitions between them.
+**StoryBord Editor** -- To manage rooms/scenes/locales and the portals and transitions between them.
 
 
 QUESTIONS TO ANSWER
