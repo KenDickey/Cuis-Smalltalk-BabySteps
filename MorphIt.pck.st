@@ -1,10 +1,10 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 22 August 2015 at 1:10:38.256195 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 22 August 2015 at 4:54:39.496162 pm'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 21!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
+!provides: 'MorphIt' 1 22!
+!requires: 'Morphic-Misc1' 1 45 nil!
 !requires: 'Value-Constraints' 1 5 nil!
 !requires: 'ValueHolder' 1 20 nil!
-!requires: 'Morphic-Misc1' 1 45 nil!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Animator' 1 11 nil!
 !classDefinition: #MorphIt category: #MorphIt!
 ProtoObject subclass: #MorphIt
@@ -896,18 +896,23 @@ holderOfStrings
 		    icon: self stringIcon 
 		    balloonText: 'String Variable'! !
 
-!MorphValueHolder class methodsFor: 'class initialization' stamp: 'KenD 10/12/2013 16:55'!
+!MorphValueHolder class methodsFor: 'class initialization' stamp: 'KenD 8/22/2015 16:53'!
 initialize
 	"Initialize my Icons"
 "	
 	self initialize.
 "
-	ColorIcon 	:= Form fromFileNamed: 'Icons/HoldsColor.png'.
-	FloatIcon 	:= Form fromFileNamed: 'Icons/HoldsFloat.png'.
-	IntegerIcon  := Form fromFileNamed: 'Icons/HoldsInteger.png'.
-	RangeIcon  := Form fromFileNamed: 'Icons/HoldsRange.png'.
-	StringIcon 	:= Form fromFileNamed: 'Icons/HoldsString.png'.
-	PointIcon 	:= Form fromFileNamed: 'Icons/HoldsPoint.png'.! !
+	| pkgDirName |
+	pkgDirName := 
+		((CodePackage installedPackages) at: (self class category)) 
+			fullFileName upToLastPathSeparator.
+
+	ColorIcon 	:= Form fromFileNamed:  pkgDirName , '/Icons/HoldsColor.png'.
+	FloatIcon 	:= Form fromFileNamed: pkgDirName , '/Icons/HoldsFloat.png'.
+	IntegerIcon  := Form fromFileNamed: pkgDirName , '/Icons/HoldsInteger.png'.
+	RangeIcon  := Form fromFileNamed: pkgDirName , '/Icons/HoldsRange.png'.
+	StringIcon 	:= Form fromFileNamed: pkgDirName , '/Icons/HoldsString.png'.
+	PointIcon 	:= Form fromFileNamed: pkgDirName , '/Icons/HoldsPoint.png'.! !
 
 !MorphValueHolder class methodsFor: 'accessing' stamp: 'KenD 10/12/2013 16:56'!
 integerIcon
@@ -1227,11 +1232,12 @@ icon: anIcon addProc: addActionClosure  removeProc: removeActionClosure
 		addProc: addActionClosure  
 		removeProc: removeActionClosure! !
 
-!UserActionMorph class methodsFor: 'class initialization' stamp: 'KenD 5/13/2015 12:48'!
+!UserActionMorph class methodsFor: 'class initialization' stamp: 'KenD 8/22/2015 16:54'!
 initialize
 "
 	self initialize.
 "
+	| pkgDirName |
 	HandlesMouseOverSelectors :=
 		#( mouseEnter:  mouseLeave: ).
 		
@@ -1250,10 +1256,13 @@ initialize
 	
 	HandlesMouseStillDownSelectors := #( mouseStillDown: ).
 	
-	ColorCycleIcon 	:= Form fromFileNamed: 'Icons/ColorCycle.png'.
-	PathIcon 	:= Form fromFileNamed: 'Icons/Path.png'.
-	GrowShrinkIcon 	:= Form fromFileNamed: 'Icons/GrowShrink2.png'.
-	BounceIcon 	:= Form fromFileNamed: 'Icons/Bounce.png'.
+	pkgDirName := 
+		((CodePackage installedPackages) at: (self class category)) 
+			fullFileName upToLastPathSeparator.
+	ColorCycleIcon 	:= Form fromFileNamed: pkgDirName, '/Icons/ColorCycle.png'.
+	PathIcon 	:= Form fromFileNamed: pkgDirName, '/Icons/Path.png'.
+	GrowShrinkIcon 	:= Form fromFileNamed: pkgDirName,  '/Icons/GrowShrink2.png'.
+	BounceIcon 	:= Form fromFileNamed: pkgDirName,  '/Icons/Bounce.png'.
 
 	! !
 
