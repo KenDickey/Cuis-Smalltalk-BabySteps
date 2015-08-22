@@ -29,7 +29,7 @@ Drop "Follow a Path" onto the DropTarget.  When clicked, the target morph will d
 
 ![MorphModifier Pallet in Cuis](IdeaMine/MorphIt-July2015.png)
 
-WHERE AM I GOING WITH THIS?
+## WHERE AM I GOING WITH THIS?
 
 MorphIt is my start at moving UI building to be more media centric.  It ia a proof-of-concept.
 
@@ -42,7 +42,7 @@ The observation is that UI events are rare and don't have to be especially fast.
 The current implementation is just a sketch and uses Morph properties.  A DropTarget is used to add (and eventually remove) MorphActions and so forth.  This keeps Morps themselves free of editing entanglements.
 
 
-DIRECTIONS / ROAD MAP
+## DIRECTIONS / ROAD MAP
 
 **Property sheets** -- Edit a Morph's properties.  This could be constrained to allow one to drop a morph or type a name/value or select from a list or pop-up a specialized editor.  For example, a property constrained to hold colors would accept a color swatch, color name, or pop-up a color editor or color pallet.
 ````Smalltalk
@@ -60,7 +60,7 @@ DIRECTIONS / ROAD MAP
 **StoryBord Editor** -- To manage rooms/scenes/locales and the portals and transitions between them.
 
 
-QUESTIONS TO ANSWER
+## QUESTIONS TO ANSWER
 
 Can one hide the differences between properties and ivars and basically treat them the same?
 
