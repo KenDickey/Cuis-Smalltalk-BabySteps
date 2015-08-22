@@ -1,11 +1,11 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 22 August 2015 at 11:23:02.231373 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 22 August 2015 at 1:10:38.256195 pm'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 20!
+!provides: 'MorphIt' 1 21!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
-!requires: 'Animator' 1 11 nil!
-!requires: 'Morphic-Misc1' 1 45 nil!
-!requires: 'ValueHolder' 1 20 nil!
 !requires: 'Value-Constraints' 1 5 nil!
+!requires: 'ValueHolder' 1 20 nil!
+!requires: 'Morphic-Misc1' 1 45 nil!
+!requires: 'Animator' 1 11 nil!
 !classDefinition: #MorphIt category: #MorphIt!
 ProtoObject subclass: #MorphIt
 	instanceVariableNames: ''
@@ -88,7 +88,10 @@ UserActionMorph class
 
 
 !MorphIt commentStamp: '<historical>' prior: 0!
-This is a documentation class -- see my class side!
+This is a documentation class -- see my class side
+
+Note:  
+		MorphIt samplePallet.!
 
 !MorphModifierPallet commentStamp: '<historical>' prior: 0!
 I am just a way to get a Morph Modifier Pattet [see my class side].
@@ -223,8 +226,11 @@ How best to add constraints to properties/ivars?  Property sheet metadata?  Phar
 Can one use Scratch-like script elements to maximise the "direct construction" experience and minimise typing?  What is the most clear separation between adding/specializing scripts and Smalltalk code components?
 '! !
 
-!MorphIt class methodsFor: 'examples' stamp: 'KenD 8/22/2015 11:18'!
+!MorphIt class methodsFor: 'examples' stamp: 'KenD 8/22/2015 13:10'!
 samplePallet
+"
+	MorphIt samplePallet.
+"
 "
 select a Morph, from the halo's Menu select 'show drop target for me'
 Then click+drag from the MorphModifierPallet to the DropTarget.
@@ -236,9 +242,11 @@ Drop 'Follow a Path' icon onto the DropTarget.  When clicked, the target morph w
 	MorphModifierPallet initializedInstance openInWorld morphExtent: (690 @ 84).
  ! !
 
-!MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 11:21'!
+!MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 13:08'!
 thingsToTry
-
+"
+	MorphIt thingsToTry.
+"
 	^
 '
 	MorphIt samplePallet.
@@ -253,7 +261,7 @@ E.g. drag the Color Cycle icon (tool help will show this) to the drop target; mo
 Drop "Follow a Path" icon onto the DropTarget.  When clicked, the target morph will do a little dance as it follows a path.
 '! !
 
-!MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 11:14'!
+!MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 11:33'!
 whyMe
 	^
 'This is a start at drag ''n drop media authoring.
@@ -263,6 +271,8 @@ The basic idea is grab and add media, then add behaviors.
 This is an incomplete prototype -- be warned!!
 
 Note: Requires Morphic-Misc1 and Morphic-ColorEditor.
+
+Look in method thingsToTry.
 '! !
 
 !MorphModifierPallet class methodsFor: 'new-morph participation' stamp: 'KenD 7/5/2015 15:30'!
