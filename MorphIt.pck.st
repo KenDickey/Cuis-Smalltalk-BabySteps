@@ -1,11 +1,21 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2402] on 5 July 2015 at 4:50:27.311322 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 22 August 2015 at 11:23:02.231373 am'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 19!
-!requires: 'Value-Constraints' 1 5 nil!
-!requires: 'ValueHolder' 1 20 nil!
-!requires: 'Animator' 1 11 nil!
+!provides: 'MorphIt' 1 20!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
+!requires: 'Animator' 1 11 nil!
 !requires: 'Morphic-Misc1' 1 45 nil!
+!requires: 'ValueHolder' 1 20 nil!
+!requires: 'Value-Constraints' 1 5 nil!
+!classDefinition: #MorphIt category: #MorphIt!
+ProtoObject subclass: #MorphIt
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MorphIt'!
+!classDefinition: 'MorphIt class' category: #MorphIt!
+MorphIt class
+	instanceVariableNames: ''!
+
 !classDefinition: #MorphModifierPallet category: #MorphIt!
 Morph subclass: #MorphModifierPallet
 	instanceVariableNames: ''
@@ -76,6 +86,9 @@ MorphMorph subclass: #UserActionMorph
 UserActionMorph class
 	instanceVariableNames: ''!
 
+
+!MorphIt commentStamp: '<historical>' prior: 0!
+This is a documentation class -- see my class side!
 
 !MorphModifierPallet commentStamp: '<historical>' prior: 0!
 I am just a way to get a Morph Modifier Pattet [see my class side].
@@ -169,6 +182,88 @@ showHaloIcon
 "
 	"^ self fetch: #( '16x16' 'emotes' 'face-angel')"
 	^ self fetch: #( '16x16' 'smalltalk' 'do-it' )! !
+
+!MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 11:10'!
+gamePlan 
+
+	^
+	
+'WHERE AM I GOING WITH THIS?
+
+MorphIt is my start at moving UI building to be more media centric.  It ia a proof-of-concept.
+
+The basic idea is that there are a bunch of pallets which allow one to add and compose individual  morphs, their properties and behaviors.  More direct authoring.  
+
+Ideas are inspired from multimedia authoring environments like SK8 and mTropolis (RIP; Note files in directory IdeaMine).
+
+The observation is that UI events are rare and don''t have to be especially fast.
+
+The current implementation is just a sketch and uses Morph properties.  A DropTarget is used to add (and eventually remove) MorphActions and so forth.  This keeps Morps themselves free of editing entanglements.
+
+
+DIRECTIONS / ROAD MAP
+
+Property sheets -- Edit a Morph''s properties.  This could be constrained to allow one to drop a morph or type a name/value or select from a list or pop-up a specialized editor.  For example, a property constrained to hold colors would accept a color swatch, color name, or pop-up a color editor or color pallet.
+
+Morph environment -- I would like to add UI behaviors to individual morphs.  The idea is to add event/message handlers for drop-actions in an editor which could constrain/check arguments.  Method variables not local would be looked up in the Morph''s UI environment -- stored in a #MorphEnv property.  Think Workspace environments.  This would allow sharing between different handlers in an individual morph.
+
+Save / Clone Composits -- I would like to be able to build things like scroll bars, ''fuse'' the result into a Composit, then add that new composit to a PartsBin Pallet to clone copies for further editing.
+
+Scene based Asset Management -- When your actor goes through that door the scene changes.  In a media rich environment, memory large media should be cached and flushed or staged in as required.
+
+StoryBord Editor -- To manage rooms/scenes/locales and the portals and transitions between them.
+
+
+QUESTIONS TO ANSWER
+
+Can one hide the differences between properties and ivars and basically treat them the same?
+
+How best to add constraints to properties/ivars?  Property sheet metadata?  Pharo-like first class slots?
+
+Can one use Scratch-like script elements to maximise the "direct construction" experience and minimise typing?  What is the most clear separation between adding/specializing scripts and Smalltalk code components?
+'! !
+
+!MorphIt class methodsFor: 'examples' stamp: 'KenD 8/22/2015 11:18'!
+samplePallet
+"
+select a Morph, from the halo's Menu select 'show drop target for me'
+Then click+drag from the MorphModifierPallet to the DropTarget.
+
+E.g. drag the Color Cycle icon (tool help will show this) to the drop target; move the DropTarget aside; move the mouse over the original morph.
+
+Drop 'Follow a Path' icon onto the DropTarget.  When clicked, the target morph will do a little dance as it follows a path.
+"
+	MorphModifierPallet initializedInstance openInWorld morphExtent: (690 @ 84).
+ ! !
+
+!MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 11:21'!
+thingsToTry
+
+	^
+'
+	MorphIt samplePallet.
+	
+Create a Morph, e.g. from the World>>New Morph menu.
+
+Select a Morph, and from the halo''s Menu select "show drop target for me"
+Then click+drag from the MorphModifierPallet to the DropTarget.
+
+E.g. drag the Color Cycle icon (tool help will show this) to the drop target; move the DropTarget aside; move the mouse over the original morph.
+
+Drop "Follow a Path" icon onto the DropTarget.  When clicked, the target morph will do a little dance as it follows a path.
+'! !
+
+!MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 11:14'!
+whyMe
+	^
+'This is a start at drag ''n drop media authoring.
+
+The basic idea is grab and add media, then add behaviors.
+
+This is an incomplete prototype -- be warned!!
+
+Note: Requires Morphic-Misc1 and Morphic-ColorEditor.
+'! !
 
 !MorphModifierPallet class methodsFor: 'new-morph participation' stamp: 'KenD 7/5/2015 15:30'!
 includeInNewMorphMenu 
