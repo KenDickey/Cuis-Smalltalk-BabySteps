@@ -14,10 +14,9 @@ Of possible interest is the MorphIt package, which is a start at drag-n-drop beh
 ````Smalltalk
 	Feature require: #'MorphIt'.
 
-	MorphModifierPallet initializedInstance openInWorld morphExtent:  (690 @ 84).
+	MorphIt samplePallet.
 
 ````
-File in '2400-CuisCore-ForMorphIt-2015Jul05-15h34m-KenD.2.cs.st'
 
 Note: Requires Morphic-Misc1 and Morphic-ColorEditor.
 
