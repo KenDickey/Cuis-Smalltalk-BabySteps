@@ -1,11 +1,11 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 22 August 2015 at 4:54:39.496162 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2463] on 22 August 2015 at 5:26:12.55165 pm'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 22!
+!provides: 'MorphIt' 1 23!
+!requires: 'Animator' 1 11 nil!
 !requires: 'Morphic-Misc1' 1 45 nil!
-!requires: 'Value-Constraints' 1 5 nil!
 !requires: 'ValueHolder' 1 20 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
-!requires: 'Animator' 1 11 nil!
+!requires: 'Value-Constraints' 1 5 nil!
 !classDefinition: #MorphIt category: #MorphIt!
 ProtoObject subclass: #MorphIt
 	instanceVariableNames: ''
@@ -896,7 +896,7 @@ holderOfStrings
 		    icon: self stringIcon 
 		    balloonText: 'String Variable'! !
 
-!MorphValueHolder class methodsFor: 'class initialization' stamp: 'KenD 8/22/2015 16:53'!
+!MorphValueHolder class methodsFor: 'class initialization' stamp: 'KenD 8/22/2015 17:24'!
 initialize
 	"Initialize my Icons"
 "	
@@ -904,7 +904,7 @@ initialize
 "
 	| pkgDirName |
 	pkgDirName := 
-		((CodePackage installedPackages) at: (self class category)) 
+		(CodePackage installedPackages at: self category)
 			fullFileName upToLastPathSeparator.
 
 	ColorIcon 	:= Form fromFileNamed:  pkgDirName , '/Icons/HoldsColor.png'.
@@ -1232,7 +1232,7 @@ icon: anIcon addProc: addActionClosure  removeProc: removeActionClosure
 		addProc: addActionClosure  
 		removeProc: removeActionClosure! !
 
-!UserActionMorph class methodsFor: 'class initialization' stamp: 'KenD 8/22/2015 16:54'!
+!UserActionMorph class methodsFor: 'class initialization' stamp: 'KenD 8/22/2015 17:25'!
 initialize
 "
 	self initialize.
@@ -1257,7 +1257,7 @@ initialize
 	HandlesMouseStillDownSelectors := #( mouseStillDown: ).
 	
 	pkgDirName := 
-		((CodePackage installedPackages) at: (self class category)) 
+		(CodePackage installedPackages at: self category) 
 			fullFileName upToLastPathSeparator.
 	ColorCycleIcon 	:= Form fromFileNamed: pkgDirName, '/Icons/ColorCycle.png'.
 	PathIcon 	:= Form fromFileNamed: pkgDirName, '/Icons/Path.png'.
