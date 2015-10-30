@@ -1,9 +1,9 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 20 August 2015 at 8:47:11.583879 am'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2563] on 30 October 2015 at 1:22:18.214239 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 41!
+!provides: 'PropertyEditor' 1 44!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Morphic-Misc1' 1 54 nil!
-!requires: 'Cuis-Base' 42 2439 nil!
+!requires: 'Cuis-Base' 42 2563 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph showIVars'
@@ -204,7 +204,7 @@ icon
 
 	^ PropertyMorph windowIcon ! !
 
-!FileDirectory methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:10'!
+!FmDirectoryEntry methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:10'!
 icon
 
 	^ PropertyMorph folderIcon ! !
@@ -311,7 +311,7 @@ icon
 
 	^ PropertyMorph blankIcon ! !
 
-!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 7/24/2015 14:55'!
+!PropertyEditor methodsFor: 'dropping/grabbing' stamp: 'KenD 10/30/2015 13:13'!
 aboutToGrab: aMorph
 	"submorph is being grabbed by a hand.
 	Perform necessary adjustments (if any) and return the actual morph
@@ -321,7 +321,11 @@ aboutToGrab: aMorph
 	Transcript show: 'PropertyEditor aboutToGrab: ', aMorph printString ; newLine.
 "
 	^ (aMorph isKindOf: PropertyMorph)
-		ifTrue: [ SignMorph forObject: aMorph propertyValue ] 
+		ifTrue: [ 
+			(aMorph propertyValue isKindOf: Color)
+			ifTrue: [ DropColorMorph fromColor: aMorph propertyValue ]
+			ifFalse: [ SignMorph forObject: aMorph propertyValue ]
+		] 
 		ifFalse: [ self ] "Title selected. User wants to move me. Pick me up"! !
 
 !PropertyEditor methodsFor: 'events' stamp: 'KenD 7/24/2015 15:50'!
@@ -388,6 +392,12 @@ editIvar: ivarName
 
 	(HoverHelpMorph contents: 'Need editor for: ' , ivarName asString)
 		popUpForHand: self targetMorph world activeHand! !
+
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 10/30/2015 08:20'!
+fontPreferenceChanged
+
+	super fontPreferenceChanged.
+	self refreshView.! !
 
 !PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/24/2015 15:59'!
 forMorph: aMorph
@@ -517,7 +527,7 @@ toggleIVars
 
 	self showIVars: (self showIVars not)! !
 
-!PropertyEditor class methodsFor: 'example' stamp: 'KenD 8/20/2015 08:18'!
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 10/30/2015 08:16'!
 example1
 "
 	self example1.
@@ -569,6 +579,7 @@ example1
 								minValue: 2 maxValue: 15.7).
 	
 	(self forMorph: aMorph) openInWorld.
+
 
 ! !
 
@@ -698,14 +709,18 @@ valueMorph
 
 	^ SignMorph forObject: self propertyValue! !
 
-!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 7/24/2015 13:08'!
+!PropertyMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 10/30/2015 13:21'!
 wantsDroppedMorph: aMorph event: evt
 	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
 
 	| dropValue |
 	(aMorph isKindOf: SignMorph)
 		ifTrue: [ dropValue := aMorph object ]
-		ifFalse: [ dropValue := aMorph ].
+		ifFalse: [ 
+			(aMorph isKindOf: DropColorMorph)
+			ifTrue: [dropValue := aMorph color] 
+			ifFalse: [dropValue := aMorph] 
+		].
 	(self allowsValue: dropValue)
 		ifTrue: [ self propertyValue: dropValue ].
 	
@@ -785,13 +800,13 @@ fractionIcon
 
 	^FracIcon! !
 
-!PropertyMorph class methodsFor: 'class initialization' stamp: 'KenD 7/13/2015 11:03'!
+!PropertyMorph class methodsFor: 'class initialization' stamp: 'KenD 10/23/2015 20:33'!
 initialize
 "
 	PropertyMorph initialize..
 "
 	| dirName |
-	dirName :=   FmFileIOAccessor default imageDirectoryPath , '../Cuis-Smalltalk-BabySteps/Icons/'.
+	dirName :=  Smalltalk imagePath , '/../Cuis-Smalltalk-BabySteps/Icons/'.
 
 	BlankIcon := ImageReadWriter formFromFileNamed: dirName , 'Blank.png'.
 	BoolIcon := ImageReadWriter formFromFileNamed: dirName , 'Bool.png'.
