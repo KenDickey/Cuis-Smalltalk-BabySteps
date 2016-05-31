@@ -1,9 +1,9 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2563] on 30 October 2015 at 1:22:18.214239 pm'!
+'From Cuis 4.2 of 25 July 2013 [latest update: #2783] on 31 May 2016 at 4:39:47.805428 pm'!
 'Description Editor for Morph Properties'!
-!provides: 'PropertyEditor' 1 44!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
-!requires: 'Morphic-Misc1' 1 54 nil!
+!provides: 'PropertyEditor' 1 48!
 !requires: 'Cuis-Base' 42 2563 nil!
+!requires: 'Morphic-Misc1' 1 54 nil!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
 !classDefinition: #PropertyEditor category: #PropertyEditor!
 MenuMorph subclass: #PropertyEditor
 	instanceVariableNames: 'morph showIVars'
@@ -169,6 +169,11 @@ icon
 
 	^ PropertyMorph trueIcon ! !
 
+!Character methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:53'!
+icon
+
+	^ PropertyMorph charIcon ! !
+
 !Collection methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:13'!
 icon
 
@@ -204,6 +209,11 @@ icon
 
 	^ PropertyMorph windowIcon ! !
 
+!DirectoryEntry methodsFor: '*propertyeditor' stamp: 'KenD 5/31/2016 16:39'!
+icon
+
+	^ PropertyMorph folderIcon ! !
+
 !FmDirectoryEntry methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:10'!
 icon
 
@@ -213,11 +223,6 @@ icon
 icon
 
 	^ PropertyMorph integerIcon ! !
-
-!Character methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 21:53'!
-icon
-
-	^ PropertyMorph charIcon ! !
 
 !Float methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:05'!
 icon
@@ -235,11 +240,6 @@ icon
 	^ PropertyMorph integerIcon ! !
 
 !Time methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:00'!
-icon
-
-	^ PropertyMorph chronIcon ! !
-
-!Timespan methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:01'!
 icon
 
 	^ PropertyMorph chronIcon ! !
@@ -306,6 +306,11 @@ icon
 
 	^ PropertyMorph fileIcon ! !
 
+!Timespan methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:01'!
+icon
+
+	^ PropertyMorph chronIcon ! !
+
 !UndefinedObject methodsFor: '*propertyeditor' stamp: 'KenD 7/13/2015 14:38'!
 icon
 
@@ -359,13 +364,14 @@ changed: myMorph
 	"@@@FIXME: my target morph has changed; need to update display@@@"
 	Transcript newLine; show: self printString , ' target changed'! !
 
-!PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:19'!
+!PropertyEditor methodsFor: 'events' stamp: 'KenD 11/7/2015 10:27'!
 closeButtonClicked
 	"The user clicked on the close-box control in the window title.  For Mac users only, the Mac convention of option-click-on-close-box is obeyed if the mac option key is down."
 
 	Preferences dismissAllOnOptionClose ifTrue:
 		[Sensor rawMacOptionKeyPressed ifTrue:
 			[^ self world closeUnchangedWindows]].
+	self targetMorph removeActionsForEvent: #propertyChanged.
 	self delete  "closeBox overrides stayUp"! !
 
 !PropertyEditor methodsFor: 'events' stamp: 'KenD 7/14/2015 21:20'!
@@ -399,12 +405,13 @@ fontPreferenceChanged
 	super fontPreferenceChanged.
 	self refreshView.! !
 
-!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 7/24/2015 15:59'!
+!PropertyEditor methodsFor: 'initialization' stamp: 'KenD 11/7/2015 10:16'!
 forMorph: aMorph
 
 	"Answer a Property Editor for aMorph"
 
 	morph := aMorph.
+	aMorph when: #propertyChanged send: #refreshView to: self.
 	self defaultTarget: self;
 		 stayUp: true;
 		 showIVars: false;
@@ -527,10 +534,10 @@ toggleIVars
 
 	self showIVars: (self showIVars not)! !
 
-!PropertyEditor class methodsFor: 'example' stamp: 'KenD 10/30/2015 08:16'!
+!PropertyEditor class methodsFor: 'example' stamp: 'KenD 11/1/2015 12:12'!
 example1
 "
-	self example1.
+	PropertyEditor example1.
 "
 	| aMorph passValue |
 	
