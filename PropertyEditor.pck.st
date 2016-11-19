@@ -214,10 +214,6 @@ icon
 
 	^ PropertyMorph folderIcon ! !
 
-!FmDirectoryEntry methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:10'!
-icon
-
-	^ PropertyMorph folderIcon ! !
 
 !Magnitude methodsFor: '*propertyeditor' stamp: 'KenD 7/12/2015 22:03'!
 icon
@@ -813,7 +809,8 @@ initialize
 	PropertyMorph initialize..
 "
 	| dirName |
-	dirName :=  Smalltalk imagePath , '/../Cuis-Smalltalk-BabySteps/Icons/'.
+	dirName :=  ((CodePackage installedPackages at: self category)
+		    		  fullFileName upToLastPathSeparator), '/Icons/'.
 
 	BlankIcon := ImageReadWriter formFromFileNamed: dirName , 'Blank.png'.
 	BoolIcon := ImageReadWriter formFromFileNamed: dirName , 'Bool.png'.
