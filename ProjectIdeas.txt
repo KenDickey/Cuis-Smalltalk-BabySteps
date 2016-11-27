@@ -1,0 +1,40 @@
+============================
+Project: STE StyleSet Editor
+============================
+  - Also, display style coverage areas in STE 
+	(=>select a StyleSet to edit)
+	Zebra striping?
+	Transparent color differs from text hilight so hilight shows through
+  - Display Styles in StyleSet; add/delete style
+  - Font Pallet (=> FontMorphs)
+  - 
+
+================================
+Project: Morphic Property Editor
+================================
+  - Used to display/edit public/shown Morphic Properties
+	=> {mutable|immutable} {hidden|shown} ; default is hidden
+  - {hidden} props are considered private
+  - These MetaProperties are shared and immutable
+	+ MetaProperties are inherited & apply to all instance of a class
+  - Used to edit STE Character and Paragraph Styles (=> Morphs for these)
+  - Drop a CharacterStyle on a ParagraphStyle to set those properties (subset)
+  - Property edits Undoable (old values in instance properties)
+	=> fooInst oldPropValueFor: #prop
+  - PropertyEditor differs from Object Explorer/Inspector
+	+ Properties meant to be edited by user
+	  => {hidden|shown}
+	+ DragNDrop of properties (also, drop SignMorph, ColorSwatch ..)
+  - Property value edit affordance different depending on case
+	+ Pallet (large range of discrete choices)
+	+ Menu Select (small range of discrete choices) [Icons shown in Menu]
+	+ FillIn (Text/Symbol/Number/Point/Range/..)
+	+ Workspace (general purpose object eval: 
+		<obj> setProperty: #prop toValue: <fillInExpression>)
+
+Prototype: Dict of (Class -> MetaPropSet x cache)
+  cache is used for inherited metaProps
+
+Recycle some Ideas from BabySteps:PropertyEditor prototype
+
+
