@@ -3,6 +3,8 @@ Cuis-Smalltalk-BabySteps
 
 Random package code under development and proof-of-concept prototypes
 
+See grainy video at https://www.youtube.com/watch?v=k8es6eqY56k&feature=youtu.be
+
 Pre-alpha, but feel free to look.
 
 To load a package
