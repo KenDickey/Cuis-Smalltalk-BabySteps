@@ -1,92 +1,92 @@
-'From Cuis 5.0 of 7 November 2016 [latest update: #3655] on 11 March 2019 at 9:10:06 pm'!
+'From Cuis 5.0 [latest update: #4568] on 16 April 2021 at 1:50:22 pm'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 24!
-!requires: 'Cuis-Base' 50 3655 nil!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
-!requires: 'Morphic-Misc1' 1 45 nil!
+!provides: 'MorphIt' 1 25!
+!requires: 'Cuis-Base' 50 4568 nil!
+!requires: 'Morphic-Misc1' 1 173 nil!
 !requires: 'Value-Constraints' 1 5 nil!
 !requires: 'ValueHolder' 1 20 nil!
+!requires: 'Morphic-ColorEditor' 1 16 nil!
 !requires: 'Animator' 1 11 nil!
-SystemOrganization addCategory: #MorphIt!
+SystemOrganization addCategory: 'MorphIt'!
 
 
-!classDefinition: #MorphMorph category: #MorphIt!
+!classDefinition: #MorphMorph category: 'MorphIt'!
 BorderedImageMorph subclass: #MorphMorph
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphMorph class' category: #MorphIt!
+!classDefinition: 'MorphMorph class' category: 'MorphIt'!
 MorphMorph class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphAction category: #MorphIt!
+!classDefinition: #MorphAction category: 'MorphIt'!
 MorphMorph subclass: #MorphAction
 	instanceVariableNames: 'when what where with theMorph theAction'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphAction class' category: #MorphIt!
+!classDefinition: 'MorphAction class' category: 'MorphIt'!
 MorphAction class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphGraphic category: #MorphIt!
+!classDefinition: #MorphGraphic category: 'MorphIt'!
 MorphMorph subclass: #MorphGraphic
 	instanceVariableNames: 'foregroundColor backgroundColor ink shape applyWhen removeWhen'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphGraphic class' category: #MorphIt!
+!classDefinition: 'MorphGraphic class' category: 'MorphIt'!
 MorphGraphic class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphTheColor category: #MorphIt!
+!classDefinition: #MorphTheColor category: 'MorphIt'!
 MorphMorph subclass: #MorphTheColor
 	instanceVariableNames: 'myColor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphTheColor class' category: #MorphIt!
+!classDefinition: 'MorphTheColor class' category: 'MorphIt'!
 MorphTheColor class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphValueHolder category: #MorphIt!
+!classDefinition: #MorphValueHolder category: 'MorphIt'!
 MorphMorph subclass: #MorphValueHolder
 	instanceVariableNames: 'valueHolder icon'
 	classVariableNames: 'ColorIcon FloatIcon IntegerIcon PointIcon RangeIcon StringIcon'
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphValueHolder class' category: #MorphIt!
+!classDefinition: 'MorphValueHolder class' category: 'MorphIt'!
 MorphValueHolder class
 	instanceVariableNames: ''!
 
-!classDefinition: #UserActionMorph category: #MorphIt!
+!classDefinition: #UserActionMorph category: 'MorphIt'!
 MorphMorph subclass: #UserActionMorph
 	instanceVariableNames: 'addActionProc removeActionProc icon'
 	classVariableNames: 'BounceIcon ColorCycleIcon GrowShrinkIcon HandlesKeyboardSelectors HandlesMouseDownSelectors HandlesMouseOverSelectors HandlesMouseStillDownSelectors PathIcon'
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'UserActionMorph class' category: #MorphIt!
+!classDefinition: 'UserActionMorph class' category: 'MorphIt'!
 UserActionMorph class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphModifierPallet category: #MorphIt!
+!classDefinition: #MorphModifierPallet category: 'MorphIt'!
 Morph subclass: #MorphModifierPallet
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphModifierPallet class' category: #MorphIt!
+!classDefinition: 'MorphModifierPallet class' category: 'MorphIt'!
 MorphModifierPallet class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphIt category: #MorphIt!
+!classDefinition: #MorphIt category: 'MorphIt'!
 ProtoObject subclass: #MorphIt
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphIt class' category: #MorphIt!
+!classDefinition: 'MorphIt class' category: 'MorphIt'!
 MorphIt class
 	instanceVariableNames: ''!
 
@@ -157,6 +157,27 @@ initializedInstance
 
 	^ ImagePallet morphModifierPallet morphExtent:  (690 @ 84).! !
 
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 09:58'!
+balloonText: aString
+
+ 	self setProperty: #balloonText toValue: aString
+! !
+
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:27'!
+defaultName
+
+	^ self class printString withFirstCharacterDownshifted ! !
+
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 08:16'!
+icon
+
+	self subclassResponsibility ! !
+
+!MorphMorph methodsFor: 'copying' stamp: 'KenD 7/5/2015 15:38'!
+copy
+
+	^ self shallowCopy postCopy! !
+
 !MorphMorph methodsFor: 'morph interactions' stamp: 'KenD 5/8/2015 22:02'!
 addToModifiersOf: aMorph
 	"Add me to aMorph morphModifiers"
@@ -187,27 +208,6 @@ removeFromModifiersOf: aMorph
 		ifTrue:  [ aMorph removeProperty: #morphModifiers ]
 		ifFalse: [ aMorph setProperty: #morphModifiers toValue: morphModifiers ]
 	! !
-
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 09:58'!
-balloonText: aString
-
- 	self setProperty: #balloonText toValue: aString
-! !
-
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:27'!
-defaultName
-
-	^ self class printString withFirstCharacterDownshifted ! !
-
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/13/2015 08:16'!
-icon
-
-	self subclassResponsibility ! !
-
-!MorphMorph methodsFor: 'copying' stamp: 'KenD 7/5/2015 15:38'!
-copy
-
-	^ self shallowCopy postCopy! !
 
 !MorphMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 5/10/2015 15:34'!
 dropAction: aDropTargetMorph
@@ -251,18 +251,20 @@ wantsToBeDroppedInto: aMorph
 		ifTrue: [ self dropAction: aMorph ].
 	^ false  "Always be rejected after doing the drop action"! !
 
-!MorphMorph methodsFor: 'initialization' stamp: 'KenD 5/13/2015 11:16'!
+!MorphMorph methodsFor: 'initialization' stamp: 'KenD 4/16/2021 13:44:34'!
 initialize
 	"Set my defaults"
 
-	| extent |
 	super initialize.
 	self setProperty: #DropActionMorph toValue: true.
 	(self class includesSelector: #icon32)
 		ifTrue: [ self image: self icon32 ]
 	 	ifFalse: [ self image: (self icon magnifyTo: 32@32) ].
 	extent := self morphExtent.
-	self layoutSpec: (LayoutSpec fixedWidth: extent x fixedHeight: extent y  minorDirectionPadding: 0.5);
+	self layoutSpec: (LayoutSpec 
+					fixedWidth: self morphWidth 
+					fixedHeight: self morphHeight 
+					offAxisEdgeWeight: 0.5);
 	yourself
 
 ! !
