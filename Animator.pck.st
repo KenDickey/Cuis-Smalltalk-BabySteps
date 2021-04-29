@@ -1,14 +1,18 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2464] on 20 August 2015 at 5:18:18.972991 pm'!
+'From Cuis 5.0 [latest update: #4578] on 29 April 2021 at 2:14:29 pm'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 16!
+!provides: 'Animator' 1 17!
 !requires: 'Cuis-Base' 42 2198 nil!
-!classDefinition: #Animator category: #Animator!
+!requires: 'Morphic-Misc1' 1 174 nil!
+SystemOrganization addCategory: 'Animator'!
+
+
+!classDefinition: #Animator category: 'Animator'!
 Object subclass: #Animator
 	instanceVariableNames: 'actor action stepTime doneProc stepping'
 	classVariableNames: 'Animators'
 	poolDictionaries: ''
 	category: 'Animator'!
-!classDefinition: 'Animator class' category: #Animator!
+!classDefinition: 'Animator class' category: 'Animator'!
 Animator class
 	instanceVariableNames: ''!
 
@@ -44,6 +48,32 @@ actor: aMorph
 
 	actor := aMorph! !
 
+!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
+doneProc
+
+	^doneProc! !
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
+doneProc: aOneArgClosure
+
+	doneProc := aOneArgClosure! !
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:53'!
+stepTime
+
+	^ stepTime! !
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:54'!
+stepTime: millisecondsToNextStep
+
+	stepTime := millisecondsToNextStep! !
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 8/20/2015 17:18'!
+world
+	"I am not directly associated with any particular world"
+	
+	^ nil ! !
+
 !Animator methodsFor: 'initialize-release' stamp: 'KenD 2/27/2015 15:07'!
 actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps
 
@@ -60,16 +90,6 @@ actor: aMorph action: oneArgClosure stepTime: milllisecondsBetweenSteps doneProc
 	      stepTime: milllisecondsBetweenSteps;
 		 doneProc: predicateClosure;
 	      yourself! !
-
-!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
-doneProc
-
-	^doneProc! !
-
-!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
-doneProc: aOneArgClosure
-
-	doneProc := aOneArgClosure! !
 
 !Animator methodsFor: 'stepping' stamp: 'jmv 5/14/2015 17:32'!
 isStepping
@@ -102,16 +122,6 @@ step
 	(self doneProc value: self actor)
 		ifTrue: [self stopStepping].! !
 
-!Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:53'!
-stepTime
-
-	^ stepTime! !
-
-!Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:54'!
-stepTime: millisecondsToNextStep
-
-	stepTime := millisecondsToNextStep! !
-
 !Animator methodsFor: 'stepping' stamp: 'jmv 5/14/2015 17:31'!
 stopStepping
 	"Stop getting sent the 'step' message."
@@ -120,12 +130,6 @@ stopStepping
 	w _ self runningWorld.
 	w ifNotNil: [w stopSteppingMorph: self].
 	stepping _ false! !
-
-!Animator methodsFor: 'accessing' stamp: 'KenD 8/20/2015 17:18'!
-world
-	"I am not directly associated with any particular world"
-	
-	^ nil ! !
 
 !Animator class methodsFor: 'instance creation' stamp: 'KenD 9/20/2013 05:01'!
 actor: aMorph action: aOneArgClosure
@@ -149,6 +153,21 @@ alwaysFalse
 	
 	^ [ :aMorph | false ]! !
 
+!Animator class methodsFor: 'doneTestProc' stamp: 'KenD 5/13/2015 12:21'!
+doneAfterNTimes: anInteger
+	"Answers a closure which reduces a counter by 1 each time called.
+	The closure answers false if counter > 0"
+
+	| counter count |
+	count := anInteger. "remember for later"
+	counter := count.
+	^ [ :aMorph | 
+		counter := counter - 1.
+		(counter <= 0) "true when count exhausted"
+		ifTrue: [ counter := count. true ] "enable reuse"
+		ifFalse: [ false ]
+	  ]! !
+
 !Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:05'!
 blinkAction
 	"Answers a closure which takes a morph and makes it blink
@@ -161,6 +180,96 @@ blinkAction
 			toggle ifTrue:  [ aMorph hide]
 					ifFalse: [ aMorph show ]
 	  ]! !
+
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:04'!
+cycleColors: aColorCollection forSelector: collorSetter
+	"Answers a closure which takes a morph and cycles the
+	 morph's Color through aColorCollection"
+	
+	| colorIndex |
+	colorIndex := 0.
+	^ [ :aMorph | 
+			colorIndex := colorIndex + 1.
+			colorIndex > aColorCollection size ifTrue:  [ colorIndex := 1 ].
+			aMorph perform: collorSetter with: (aColorCollection at: colorIndex).
+			aMorph redrawNeeded.
+	  ]! !
+
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:01'!
+followPathAction: aPointCollection
+	"Answers a closure which takes a morph and sets its morphPosition
+	to each point in aPointCollection, circularly"
+	
+	| pathIndex |
+	pathIndex := 0.
+	^ [ :aMorph | 
+			pathIndex := pathIndex + 1.
+			pathIndex > aPointCollection size ifTrue:  [ pathIndex := 1 ].
+			aMorph morphPosition: (aPointCollection at: pathIndex).
+			aMorph redrawNeeded.
+	  ]! !
+
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:03'!
+growShrinkAction: growSizeinPixels numSteps: numSteps
+	"Answers a closure which takes a morph and sets its morphExtent 
+	 to grow then shrink in numSteps, keeping the morph centered on
+	 its original morphPosition."
+	
+	| count isGrowing delta  |
+	count := 0.
+	isGrowing := true.
+	growSizeinPixels even  "Want even number of pixels for centering"
+		ifTrue: [ delta := growSizeinPixels ]
+		ifFalse: [ delta := growSizeinPixels + 1 ].
+	^ [ :aMorph | 
+			isGrowing ifTrue:  [
+				count := count + 1.
+				aMorph morphExtent: aMorph morphExtent + delta.
+				aMorph morphPosition: aMorph morphPosition - (delta / 2). "recenter"
+				count >= numSteps ifTrue: [ isGrowing := false ].
+			]
+			ifFalse: [
+				count := count - 1.
+				aMorph morphExtent: aMorph morphExtent - delta.
+				aMorph morphPosition: aMorph morphPosition + (delta / 2). "recenter"
+				count < 1 ifTrue: [ isGrowing := true ].
+			]
+	  ]! !
+
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 9/20/2013 15:26'!
+simpleMoveBounceAction: aPoint
+	"Move around and vector off container edges"
+	
+	| ownerExtent deltaPoint |
+	deltaPoint := aPoint.
+	
+	^ [ :aMorph |
+		aMorph morphPosition: aMorph morphPosition + deltaPoint.
+		ownerExtent := aMorph owner morphExtent.
+		(aMorph morphPosition x <= 0) "Hit left wall"
+			ifTrue: [ 
+				aMorph morphPosition: 0 @ (aMorph morphPosition y). 
+				deltaPoint := deltaPoint x negated @ deltaPoint y 
+		].
+		(aMorph morphPosition y <= 0) "Hit top wall"
+			ifTrue: [ 
+				aMorph morphPosition: (aMorph morphPosition x) @ 0. 
+				deltaPoint := deltaPoint x  @  deltaPoint y negated.
+		].
+		((aMorph morphPosition x + aMorph morphExtent x) >= ownerExtent x) "Hit right wall"
+			ifTrue: [ 
+				aMorph morphPosition: (ownerExtent x - aMorph morphExtent x) 
+										@ (aMorph morphPosition y). 
+				deltaPoint := deltaPoint x negated @ deltaPoint y 
+		].
+		((aMorph morphPosition y + aMorph morphExtent y) >= ownerExtent y) "Hit bottom wall"
+			ifTrue: [ 
+				aMorph morphPosition: (aMorph morphPosition x) 
+										@ (ownerExtent y - aMorph  morphExtent y). 
+				deltaPoint := deltaPoint x  @ deltaPoint y negated.
+		].
+	]
+! !
 
 !Animator class methodsFor: 'examples' stamp: 'KenD 5/13/2015 14:08'!
 blinkingExample    "Blinking"
@@ -262,55 +371,6 @@ composedActionExample2  "Compose actions -- alternative:  grow&shring + path"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:04'!
-cycleColors: aColorCollection forSelector: collorSetter
-	"Answers a closure which takes a morph and cycles the
-	 morph's Color through aColorCollection"
-	
-	| colorIndex |
-	colorIndex := 0.
-	^ [ :aMorph | 
-			colorIndex := colorIndex + 1.
-			colorIndex > aColorCollection size ifTrue:  [ colorIndex := 1 ].
-			aMorph perform: collorSetter with: (aColorCollection at: colorIndex).
-			aMorph redrawNeeded.
-	  ]! !
-
-!Animator class methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:57'!
-defaultStepTime
-	"Twice a second"
-
-	^ 500 "milliSeconds"! !
-
-!Animator class methodsFor: 'doneTestProc' stamp: 'KenD 5/13/2015 12:21'!
-doneAfterNTimes: anInteger
-	"Answers a closure which reduces a counter by 1 each time called.
-	The closure answers false if counter > 0"
-
-	| counter count |
-	count := anInteger. "remember for later"
-	counter := count.
-	^ [ :aMorph | 
-		counter := counter - 1.
-		(counter <= 0) "true when count exhausted"
-		ifTrue: [ counter := count. true ] "enable reuse"
-		ifFalse: [ false ]
-	  ]! !
-
-!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:01'!
-followPathAction: aPointCollection
-	"Answers a closure which takes a morph and sets its morphPosition
-	to each point in aPointCollection, circularly"
-	
-	| pathIndex |
-	pathIndex := 0.
-	^ [ :aMorph | 
-			pathIndex := pathIndex + 1.
-			pathIndex > aPointCollection size ifTrue:  [ pathIndex := 1 ].
-			aMorph morphPosition: (aPointCollection at: pathIndex).
-			aMorph redrawNeeded.
-	  ]! !
-
 !Animator class methodsFor: 'examples' stamp: 'KenD 5/13/2015 14:07'!
 growAndShrinkExample    "Grow &Shrink"
 "
@@ -327,33 +387,6 @@ growAndShrinkExample    "Grow &Shrink"
 						 stepTime: 100.
 	animator startStepping.
 	^ animator ! !
-
-!Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:03'!
-growShrinkAction: growSizeinPixels numSteps: numSteps
-	"Answers a closure which takes a morph and sets its morphExtent 
-	 to grow then shrink in numSteps, keeping the morph centered on
-	 its original morphPosition."
-	
-	| count isGrowing delta  |
-	count := 0.
-	isGrowing := true.
-	growSizeinPixels even  "Want even number of pixels for centering"
-		ifTrue: [ delta := growSizeinPixels ]
-		ifFalse: [ delta := growSizeinPixels + 1 ].
-	^ [ :aMorph | 
-			isGrowing ifTrue:  [
-				count := count + 1.
-				aMorph morphExtent: aMorph morphExtent + delta.
-				aMorph morphPosition: aMorph morphPosition - (delta / 2). "recenter"
-				count >= numSteps ifTrue: [ isGrowing := false ].
-			]
-			ifFalse: [
-				count := count - 1.
-				aMorph morphExtent: aMorph morphExtent - delta.
-				aMorph morphPosition: aMorph morphPosition + (delta / 2). "recenter"
-				count < 1 ifTrue: [ isGrowing := true ].
-			]
-	  ]! !
 
 !Animator class methodsFor: 'examples' stamp: 'KenD 2/28/2015 10:55'!
 moveMorphExample
@@ -403,6 +436,12 @@ pathLoopExample    "Follow a path, repeatedly"
 	animator startStepping.
 	^ animator ! !
 
+!Animator class methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:57'!
+defaultStepTime
+	"Twice a second"
+
+	^ 500 "milliSeconds"! !
+
 !Animator class methodsFor: 'stepping' stamp: 'KenD 9/20/2013 15:57'!
 restartStepping
 	"Start all my instances"
@@ -410,40 +449,11 @@ restartStepping
 	Smalltalk garbageCollectMost. "Clean out stale instances"
 	self allInstancesDo: [ :a | a startStepping ].! !
 
-!Animator class methodsFor: 'actionProc' stamp: 'KenD 9/20/2013 15:26'!
-simpleMoveBounceAction: aPoint
-	"Move around and vector off container edges"
-	
-	| ownerExtent deltaPoint |
-	deltaPoint := aPoint.
-	
-	^ [ :aMorph |
-		aMorph morphPosition: aMorph morphPosition + deltaPoint.
-		ownerExtent := aMorph owner morphExtent.
-		(aMorph morphPosition x <= 0) "Hit left wall"
-			ifTrue: [ 
-				aMorph morphPosition: 0 @ (aMorph morphPosition y). 
-				deltaPoint := deltaPoint x negated @ deltaPoint y 
-		].
-		(aMorph morphPosition y <= 0) "Hit top wall"
-			ifTrue: [ 
-				aMorph morphPosition: (aMorph morphPosition x) @ 0. 
-				deltaPoint := deltaPoint x  @  deltaPoint y negated.
-		].
-		((aMorph morphPosition x + aMorph morphExtent x) >= ownerExtent x) "Hit right wall"
-			ifTrue: [ 
-				aMorph morphPosition: (ownerExtent x - aMorph morphExtent x) 
-										@ (aMorph morphPosition y). 
-				deltaPoint := deltaPoint x negated @ deltaPoint y 
-		].
-		((aMorph morphPosition y + aMorph morphExtent y) >= ownerExtent y) "Hit bottom wall"
-			ifTrue: [ 
-				aMorph morphPosition: (aMorph morphPosition x) 
-										@ (ownerExtent y - aMorph  morphExtent y). 
-				deltaPoint := deltaPoint x  @ deltaPoint y negated.
-		].
-	]
-! !
+!Animator class methodsFor: 'stepping' stamp: 'KenD 9/20/2013 12:04'!
+stopStepping
+	"Stop all my instances"
+
+	self allInstancesDo: [ :a | a stopStepping ].! !
 
 !Animator class methodsFor: 'moveMorph' stamp: 'KenD 2/27/2015 20:02'!
 slide: aMorph from: startPoint to: endPoint nSteps: numberOfMoveSteps delay: milliSeconds
@@ -461,9 +471,3 @@ slide: aMorph from: startPoint to: endPoint nSteps: numberOfMoveSteps delay: mil
 						stepTime: milliSeconds 
 						doneProc: (Animator doneAfterNTimes: numberOfMoveSteps).
 	animator startStepping.! !
-
-!Animator class methodsFor: 'stepping' stamp: 'KenD 9/20/2013 12:04'!
-stopStepping
-	"Stop all my instances"
-
-	self allInstancesDo: [ :a | a stopStepping ].! !

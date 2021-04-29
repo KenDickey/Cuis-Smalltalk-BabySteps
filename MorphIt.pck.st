@@ -1,8 +1,8 @@
-'From Cuis 5.0 [latest update: #4568] on 16 April 2021 at 1:50:22 pm'!
+'From Cuis 5.0 [latest update: #4578] on 29 April 2021 at 2:14:55 pm'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 25!
-!requires: 'Cuis-Base' 50 4568 nil!
-!requires: 'Morphic-Misc1' 1 173 nil!
+!provides: 'MorphIt' 1 26!
+!requires: 'Cuis-Base' 50 4578 nil!
+!requires: 'Morphic-Misc1' 1 174 nil!
 !requires: 'Value-Constraints' 1 5 nil!
 !requires: 'ValueHolder' 1 20 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
