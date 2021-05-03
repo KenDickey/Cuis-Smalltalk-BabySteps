@@ -1,6 +1,6 @@
-'From Cuis 5.0 [latest update: #4578] on 29 April 2021 at 2:14:29 pm'!
+'From Cuis 5.0 [latest update: #4583] on 3 May 2021 at 1:41:36 pm'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 17!
+!provides: 'Animator' 1 18!
 !requires: 'Cuis-Base' 42 2198 nil!
 !requires: 'Morphic-Misc1' 1 174 nil!
 SystemOrganization addCategory: 'Animator'!
@@ -236,7 +236,7 @@ growShrinkAction: growSizeinPixels numSteps: numSteps
 			]
 	  ]! !
 
-!Animator class methodsFor: 'actionProc' stamp: 'KenD 9/20/2013 15:26'!
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 5/3/2021 13:39:58'!
 simpleMoveBounceAction: aPoint
 	"Move around and vector off container edges"
 	
@@ -268,6 +268,7 @@ simpleMoveBounceAction: aPoint
 										@ (ownerExtent y - aMorph  morphExtent y). 
 				deltaPoint := deltaPoint x  @ deltaPoint y negated.
 		].
+		aMorph redrawNeeded 
 	]
 ! !
 
