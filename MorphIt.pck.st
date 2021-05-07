@@ -1,102 +1,95 @@
-'From Cuis 5.0 [latest update: #4584] on 3 May 2021 at 7:29:09 pm'!
+'From Cuis 5.0 [latest update: #4587] on 7 May 2021 at 7:26:14 am'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 27!
+!provides: 'MorphIt' 1 28!
 !requires: 'Cuis-Base' 50 4578 nil!
-!requires: 'Morphic-Misc1' 1 174 nil!
+!requires: 'Morphic-Misc1' 1 175 nil!
 !requires: 'Value-Constraints' 1 5 nil!
 !requires: 'ValueHolder' 1 20 nil!
 !requires: 'Morphic-ColorEditor' 1 16 nil!
-!requires: 'Animator' 1 11 nil!
-SystemOrganization addCategory: #MorphIt!
+!requires: 'Animator' 1 19 nil!
+SystemOrganization addCategory: 'MorphIt'!
 
 
-!classDefinition: #MorphModifierPallet category: #MorphIt!
-Morph subclass: #MorphModifierPallet
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'MorphIt'!
-!classDefinition: 'MorphModifierPallet class' category: #MorphIt!
-MorphModifierPallet class
-	instanceVariableNames: ''!
-
-!classDefinition: #MorphMorph category: #MorphIt!
+!classDefinition: #MorphMorph category: 'MorphIt'!
 BorderedImageMorph subclass: #MorphMorph
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphMorph class' category: #MorphIt!
+!classDefinition: 'MorphMorph class' category: 'MorphIt'!
 MorphMorph class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphAction category: #MorphIt!
+!classDefinition: #MorphAction category: 'MorphIt'!
 MorphMorph subclass: #MorphAction
 	instanceVariableNames: 'when what where with theMorph theAction'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphAction class' category: #MorphIt!
+!classDefinition: 'MorphAction class' category: 'MorphIt'!
 MorphAction class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphGraphic category: #MorphIt!
+!classDefinition: #MorphGraphic category: 'MorphIt'!
 MorphMorph subclass: #MorphGraphic
 	instanceVariableNames: 'foregroundColor backgroundColor ink shape applyWhen removeWhen'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphGraphic class' category: #MorphIt!
+!classDefinition: 'MorphGraphic class' category: 'MorphIt'!
 MorphGraphic class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphTheColor category: #MorphIt!
+!classDefinition: #MorphTheColor category: 'MorphIt'!
 MorphMorph subclass: #MorphTheColor
 	instanceVariableNames: 'myColor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphTheColor class' category: #MorphIt!
+!classDefinition: 'MorphTheColor class' category: 'MorphIt'!
 MorphTheColor class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphValueHolder category: #MorphIt!
+!classDefinition: #MorphValueHolder category: 'MorphIt'!
 MorphMorph subclass: #MorphValueHolder
 	instanceVariableNames: 'valueHolder icon'
 	classVariableNames: 'ColorIcon FloatIcon IntegerIcon PointIcon RangeIcon StringIcon'
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphValueHolder class' category: #MorphIt!
+!classDefinition: 'MorphValueHolder class' category: 'MorphIt'!
 MorphValueHolder class
 	instanceVariableNames: ''!
 
-!classDefinition: #UserActionMorph category: #MorphIt!
+!classDefinition: #UserActionMorph category: 'MorphIt'!
 MorphMorph subclass: #UserActionMorph
 	instanceVariableNames: 'addActionProc removeActionProc icon'
 	classVariableNames: 'BounceIcon ColorCycleIcon GrowShrinkIcon HandlesKeyboardSelectors HandlesMouseDownSelectors HandlesMouseOverSelectors HandlesMouseStillDownSelectors PathIcon'
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'UserActionMorph class' category: #MorphIt!
+!classDefinition: 'UserActionMorph class' category: 'MorphIt'!
 UserActionMorph class
 	instanceVariableNames: ''!
 
-!classDefinition: #MorphIt category: #MorphIt!
+!classDefinition: #MorphModifierPallet category: 'MorphIt'!
+Morph subclass: #MorphModifierPallet
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'MorphIt'!
+!classDefinition: 'MorphModifierPallet class' category: 'MorphIt'!
+MorphModifierPallet class
+	instanceVariableNames: ''!
+
+!classDefinition: #MorphIt category: 'MorphIt'!
 ProtoObject subclass: #MorphIt
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MorphIt'!
-!classDefinition: 'MorphIt class' category: #MorphIt!
+!classDefinition: 'MorphIt class' category: 'MorphIt'!
 MorphIt class
 	instanceVariableNames: ''!
 
-
-!MorphModifierPallet commentStamp: '<historical>' prior: 0!
-I am just a way to get a Morph Modifier Pattet [see my class side].
-
-
-MorphModifierPallet initializedInstance openInWorld morphExtent: (690 @ 84).
-!
 
 !MorphMorph commentStamp: '<historical>' prior: 0!
 I am part of Morphit -- a package to author largely via drag 'n drop.
@@ -124,16 +117,18 @@ My instances represent ValueHolders!
 !UserActionMorph commentStamp: '<historical>' prior: 0!
 This class adds mouse or keyboard actions to Morph instances.!
 
+!MorphModifierPallet commentStamp: '<historical>' prior: 0!
+I am just a way to get a Morph Modifier Pattet [see my class side].
+
+
+MorphModifierPallet initializedInstance openInWorld morphExtent: (690 @ 84).
+!
+
 !MorphIt commentStamp: '<historical>' prior: 0!
 This is a documentation class -- see my class side
 
 Note:  
 		MorphIt samplePallet.!
-
-!MorphModifierPallet class methodsFor: 'instance creation' stamp: 'KenD 7/5/2015 15:29'!
-initializedInstance
-
-	^ ImagePallet morphModifierPallet morphExtent:  (690 @ 84).! !
 
 !MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 10:00'!
 name
@@ -158,10 +153,10 @@ initializedInstance
 
 	^ self forColor: Color blue! !
 
-!MorphModifierPallet class methodsFor: 'new-morph participation' stamp: 'KenD 7/5/2015 15:30'!
-includeInNewMorphMenu 
+!MorphModifierPallet class methodsFor: 'instance creation' stamp: 'KenD 7/5/2015 15:29'!
+initializedInstance
 
-	^ true! !
+	^ ImagePallet morphModifierPallet morphExtent:  (690 @ 84).! !
 
 !MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 09:58'!
 balloonText: aString
@@ -1185,6 +1180,11 @@ initialize
 	BounceIcon 	:= Form fromFileNamed: pkgDirName,  '/Icons/Bounce.png'.
 
 	! !
+
+!MorphModifierPallet class methodsFor: 'new-morph participation' stamp: 'KenD 7/5/2015 15:30'!
+includeInNewMorphMenu 
+
+	^ true! !
 
 !MorphIt class methodsFor: 'documentation' stamp: 'KenD 8/22/2015 11:10'!
 gamePlan 
