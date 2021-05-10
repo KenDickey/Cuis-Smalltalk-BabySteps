@@ -1,15 +1,16 @@
-'From Cuis 5.0 [latest update: #4589] on 10 May 2021 at 8:45:13 am'!
+'From Cuis 5.0 [latest update: #4589] on 10 May 2021 at 11:40:12 am'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 20!
-!requires: 'Cuis-Base' 42 2198 nil!
-!requires: 'Morphic-Misc1' 1 174 nil!
+!provides: 'Animator' 1 23!
+!requires: 'Cuis-Base' 50 4413 nil!
+!requires: 'Morphic-Misc1' 1 175 nil!
+!requires: 'Graphics-Files-Additional' 1 22 nil!
 SystemOrganization addCategory: 'Animator'!
 
 
 !classDefinition: #Animator category: 'Animator'!
 Object subclass: #Animator
 	instanceVariableNames: 'actor action stepTime doneProc stepping'
-	classVariableNames: 'Animators'
+	classVariableNames: 'Animators ButterflyForms'
 	poolDictionaries: ''
 	category: 'Animator'!
 !classDefinition: 'Animator class' category: 'Animator'!
@@ -26,11 +27,61 @@ action -- a one argument closure which gets the actor morph as an argument
 stepTime -- the step time increment
 doneProc -- a one arg closure which answers false if animation is to continue
 
--- see examples in class siide!
+-- see examples in class siide
 
-!Animator methodsFor: 'accessing' stamp: 'KenD 5/10/2021 08:43:53'!
+
+Note: Blue Butterfly used in 'Animator class>>imageCyclingExample' 
+is a scale reduced image set originally derived from one by Dontmind8.com
+with a Creative Commons 4 licence file (reproduced below)
+
+-------------------
+-------------------
+IMPORTANT NOTICE: This license only applies if you downloaded this content as
+a free user. 
+
+---------------------
+
+You must attribute the digital products to Dontmind8.com:
+
+In order to use a content or a part of it, you must attribute it to Dontmind8.com,
+so we will be able to continue creating new digital resources every day.
+
+
+How to attribute it?
+
+For websites:
+
+Please, copy this code on your website to accredit the author:
+<a href="http://www.Dontmind8.com">From Dontmind8</a>
+
+For printing:
+
+Paste this text on the final work so the authorship is known.
+- For example, in the acknowledgements chapter of a book:
+"From Dontmind8.com"
+
+
+You are free to use this digital product:
+
+- For both personal and commercial projects and to modify it.
+- In a website or presentation template or application or as part of your design.
+
+You are not allowed to:
+
+- Sub-license, resell or rent it.
+- Include it in any online or offline archive or database.
+
+The terms of the license are described in https://creativecommons.org/licenses/by/4.0/
+
+
+The terms described in the above link have precedence over the terms described
+in the present document. In case of disagreement, the Creative Commons Attribution 4.0 Terms of Use will prevail.
+-------------------!
+
+!Animator methodsFor: 'accessing' stamp: 'KenD 5/10/2021 11:39:56'!
 action
 
+	"Add a guard for un-owned Morphs"
 	^ [ :aMorph | aMorph ifNotNil: [ aMorph owner ifNotNil: [action value: aMorph]]]! !
 
 !Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:53'!
@@ -48,7 +99,7 @@ actor: aMorph
 
 	actor := aMorph! !
 
-!Animator methodsFor: 'accessing' stamp: 'KenD 5/10/2021 08:06:51'!
+!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
 doneProc
 
 	^doneProc! !
@@ -68,22 +119,33 @@ stepTime: millisecondsToNextStep
 
 	stepTime := millisecondsToNextStep! !
 
-!Animator methodsFor: 'initialize-release' stamp: 'KenD 2/27/2015 15:07'!
+!Animator methodsFor: 'accessing' stamp: 'KenD 8/20/2015 17:18'!
+world
+	"I am not directly associated with any particular world"
+	
+	^ nil ! !
+
+!Animator methodsFor: 'initialize-release' stamp: 'KenD 5/6/2019 10:35:17'!
 actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps
 
-	^self actor: aMorph
-	       action: aOneArgClosure
-	       stepTime: milllisecondsBetweenSteps
-	       doneProc: [ :iaMorph | false ]  "never done -> loops continuously"! !
+	self actor: aMorph;
+	      action: aOneArgClosure;
+	      stepTime: milllisecondsBetweenSteps;
+		 doneProc: [ :iaMorph | false ].  "never done -> loops continuously"
+	aMorph setProperty: #animator toValue: self.
+	^self
+! !
 
-!Animator methodsFor: 'initialize-release' stamp: 'KenD 2/27/2015 15:22'!
+!Animator methodsFor: 'initialize-release' stamp: 'KenD 5/6/2019 14:58:28'!
 actor: aMorph action: oneArgClosure stepTime: milllisecondsBetweenSteps doneProc: predicateClosure
 
 	self actor: aMorph;
 	      action: oneArgClosure;
 	      stepTime: milllisecondsBetweenSteps;
-		 doneProc: predicateClosure;
-	      yourself! !
+		 doneProc: predicateClosure.
+	aMorph setProperty: #animator toValue: self.
+	^self
+	! !
 
 !Animator methodsFor: 'stepping' stamp: 'jmv 5/14/2015 17:32'!
 isStepping
@@ -109,25 +171,20 @@ startStepping
 		stepping _ true].
 		! !
 
-!Animator methodsFor: 'stepping' stamp: 'KenD 5/10/2021 08:20:32'!
+!Animator methodsFor: 'stepping' stamp: 'KenD 2/27/2015 14:50'!
 step
 
-	| aMorph actionClosure doneCheck |
-	aMorph := self actor ifNil: [ ^self stopStepping ].
-	actionClosure := self action ifNil: [ ^self stopStepping ]..
-	doneCheck := self doneProc ifNil: [ ^self stopStepping ]..
-	(doneCheck value: aMorph) 
-		ifTrue: [self stopStepping]
-		ifFalse: [actionClosure value: aMorph ]! !
+	self action value: self actor.
+	(self doneProc value: self actor)
+		ifTrue: [self stopStepping].! !
 
-!Animator methodsFor: 'stepping' stamp: 'KenD 5/10/2021 08:09:10'!
+!Animator methodsFor: 'stepping' stamp: 'jmv 5/14/2015 17:31'!
 stopStepping
 	"Stop getting sent the 'step' message."
 
 	| w |
-	w _ Object runningWorld.
+	w _ self runningWorld.
 	w ifNotNil: [w stopSteppingMorph: self].
-	action := nil.
 	stepping _ false! !
 
 !Animator class methodsFor: 'instance creation' stamp: 'KenD 9/20/2013 05:01'!
@@ -135,15 +192,22 @@ actor: aMorph action: aOneArgClosure
 
 	^ self new actor: aMorph action: aOneArgClosure stepTime: self defaultStepTime ! !
 
-!Animator class methodsFor: 'instance creation' stamp: 'KenD 2/27/2015 15:25'!
+!Animator class methodsFor: 'instance creation' stamp: 'KenD 5/6/2019 14:55:20'!
 actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps
 
 	^ self new actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps doneProc: self alwaysFalse! !
 
-!Animator class methodsFor: 'instance creation' stamp: 'KenD 2/27/2015 15:23'!
+!Animator class methodsFor: 'instance creation' stamp: 'KenD 5/6/2019 14:49:54'!
 actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps doneProc: predicateClosure
 
-	^ self new actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps doneProc: predicateClosure! !
+	| newInst |
+	newInst := self new actor: aMorph 
+					action: aOneArgClosure 
+					stepTime: milllisecondsBetweenSteps 
+					doneProc: predicateClosure.
+	"animator property allows access through Morph and keeps instance from GC"
+	aMorph setProperty: #animator toValue: newInst.
+	^newInst ! !
 
 !Animator class methodsFor: 'doneTestProc' stamp: 'KenD 2/27/2015 15:24'!
 alwaysFalse
@@ -194,6 +258,19 @@ cycleColors: aColorCollection forSelector: collorSetter
 			aMorph redrawNeeded.
 	  ]! !
 
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 5/5/2019 13:43:55'!
+cycleImagesFrom: aFormsArray
+	"Answers a closure which takes an ImageMorph and sets its form, circularly"
+	
+	| pathIndex |
+	pathIndex := 0.
+	^ [ :aMorph | 
+			pathIndex := pathIndex + 1.
+			pathIndex > aFormsArray size ifTrue:  [ pathIndex := 1 ].
+			aMorph image: (aFormsArray at: pathIndex).
+			aMorph redrawNeeded.
+	  ]! !
+
 !Animator class methodsFor: 'actionProc' stamp: 'KenD 2/27/2015 15:01'!
 followPathAction: aPointCollection
 	"Answers a closure which takes a morph and sets its morphPosition
@@ -235,7 +312,7 @@ growShrinkAction: growSizeinPixels numSteps: numSteps
 			]
 	  ]! !
 
-!Animator class methodsFor: 'actionProc' stamp: 'KenD 5/10/2021 08:17:39'!
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 9/20/2013 15:26'!
 simpleMoveBounceAction: aPoint
 	"Move around and vector off container edges"
 	
@@ -267,8 +344,6 @@ simpleMoveBounceAction: aPoint
 										@ (ownerExtent y - aMorph  morphExtent y). 
 				deltaPoint := deltaPoint x  @ deltaPoint y negated.
 		].
-		aMorph show.
-		aMorph redrawNeeded 
 	]
 ! !
 
@@ -304,16 +379,16 @@ bouncingBallExample    "Bounces off walls of container"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 2/27/2015 15:14'!
+!Animator class methodsFor: 'examples' stamp: 'KenD 10/16/2020 15:32:18'!
 colorCyclingExample  "Color Cycling"
 "
 	self colorCyclingExample.  
 "
 	| morph colors animator |
-	morph := BorderedRectMorph initializedInstance.
+	morph := WidgetMorph initializedInstance.
 	morph borderWidth: 6;
 		      morphPosition: 100@200.
-	colors := { Color green. Color lightGreen. Color brightGreen. Color forestGreen.  }.
+	colors := { Color green. Color red. Color blue. Color yellow.  }.
 	animator :=  
 		Animator actor: morph 
 					   action: (Animator cycleColors: colors 
@@ -323,7 +398,7 @@ colorCyclingExample  "Color Cycling"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 2/26/2015 14:50'!
+!Animator class methodsFor: 'examples' stamp: 'KenD 10/16/2020 15:32:32'!
 composedActionExample1  "Compose actions:  grow&shring + path"
 "
 	self composedActionExample1.  
@@ -331,7 +406,7 @@ composedActionExample1  "Compose actions:  grow&shring + path"
 	Animator stopStepping.
 "
 	| morph actions animator |
-	morph := BorderedRectMorph initializedInstance.
+	morph := WidgetMorph initializedInstance.
 	morph morphPosition: 120@120;
 	 		 openInWorld.
 	actions := { 
@@ -372,7 +447,7 @@ composedActionExample2  "Compose actions -- alternative:  grow&shring + path"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 5/13/2015 14:07'!
+!Animator class methodsFor: 'examples' stamp: 'KenD 10/16/2020 15:32:49'!
 growAndShrinkExample    "Grow &Shrink"
 "
 	self growAndShrinkExample.
@@ -380,7 +455,7 @@ growAndShrinkExample    "Grow &Shrink"
 	Animator stopStepping.
 "
 	| morph animator |
-	morph := BorderedRectMorph initializedInstance openInWorld.
+	morph := WidgetMorph initializedInstance openInWorld.
 	morph morphPosition: 200 @ 100.
 	animator := Animator
 						 actor: morph 
@@ -389,7 +464,25 @@ growAndShrinkExample    "Grow &Shrink"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 2/28/2015 10:55'!
+!Animator class methodsFor: 'examples' stamp: 'KenD 5/5/2019 13:50:10'!
+imageCyclingExample
+	"Blue Butterfly"
+"
+	Animator imageCyclingExample.
+	
+	Animator stopStepping.
+"
+	| morph animator |
+	morph := (ImageMorph new image: (ButterflyForms at: 1)) openInWorld.
+	morph morphPosition: 200 @ 100.
+	animator := Animator
+						 actor: morph 
+						 action: (Animator cycleImagesFrom: ButterflyForms)
+						 stepTime: 100.
+	animator startStepping.
+	^ animator ! !
+
+!Animator class methodsFor: 'examples' stamp: 'KenD 5/5/2019 22:02:04'!
 moveMorphExample
 	"Nota Bene: Asynchronous"
 "
@@ -472,3 +565,22 @@ slide: aMorph from: startPoint to: endPoint nSteps: numberOfMoveSteps delay: mil
 						stepTime: milliSeconds 
 						doneProc: (Animator doneAfterNTimes: numberOfMoveSteps).
 	animator startStepping.! !
+
+!Animator class methodsFor: 'class initialization' stamp: 'KenD 5/5/2019 21:53:32'!
+initialize
+"
+	Animator initialize.
+"
+	| filePrefix |
+	
+	filePrefix := (CodePackage installedPackages at: #'Animator')
+		fullFileName pathAndLocalName at: 1.
+	
+	ButterflyForms := Array new: 15.
+	1 to: 9 do: [ :n | ButterflyForms 
+		at: n 
+		put: (Form fromFileNamed: filePrefix, '/BlueButterfly/b0', n asString, '.png')].
+	10 to: 15 do: [ :n | ButterflyForms 
+		at: n 
+		put: (Form fromFileNamed: filePrefix, '/BlueButterfly/b', n asString, '.png')]! !
+Animator initialize!
