@@ -1,6 +1,6 @@
-'From Cuis 5.0 [latest update: #4587] on 7 May 2021 at 7:19:12 am'!
+'From Cuis 5.0 [latest update: #4589] on 10 May 2021 at 8:45:13 am'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 19!
+!provides: 'Animator' 1 20!
 !requires: 'Cuis-Base' 42 2198 nil!
 !requires: 'Morphic-Misc1' 1 174 nil!
 SystemOrganization addCategory: 'Animator'!
@@ -28,10 +28,10 @@ doneProc -- a one arg closure which answers false if animation is to continue
 
 -- see examples in class siide!
 
-!Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:53'!
+!Animator methodsFor: 'accessing' stamp: 'KenD 5/10/2021 08:43:53'!
 action
 
-	^ action! !
+	^ [ :aMorph | aMorph ifNotNil: [ aMorph owner ifNotNil: [action value: aMorph]]]! !
 
 !Animator methodsFor: 'accessing' stamp: 'KenD 9/20/2013 04:53'!
 action: aOneArgClosure
@@ -48,7 +48,7 @@ actor: aMorph
 
 	actor := aMorph! !
 
-!Animator methodsFor: 'accessing' stamp: 'KenD 2/27/2015 14:45'!
+!Animator methodsFor: 'accessing' stamp: 'KenD 5/10/2021 08:06:51'!
 doneProc
 
 	^doneProc! !
@@ -67,12 +67,6 @@ stepTime
 stepTime: millisecondsToNextStep
 
 	stepTime := millisecondsToNextStep! !
-
-!Animator methodsFor: 'accessing' stamp: 'KenD 8/20/2015 17:18'!
-world
-	"I am not directly associated with any particular world"
-	
-	^ nil ! !
 
 !Animator methodsFor: 'initialize-release' stamp: 'KenD 2/27/2015 15:07'!
 actor: aMorph action: aOneArgClosure stepTime: milllisecondsBetweenSteps
@@ -115,20 +109,25 @@ startStepping
 		stepping _ true].
 		! !
 
-!Animator methodsFor: 'stepping' stamp: 'KenD 2/27/2015 14:50'!
+!Animator methodsFor: 'stepping' stamp: 'KenD 5/10/2021 08:20:32'!
 step
 
-	self action value: self actor.
-	(self doneProc value: self actor)
-		ifTrue: [self stopStepping].! !
+	| aMorph actionClosure doneCheck |
+	aMorph := self actor ifNil: [ ^self stopStepping ].
+	actionClosure := self action ifNil: [ ^self stopStepping ]..
+	doneCheck := self doneProc ifNil: [ ^self stopStepping ]..
+	(doneCheck value: aMorph) 
+		ifTrue: [self stopStepping]
+		ifFalse: [actionClosure value: aMorph ]! !
 
-!Animator methodsFor: 'stepping' stamp: 'jmv 5/14/2015 17:31'!
+!Animator methodsFor: 'stepping' stamp: 'KenD 5/10/2021 08:09:10'!
 stopStepping
 	"Stop getting sent the 'step' message."
 
 	| w |
-	w _ self runningWorld.
+	w _ Object runningWorld.
 	w ifNotNil: [w stopSteppingMorph: self].
+	action := nil.
 	stepping _ false! !
 
 !Animator class methodsFor: 'instance creation' stamp: 'KenD 9/20/2013 05:01'!
@@ -236,7 +235,7 @@ growShrinkAction: growSizeinPixels numSteps: numSteps
 			]
 	  ]! !
 
-!Animator class methodsFor: 'actionProc' stamp: 'KenD 5/7/2021 07:17:17'!
+!Animator class methodsFor: 'actionProc' stamp: 'KenD 5/10/2021 08:17:39'!
 simpleMoveBounceAction: aPoint
 	"Move around and vector off container edges"
 	
