@@ -1,6 +1,6 @@
-'From Cuis 5.0 [latest update: #4856] on 11 September 2021 at 3:59:12 pm'!
+'From Cuis 5.0 [latest update: #4856] on 11 September 2021 at 4:35:25 pm'!
 'Description FreeCell and Klondike Solitaire using SVG Card Images'!
-!provides: 'SVGSolitaire' 1 0!
+!provides: 'SVGSolitaire' 1 2!
 !requires: 'Cuis-Base' 50 4856 nil!
 !requires: 'SVG' 1 13 nil!
 SystemOrganization addCategory: 'SVGSolitaire'!
@@ -192,6 +192,38 @@ makeFaceUp
 
 	self isFaceUp ifFalse: [ self flip ]! !
 
+!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 16:31:41'!
+openInHand
+	"Scale before display"
+	| currentExtent |
+	currentExtent := self cardExtent.
+	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
+	super openInHand! !
+
+!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 16:31:46'!
+openInWorld
+	"Scale before display"
+	| currentExtent |
+	currentExtent := self cardExtent.
+	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
+	super openInWorld! !
+
+!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 16:30:43'!
+openInWorld: aWorld
+	"Scale before display"
+	| currentExtent |
+	currentExtent := self cardExtent.
+	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
+	super openInWorld: aWorld.! !
+
+!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 16:29:49'!
+show
+	"Scale before display"
+	| currentExtent |
+	currentExtent := self cardExtent.
+	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
+	super show! !
+
 !SVGCardMorph methodsFor: 'drawing' stamp: 'KenD 9/11/2021 07:11:24'!
 drawOn: aCanvas
 
@@ -232,24 +264,23 @@ updateExtent
 	newExtent := self class cardExtent.
 	self allSubmorphsDo: [ :s | s fitInto:  newExtent ]! !
 
-!SVGCardMorph methodsFor: 'initialization' stamp: 'KenD 9/11/2021 15:31:27'!
+!SVGCardMorph methodsFor: 'initialization' stamp: 'KenD 9/11/2021 16:26:18'!
 withCardNumber: cardNum
 	"See my class comment on card numbering"
 	
-	| currentExtent face back |
-	currentExtent := self class morphExtent.
+	|  face back |
 	"NB: Must set cardNumber before #initialize"
 	cardNumber := cardNum. 
 	super initialize.
 	grabPreowner := nil.
 	face := self class faceAt: cardNumber.
 	back := self class defaultBack.
-	submorphs add: face.
-	submorphs add: back.
+	self addMorphFront: face.
+	self addMorphBack: back.
 	back hide.
 	face show.
 	isFaceDown := false.
-	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
+	"self submorphsDo: [ :sm | sm fitInto: currentExtent ]."
 	
 	
 	
@@ -399,7 +430,7 @@ resetCardExtent
 	self allInstancesDo: [ :aCard | aCard updateExtent ].
 	^newExtent! !
 
-!SVGCardMorph class methodsFor: 'instance creation' stamp: 'KenD 9/11/2021 12:19:03'!
+!SVGCardMorph class methodsFor: 'instance creation' stamp: 'KenD 9/11/2021 16:14:34'!
 the: face of: suit
 	"Return an Card instance"
 	
@@ -426,7 +457,6 @@ the: face of: suit
 	
 	"Translate between zero based cardNumber and 1 based arrays"
 	newInst := (super basicNew) withCardNumber: (suitNum - 1 + (4 * (faceNum - 1))).
-	newInst color: Color transparent.
 	^newInst! !
 
 !SVGCardMorph class methodsFor: 'new-morph participation' stamp: 'KenD 9/11/2021 12:11:23'!
@@ -435,13 +465,13 @@ includeInNewMorphMenu
 
 	^false! !
 
-!SVGCardTests methodsFor: 'setUp/tearDown' stamp: 'KenD 9/11/2021 15:55:14'!
+!SVGCardTests methodsFor: 'setUp/tearDown' stamp: 'KenD 9/11/2021 16:11:05'!
 setUp
-	jackOfClubs      := CardMorph the: #Jack of: #Clubs.
-	aceOfSpades      := CardMorph the: #Ace of: #spades.
-	twoOfDiamonds  := CardMorph the: 2 of: #diamonds.
-	threeOfHearts    := CardMorph the: 3 of: #hearts.
-	fiveOfHearts     := CardMorph the: #five of: #hearts! !
+	jackOfClubs        := SVGCardMorph the: #Jack of: #Clubs.
+	aceOfSpades      := SVGCardMorph the: #Ace of: #spades.
+	twoOfDiamonds  := SVGCardMorph the: 2 of: #diamonds.
+	threeOfHearts    := SVGCardMorph the: 3 of: #hearts.
+	fiveOfHearts      := SVGCardMorph the: #five of: #hearts! !
 
 !SVGCardTests methodsFor: 'testing' stamp: 'KenD 9/11/2021 15:55:41'!
 testColor
@@ -461,12 +491,12 @@ testColor
 	self deny:  (jackOfClubs     isRed).
 	self deny:  (twoOfDiamonds isBlack)! !
 
-!SVGCardTests methodsFor: 'testing' stamp: 'KenD 9/11/2021 15:55:49'!
+!SVGCardTests methodsFor: 'testing' stamp: 'KenD 9/11/2021 16:15:57'!
 testComparisons
 	self deny: (jackOfClubs < aceOfSpades).
 	self deny: (jackOfClubs = aceOfSpades).
 	self assert: (aceOfSpades <  jackOfClubs).
-	self assert: (threeOfHearts = (CardMorph the: 3 of: #hearts)).
+	self assert: (threeOfHearts = (SVGCardMorph the: 3 of: #hearts)).
 	
 	self assert: (aceOfSpades hasDifferentColorThan: threeOfHearts).
 	self deny: (fiveOfHearts hasDifferentColorThan: twoOfDiamonds).
@@ -475,13 +505,13 @@ testComparisons
 	self assert: (fiveOfHearts hasSameColorAs: twoOfDiamonds).
 	
 	self deny: (aceOfSpades hasSameFaceAs: threeOfHearts).
-	self assert: (fiveOfHearts hasSameFaceAs: (CardMorph the: 5 of: #Hearts)).
+	self assert: (fiveOfHearts hasSameFaceAs: (SVGCardMorph the: 5 of: #Hearts)).
 	
 	self deny: (aceOfSpades hasSameSuitAs: threeOfHearts).
 	self assert: (fiveOfHearts hasSameSuitAs: threeOfHearts).
 	
-	self deny: (#randomSymbol isKindOf: CardMorph).
-	self assert: (aceOfSpades isKindOf: CardMorph)! !
+	self deny: (#randomSymbol isKindOf: SVGCardMorph).
+	self assert: (aceOfSpades isKindOf: SVGCardMorph)! !
 
 !SVGCardTests methodsFor: 'testing' stamp: 'KenD 9/11/2021 15:55:56'!
 testFace
