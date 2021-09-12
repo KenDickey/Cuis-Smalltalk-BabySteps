@@ -1,10 +1,21 @@
-'From Cuis 5.0 [latest update: #4856] on 11 September 2021 at 4:35:25 pm'!
+'From Cuis 5.0 [latest update: #4856] on 12 September 2021 at 10:50:28 am'!
 'Description FreeCell and Klondike Solitaire using SVG Card Images'!
-!provides: 'SVGSolitaire' 1 2!
+!provides: 'SVGSolitaire' 1 6!
 !requires: 'Cuis-Base' 50 4856 nil!
+!requires: 'Morphic-Games-Solitaire' 1 112 nil!
 !requires: 'SVG' 1 13 nil!
 SystemOrganization addCategory: 'SVGSolitaire'!
 
+
+!classDefinition: #SVGFreeCell category: 'SVGSolitaire'!
+FreeCell subclass: #SVGFreeCell
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'SVGSolitaire'!
+!classDefinition: 'SVGFreeCell class' category: 'SVGSolitaire'!
+SVGFreeCell class
+	instanceVariableNames: ''!
 
 !classDefinition: #SVGCardMorph category: 'SVGSolitaire'!
 MovableMorph subclass: #SVGCardMorph
@@ -26,6 +37,23 @@ TestCase subclass: #SVGCardTests
 SVGCardTests class
 	instanceVariableNames: ''!
 
+!classDefinition: #SVGCardDeck category: 'SVGSolitaire'!
+Object subclass: #SVGCardDeck
+	instanceVariableNames: 'cards index seed'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'SVGSolitaire'!
+!classDefinition: 'SVGCardDeck class' category: 'SVGSolitaire'!
+SVGCardDeck class
+	instanceVariableNames: ''!
+
+
+!SVGFreeCell commentStamp: '<historical>' prior: 0!
+FreeCell Solitare using SVGCardMorphs
+
+@@@REVISIT:  
+	Could parameterize Card Class rather than subclass
+	Subclass for now to prototype..!
 
 !SVGCardMorph commentStamp: '<historical>' prior: 0!
 I have SVG front and back morphs as submorphs.
@@ -60,10 +88,184 @@ There are 54 card images (two jokers, a red and a black).
 !SVGCardTests commentStamp: '<historical>' prior: 0!
 "Unit tests for SVGCardMorph and related classes"!
 
+!SVGCardDeck commentStamp: '<historical>' prior: 0!
+I am a 52 Card Deck you can shuffle and deal from.
+
+aDeck shuffle.
+aDeck dealACard.!
+
 !SVGCardMorph methodsFor: 'accessing' stamp: 'KenD 9/11/2021 15:34:11'!
 name
 	"e.g. Jack of Hearts"
 	^((self face) asString), ' of ', ((self suit) asString)! !
+
+!SVGFreeCell methodsFor: 'dropping/grabbing' stamp: 'KenD 9/12/2021 09:13:21'!
+column: columnMorph wantsDropOf: aCardOrColumnMorph 
+	"Answer true if Column is empty or if (lowest)
+	card is opposit color and one higher in face value."
+	
+	"Ignore other game card instances"
+	(self isMyCard: aCardOrColumnMorph) ifFalse: [^false]. 
+	
+	(aCardOrColumnMorph isKindOf: SVGCardMorph)
+		ifTrue: [| topCard | 
+			topCard := columnMorph topCard.
+			topCard isNil
+			ifTrue: [^true]
+			ifFalse: [ ^ (aCardOrColumnMorph hasFaceOneLessThan: topCard)
+					& (topCard hasDifferentColorThan: aCardOrColumnMorph)]]
+		ifFalse: [
+			Error signal: '@@FIXME: implement for column drops!!'.
+			^ false]! !
+
+!SVGFreeCell methodsFor: 'dropping/grabbing' stamp: 'KenD 9/12/2021 09:14:47'!
+container: aContainerMorph wantsDropOf: aCardOrColumnMorph 
+	"Answer true if legal drop by FreeCell game rules"
+	| dropObjectClass |
+	
+	"Ignore other game card instances"
+	(self isMyCard: aCardOrColumnMorph) ifFalse: [^false]. 
+	
+	dropObjectClass := aCardOrColumnMorph class.
+	(dropObjectClass = CardColumnMorph) | (aCardOrColumnMorph isKindOf: SVGCardMorph)
+	ifFalse: [ ^false ]
+	ifTrue: [ aContainerMorph class = CardSpareMorph
+		ifTrue: [^ self spare: aContainerMorph wantsDropOf: aCardOrColumnMorph]
+		ifFalse: [aContainerMorph class = CardPileMorph
+				ifTrue: [^ self pile: aContainerMorph wantsDropOf: aCardOrColumnMorph]
+				ifFalse: [aContainerMorph class = CardColumnMorph
+						ifTrue: [^ self column: aContainerMorph wantsDropOf: aCardOrColumnMorph]
+						ifFalse: [^ false]]]]! !
+
+!SVGFreeCell methodsFor: 'dropping/grabbing' stamp: 'KenD 9/12/2021 09:15:15'!
+pile: pileMorph wantsDropOf: aCardOrColumnMorph 
+	"Answer true if Pile is empty and Card is Ace or if  
+	card is same suit and one higher in face value."
+	
+	| card |
+	card := (aCardOrColumnMorph isKindOf: SVGCardMorph)
+				ifTrue: [aCardOrColumnMorph]
+				ifFalse: [aCardOrColumnMorph singletonCard].
+				
+	"Ignore other game card instances"
+	(self isMyCard: card) ifFalse: [^false]. 
+	
+	card isNil
+		ifTrue: [ ^nil ]
+		ifFalse: [ pileMorph isEmpty
+			ifTrue: [ ^ card face == #Ace ]
+			ifFalse: [ | topCard | 
+			topCard := pileMorph topCard.
+			^ (topCard hasFaceOneLessThan: card)  & (topCard hasSameSuitAs: card)]]! !
+
+!SVGFreeCell methodsFor: 'dropping/grabbing' stamp: 'KenD 9/12/2021 09:15:31'!
+spare: spareMorph wantsDropOf: aCardOrColumnMorph 
+	"Answer true if Spare is empty and Card is singleton."
+	| card |
+	aCardOrColumnMorph hideDropShadow.
+	card := (aCardOrColumnMorph isKindOf: SVGCardMorph)
+				ifTrue: [aCardOrColumnMorph]
+				ifFalse: [aCardOrColumnMorph singletonCard].
+				
+	"Ignore other game card instances"
+	(self isMyCard: card) ifFalse: [^false]. 
+	
+	spareMorph isEmpty
+		ifTrue: [^ (card isNil not) and: [card submorphs size = 0]] "only holds 1 card"
+		ifFalse: [^ false]! !
+
+!SVGFreeCell methodsFor: 'fileIn/out' stamp: 'KenD 9/12/2021 09:20:14'!
+restoreGameFromDataStream: aDataStream
+	"Given an open DataStream, read and restore game state."
+	
+	"Game state consists of information to reconsitiute the deck, spares, piles, and columns."
+	"NYI: undo stack save/restore."
+	| stateArray |
+	stateArray := aDataStream next.
+	(stateArray at: 1) == #SVGFreeCell
+	ifFalse: [ Error signal: 'Not a saved SVG FreeCell Game!!' ]
+	ifTrue: [
+		| columnInfo pileInfo spareInfo undoInfo |
+		deck := SVGCardDeck new initializeFromArray: (stateArray at: 3).
+		deck setScale: self scale.
+		columnInfo := stateArray at: 5.
+		pileInfo     := stateArray at: 7.
+		spareInfo   := stateArray at: 9.
+		undoInfo    := stateArray at: 11.
+		
+		1 to: NumColumns
+			do: [ :idx |
+				(self columns at: idx) restoreFromArray: (columnInfo at: idx) givenDeck: self deck ].
+		
+		1 to: NumSpares
+			do: [ :idx |
+				(self spares at: idx) restoreFromArray: (spareInfo at: idx) givenDeck: self deck ].
+			
+		1 to: NumPiles
+			do: [ :idx |
+				(self piles at: idx) restoreFromArray: (pileInfo at: idx) givenDeck: self deck ].
+			
+		undoInfo isNil
+		ifTrue: [ self makeUndoStackEmpty ]
+		ifFalse: [ Error signal: 'FIXME: Undo save/restore NYI' ].
+	]! !
+
+!SVGFreeCell methodsFor: 'fileIn/out' stamp: 'KenD 9/12/2021 09:19:27'!
+saveGameToDataStream: aDataStream
+	"Given an open DataStream, save the current game state."
+	
+	"Game state consists of information to reconsitiute the deck, spares, piles, and columns."
+	"NYI: undo stack save/restore."
+	| someData |
+	someData := 	 { #SVGFreeCell. 
+				#CardDeck.
+				self deck saveStateToArray.
+				#Columns.
+				self columns 
+					collect: [ :container | container saveStateToArray].
+				#Piles.
+				self piles 
+					collect: [ :container | container saveStateToArray].
+				#Spares.
+				self spares 
+					collect: [ :container | container saveStateToArray].
+				#Undo.
+				nil. "FIXME"
+	}.
+	aDataStream nextPut: someData.
+! !
+
+!SVGFreeCell methodsFor: 'geometry' stamp: 'KenD 9/12/2021 09:21:39'!
+reScale
+	"reScale self based on new font sizes"
+	self notYetImplemented ! !
+
+!SVGFreeCell methodsFor: 'initialization' stamp: 'KenD 9/12/2021 09:23:34'!
+defaultExtent
+
+	| cardWidth cardHeight tableExtent |
+	cardWidth  := SVGCardMorph morphWidth.
+	cardHeight := SVGCardMorph morphHeight.
+	"buttonArea height 50; labelArea height 40; pilesArea CardHeight+30" 
+	tableExtent := (cardWidth + self columnSeparation * 4)@(cardHeight * 6 + 120).
+
+	^ tableExtent.! !
+
+!SVGFreeCell methodsFor: 'initialization' stamp: 'KenD 9/12/2021 10:37:37'!
+initializeWithScale: aScale
+
+	self flag: #FixMe. "Ignoring scale"
+	scale := 1.
+	super initialize.
+	deck := SVGCardDeck new initializeWithScale: self scale.
+	self makeLabelArea: 'SVG FreeCell';
+		 makePilesArea;
+		 makeColumnArea;
+		 makeButtonArea;
+		 dealCards;
+		 "reScale;"
+		 morphExtent: self minimumExtent;
+		 yourself! !
 
 !SVGCardMorph methodsFor: 'accessing' stamp: 'KenD 9/11/2021 15:32:52'!
 cardColor
@@ -168,6 +370,27 @@ hash
 	"because = is implemented"
 	^ (self cardNumber) hash! !
 
+!SVGCardMorph methodsFor: 'dropShadow' stamp: 'KenD 9/12/2021 10:25:03'!
+dropShadowShown
+
+	self flag: #FixMe.
+	^false! !
+
+!SVGCardMorph methodsFor: 'dropShadow' stamp: 'KenD 9/12/2021 10:24:06'!
+hideDropShadow
+
+	self flag: #FixMe! !
+
+!SVGCardMorph methodsFor: 'dropShadow' stamp: 'KenD 9/12/2021 10:24:14'!
+setDropShadowMorph
+
+	self flag: #FixMe! !
+
+!SVGCardMorph methodsFor: 'dropShadow' stamp: 'KenD 9/12/2021 10:24:22'!
+showDropShadow
+
+	self flag: #FixMe! !
+
 !SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 15:45:06'!
 flip
 	"Turn the card over"
@@ -257,6 +480,22 @@ minimumExtent
 	"Same as maximum extent"
 	^ self cardExtent! !
 
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/12/2021 10:48:29'!
+morphExtent: extent
+
+	self fitInto: extent
+! !
+
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/12/2021 08:29:05'!
+morphHeight
+
+	^self class cardExtent height! !
+
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/12/2021 08:28:54'!
+morphWidth
+
+	^self class cardExtent width! !
+
 !SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/11/2021 07:26:36'!
 updateExtent
 
@@ -341,11 +580,11 @@ defaultBack
 	"Blue back is current default"
 	^ self backAt: 1! !
 
-!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/11/2021 15:23:39'!
+!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/12/2021 10:28:08'!
 faceAt: index
-
+	"Convert zero based to 1 based index"
 	"Must copy prototype else try to be submorph of multple supers"
-	^(Fronts at: index) duplicate! !
+	^(Fronts at: index + 1) duplicate! !
 
 !SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/11/2021 12:10:03'!
 morphHeight
@@ -589,4 +828,184 @@ testSuit
 	self assert: (threeOfHearts suit == #Hearts).
 	self assert: (aceOfSpades suit == #Spades).
 	self assert: (fiveOfHearts suit == #Hearts)! !
+
+!SVGCardDeck methodsFor: 'accessing' stamp: 'KenD 9/12/2021 08:17:16'!
+cardFromNumber: anInteger
+	"Given card number 1..52 answer the corresponding CardMorph from this deck."
+
+	"(anInteger < 0) | (anInteger > 52)
+	ifTrue: [ Error signal: 'Card Number out of Range 1..52' ]
+	ifFalse: [^ self cards detect: [ :card | card cardNumber = anInteger ]]"
+	
+	^ self cards detect: [ :card | card cardNumber = anInteger ]! !
+
+!SVGCardDeck methodsFor: 'accessing' stamp: 'KenD 9/12/2021 08:18:42'!
+saveStateToArray
+	"Answer a n Array of size 55 which contains card numbers for this deck,
+	the index, the seed and symbol #CardDeck."
+
+	| stateArray |
+	stateArray := Array new: 55.
+	stateArray at: 53 put: index.
+	stateArray at: 54 put: seed.
+	stateArray at: 55 put: #SVGCardDeck.
+	1 to: 52 
+		do: [ :idx |  stateArray at: idx put: (cards at: idx) cardNumber ].
+
+	^stateArray! !
+
+!SVGCardDeck methodsFor: 'dropping/grabbing' stamp: 'KenD 9/12/2021 08:20:21'!
+dropEnabled
+	"I do NOT accept drops"
+
+	^false! !
+
+!SVGCardDeck methodsFor: 'initialization' stamp: 'KenD 9/12/2021 10:32:04'!
+initialize
+	"Create an unshuffled deck of Cards."
+
+	super initialize.
+	seed := Random new initialize next.
+	index := 0.  "Index incremented gives next Card"
+	cards := Array new: 52.
+	1 to: 52 
+		do: [ :idx | 
+			cards 
+				at: idx 
+				put: (SVGCardMorph 
+						the: (((idx - 1) // 4) + 1)    "1..13"
+						of: (idx - 1 rem: 4) + 1) ].  "1..4"
+	^self scaleCards; yourself
+	! !
+
+!SVGCardDeck methodsFor: 'initialization' stamp: 'KenD 9/12/2021 10:32:46'!
+initializeFromArray: stateArray
+	"Reconstiture a Card Deck."
+	"stateArray contains 52 card numbers, an index, a seed, and #CardDeck, which abstracts a deck's state"
+
+	super initialize.
+	(stateArray at: 55) == #SVGCardDeck
+	ifFalse: [ Error signal: 'Improper state array for CardDeck' ].
+	seed  := stateArray at: 54.
+	index := stateArray at: 53.  "Index incremented gives next Card"
+	cards := Array new: 52.
+	1 to: 52 
+		do: [ :idx | 
+			| cardNum |
+			cardNum := stateArray at: idx.
+			cards at: idx 
+				put: (SVGCardMorph new withCardNumber: cardNum) ]. 
+	^self scaleCards; yourself
+! !
+
+!SVGCardDeck methodsFor: 'initialization' stamp: 'KenD 9/12/2021 10:33:28'!
+initializeWithScale: aScale
+	"Create an unshuffled deck of Cards."
+	self flag: #FixMe. "Ignore aScale"
+	super initialize.
+	seed := Random new initialize next.
+	index := 0.  "Index incremented gives next Card"
+	cards := Array new: 52.
+	1 to: 52 
+		do: [ :idx | 
+			cards 
+				at: idx 
+				put: (SVGCardMorph 
+						the: (((idx - 1) // 4) + 1)    "1..13"
+						of: (idx - 1 rem: 4) + 1) ].  "1..4"
+	^self scaleCards; yourself
+	! !
+
+!SVGCardDeck methodsFor: 'initialization' stamp: 'KenD 9/12/2021 10:31:07'!
+scaleCards
+	"Set card size to current scale"
+	| extent |
+	extent := SVGCardMorph cardExtent.
+	1 to: 52 do: [ :idx | (cards at: idx) fitInto: extent ]! !
+
+!SVGCardDeck methodsFor: 'testing' stamp: 'KenD 9/12/2021 08:19:45'!
+contains: aCard
+	"Answer true if this deck instance owns this card instance"
+
+	^self cards anySatisfy: [:each | each == aCard] ! !
+
+!SVGCardDeck methodsFor: 'testing' stamp: 'KenD 9/12/2021 08:19:54'!
+isEmpty
+	"I am 'empty' when I have dealt all my cards"
+
+	^(index = 52)! !
+
+!SVGCardDeck methodsFor: 'use' stamp: 'KenD 9/12/2021 08:17:50'!
+cardsLeft
+	"Answer the number of undealt Cards"
+
+	^(52 - index)! !
+
+!SVGCardDeck methodsFor: 'use' stamp: 'KenD 9/12/2021 08:18:09'!
+dealACard
+	"Answer the next Card or nil"
+
+	(self isEmpty)
+	ifTrue: [ ^nil ]
+	ifFalse: [ index := index + 1. ^cards at: index ]! !
+
+!SVGCardDeck methodsFor: 'use' stamp: 'KenD 9/12/2021 08:21:15'!
+shuffle
+	"Shuffle the cards & deal from 0"
+	| newRand numCards |
+	
+	[seed := (Time millisecondClockValue bitAnd: 16r3FFFFFFF). "bitXor: self hash."
+	 seed = 0] whileTrue: ["Try again if ever get a seed = 0"].
+
+	index := 0.
+	newRand := Random new seed: seed.
+	numCards := cards size.
+	1 to: 23 do:
+		[ :ignoredIndex | 
+			"minor Shuffle"
+			numCards to: 1 by: -1 do: 
+				[:idx | cards swap: idx with: ((1 to: idx) atRandom: newRand)]
+		]
+! !
+
+!SVGCardDeck methodsFor: 'use' stamp: 'KenD 9/12/2021 08:19:22'!
+startOver
+	"Re-deal the same cards."
+
+	index := 0! !
+
+!SVGCardDeck methodsFor: 'private' stamp: 'KenD 9/12/2021 08:17:41'!
+cards
+	"Private"
+
+	^cards! !
+
+!SVGCardDeck methodsFor: 'private' stamp: 'KenD 9/12/2021 08:18:56'!
+seed
+	"Answer my random number seed"
+
+	^seed! !
+
+!SVGCardDeck methodsFor: 'private' stamp: 'KenD 9/12/2021 08:19:06'!
+seed: anInteger
+	"Set my random number seed"
+
+	(anInteger isInteger)
+	ifFalse: [Error signal: 'seed must be an Integer' ]
+	ifTrue: [ seed := anInteger ].
+	^anInteger! !
+
+!CardContainerMorph methodsFor: '*svgsolitaire' stamp: 'KenD 9/12/2021 08:35:48'!
+initializeSVG
+	"Set my typical properties; Assume displayed on a Green table."
+
+	super initialize.
+	self color: Color transparent;
+		borderColor: Color yellow;
+		borderWidth: 2; "pixels"
+		cardClass: SVGCardMorph ;
+		morphWidth:  cardClass morphWidth + 4;
+		morphHeight: cardClass morphHeight + 4;
+		layoutSpec: self defaultLayout; "subclasses may mutate or replace"
+		yourself! !
 SVGCardMorph initialize!
