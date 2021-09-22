@@ -1,8 +1,8 @@
-'From Cuis 5.0 [latest update: #4868] on 18 September 2021 at 2:03:28 pm'!
+'From Cuis 5.0 [latest update: #4878] on 22 September 2021 at 12:35:54 pm'!
 'Description Select from a Pallet of Playing Cards.'!
-!provides: 'PickACard' 1 1!
+!provides: 'PickACard' 1 2!
 !requires: 'Morphic-Games-Solitaire' 1 114 nil!
-!requires: 'Morphic-Misc1' 1 186 nil!
+!requires: 'Morphic-Misc1' 1 187 nil!
 SystemOrganization addCategory: 'PickACard'!
 
 
@@ -30,12 +30,19 @@ PickACardImage class
 !PickACardImage commentStamp: '<historical>' prior: 0!
 I am just a way of getting an initializedInstance from the New Morph.. menu..  
 
-See my class side!
+See my class side.
 
-!PickACardImage class methodsFor: 'instance creation' stamp: 'KenD 9/18/2021 12:31:47'!
+	| pickerMorph savedExtent |
+	pickerMorph := self pickACard.
+	savedExtent := pickerMorph morphExtent.
+	pickerMorph openInWorld. "openInWorld changes extent"
+	pickerMorph morphExtent: savedExtent.!
+
+!PickACardImage class methodsFor: 'instance creation' stamp: 'KenD 9/22/2021 12:34:50'!
 initializedInstance
-
-	^ self pickACard! !
+	"Answer a card picker pallet"
+	^self pickACard.
+! !
 
 !PickableCardMorph methodsFor: 'dropping/grabbing' stamp: 'KenD 9/18/2021 13:37:05'!
 aboutToBeGrabbedBy: aHand 
