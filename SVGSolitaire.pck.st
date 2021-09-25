@@ -1,9 +1,10 @@
-'From Cuis 5.0 [latest update: #4856] on 12 September 2021 at 10:50:28 am'!
+'From Cuis 5.0 [latest update: #4886] on 25 September 2021 at 2:29:59 pm'!
 'Description FreeCell and Klondike Solitaire using SVG Card Images'!
-!provides: 'SVGSolitaire' 1 6!
-!requires: 'Cuis-Base' 50 4856 nil!
+!provides: 'SVGSolitaire' 1 11!
+!requires: 'Cuis-Base' 50 4868 nil!
 !requires: 'Morphic-Games-Solitaire' 1 112 nil!
 !requires: 'SVG' 1 13 nil!
+!requires: 'Morphic-Misc1' 1 186 nil!
 SystemOrganization addCategory: 'SVGSolitaire'!
 
 
@@ -15,6 +16,16 @@ FreeCell subclass: #SVGFreeCell
 	category: 'SVGSolitaire'!
 !classDefinition: 'SVGFreeCell class' category: 'SVGSolitaire'!
 SVGFreeCell class
+	instanceVariableNames: ''!
+
+!classDefinition: #PickASVGCardImagePallet category: 'SVGSolitaire'!
+ImagePickerPanel subclass: #PickASVGCardImagePallet
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'SVGSolitaire'!
+!classDefinition: 'PickASVGCardImagePallet class' category: 'SVGSolitaire'!
+PickASVGCardImagePallet class
 	instanceVariableNames: ''!
 
 !classDefinition: #SVGCardMorph category: 'SVGSolitaire'!
@@ -55,6 +66,11 @@ FreeCell Solitare using SVGCardMorphs
 	Could parameterize Card Class rather than subclass
 	Subclass for now to prototype..!
 
+!PickASVGCardImagePallet commentStamp: '<historical>' prior: 0!
+I am just a way of getting an initializedInstance from the New Morph.. menu..  
+
+See my class side.!
+
 !SVGCardMorph commentStamp: '<historical>' prior: 0!
 I have SVG front and back morphs as submorphs.
 I hide and show to "flip" between them.
@@ -93,6 +109,29 @@ I am a 52 Card Deck you can shuffle and deal from.
 
 aDeck shuffle.
 aDeck dealACard.!
+
+!PickASVGCardImagePallet class methodsFor: 'instance creation' stamp: 'KenD 9/18/2021 08:10:56'!
+initializedInstance
+	"Answer a pallet of SVG image selections"
+	| imageCollection f j b sortedCollection |
+	f := SVGCardMorph fronts.
+	j := SVGCardMorph jokers.
+	b := SVGCardMorph backs.
+	imageCollection := OrderedCollection new: ( f size + j size + b size ).
+	f do: [ :face  | imageCollection addLast: face ].
+	j do: [ :joker | imageCollection addLast: joker ].
+	b do: [ :back | imageCollection addLast: back ].
+	sortedCollection := OrderedCollection new: imageCollection size.
+	"Need named, image collection"
+	imageCollection keysAndValuesDo: [ :k :v |
+		sortedCollection addLast: (k printString)->v
+	].
+	
+	^ self
+		privateBuildPanelLabel:  'Pick a SVG card image' 
+		collection: imageCollection
+		transducer: [ :cardImage | cardImage ]
+! !
 
 !SVGCardMorph methodsFor: 'accessing' stamp: 'KenD 9/11/2021 15:34:11'!
 name
@@ -267,6 +306,12 @@ initializeWithScale: aScale
 		 morphExtent: self minimumExtent;
 		 yourself! !
 
+!PickASVGCardImagePallet class methodsFor: 'new-morph participation' stamp: 'KenD 9/18/2021 07:56:33'!
+includeInNewMorphMenu
+	"Return true for all classes that can be instantiated from the menu"
+	
+	^ true! !
+
 !SVGCardMorph methodsFor: 'accessing' stamp: 'KenD 9/11/2021 15:32:52'!
 cardColor
 	"Answer a symbol denoting the color of this card"
@@ -423,28 +468,28 @@ openInHand
 	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
 	super openInHand! !
 
-!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 16:31:46'!
+!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/24/2021 08:38:15'!
 openInWorld
 	"Scale before display"
 	| currentExtent |
-	currentExtent := self cardExtent.
+	currentExtent := (0@0) extent: self cardExtent.
 	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
 	super openInWorld! !
 
-!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 16:30:43'!
+!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/24/2021 13:56:57'!
 openInWorld: aWorld
 	"Scale before display"
 	| currentExtent |
 	currentExtent := self cardExtent.
-	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
+	self submorphsDo: [ :sm | sm fitInto: (0@0 extent: currentExtent) ].
 	super openInWorld: aWorld.! !
 
-!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/11/2021 16:29:49'!
+!SVGCardMorph methodsFor: 'display' stamp: 'KenD 9/25/2021 14:23:25'!
 show
 	"Scale before display"
 	| currentExtent |
 	currentExtent := self cardExtent.
-	self submorphsDo: [ :sm | sm fitInto: currentExtent ].
+	self submorphsDo: [ :sm | sm fitInto: (0@0 extent: currentExtent) ].
 	super show! !
 
 !SVGCardMorph methodsFor: 'drawing' stamp: 'KenD 9/11/2021 07:11:24'!
@@ -480,21 +525,26 @@ minimumExtent
 	"Same as maximum extent"
 	^ self cardExtent! !
 
-!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/12/2021 10:48:29'!
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/18/2021 10:01:23'!
+morphExtent
+
+	^self class cardExtent! !
+
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/24/2021 13:56:03'!
 morphExtent: extent
 
-	self fitInto: extent
+	self fitInto:  (0@0 extent: extent)
 ! !
 
-!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/12/2021 08:29:05'!
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/22/2021 13:07:47'!
 morphHeight
 
-	^self class cardExtent height! !
+	^self class cardExtent y! !
 
-!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/12/2021 08:28:54'!
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/22/2021 13:07:57'!
 morphWidth
 
-	^self class cardExtent width! !
+	^self class cardExtent x! !
 
 !SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/11/2021 07:26:36'!
 updateExtent
@@ -503,7 +553,7 @@ updateExtent
 	newExtent := self class cardExtent.
 	self allSubmorphsDo: [ :s | s fitInto:  newExtent ]! !
 
-!SVGCardMorph methodsFor: 'initialization' stamp: 'KenD 9/11/2021 16:26:18'!
+!SVGCardMorph methodsFor: 'initialization' stamp: 'KenD 9/24/2021 13:54:13'!
 withCardNumber: cardNum
 	"See my class comment on card numbering"
 	
@@ -519,6 +569,7 @@ withCardNumber: cardNum
 	back hide.
 	face show.
 	isFaceDown := false.
+	self morphExtent: self class cardExtent.
 	"self submorphsDo: [ :sm | sm fitInto: currentExtent ]."
 	
 	
@@ -574,6 +625,11 @@ backAt: index
 	"Must copy prototype else try to be submorph of multple supers"
 	^(Backs at: index) duplicate! !
 
+!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/18/2021 08:00:00'!
+backs
+
+	^Backs! !
+
 !SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/11/2021 15:27:56'!
 defaultBack
 
@@ -586,15 +642,25 @@ faceAt: index
 	"Must copy prototype else try to be submorph of multple supers"
 	^(Fronts at: index + 1) duplicate! !
 
-!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/11/2021 12:10:03'!
+!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/18/2021 07:59:52'!
+fronts
+
+	^Fronts! !
+
+!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/18/2021 08:00:09'!
+jokers
+
+	^Jokers! !
+
+!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/22/2021 13:10:29'!
 morphHeight
 
-	^self cardExtent height! !
+	^self cardExtent y! !
 
-!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/11/2021 12:10:22'!
+!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/22/2021 13:10:11'!
 morphWidth
 
-	^self cardExtent width! !
+	^self cardExtent x! !
 
 !SVGCardMorph class methodsFor: 'class initialization' stamp: 'Install-SVG-Solitaire 9/11/2021 15:07:42'!
 initialize
@@ -650,12 +716,14 @@ baseUnit
 	
 	^ Preferences windowTitleFont lineSpacing! !
 
-!SVGCardMorph class methodsFor: 'geometry' stamp: 'KenD 9/11/2021 07:20:41'!
+!SVGCardMorph class methodsFor: 'geometry' stamp: 'KenD 9/22/2021 13:08:50'!
 cardExtent
-
+"
+	self cardExtent.
+"
 	CardExtent ifNil: [ | unit | 
 		unit := self baseUnit. 
-		CardExtent := (0@0) extent: ((3 * unit) @ (7 * unit))
+		CardExtent := ((3 * unit) @ (7 * unit))
 	].
 	^CardExtent! !
 
