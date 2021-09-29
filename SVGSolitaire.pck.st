@@ -1,7 +1,7 @@
-'From Cuis 5.0 [latest update: #4886] on 25 September 2021 at 2:29:59 pm'!
+'From Cuis 5.0 [latest update: #4894] on 29 September 2021 at 3:12:10 pm'!
 'Description FreeCell and Klondike Solitaire using SVG Card Images'!
-!provides: 'SVGSolitaire' 1 11!
-!requires: 'Cuis-Base' 50 4868 nil!
+!provides: 'SVGSolitaire' 1 12!
+!requires: 'Cuis-Base' 50 4894 nil!
 !requires: 'Morphic-Games-Solitaire' 1 112 nil!
 !requires: 'SVG' 1 13 nil!
 !requires: 'Morphic-Misc1' 1 186 nil!
@@ -31,7 +31,7 @@ PickASVGCardImagePallet class
 !classDefinition: #SVGCardMorph category: 'SVGSolitaire'!
 MovableMorph subclass: #SVGCardMorph
 	instanceVariableNames: 'cardNumber grabPreowner isFaceDown'
-	classVariableNames: 'Backs CardExtent ColorNames DropShadowMorph FaceNames Fronts Jokers SuitNames'
+	classVariableNames: 'Backs CardExtent ColorNames DropShadowMorph FaceNames Fronts Jokers SuitNames UpperLeftOffset'
 	poolDictionaries: ''
 	category: 'SVGSolitaire'!
 !classDefinition: 'SVGCardMorph class' category: 'SVGSolitaire'!
@@ -546,6 +546,11 @@ morphWidth
 
 	^self class cardExtent x! !
 
+!SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/29/2021 14:46:48'!
+rotationCenter
+	
+	^ self class rotationCenter ! !
+
 !SVGCardMorph methodsFor: 'geometry' stamp: 'KenD 9/11/2021 07:26:36'!
 updateExtent
 
@@ -553,7 +558,7 @@ updateExtent
 	newExtent := self class cardExtent.
 	self allSubmorphsDo: [ :s | s fitInto:  newExtent ]! !
 
-!SVGCardMorph methodsFor: 'initialization' stamp: 'KenD 9/24/2021 13:54:13'!
+!SVGCardMorph methodsFor: 'initialization' stamp: 'KenD 9/29/2021 15:11:24'!
 withCardNumber: cardNum
 	"See my class comment on card numbering"
 	
@@ -569,8 +574,7 @@ withCardNumber: cardNum
 	back hide.
 	face show.
 	isFaceDown := false.
-	self morphExtent: self class cardExtent.
-	"self submorphsDo: [ :sm | sm fitInto: currentExtent ]."
+	self scale: self class defaultScale.
 	
 	
 	
@@ -630,6 +634,11 @@ backs
 
 	^Backs! !
 
+!SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/29/2021 14:36:50'!
+cardExtent
+	"Set in class initializer"
+	^ CardExtent ! !
+
 !SVGCardMorph class methodsFor: 'accessing' stamp: 'KenD 9/11/2021 15:27:56'!
 defaultBack
 
@@ -662,12 +671,12 @@ morphWidth
 
 	^self cardExtent x! !
 
-!SVGCardMorph class methodsFor: 'class initialization' stamp: 'Install-SVG-Solitaire 9/11/2021 15:07:42'!
+!SVGCardMorph class methodsFor: 'class initialization' stamp: 'KenD 9/29/2021 15:03:54'!
 initialize
 "
 	SVGCardMorph initialize.
 "
-	| pathPrefix baseIndex |
+	| pathPrefix baseIndex  |
 	pathPrefix := ((CodePackage installedPackages at: #'SVG')
 				fullFileName pathAndLocalName at: 1) ,
 				'/../Games/Solitaire/SVG-CardImages/'.
@@ -678,6 +687,9 @@ initialize
 		self SVGMorphFromFile: pathPrefix, 'backs/blue.svg'.
 		self SVGMorphFromFile: pathPrefix, 'backs/red.svg'.
 	}.
+	CardExtent := (Backs at: 1) fullBoundsInOwner extent.
+	UpperLeftOffset :=  (Backs at: 1) fullBoundsInOwner center negated.
+	
 	baseIndex := 0.
 	Fronts := Array new: 52.
 	#( #ace 2 3 4 5 6 7 8 9 10 #jack #queen #king ) do: [ :faceId |
@@ -695,7 +707,18 @@ initialize
 	Jokers := { 
 		self  SVGMorphFromFile:  pathPrefix, 'fronts/joker_black.svg'.
 		self  SVGMorphFromFile:  pathPrefix, 'fronts/joker_red.svg'.
-	}.! !
+	}.
+	self scaleCards.! !
+
+!SVGCardMorph class methodsFor: 'class initialization' stamp: 'KenD 9/29/2021 15:09:51'!
+scaleCards
+
+	| cardScale |
+	cardScale := self defaultScale.
+	
+	Fronts do: [ :f |  f scale: cardScale ].
+	Backs  do: [ :b | b scale: cardScale ].	
+	Jokers  do: [ :j |  j scale: cardScale ].	! !
 
 !SVGCardMorph class methodsFor: 'fileIn/Out' stamp: 'KenD 9/11/2021 12:50:14'!
 SVGMorphFromFile: aPath
@@ -716,16 +739,10 @@ baseUnit
 	
 	^ Preferences windowTitleFont lineSpacing! !
 
-!SVGCardMorph class methodsFor: 'geometry' stamp: 'KenD 9/22/2021 13:08:50'!
-cardExtent
-"
-	self cardExtent.
-"
-	CardExtent ifNil: [ | unit | 
-		unit := self baseUnit. 
-		CardExtent := ((3 * unit) @ (7 * unit))
-	].
-	^CardExtent! !
+!SVGCardMorph class methodsFor: 'geometry' stamp: 'KenD 9/29/2021 15:06:08'!
+defaultScale
+	"Answer a scale which makes my extent about the same as a CardMorph."
+	^ 0.36! !
 
 !SVGCardMorph class methodsFor: 'geometry' stamp: 'KenD 9/11/2021 07:24:34'!
 resetCardExtent
@@ -736,6 +753,11 @@ resetCardExtent
 	newExtent := self cardExtent.
 	self allInstancesDo: [ :aCard | aCard updateExtent ].
 	^newExtent! !
+
+!SVGCardMorph class methodsFor: 'geometry' stamp: 'KenD 9/29/2021 14:46:18'!
+rotationCenter
+	"Answer the Upper Left Corner (set at class initialization)"
+	^ UpperLeftOffset! !
 
 !SVGCardMorph class methodsFor: 'instance creation' stamp: 'KenD 9/11/2021 16:14:34'!
 the: face of: suit
