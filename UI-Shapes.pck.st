@@ -1,48 +1,48 @@
-'From Cuis 6.0 [latest update: #5053] on 30 January 2022 at 4:06:35 pm'!
+'From Cuis 6.0 [latest update: #5053] on 31 January 2022 at 11:40:37 am'!
 'Description Bezier Curves et al'!
-!provides: 'UI-Shapes' 1 10!
+!provides: 'UI-Shapes' 1 11!
 !requires: 'Morphic-MetaProperties' 1 106 nil!
 !requires: 'VectorGraphics' 1 333 nil!
 SystemOrganization addCategory: 'UI-Shapes'!
 
 
-!classDefinition: #Bezier1Morph category: 'UI-Shapes'!
-PlacedMorph subclass: #Bezier1Morph
+!classDefinition: #BezierQuadraticMorph category: 'UI-Shapes'!
+PlacedMorph subclass: #BezierQuadraticMorph
 	instanceVariableNames: 'lineColor lineWidth startPoint endPoint oneControlPoint'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'UI-Shapes'!
-!classDefinition: 'Bezier1Morph class' category: 'UI-Shapes'!
-Bezier1Morph class
+!classDefinition: 'BezierQuadraticMorph class' category: 'UI-Shapes'!
+BezierQuadraticMorph class
 	instanceVariableNames: ''!
 
-!classDefinition: #Bezier2Morph category: 'UI-Shapes'!
-Bezier1Morph subclass: #Bezier2Morph
+!classDefinition: #BezierCubicMorph category: 'UI-Shapes'!
+BezierQuadraticMorph subclass: #BezierCubicMorph
 	instanceVariableNames: 'twoControlPoint'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'UI-Shapes'!
-!classDefinition: 'Bezier2Morph class' category: 'UI-Shapes'!
-Bezier2Morph class
+!classDefinition: 'BezierCubicMorph class' category: 'UI-Shapes'!
+BezierCubicMorph class
 	instanceVariableNames: ''!
 
 
-!Bezier1Morph commentStamp: '<historical>' prior: 0!
+!BezierQuadraticMorph commentStamp: '<historical>' prior: 0!
 I present a Quadratic Bezier curve.
 
 I have one control point.!
 
-!Bezier2Morph commentStamp: '<historical>' prior: 0!
+!BezierCubicMorph commentStamp: '<historical>' prior: 0!
 I present a Cubic Bezier curve.
 
 I have two control points.!
 
-!Bezier1Morph methodsFor: 'geometry testing' stamp: 'KenD 1/30/2022 13:01:45'!
+!BezierQuadraticMorph methodsFor: 'geometry testing' stamp: 'KenD 1/30/2022 13:01:45'!
 yAxisPointsUp
 
 	^true! !
 
-!Bezier1Morph methodsFor: 'initialization' stamp: 'KenD 1/30/2022 13:29:44'!
+!BezierQuadraticMorph methodsFor: 'initialization' stamp: 'KenD 1/30/2022 13:29:44'!
 initialize
 
 	"Harmless Values"
@@ -54,57 +54,57 @@ initialize
 		endPoint:     50 @ -20;
 		oneControlPoint: 15 @ 200! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:29:45'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:29:45'!
 endPoint
 
 	^ endPoint! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:28:07'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:28:07'!
 endPoint: aPoint
 
 	endPoint := aPoint! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:30:25'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:30:25'!
 lineColor 
 
 	^ lineColor ! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:30:43'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:30:43'!
 lineColor: aColor
 
 	lineColor := aColor! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:31:02'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:31:02'!
 lineWidth
 
 	^ lineWidth! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:31:29'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:31:29'!
 lineWidth: positiveNumber
 
 	lineWidth := positiveNumber ! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:29:32'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:29:32'!
 oneControlPoint
 
 	^ oneControlPoint! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:29:15'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:29:15'!
 oneControlPoint: aPoint
 
 	oneControlPoint := aPoint! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:30:03'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:30:03'!
 startPoint 
 
 	^ startPoint ! !
 
-!Bezier1Morph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:27:58'!
+!BezierQuadraticMorph methodsFor: 'accessing' stamp: 'KenD 1/28/2022 13:27:58'!
 startPoint: aPoint
 
 	startPoint := aPoint! !
 
-!Bezier1Morph methodsFor: 'drawing' stamp: 'KenD 1/30/2022 13:00:46'!
+!BezierQuadraticMorph methodsFor: 'drawing' stamp: 'KenD 1/30/2022 13:00:46'!
 drawOn: aCanvas
 
 	aCanvas strokeWidth: lineWidth color: lineColor do: [
@@ -113,7 +113,7 @@ drawOn: aCanvas
 			quadraticBezierTo: endPoint control: oneControlPoint 
 	]! !
 
-!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 16:04:33'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 16:04:33'!
 addOptionalHandlesTo: aHalo box: box
 	"Control point is relative to my center.
 	 Translate relative to aHalo"
@@ -138,7 +138,7 @@ addOptionalHandlesTo: aHalo box: box
 		mouseDownSelector: #startControlPoint:with: ;
 		mouseMoveSelector: #doEndPoint:with: .! !
 
-!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 14:15:40'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 14:15:40'!
 controlPointOneInWorld
 	"Answer control point one in World coordinates.
 	 Take into account #yAxisPointsUp."
@@ -150,7 +150,7 @@ controlPointOneInWorld
 	^ (self externalize: 0@0)  "center"
 		+ (oneControlPoint x @ ctrlY). "offset"! !
 
-!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:49'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:49'!
 endPointInWorld
 	"Answer start point in World coordinates.
 	 Take into account #yAxisPointsUp."
@@ -162,7 +162,7 @@ endPointInWorld
 	^ (self externalize: 0@0)  "center"
 		+ (endPoint x @ ctrlY). "offset"! !
 
-!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:30'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:30'!
 startPointInWorld
 	"Answer start point in World coordinates.
 	 Take into account #yAxisPointsUp."
@@ -174,14 +174,14 @@ startPointInWorld
 	^ (self externalize: 0@0)  "center"
 		+ (startPoint x @ ctrlY). "offset"! !
 
-!Bezier1Morph class methodsFor: 'class initialization' stamp: 'KenD 1/28/2022 13:47:38'!
+!BezierQuadraticMorph class methodsFor: 'class initialization' stamp: 'KenD 1/28/2022 13:47:38'!
 initialize
 	
 	(Smalltalk includesKey: #MetaProperty )
 		ifTrue: [ self initializeMetaProperties ].
 	! !
 
-!Bezier1Morph class methodsFor: 'class initialization' stamp: 'KenD 1/28/2022 13:47:20'!
+!BezierQuadraticMorph class methodsFor: 'class initialization' stamp: 'KenD 1/31/2022 11:32:09'!
 initializeMetaProperties
 "
 	Bezier1Morph initializeMetaProperties.
@@ -193,7 +193,7 @@ initializeMetaProperties
 	"Seed MetaProperties for known Morphs"
 	propsDict := MetaProperty preDefinedPropsDict.
 	
-	classDict := MetaProperty metaPropsDictForClass: Bezier1Morph.
+	classDict := MetaProperty metaPropsDictForClass: BezierQuadraticMorph.
 	classDict at: #startPoint put: (propsDict at: #acceptsPoint). 
 	classDict at: #endPoint put: (propsDict at: #acceptsPoint). 
 	classDict at: #oneControlPoint put: (propsDict at: #acceptsPoint). 
@@ -203,7 +203,7 @@ initializeMetaProperties
 
 	! !
 
-!Bezier2Morph methodsFor: 'drawing' stamp: 'KenD 1/30/2022 14:55:18'!
+!BezierCubicMorph methodsFor: 'drawing' stamp: 'KenD 1/30/2022 14:55:18'!
 drawOn: aCanvas
 
 	aCanvas strokeWidth: lineWidth color: lineColor do: [
@@ -214,7 +214,7 @@ drawOn: aCanvas
 				control2: twoControlPoint 
 	]! !
 
-!Bezier2Morph methodsFor: 'initialization' stamp: 'KenD 1/30/2022 14:59:51'!
+!BezierCubicMorph methodsFor: 'initialization' stamp: 'KenD 1/30/2022 14:59:51'!
 initialize
 
 	super initialize.
@@ -223,17 +223,17 @@ initialize
 		oneControlPoint: 228@75 ;
 		twoControlPoint: 25 @ 160.! !
 
-!Bezier2Morph methodsFor: 'accessing' stamp: 'KenD 1/30/2022 14:41:44'!
+!BezierCubicMorph methodsFor: 'accessing' stamp: 'KenD 1/30/2022 14:41:44'!
 twoControlPoint
 
 	^ twoControlPoint ! !
 
-!Bezier2Morph methodsFor: 'accessing' stamp: 'KenD 1/30/2022 14:41:38'!
+!BezierCubicMorph methodsFor: 'accessing' stamp: 'KenD 1/30/2022 14:41:38'!
 twoControlPoint: aPoint
 
 	twoControlPoint := aPoint ! !
 
-!Bezier2Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:07:09'!
+!BezierCubicMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:07:09'!
 addOptionalHandlesTo: aHalo box: box
 	"Control point is relative to my center.
 	 Translate relative to aHalo"
@@ -248,7 +248,7 @@ addOptionalHandlesTo: aHalo box: box
 		mouseDownSelector: #startControlPoint:with: ;
 		mouseMoveSelector: #doControlTwo:with: .! !
 
-!Bezier2Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:03:09'!
+!BezierCubicMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:03:09'!
 controlPointTwoInWorld
 	"Answer control point one in World coordinates.
 	 Take into account #yAxisPointsUp."
@@ -261,14 +261,14 @@ controlPointTwoInWorld
 	^ (self externalize: 0@0)  "center"
 		+ (twoControlPoint x @ ctrlY). "offset"! !
 
-!Bezier2Morph class methodsFor: 'class initialization' stamp: 'KenD 1/30/2022 14:55:53'!
+!BezierCubicMorph class methodsFor: 'class initialization' stamp: 'KenD 1/30/2022 14:55:53'!
 initialize
 	
 	(Smalltalk includesKey: #MetaProperty )
 		ifTrue: [ self initializeMetaProperties ].
 	! !
 
-!Bezier2Morph class methodsFor: 'class initialization' stamp: 'KenD 1/30/2022 14:57:22'!
+!BezierCubicMorph class methodsFor: 'class initialization' stamp: 'KenD 1/31/2022 11:32:47'!
 initializeMetaProperties
 "
 	Bezier2Morph initializeMetaProperties.
@@ -280,7 +280,7 @@ initializeMetaProperties
 	"Seed MetaProperties for known Morphs"
 	propsDict := MetaProperty preDefinedPropsDict.
 	
-	classDict := MetaProperty metaPropsDictForClass: Bezier2Morph. 
+	classDict := MetaProperty metaPropsDictForClass: BezierCubicMorph. 
 	"Note that MetaProperties are inherited.."
 	classDict at: #twoControlPoint put: (propsDict at: #acceptsPoint).  
 
@@ -463,5 +463,5 @@ haloTargetIcon
 	^ self icons
 		at: #haloTargetIcon
 		ifAbsentPut: [ VisualPropertyMenuItem targetIcon ]! !
-Bezier1Morph initialize!
-Bezier2Morph initialize!
+BezierQuadraticMorph initialize!
+BezierCubicMorph initialize!
