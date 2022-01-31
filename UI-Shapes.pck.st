@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5053] on 31 January 2022 at 11:40:37 am'!
+'From Cuis 6.0 [latest update: #5053] on 31 January 2022 at 2:56:01 pm'!
 'Description Bezier Curves et al'!
-!provides: 'UI-Shapes' 1 11!
+!provides: 'UI-Shapes' 1 12!
 !requires: 'Morphic-MetaProperties' 1 106 nil!
 !requires: 'VectorGraphics' 1 333 nil!
 SystemOrganization addCategory: 'UI-Shapes'!
@@ -138,41 +138,23 @@ addOptionalHandlesTo: aHalo box: box
 		mouseDownSelector: #startControlPoint:with: ;
 		mouseMoveSelector: #doEndPoint:with: .! !
 
-!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 14:15:40'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/31/2022 14:52:41'!
 controlPointOneInWorld
-	"Answer control point one in World coordinates.
-	 Take into account #yAxisPointsUp."
+	"Answer control point one in World coordinates."
 
-	| ctrlY |
-	ctrlY := (self yAxisPointsUp) 
-				ifTrue: [oneControlPoint y negated] 
-				ifFalse: [oneControlPoint y].
-	^ (self externalize: 0@0)  "center"
-		+ (oneControlPoint x @ ctrlY). "offset"! !
+	^ self externalizeToWorld: oneControlPoint ! !
 
-!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:49'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/31/2022 14:53:48'!
 endPointInWorld
-	"Answer start point in World coordinates.
-	 Take into account #yAxisPointsUp."
+	"Answer end point in World coordinates."
 
-	| ctrlY |
-	ctrlY := (self yAxisPointsUp) 
-				ifTrue: [endPoint y negated] 
-				ifFalse: [endPoint y].
-	^ (self externalize: 0@0)  "center"
-		+ (endPoint x @ ctrlY). "offset"! !
+	^ self externalizeToWorld: endPoint! !
 
-!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:30'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/31/2022 14:54:09'!
 startPointInWorld
-	"Answer start point in World coordinates.
-	 Take into account #yAxisPointsUp."
+	"Answer start point in World coordinates."
 
-	| ctrlY |
-	ctrlY := (self yAxisPointsUp) 
-				ifTrue: [startPoint y negated] 
-				ifFalse: [startPoint y].
-	^ (self externalize: 0@0)  "center"
-		+ (startPoint x @ ctrlY). "offset"! !
+	^ self externalizeToWorld: startPoint! !
 
 !BezierQuadraticMorph class methodsFor: 'class initialization' stamp: 'KenD 1/28/2022 13:47:38'!
 initialize
@@ -248,18 +230,11 @@ addOptionalHandlesTo: aHalo box: box
 		mouseDownSelector: #startControlPoint:with: ;
 		mouseMoveSelector: #doControlTwo:with: .! !
 
-!BezierCubicMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:03:09'!
+!BezierCubicMorph methodsFor: 'control points' stamp: 'KenD 1/31/2022 14:55:49'!
 controlPointTwoInWorld
-	"Answer control point one in World coordinates.
-	 Take into account #yAxisPointsUp."
+	"Answer control point one in World coordinates"
 
-	| ctrlY |
-	ctrlY := (self yAxisPointsUp) 
-				ifTrue: [twoControlPoint y negated] 
-				ifFalse: [twoControlPoint y].
-				
-	^ (self externalize: 0@0)  "center"
-		+ (twoControlPoint x @ ctrlY). "offset"! !
+	^self externalizeToWorld: twoControlPoint ! !
 
 !BezierCubicMorph class methodsFor: 'class initialization' stamp: 'KenD 1/30/2022 14:55:53'!
 initialize
