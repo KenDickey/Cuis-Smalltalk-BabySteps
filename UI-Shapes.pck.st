@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5053] on 30 January 2022 at 3:09:00 pm'!
+'From Cuis 6.0 [latest update: #5053] on 30 January 2022 at 4:06:35 pm'!
 'Description Bezier Curves et al'!
-!provides: 'UI-Shapes' 1 6!
+!provides: 'UI-Shapes' 1 10!
 !requires: 'Morphic-MetaProperties' 1 106 nil!
 !requires: 'VectorGraphics' 1 333 nil!
 SystemOrganization addCategory: 'UI-Shapes'!
@@ -113,7 +113,7 @@ drawOn: aCanvas
 			quadraticBezierTo: endPoint control: oneControlPoint 
 	]! !
 
-!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:07:29'!
+!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 16:04:33'!
 addOptionalHandlesTo: aHalo box: box
 	"Control point is relative to my center.
 	 Translate relative to aHalo"
@@ -121,10 +121,22 @@ addOptionalHandlesTo: aHalo box: box
 	| haloCtlPt |
 	haloCtlPt := self controlPointOneInWorld 
 				- aHalo morphPositionInWorld.
-
 	(aHalo addControlHandle: haloCtlPt)
 		mouseDownSelector: #startControlPoint:with: ;
-		mouseMoveSelector: #doControlOne:with: .! !
+		mouseMoveSelector: #doControlOne:with: .
+		
+	haloCtlPt := self startPointInWorld 
+				- aHalo morphPositionInWorld.
+	(aHalo addPointHandle: haloCtlPt)
+		mouseDownSelector: #startControlPoint:with: ;
+		mouseMoveSelector: #doStartPoint:with: .
+		
+	haloCtlPt := self endPointInWorld 
+				- aHalo morphPositionInWorld.
+
+	(aHalo addPointHandle: haloCtlPt)
+		mouseDownSelector: #startControlPoint:with: ;
+		mouseMoveSelector: #doEndPoint:with: .! !
 
 !Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 14:15:40'!
 controlPointOneInWorld
@@ -137,6 +149,30 @@ controlPointOneInWorld
 				ifFalse: [oneControlPoint y].
 	^ (self externalize: 0@0)  "center"
 		+ (oneControlPoint x @ ctrlY). "offset"! !
+
+!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:49'!
+endPointInWorld
+	"Answer start point in World coordinates.
+	 Take into account #yAxisPointsUp."
+
+	| ctrlY |
+	ctrlY := (self yAxisPointsUp) 
+				ifTrue: [endPoint y negated] 
+				ifFalse: [endPoint y].
+	^ (self externalize: 0@0)  "center"
+		+ (endPoint x @ ctrlY). "offset"! !
+
+!Bezier1Morph methodsFor: 'control points' stamp: 'KenD 1/30/2022 15:57:30'!
+startPointInWorld
+	"Answer start point in World coordinates.
+	 Take into account #yAxisPointsUp."
+
+	| ctrlY |
+	ctrlY := (self yAxisPointsUp) 
+				ifTrue: [startPoint y negated] 
+				ifFalse: [startPoint y].
+	^ (self externalize: 0@0)  "center"
+		+ (startPoint x @ ctrlY). "offset"! !
 
 !Bezier1Morph class methodsFor: 'class initialization' stamp: 'KenD 1/28/2022 13:47:38'!
 initialize
@@ -279,6 +315,34 @@ addControlHandle: aPoint
 		yourself
 ! !
 
+!HaloMorph methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 16:04:05'!
+addPointHandle: aPoint
+	"Add a handle for the control point and return the handle."
+
+	| handle  colorToUse form icon e |
+	colorToUse _ Color green. "@@parameterize by theme@@"
+	handle _ HaloHandleMorph new color: colorToUse.
+	self addMorph: handle.
+	e _ Preferences haloHandleSize asPoint.
+	handle morphPosition: aPoint-(e//2) extent: e.
+	form _ self class haloPointIcon.
+	(form extent = e) ifFalse: [ 
+		form _ form  "Be as smooth as possible, these images are small."
+				magnify: form boundingBox
+				to: e
+				smoothing: 2 
+	].
+	icon _ ImageMorph new
+				image: form;
+				color: colorToUse makeForegroundColor;
+				lock.
+	^handle 
+		addMorphFront: icon position: `0@0`;
+		mouseUpSelector: #endInteraction;
+		setBalloonText: 'Shape control point';
+		yourself
+! !
+
 !HaloMorph methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 14:37:11'!
 doControlOne: evt with: controlPointHandle
 	"Enable Target Morph to follow control point one."
@@ -327,6 +391,54 @@ doControlTwo: evt with: controlPointHandle
 					- (controlPointHandle morphExtent // 2).	
 	self redrawNeeded.! !
 
+!HaloMorph methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 15:56:34'!
+doEndPoint: evt with: controlPointHandle
+	"Enable Target Morph to follow control point one."
+
+	| controlDelta controlPoint |
+	evt hand obtainHalo: self.	
+	
+	controlDelta _ (evt eventPosition - target endPointInWorld). 
+	
+	(self target yAxisPointsUp) 
+	ifFalse: [
+		controlPoint := self target endPoint + controlDelta.
+	]
+	ifTrue: [
+		controlPoint := self target endPoint + 
+			(controlDelta x @ controlDelta y negated).
+	].
+	self target endPoint: controlPoint.
+	"Track the hand"
+	controlPointHandle 
+		morphPositionInWorld: evt eventPosition 
+					- (controlPointHandle morphExtent // 2).	
+	self redrawNeeded.! !
+
+!HaloMorph methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 15:55:45'!
+doStartPoint: evt with: controlPointHandle
+	"Enable Target Morph to follow control point one."
+
+	| controlDelta controlPoint |
+	evt hand obtainHalo: self.	
+	
+	controlDelta _ (evt eventPosition - target startPointInWorld). 
+	
+	(self target yAxisPointsUp) 
+	ifFalse: [
+		controlPoint := self target startPoint + controlDelta.
+	]
+	ifTrue: [
+		controlPoint := self target startPoint + 
+			(controlDelta x @ controlDelta y negated).
+	].
+	self target startPoint: controlPoint.
+	"Track the hand"
+	controlPointHandle 
+		morphPositionInWorld: evt eventPosition 
+					- (controlPointHandle morphExtent // 2).	
+	self redrawNeeded.! !
+
 !HaloMorph methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 15:07:17'!
 startControlPoint: evt with: controlPointHandle
 	"Initialize control point target."
@@ -337,5 +449,19 @@ startControlPoint: evt with: controlPointHandle
 	self removeAllHandlesBut: controlPointHandle.  
 
 ! !
+
+!HaloMorph class methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 15:28:52'!
+haloPointIcon
+
+	^ self icons
+		at: #haloPointIcon
+		ifAbsentPut: [ VisualPropertyMenuItem pointIcon ]! !
+
+!HaloMorph class methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 15:29:09'!
+haloTargetIcon
+
+	^ self icons
+		at: #haloTargetIcon
+		ifAbsentPut: [ VisualPropertyMenuItem targetIcon ]! !
 Bezier1Morph initialize!
 Bezier2Morph initialize!
