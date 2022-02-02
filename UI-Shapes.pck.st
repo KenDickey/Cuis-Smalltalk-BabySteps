@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5053] on 31 January 2022 at 2:56:01 pm'!
+'From Cuis 6.0 [latest update: #5057] on 2 February 2022 at 7:28:30 am'!
 'Description Bezier Curves et al'!
-!provides: 'UI-Shapes' 1 12!
+!provides: 'UI-Shapes' 1 14!
 !requires: 'Morphic-MetaProperties' 1 106 nil!
 !requires: 'VectorGraphics' 1 333 nil!
 SystemOrganization addCategory: 'UI-Shapes'!
@@ -37,10 +37,10 @@ I present a Cubic Bezier curve.
 
 I have two control points.!
 
-!BezierQuadraticMorph methodsFor: 'geometry testing' stamp: 'KenD 1/30/2022 13:01:45'!
+!BezierQuadraticMorph methodsFor: 'geometry testing' stamp: 'KenD 1/31/2022 15:09:46'!
 yAxisPointsUp
 
-	^true! !
+	^ true! !
 
 !BezierQuadraticMorph methodsFor: 'initialization' stamp: 'KenD 1/30/2022 13:29:44'!
 initialize
@@ -113,7 +113,7 @@ drawOn: aCanvas
 			quadraticBezierTo: endPoint control: oneControlPoint 
 	]! !
 
-!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 1/30/2022 16:04:33'!
+!BezierQuadraticMorph methodsFor: 'control points' stamp: 'KenD 2/2/2022 07:28:00'!
 addOptionalHandlesTo: aHalo box: box
 	"Control point is relative to my center.
 	 Translate relative to aHalo"
@@ -133,7 +133,6 @@ addOptionalHandlesTo: aHalo box: box
 		
 	haloCtlPt := self endPointInWorld 
 				- aHalo morphPositionInWorld.
-
 	(aHalo addPointHandle: haloCtlPt)
 		mouseDownSelector: #startControlPoint:with: ;
 		mouseMoveSelector: #doEndPoint:with: .! !
@@ -318,7 +317,7 @@ addPointHandle: aPoint
 		yourself
 ! !
 
-!HaloMorph methodsFor: '*ui-shapes' stamp: 'KenD 1/30/2022 14:37:11'!
+!HaloMorph methodsFor: '*ui-shapes' stamp: 'KenD 2/1/2022 14:14:29'!
 doControlOne: evt with: controlPointHandle
 	"Enable Target Morph to follow control point one."
 
