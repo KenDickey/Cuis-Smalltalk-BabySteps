@@ -3,45 +3,66 @@ Understanding Drag and Drop Mechanics
 
 Event driven code allows multiple objects to interact without direct contact.
 
-One example of this is ***Drag and Drop***.
-One might, say "pick up" a color from a color palette,
+One example of this is **Drag and Drop**.
+One might, say "pick up a color" from a color palette,
 and drop it on an area which may or may not be sensitive to colors.
 
 How does this work?
 
-Following is a brief discussion, with much code,
-showing how events are used to pick up some value and drop onto some target morph.
+Part of the difficulty in understanding event driven code is that in many
+cases, small bits of work are split among a number of different classes.
 
-You can take a look at the code via the #UI-Tools package and use
-of a code or message names browser.
+Following is a brief discussion, with much code,
+showing how events are used to pick up some value
+and drop onto some target morph.
+We are going to look at the main beads of the thread and skip
+a number of details.
+
+You can take a look at the code via the **UI-Tools** package and use
+of a code or message names browser and look at **senders**.
 
 
 ````Smalltalk
   Feature require: 'UI-Tools'.
 ````
 
-###DRAG
+## DRAG
 
 First, let's look at picking up a value.
+What do we mean by this?
+Basically, we move the cursor/hand over a Morph,
+press the mouse and keeping the mouse "down" drag
+a Morph denoting the thing being dragged.
+Letting up on the mouse button "drops" the value,
+which may be accepted or rejected by the Morph it
+is dropped upon.
 
 This is an "opt in" for a Morph.
-Just as with mouse events, a Morph class can override #allowsSubmorphDrag to answer 'true'
+Just as with mouse events, a Morph 
+can override method ````Smalltalk allowsSubmorphDrag```` to answer 'true'
 or an individual Morph can set the property with that name.
 
 ````Smalltalk
 Morph>>allowsSubmorphDrag
-	"Answer whether our morphs can just be grabbed with the hand, instead of requiring the use of the halo. By default answer false."
+	"Answer whether our morphs can just be grabbed with the hand, 
+         instead of requiring the use of the halo.
+	 By default answer false."
 
 	"Use a property test to allow individual instances to specify this."
 	^ self hasProperty: #'allowsSubmorphDrag'
 ````
 
-As with mouse events, the HandMorph does most of the interacting.
+As with mouse events, the HandMorph does most of the interacting starting
+with  the processing of the event queue (````Smalltalk HandMorph>>processEventQueue````), but we don't need to understand the details of this to get the
+gist of what is going on.
+
+At some point, a Morph which allowsSubMorphDrag gets to handle the mouse down event.  For example, in the MetaProperty package:
 
 ````Smalltalk
 VisualPropertyMenuItem>>processMouseDown: evt localPosition: localEventPosition
-	"Do nothing upon mouse-down except inform the hand to watch for a 
-	click; wait until an ensuing #click: message gets dispatched"
+	"Do nothing upon mouse-down except inform the hand 
+	 to watch for a click; wait until an ensuing #click: 
+	 message gets dispatched"
 
 	evt wasHandled: true.
 	evt hand waitForClicksOrDrag: self
@@ -50,6 +71,9 @@ VisualPropertyMenuItem>>processMouseDown: evt localPosition: localEventPosition
 				clkSel: #mouseButton1Down:localPosition:
 ````
 
+As VisualPropertyMenuItem sets the dragSel selector, upon a drag action,
+the drag event causes the HandMorph to "pick up" something.
+
 ````Smalltalk
 Morph>>dragEvent: aMouseEvent localPosition: aPoint
 
@@ -57,17 +81,28 @@ Morph>>dragEvent: aMouseEvent localPosition: aPoint
 	aMouseEvent hand grabMorph: self
 ````
 
+The "something" which is picked up is a Morph
+which becomes a suborph of the HandMorph.
+
 ````Smalltalk
 HandMorph>>grabMorph: aMorph
-	"Grab the given morph (i.e., add it to this hand and remove it from its current owner) without changing its position. This is used to pick up a morph under the hand's current position, versus attachMorph: which is used to pick up a morph that may not be near this hand."
+	"Grab the given morph (i.e., add it to this hand 
+	 and remove it from its current owner) 
+	 without changing its position. 
+	 This is used to pick up a morph under the 
+	 hand's current position, versus attachMorph: 
+	 which is used to pick up a morph that 
+	 may not be near this hand."
 
 	^self grabMorph: aMorph moveUnderHand: false
 ````
 
 ````Smalltalk
 grabMorph: aMorph moveUnderHand: moveUnderHand
-	"Grab the given morph (i.e., add it to this hand and remove it from its current owner).
-	If moveUnderHand is requested or it seems neccesary anyway, move the grabbed morph under the hand."
+	"Grab the given morph 
+	(i.e., add it to this hand and remove it from its current owner).
+	If moveUnderHand is requested or it seems neccesary anyway, 
+	move the grabbed morph under the hand."
 
 	| grabbed positionInHandCoordinates tx bounds |
 	self releaseMouseFocus.	"Break focus"
@@ -81,25 +116,27 @@ grabMorph: aMorph moveUnderHand: moveUnderHand
 "..."
 ````
 
+For example, picking up a Color from a color palette "grabs" a
+DropColorMorph, which gives a copy of itself to the HandMorph
+to carry around.
+
 ````Smalltalk
 DropColorMorph>>aboutToBeGrabbedBy: aHand
 	"The receiver is being grabbed by a hand.
-	Perform necessary adjustments (if any) and return the actual morph
-	that should be added to the hand.
+	Perform necessary adjustments (if any) and return
+	the actual morph that should be added to the hand.
 	Answer nil to reject the drag."
-	"This message is sent to the dragged morph, not to the owner.
-	It is included here just for reference."
+	"This message is sent to the dragged morph, not to the owner."
 
 	^ self class fromColor: self color "Grab a new sibling of me"
 ````
 
 
-The above @@@
+## DROP
 
-
-###DROP
-
-OK.  What happens when we drop a morph representing a value somewhere?
+OK. The HandMorph is carrying around a submorph and the mouse is down.
+What happens when we drop a morph representing a value somewhere
+by letting up on the mouse?
 
 ````Smalltalk
 HandMorph>>dropMorph: aMorph event: aMouseEvent
@@ -117,7 +154,13 @@ HandMorph>>dropMorph: aMorph event: aMouseEvent
 	self forgetGrabMorphDataFor: aMorph.
 	self mouseOverHandler processMouseOver: aMouseEvent
 ````
+Upon a mouse up event, the HandMorph creates a DropEvent and asks
+it to dispatch to some Morph under the hand, then checks if
+the event was handled, or if the drop was rejected.
 
+The actual dispatch contains the cleverness which allows the dropped
+Morph and the Morph which is the target of the drop to mutually
+decide if they like each other enough to cooperate.
 
 ````Smalltalk
 DropEvent>>dispatchWith: aMorph
@@ -133,43 +176,56 @@ DropEvent>>dispatchWith: aMorph
 		(eachChild dispatchEvent: self) == #rejected ifFalse: [
 			^self ]].
 
-	(aMorph allowsMorphDrop and: [ (aMorph rejectsEvent: self) not and: [aMorph fullIncludesPixel: position] ])
+	(aMorph allowsMorphDrop
+	  and: [ (aMorph rejectsEvent: self) not
+	    and: [aMorph fullIncludesPixel: position] ])
 		ifTrue: [
-			"Do a symmetric check if both morphs like each other"
-			dropped _ self contents.
-			((aMorph wantsDroppedMorph: dropped event: self)	"I want her"
-				and: [dropped wantsToBeDroppedInto: aMorph])		"she wants me"
-					ifTrue: [
-						^ self sendEventTo: aMorph ]].
+		"Do a symmetric check if both morphs like each other"
+		dropped _ self contents.
+		((aMorph wantsDroppedMorph: dropped event: self)  "I want her"
+		    and: [dropped wantsToBeDroppedInto: aMorph]) "she wants me"
+			ifTrue: [ ^ self sendEventTo: aMorph ]].
 	^#rejected
 ````
 
+Testing cooperation is up to each Morph.
 
 ````Smalltalk
 Morph>>wantsDroppedMorph: aMorph event: evt
 	"Return true if the receiver wishes to accept the given morph, 
 	 which is being dropped by a hand in response to the given event. 
-	Note that for a successful drop operation both parties need to agree. 
-	The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self.
+	 Note that for a successful drop operation both parties need to agree. 
+	 The symmetric check is done automatically 
+	 via aMorph wantsToBeDroppedInto: self.
 	 Individual Morpks may override by setting the corresponding property
 	 to an appropriate two argument closure."
 
-	^self valueOfProperty: #wantsDroppedMorph:event:
-		 ifPresentDo: [ :wantsMorphEvt | wantsMorphEvt value: aMorph value: evt ]
-		 ifAbsent: [ true ]
+    ^self valueOfProperty: #wantsDroppedMorph:event:
+       ifPresentDo: [ :wantsMorphEvt | wantsMorphEvt value: aMorph value: evt ]
+       ifAbsent: [ true ]
 ````
 
+For example, a VisualPropertyMenuItem has a MetaProperty with a test.
 
 ````Smalltalk
 VisualPropertyMenuItem>>wantsDroppedMorph: aMorph event: evt
-	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
+	"Return true if the receiver wishes to accept 
+	 the given morph, which is being dropped by a hand 
+	 in response to the given event. 
+	 Note that for a successful drop operation both parties 
+	 need to agree. 
+	 The symmetric check is done automatically 
+	 via aMorph wantsToBeDroppedInto: self."
 
 	^ self allowsValue: aMorph valueWhenDropped
 ````
 
+A MorphEditLens drop target checks that a least one visual
+property is willing to accept the dropped value.
+
 ````Smalltalk
 MorphEditLens>>wantsDroppedMorph: aMorph event: evt
-	"Return true if the receiver wishes to accept the given morph, which is being dropped by a hand in response to the given event. Note that for a successful drop operation both parties need to agree. The symmetric check is done automatically via aMorph wantsToBeDroppedInto: self."
+	"Return true if the receiver wishes to accept the given morph"
 
 	^ (aMorph hasProperty: #DropActionMorph)
 	or: [(Smalltalk includesKey: #MetaProperty)
@@ -184,6 +240,13 @@ MorphEditLens>>wantsDroppedMorph: aMorph event: evt
 	]
 ````
 
+On the other side of the action, the dropping Morph also
+gets to answer if it wants to be dropped onto the
+target morph.
+
+For example, a DropColorMorph checks for a MorphEditLens, a #dropAction
+property, or a VisualPropertyMenuItem.
+The guards around the #isKindOf: test make sure that the class code is loaded.
 
 ````Smalltalk
 DropColorMorph>>wantsToBeDroppedInto: aMorph
@@ -203,6 +266,8 @@ DropColorMorph>>wantsToBeDroppedInto: aMorph
 	^ false 
 ````
 
+Eventually, if everyone cooperates, the target of the drop is
+finally introduced the dropping morph.
 
 ````Smalltalk
 DropEvent>>sendEventTo: aMorph
@@ -224,33 +289,22 @@ DropColorMorph>>processDropMorph: aDropEvent
 	 ]
 ````
 
-````Smalltalk
-DropColorMorph>>processDropMorph: aDropEvent
-	"I have already expressed a desire for the drop. Just do it."
-	
-	| dropedMorph dropAction |
-	dropedMorph := aDropEvent contents.
-	dropAction := self valueOfProperty: #dropAction ifAbsent: [ nil ]. 
-	aDropEvent wasHandled: (dropAction notNil).
-	dropAction ifNotNil: [ :doIt |
-		doIt value: dropedMorph value:  dropedMorph valueWhenDropped.
-	 ]
-````
-
+Set up. @@@
 
 ````Smalltalk
 ColorEditorPanel>>colorSwatchesBeDroppable
 
 	{alphaSwatch. colorPane. colorSwatch.} do: [ :dropTarget | 
-		dropTarget
-			setProperty:  #'allowsMorphDrop' toValue: true;
-			setProperty: #wantsDroppedMorph:event: 
-				toValue: [ :dropMorph :evt | dropMorph valueWhenDropped isKindOf: Color] ;
-			setProperty: #dropAction 
-				toValue: [ :dropMorph :colorValue |
-					self setColor: colorValue. 
-					dropMorph showAcceptAndDeleteSelf.
-				]
+	  dropTarget
+	    setProperty:  #'allowsMorphDrop' toValue: true;
+	    setProperty: #wantsDroppedMorph:event: 
+		toValue: [ :dropMorph :evt |
+			   dropMorph valueWhenDropped isKindOf: Color] ;
+	    setProperty: #dropAction 
+		toValue: [ :dropMorph :colorValue |
+			self setColor: colorValue. 
+			dropMorph showAcceptAndDeleteSelf.
+		]
 	].
 ````
 
@@ -261,15 +315,14 @@ SignMorph>>rejectDropMorphEvent: dropEvent
 	
 	self showReject; hide; delete.
 	self world ifNotNil: [ :w | w activeHand removeMorph: self ].
-
 ````
 
 
 ````Smalltalk
 SignMorph>>justDroppedInto: newOwnerMorph event: anEvent 
 	"This message is sent to a dropped morph 
-after it has been dropped on -- 
-and been accepted by -- a drop-sensitive morph"
+	 after it has been dropped on -- 
+	 and been accepted by -- a drop-sensitive morph"
 
 	self showAcceptAndDeleteSelf 
 ````
