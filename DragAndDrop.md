@@ -38,7 +38,7 @@ which may be accepted or rejected by the Morph it
 is dropped upon.
 
 This is an "opt in" for a Morph.
-Just as with mouse events, a Morph 
+Just as with mouse events, a Morph class 
 can override method ````allowsSubmorphDrag```` to answer **true**
 or an individual Morph can set the property with that name.
 
@@ -75,8 +75,9 @@ VisualPropertyMenuItem>>processMouseDown: evt localPosition: localEventPosition
 				clkSel: #mouseButton1Down:localPosition:
 ````
 
-As VisualPropertyMenuItem sets the drag
-selector (to ````#dragEvent:localPosition:````, upon a drag action,
+The VisualPropertyMenuItem sets the drag
+selector to ````#dragEvent:localPosition:````.
+Upon a drag action,
 the drag event causes the HandMorph to "pick up" something.
 
 ````Smalltalk
@@ -273,7 +274,7 @@ DropColorMorph>>wantsToBeDroppedInto: aMorph
 	^ false 
 ````
 
-Eventually, if everyone agreesto the "dating before marriage", 
+Eventually, if everyone agrees to the "dating before marriage", 
 the target of the drop finally gets
 an introduction to the dropping morph.
 
@@ -306,7 +307,7 @@ by setting property values.
 
 An example is the Color Editor, which makes many uses of events (e.g. to
 update display areas when the ColorEditModel changes color --
-e.g. ````ColorEditModel>>setColor:````).
+note ````ColorEditModel>>setColor:````).
 
 In this case, the areas where a color can be dropped are made sensitive.
 
