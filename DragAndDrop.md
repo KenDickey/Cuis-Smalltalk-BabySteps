@@ -39,7 +39,7 @@ is dropped upon.
 
 This is an "opt in" for a Morph.
 Just as with mouse events, a Morph 
-can override method ````Smalltalk allowsSubmorphDrag```` to answer 'true'
+can override method ````allowsSubmorphDrag```` to answer **true**
 or an individual Morph can set the property with that name.
 
 ````Smalltalk
@@ -53,10 +53,14 @@ Morph>>allowsSubmorphDrag
 ````
 
 As with mouse events, the HandMorph does most of the interacting starting
-with  the processing of the event queue (````Smalltalk HandMorph>>processEventQueue````), but we don't need to understand the details of this to get the
+with  the processing of the
+event queue (````HandMorph>>processEventQueue````),
+but we don't need to understand the details of this to get the
 gist of what is going on.
 
-At some point, a Morph which allowsSubMorphDrag gets to handle the mouse down event.  For example, in the MetaProperty package:
+At some point, a Morph which allowsSubMorphDrag
+gets to handle the mouse down event.
+For example, in the MetaProperty package:
 
 ````Smalltalk
 VisualPropertyMenuItem>>processMouseDown: evt localPosition: localEventPosition
@@ -71,7 +75,8 @@ VisualPropertyMenuItem>>processMouseDown: evt localPosition: localEventPosition
 				clkSel: #mouseButton1Down:localPosition:
 ````
 
-As VisualPropertyMenuItem sets the dragSel selector, upon a drag action,
+As VisualPropertyMenuItem sets the drag
+selector (to ````#dragEvent:localPosition:````, upon a drag action,
 the drag event causes the HandMorph to "pick up" something.
 
 ````Smalltalk
@@ -82,7 +87,7 @@ Morph>>dragEvent: aMouseEvent localPosition: aPoint
 ````
 
 The "something" which is picked up is a Morph
-which becomes a suborph of the HandMorph.
+which becomes a submorph of the HandMorph.
 
 ````Smalltalk
 HandMorph>>grabMorph: aMorph
@@ -113,8 +118,11 @@ grabMorph: aMorph moveUnderHand: moveUnderHand
 	grabbed ifNil: [ ^ self ].
 	self hideHardwareCursor.
 	self redrawNeeded.
-"..."
+"...some code elided..."
 ````
+
+The grabbed Morph which is ````aboutToBeGrabbedBy:```` gets
+to answer the actual Morph which is given to the HandMorph.
 
 For example, picking up a Color from a color palette "grabs" a
 DropColorMorph, which gives a copy of itself to the HandMorph
@@ -150,7 +158,8 @@ HandMorph>>dropMorph: aMorph event: aMouseEvent
 			formerOwner: (morphData at: 1)
 			formerPosition: (morphData at: 2).
 	owner dispatchEvent: dropEvent.
-	dropEvent wasHandled ifFalse: [ aMorph rejectDropMorphEvent: dropEvent ].
+	dropEvent wasHandled
+		  ifFalse: [ aMorph rejectDropMorphEvent: dropEvent ].
 	self forgetGrabMorphDataFor: aMorph.
 	self mouseOverHandler processMouseOver: aMouseEvent
 ````
@@ -188,7 +197,7 @@ DropEvent>>dispatchWith: aMorph
 	^#rejected
 ````
 
-Testing cooperation is up to each Morph.
+Deciding to cooperate is up to each of the dropped Morph and drop target.
 
 ````Smalltalk
 Morph>>wantsDroppedMorph: aMorph event: evt
@@ -205,22 +214,17 @@ Morph>>wantsDroppedMorph: aMorph event: evt
        ifAbsent: [ true ]
 ````
 
-For example, a VisualPropertyMenuItem has a MetaProperty with a test.
+For example, a VisualPropertyMenuItem has a MetaProperty with a test, so
+it overrides ````wantsDroppedMorph:event:````.
 
 ````Smalltalk
 VisualPropertyMenuItem>>wantsDroppedMorph: aMorph event: evt
-	"Return true if the receiver wishes to accept 
-	 the given morph, which is being dropped by a hand 
-	 in response to the given event. 
-	 Note that for a successful drop operation both parties 
-	 need to agree. 
-	 The symmetric check is done automatically 
-	 via aMorph wantsToBeDroppedInto: self."
 
 	^ self allowsValue: aMorph valueWhenDropped
 ````
 
-A MorphEditLens drop target checks that a least one visual
+As another example, a MorphEditLens drop target checks
+that a least one visual
 property is willing to accept the dropped value.
 
 ````Smalltalk
@@ -240,13 +244,16 @@ MorphEditLens>>wantsDroppedMorph: aMorph event: evt
 	]
 ````
 
+So much for the Morph which is the taget of the drop..
 On the other side of the action, the dropping Morph also
 gets to answer if it wants to be dropped onto the
 target morph.
 
 For example, a DropColorMorph checks for a MorphEditLens, a #dropAction
 property, or a VisualPropertyMenuItem.
-The guards around the #isKindOf: test make sure that the class code is loaded.
+
+The guards around the ````isKindOf:```` test
+make sure that the class code is loaded before being asked.
 
 ````Smalltalk
 DropColorMorph>>wantsToBeDroppedInto: aMorph
@@ -266,8 +273,9 @@ DropColorMorph>>wantsToBeDroppedInto: aMorph
 	^ false 
 ````
 
-Eventually, if everyone cooperates, the target of the drop is
-finally introduced the dropping morph.
+Eventually, if everyone agreesto the "dating before marriage", 
+the target of the drop finally gets
+an introduction to the dropping morph.
 
 ````Smalltalk
 DropEvent>>sendEventTo: aMorph
@@ -275,6 +283,10 @@ DropEvent>>sendEventTo: aMorph
 
 	^aMorph processDropMorph: self
 ````
+
+The drop target then gets to query the DropEvent for its
+desired drop Morph and gets to take some action for the drop.
+This allows toolkits to cooperate with a minimum of required detail.
 
 ````Smalltalk
 DropColorMorph>>processDropMorph: aDropEvent
@@ -289,14 +301,21 @@ DropColorMorph>>processDropMorph: aDropEvent
 	 ]
 ````
 
-Set up. @@@
+Again, it is easy to have individual Morphs participate in Drag and Drop
+by setting property values.
+
+An example is the Color Editor, which makes many uses of events (e.g. to
+update display areas when the ColorEditModel changes color --
+e.g. ````ColorEditModel>>setColor:````).
+
+In this case, the areas where a color can be dropped are made sensitive.
 
 ````Smalltalk
 ColorEditorPanel>>colorSwatchesBeDroppable
 
 	{alphaSwatch. colorPane. colorSwatch.} do: [ :dropTarget | 
 	  dropTarget
-	    setProperty:  #'allowsMorphDrop' toValue: true;
+	    setProperty: #'allowsMorphDrop' toValue: true;
 	    setProperty: #wantsDroppedMorph:event: 
 		toValue: [ :dropMorph :evt |
 			   dropMorph valueWhenDropped isKindOf: Color] ;
@@ -308,6 +327,10 @@ ColorEditorPanel>>colorSwatchesBeDroppable
 	].
 ````
 
+It is a good idea to let the user know when something is complete.
+The ````showAcceptAndDeleteSelf````, ````showReject````, and friends
+give visual feedback that a drop was accepted or rejected.
+
 
 ````Smalltalk
 SignMorph>>rejectDropMorphEvent: dropEvent
@@ -317,6 +340,9 @@ SignMorph>>rejectDropMorphEvent: dropEvent
 	self world ifNotNil: [ :w | w activeHand removeMorph: self ].
 ````
 
+Finally, when a drop succeeds, the dropped Morph gets
+notification that all went well and the action is complete.
+The dropped Morph only gets this after a successful drop.
 
 ````Smalltalk
 SignMorph>>justDroppedInto: newOwnerMorph event: anEvent 
@@ -327,10 +353,23 @@ SignMorph>>justDroppedInto: newOwnerMorph event: anEvent
 	self showAcceptAndDeleteSelf 
 ````
 
-Introspection -- looking within.
+Whew!  You can now see that a long evolution of making Drag and Drop
+activity work for a large variety of use-cases has led to a sophisticated
+protocol.  But when you need it..
+
+OK.  One last example: **Introspection -- looking within**.
+
 Smalltalk knows about itself and can be asked about itself.
 This lets us query internals and put up a choice list.
 
+Here is the code used by a SignMorph to give choices when
+dropped upon a MorphEditLens drop target.
+
+When dropped on something that has only a simple action, the
+strategy above is followed, but in this case we want to
+find all the _possible_ actions and give the user a choice.
+
+Note that this only happens if MetaProperties are loaded.
 
 ````Smalltalk
 SignMorph>>dropAction: aDropTargetMorph
@@ -349,7 +388,8 @@ SignMorph>>dropAction: aDropTargetMorph
 	choices := OrderedCollection with: #Cancel.
 	choices addAll: (metaPropsForMyValue keys).
 	
-	"I am being carried by the hand.  Disappear and let user make a choice."
+	"I am being carried by the hand. 
+	 Disappear and let user make a choice."
 	self delete.
 	selection := PopUpMenu withCaption: 'Choose setter' 
 						chooseFrom: choices.
@@ -366,12 +406,8 @@ SignMorph>>dropAction: aDropTargetMorph
 	].
 ````
 
+The Drag and Drop mechanics are complex, but implement a sophisticated
+system to design pretty much any style of interaction you want or need.
 
-````Smalltalk
+Hopefully this introduction has given enough clues to do what interests you!
 
-````
-
-
-````Smalltalk
-
-````
