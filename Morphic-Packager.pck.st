@@ -1,8 +1,8 @@
-'From Cuis 6.0 [latest update: #5092] on 7 March 2022 at 5:12:34 pm'!
+'From Cuis 6.0 [latest update: #5092] on 8 March 2022 at 7:00:41 pm'!
 'Description Save combined Morph into a package which requires its dependent code.
 Restore via 
   Feature require: <package>'!
-!provides: 'Morphic-Packager' 1 8!
+!provides: 'Morphic-Packager' 1 9!
 !requires: 'Cuis-Base' 60 5092 nil!
 SystemOrganization addCategory: 'Morphic-Packager'!
 
@@ -59,7 +59,7 @@ packagesFromDumpOnFile: morphObjectFileEntry object: aMorph
 		
 	! !
 
-!Morph methodsFor: '*morphic-packager' stamp: 'KenD 3/7/2022 16:30:27'!
+!Morph methodsFor: '*morphic-packager' stamp: 'KenD 3/8/2022 18:58:57'!
 packageFileEntry: packageFileEntry 
 requires: packRequires 
 forLoadofName: packageName
@@ -80,9 +80,10 @@ forLoadofName: packageName
 	feature := Feature name: packageName version: 1 revision: 0. 
 	fspec := FeatureSpec provides: feature requires: requirements.
 	codePkg
-		description: 'Load Morph for ', packageName;
-		featureSpec: fspec;
-		save.  "Write header & requirements"
+ 	       description: 'Load Morph for ', packageName;
+  	      featureSpec: fspec;
+   	     fullFileName: packageFileEntry fullPrintString;
+    	    save.  "Write header & requirements"
 
 	packageFileEntry 
 		appendContents: 
@@ -100,7 +101,12 @@ Object subclass: #{1}
 !!{1} class methodsFor: ''class initialization'' stamp: ''{2}''!!
 initialize
 
-	(ReferenceStream restoreFromFile: ''{1}.obj'' asFileEntry) openInWorld!! !!
+    [
+        (Delay forSeconds: 1) wait.
+        UISupervisor whenUIinSafeState: [
+	    (ReferenceStream restoreFromFile: ''{1}.obj'' asFileEntry) openInWorld 
+	]
+    ] fork!! !!
 
 {1} initialize!!
 '
