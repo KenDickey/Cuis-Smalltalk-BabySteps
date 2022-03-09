@@ -1,8 +1,8 @@
-'From Cuis 6.0 [latest update: #5092] on 8 March 2022 at 7:00:41 pm'!
+'From Cuis 6.0 [latest update: #5092] on 9 March 2022 at 8:50:45 am'!
 'Description Save combined Morph into a package which requires its dependent code.
 Restore via 
   Feature require: <package>'!
-!provides: 'Morphic-Packager' 1 9!
+!provides: 'Morphic-Packager' 1 10!
 !requires: 'Cuis-Base' 60 5092 nil!
 SystemOrganization addCategory: 'Morphic-Packager'!
 
@@ -134,14 +134,14 @@ saveAsPackage
 
 	! !
 
-!Morph methodsFor: '*morphic-packager' stamp: 'KenD 3/7/2022 15:57:31'!
+!Morph methodsFor: '*morphic-packager' stamp: 'KenD 3/9/2022 08:50:16'!
 saveAsPackage: packageName
 	"Save me and create a package which requires all my dependent code."
 	
 	| packageFileName packageFileEntry morphObjectFileName morphObjectFileEntry packRequires |
 	packageFileName := packageName , '.pck.st'.
 	packageFileEntry := packageFileName asFileEntry.
-	packageFileEntry ifExists: [
+	packageFileEntry ifExists: [ :fe | 
 		(PopUpMenu confirm: packageFileName, ' already exists. Overwrite?')
 				ifFalse: [ ^nil ]
 	].
