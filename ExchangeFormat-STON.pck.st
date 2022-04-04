@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 3 April 2022 at 7:12:54 pm'!
+'From Cuis 6.0 [latest update: #5096] on 4 April 2022 at 10:46:23 am'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 6!
+!provides: 'ExchangeFormat-STON' 1 7!
 !requires: 'Cuis-Base' 60 5096 nil!
 SystemOrganization addCategory: 'ExchangeFormat-STON'!
 
@@ -77,6 +77,16 @@ Object subclass: #STONJSON
 	category: 'ExchangeFormat-STON'!
 !classDefinition: 'STONJSON class' category: 'ExchangeFormat-STON'!
 STONJSON class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONReader category: 'ExchangeFormat-STON'!
+Object subclass: #STONReader
+	instanceVariableNames: 'readStream objects classes unresolvedReferences stringStream acceptUnknownClasses newLine convertNewLines'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONReader class' category: 'ExchangeFormat-STON'!
+STONReader class
 	instanceVariableNames: ''!
 
 !classDefinition: #STONReference category: 'ExchangeFormat-STON'!
@@ -344,6 +354,22 @@ E x a m p l e s
   STONJSON fromString: '{"foo":1,"bar":2,"sub":{"a":true,"b":false},"flags":[1,8,32]}'.
  
 For a much more sophisticated JSON parser/writer implementation, have a look at NeoJSON.!
+
+!STONReader commentStamp: '<historical>' prior: 0!
+STONReader materializes objects using the Smalltalk Object Notation format.
+
+This parser is backwards compatible with standard JSON.
+
+Customization options are:
+
+- acceptUnknownClasses <Boolean> default is false
+	if true, unknown class names are allowed, the standard #mapClass (Dictionary) is instanciated and the class name is added under #classNameKey (#className)
+	if false, unknown class names result in a NotFound error
+- convertNewLines <Boolean> default is false
+	if true, any unescaped EOL sequence CR, LF or CRLF inside strings or symbols is read and converted as the chosen EOL sequence
+	if false, CR, LF and CRLF are read unmodified
+- newLine <String> default is String cr
+	sequence to use as EOL!
 
 !STONReference commentStamp: '<historical>' prior: 0!
 STONReference holds a forward reference to another object during materialization.
@@ -794,6 +820,553 @@ toString: object
 toStringPretty: object
 
 	^ STON toJsonStringPretty: object! !
+
+!STONReader methodsFor: 'error handling' stamp: 'KenD 4/4/2022 10:41:47'!
+error: aString
+	| streamPosition |
+	"Remain compatible with streams that don't understand #position"
+	streamPosition := [ readStream position ]
+		on: MessageNotUnderstood do: [ nil ].
+	^ STONReaderError signal: aString streamPosition: streamPosition! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:45:41'!
+acceptUnknownClasses: boolean
+
+	acceptUnknownClasses := boolean! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:45:24'!
+allowComplexMapKeys: boolean
+	"This is a no-op, this used to be an option, but it is now always enabled"! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:43:07'!
+close
+
+	readStream ifNotNil: [
+		readStream close.
+		readStream := nil ]! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:42:22'!
+convertNewLines: boolean
+	"When true, any newline CR, LF or CRLF read unescaped inside strings or symbols 
+	will be converted to the newline convention chosen, see #newLine:
+	The default is false, not doing any conversions."
+	
+	convertNewLines := boolean! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:38:32'!
+newLine: string
+	"Set the newline convention to be used when converting newlines, see #convertNewLines"
+	
+	newLine := string! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:37:23'!
+on: aReadStream
+
+	readStream := aReadStream! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:37:04'!
+optimizeForLargeStructures
+	self class environment
+		at: #FLLargeIdentityDictionary
+		ifPresent: [ :identityDictionaryClass | 
+			objects := identityDictionaryClass new ]! !
+
+!STONReader methodsFor: 'initialize-release' stamp: 'KenD 4/4/2022 10:26:46'!
+reset
+
+	unresolvedReferences := 0.
+	objects removeAll! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:35:13'!
+parseEscapedCharacter
+	| char |
+	char := readStream next.
+	(#($' $" $/ $\) includes: char)
+		ifTrue: [ ^ char ].
+	char = $b
+		ifTrue: [ ^ Character backspace ].
+	char = $f
+		ifTrue: [ ^ Character newPage ].
+	char = $n
+		ifTrue: [ ^ Character lf ].
+	char = $r
+		ifTrue: [ ^ Character cr ].
+	char = $t
+		ifTrue: [ ^ Character tab ].
+	char = $u
+		ifTrue: [ ^ self parseCharacterHex ].
+	self error: 'invalid escape character \' , (String with: char).
+	^ char! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:35:00'!
+parseList
+	| reference array |
+	reference := self newReference.
+	array := STON listClass streamContents: [ :stream |
+		self parseListDo: [ :each | stream nextPut: each ] ].
+	self setReference: reference to: array.
+	^ array! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:34:48'!
+parseListDo: block
+	| index |
+	self expectChar: $[.
+	(self matchChar: $]) ifTrue: [ ^ self ]. "short cut for empty lists"
+	index := 1.
+	[ readStream atEnd ] whileFalse: [
+		block cull: self parseValue cull: index.
+		(self matchChar: $]) ifTrue: [ ^ self ].
+		index := index + 1.
+		self expectChar: $, ].
+	self error: 'end of list expected'! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:34:39'!
+parseListSingleton
+	| value |
+	value := nil.
+	self parseListDo: [ :each :index |
+		index = 1 ifTrue: [ value := each ] ].
+	^ value! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:34:29'!
+parseMap
+	| map |
+	map := STON mapClass new.
+	self storeReference: map.
+	self parseMapDo: [ :key :value |
+		map at: key put: value ].
+	^ map! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:34:16'!
+parseMapDo: block
+
+	self expectChar: ${.
+	(self matchChar: $}) ifTrue: [ ^ self ]. "short cut for empty maps"
+	[ readStream atEnd ] whileFalse: [ | name value |
+		name := self parseSimpleValue.
+		self expectChar: $:.
+		value := self parseValue.
+		block value: name value: value.
+		"The above is a more efficient way to say 'self parseValue' and using the returned association"
+		(self matchChar: $}) ifTrue: [ ^ self ].
+		self expectChar: $, ].
+	self error: 'end of map expected'! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:33:59'!
+parseMapOrListRepresentation
+	"Parse either a map or list to be used as a representation, not considering it as a referenceable object"
+	readStream atEnd 
+		ifFalse: [ 
+			readStream peek = ${
+				ifTrue: [ | map |
+					map := STON mapClass new.
+					self parseMapDo: [ :key :value |
+						map at: key put: value ].
+					^ map ].
+			readStream peek = $[
+				ifTrue: [ 
+					^ STON listClass streamContents: [ :stream |
+						self parseListDo: [ :each | stream nextPut: each ] ] ] ].
+	self error: 'invalid input'! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:33:43'!
+parseNamedInstVarsFor: anObject
+	self parseMapDo: [ :instVarName :value |
+		anObject instVarNamed: instVarName asString put: value ]! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:32:17'!
+parseObject
+	| targetClass reference object |
+	[
+		reference := self newReference.
+		targetClass := self parseClass.
+		object := targetClass fromSton: self .
+		self setReference: reference to: object ]
+		on: NotFound 
+		do: [ :notFound |
+			acceptUnknownClasses 
+				ifTrue: [ 
+					object := STON mapClass new.
+					self storeReference: object.
+					self parseMapDo: [ :key :value |
+						object at: key put: value ].
+					object at: STON classNameKey put: notFound object ]
+				ifFalse: [ self error: 'Cannot resolve class named ', notFound object printString ] ].
+	^ object! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:31:36'!
+parseSimpleValue
+	| char |
+	readStream atEnd ifFalse: [ 
+		(self isClassStartChar: (char := readStream peek)) 
+			ifTrue: [ ^ self parseObject ].
+		char = ${
+			ifTrue: [ ^ self parseMap ].
+		char = $[
+			ifTrue: [ ^ self parseList ].
+		(char = $' or: [ char = $" ])
+			ifTrue: [ ^ self parseString ].
+		char = $#
+			ifTrue: [ ^ self parseSymbol ].
+		char = $@
+			ifTrue: [ ^ self parseReference ].
+		(char = $- or: [ char isDigit ])
+			ifTrue: [ ^ self parseNumber ].
+		self parseConstantDo: [ :value | ^ value ] ].
+	self error: 'invalid input'! !
+
+!STONReader methodsFor: 'parsing' stamp: 'KenD 4/4/2022 10:30:06'!
+parseValue
+	| value |
+	value := self parseSimpleValue.
+	^ (self matchChar: $:)
+		ifTrue: [ STON associationClass key: value value: self parseValue ]
+		ifFalse: [ value ]! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:41:13'!
+initialize
+	super initialize.
+	objects := IdentityDictionary new.
+	classes := IdentityDictionary new.
+	acceptUnknownClasses := convertNewLines := false.
+	newLine := String newLineString  "OS independent; Cuis specific".
+	unresolvedReferences := 0! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:36:43'!
+parseCharacter
+	| char |
+	^ (char := readStream next) = $\
+		ifTrue: [ self parseEscapedCharacter ]
+		ifFalse: [ char ]! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:36:33'!
+parseCharacterConvertingNewLinesOn: writeStream
+	| char |
+	(char := readStream next) = $\
+		ifTrue: [ writeStream nextPut: self parseEscapedCharacter ]
+		ifFalse: [ 
+			char = Character lf 
+				ifTrue: [ writeStream nextPutAll: newLine ]
+				ifFalse: [ 
+					char = Character cr 
+						ifTrue: [ 
+							readStream peekFor: Character lf.
+							writeStream nextPutAll: newLine ]
+						ifFalse: [ writeStream nextPut: char ] ] ]! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:36:21'!
+parseCharacterHex
+	| value codePoint |
+	value := self parseCharacterHex4Value.
+	(value < 16rD800 or: [ value > 16rDBFF ])
+		ifTrue: [ codePoint := value ]
+		ifFalse: [ | leadSurrogate trailSurrogate |
+			"Characters not in the Basic Multilingual Plane are encoded as a UTF-16 surrogate pair"
+			"See https://tools.ietf.org/html/rfc7159#section-7"
+			leadSurrogate := value.
+			trailSurrogate := self parseTrailingSurrogateHexEscape.
+			codePoint := (leadSurrogate - 16rD800) * 16r400 + (trailSurrogate - 16rDC00).
+			codePoint := 16r10000 + codePoint ].
+	^ Character codePoint: codePoint! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:36:11'!
+parseCharacterHex4Value
+	| value |
+	value := self parseCharacterHexDigit.
+	3 timesRepeat: [ 
+		value := (value << 4) + self parseCharacterHexDigit ].
+	^ value! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:35:58'!
+parseCharacterHexDigit
+	| digit |
+	readStream atEnd ifFalse: [ 
+		digit := readStream next asInteger.
+		(digit between: "$0" 48 and: "$9" 57)
+			ifTrue: [ ^ digit - 48 ].
+		(digit between: "$A" 65 and: "$F" 70)
+			ifTrue: [ ^ digit - 55 ].
+		(digit between: "$a" 97 and: "$f" 102)
+			ifTrue: [ ^ digit - 87 ] ].
+	self error: 'hex-digit expected'! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:35:45'!
+parseClass
+	| className |
+	className := self stringStreamContents: [ :stream |
+		[ readStream atEnd not and: [ self isClassChar: readStream peek ] ] whileTrue: [ 
+			stream nextPut: readStream next ] ].
+	self consumeWhitespace.
+	^ self lookupClass: className asSymbol! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:35:29'!
+parseConstantDo: block
+	"Parse and consume either true|false|nil|null and execute block 
+	or else do nothing (but do not back up).
+	Hand written implementation to avoid the use of #position:"
+	
+	(readStream peek = $t)
+		ifTrue: [
+			^ self match: 'true' do: [ block value: true ] ].
+	(readStream peek = $f)
+		ifTrue: [
+			^ self match: 'false' do: [ block value: false ] ].
+	(readStream peek = $n)
+		ifTrue: [
+			readStream next.
+			(readStream peek = $i)
+				ifTrue: [
+					self match: 'il' do: [ block value: nil ] ].
+			(readStream peek = $u)
+				ifTrue: [
+					self match: 'ull' do: [ block value: nil ] ] ]! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:33:17'!
+parseNumber
+	| negated number |
+	negated := readStream peekFor: $-.
+	number := self parseNumberInteger.
+	(readStream peekFor: $/)
+		ifTrue: [ 
+			number := Fraction numerator: number denominator: self parseNumberInteger.
+			(readStream peekFor: $s)
+				ifTrue: [ number := ScaledDecimal newFromNumber: number scale: self parseNumberInteger ] ]
+		ifFalse: [ 
+			(readStream peekFor: $.)
+				ifTrue: [ number := number + self parseNumberFraction ].
+			((readStream peekFor: $e) or: [ readStream peekFor: $E ])
+				ifTrue: [ number := number * self parseNumberExponent ] ].
+	negated
+		ifTrue: [ number := number negated ].
+	self consumeWhitespace.
+	^ number! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:33:03'!
+parseNumberExponent
+	| number negated |
+	number := 0.
+	(negated := readStream peekFor: $-)
+		ifFalse: [ readStream peekFor: $+ ].
+	[ readStream atEnd not and: [ readStream peek isDigit ] ]
+		whileTrue: [ number := 10 * number + readStream next digitValue ].
+	negated
+		ifTrue: [ number := number negated ].
+	^ 10 raisedTo: number! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:32:52'!
+parseNumberFraction
+	| number power |
+	number := 0.
+	power := 1.0.
+	[ readStream atEnd not and: [ readStream peek isDigit ] ] whileTrue: [
+		number := 10 * number + readStream next digitValue.
+		power := power * 10.0 ].
+	^ number / power! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:32:43'!
+parseNumberInteger
+	| number |
+	number := 0.
+	[ readStream atEnd not and: [ readStream peek isDigit ] ] whileTrue: [ 
+		number := 10 * number + readStream next digitValue ].
+	^ number! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:31:58'!
+parseReference
+	| index |
+	self expectChar: $@.
+	index := self parseNumberInteger.
+	self consumeWhitespace.
+	unresolvedReferences := unresolvedReferences + 1.
+	^ STONReference index: index! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:31:09'!
+parseString
+
+	^ self parseStringInternal! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:28:30'!
+parseStringInternal
+	| result delimiter |
+	delimiter := readStream next.
+	(delimiter = $' or: [ delimiter = $" ])
+		ifFalse: [ self error: ''' or " expected' ].
+	result := self
+		stringStreamContents: [ :stream | 
+			convertNewLines
+				ifTrue: [ 
+					[ readStream atEnd or: [ readStream peek = delimiter ] ] 
+						whileFalse: [ self parseCharacterConvertingNewLinesOn: stream ] ]
+				ifFalse: [ 
+					[ readStream atEnd or: [ readStream peek = delimiter ] ] 
+						whileFalse: [ stream nextPut: self parseCharacter ] ] ].
+	self expectChar: delimiter.
+	^ result! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:28:12'!
+parseSymbol
+	| string |
+	self expectChar: $#.
+	readStream peek = $'
+		ifTrue: [ ^ self parseStringInternal asSymbol ].
+	string := self stringStreamContents: [ :stream |
+		[ readStream atEnd not and: [ self isSimpleSymbolChar: readStream peek ] ] whileTrue: [
+			stream nextPut: readStream next ] ].
+	string isEmpty
+		ifFalse: [ 
+			self consumeWhitespace.
+			^ string asSymbol ].
+	self error: 'unexpected input'! !
+
+!STONReader methodsFor: 'parsing-internal' stamp: 'KenD 4/4/2022 10:27:55'!
+parseTrailingSurrogateHexEscape
+
+	(readStream next = $\ and: [ readStream next = $u ])
+		ifTrue: [ ^ self parseCharacterHex4Value ]
+		ifFalse: [ self error: 'trailing surrogate hex escape expected' ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:42:49'!
+consumeWhitespace
+	"Strip whitespaces from the input stream."
+
+	[ readStream atEnd not and: [ readStream peek isSeparator ] ]
+		whileTrue: [ readStream next ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:41:25'!
+expectChar: character
+	"Expect character and consume input and optional whitespace at the end,
+	 throw an error otherwise."
+
+	(self matchChar: character)
+		ifFalse: [ self error: character asString, ' expected' ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:40:13'!
+isClassChar: char
+
+	^ char isAlphaNumeric or: [ char = $_ ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:40:01'!
+isClassStartChar: char
+
+	^ char isLetter and: [ char isUppercase ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:39:47'!
+isSimpleSymbolChar: char
+
+	^char isLetter or: ['0123456789-_./' includes: char]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:39:24'!
+lookupClass: name
+	"name is a symbol at this point"
+	Smalltalk globals 
+		at: name 
+		ifPresent: [ :class | ^ class ].
+	"note that classes is an identity dictionary"
+	^ classes 
+		at: name 
+		ifAbsentPut: [
+			Object allSubclasses 
+				detect: [ :class | class isMeta not and: [ class stonName = name ]  ]
+				ifNone: [ NotFound signalFor: name ] ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:39:13'!
+match: string do: block
+	"Try to read and consume string and execute block if successful.
+	Else do nothing (but do not back up)"
+
+	(string allSatisfy: [ :each | readStream peekFor: each ])
+		ifTrue: [ 
+			self consumeWhitespace.
+			block value ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:39:03'!
+matchChar: character
+	"Tries to match character, consume input and 
+	answer true if successful and consumes whitespace at the end."
+
+	^ (readStream peekFor: character)
+		ifTrue: [ 
+			self consumeWhitespace.
+			true ]
+		ifFalse: [ false ]! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:38:09'!
+newReference
+	| index reference |
+	index := objects size + 1.
+	reference := STONReference index: index.
+	objects at: index put: reference.
+	^ reference! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:27:39'!
+processSubObjectsOf: object
+	| unresolvedReferencesCount |
+	unresolvedReferencesCount := unresolvedReferences.
+	object stonProcessSubObjects: [ :each | 
+		each isStonReference
+			ifTrue: [ self resolveReference: each ]
+			ifFalse: [ 
+				each stonContainSubObjects
+					ifTrue: [ self processSubObjectsOf: each ]
+					ifFalse: [ each ] ] ].
+	unresolvedReferencesCount > unresolvedReferences
+		ifTrue: [ object stonPostReferenceResolution ].
+	^ object! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:26:15'!
+resolveReference: reference
+
+	unresolvedReferences := unresolvedReferences - 1.
+	^ self resolveReferenceIndex: reference index! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:26:03'!
+resolveReferenceIndex: index
+
+	^ objects at: index! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:25:51'!
+setReference: reference to: object
+
+	objects at: reference index put: object! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:25:39'!
+storeReference: object
+	| index |
+	index := objects size + 1.
+	objects at: index put: object.
+	^ index! !
+
+!STONReader methodsFor: 'private' stamp: 'KenD 4/4/2022 10:25:27'!
+stringStreamContents: block
+
+	stringStream ifNil: [ 
+		stringStream := (String new: 32) writeStream ].
+	stringStream reset.
+	block value: stringStream.
+	^ stringStream contents! !
+
+!STONReader methodsFor: 'reading' stamp: 'KenD 4/4/2022 10:37:56'!
+next
+	| object |
+	self consumeWhitespace.
+	object := self parseValue.
+	unresolvedReferences > 0
+		ifTrue: [ self processSubObjectsOf: object ].
+	unresolvedReferences = 0
+		ifFalse: [ self error: 'Inconsistent reference resolution' ].
+	^ object! !
+
+!STONReader methodsFor: 'testing' stamp: 'KenD 4/4/2022 10:43:57'!
+atEnd
+
+	^ readStream atEnd! !
+
+!STONReader class methodsFor: 'instance creation' stamp: 'KenD 4/4/2022 10:24:47'!
+on: readStream
+
+	^ self new ::
+		on: readStream;
+		yourself! !
 
 !STONReference methodsFor: 'accessing' stamp: 'KenD 4/3/2022 18:38:57'!
 index
