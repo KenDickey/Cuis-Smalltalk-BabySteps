@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 4 April 2022 at 10:46:23 am'!
+'From Cuis 6.0 [latest update: #5096] on 4 April 2022 at 1:26:11 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 7!
+!provides: 'ExchangeFormat-STON' 1 8!
 !requires: 'Cuis-Base' 60 5096 nil!
 SystemOrganization addCategory: 'ExchangeFormat-STON'!
 
@@ -107,6 +107,36 @@ Object subclass: #STONStreamWriter
 	category: 'ExchangeFormat-STON'!
 !classDefinition: 'STONStreamWriter class' category: 'ExchangeFormat-STON'!
 STONStreamWriter class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONListWriter category: 'ExchangeFormat-STON'!
+STONStreamWriter subclass: #STONListWriter
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONListWriter class' category: 'ExchangeFormat-STON'!
+STONListWriter class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONShortListWriter category: 'ExchangeFormat-STON'!
+STONListWriter subclass: #STONShortListWriter
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONShortListWriter class' category: 'ExchangeFormat-STON'!
+STONShortListWriter class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONMapWriter category: 'ExchangeFormat-STON'!
+STONStreamWriter subclass: #STONMapWriter
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONMapWriter class' category: 'ExchangeFormat-STON'!
+STONMapWriter class
 	instanceVariableNames: ''!
 
 !classDefinition: #STONWriter category: 'ExchangeFormat-STON'!
@@ -378,6 +408,17 @@ STONReference holds a forward reference to another object during materialization
 !STONStreamWriter commentStamp: '<historical>' prior: 0!
 STONStreamWriter helps in streaming writing STON representations.
 This is an abstract class.!
+
+!STONListWriter commentStamp: '<historical>' prior: 0!
+STONArrayWriter helps in writing array based STON representations.
+!
+
+!STONShortListWriter commentStamp: '<historical>' prior: 0!
+STONShortArrayWriter helps in writing short array based STON representations.
+!
+
+!STONMapWriter commentStamp: '<historical>' prior: 0!
+STONDictionaryWriter helps in writing dictionary based STON representations.!
 
 !STONWriter commentStamp: '<historical>' prior: 0!
 STONWriter serializes objects using the Smalltalk Object Notation format. 
@@ -1413,6 +1454,24 @@ on: stonWriter
 		on: stonWriter;
 		yourself! !
 
+!STONListWriter methodsFor: 'accessing' stamp: 'KenD 4/4/2022 12:05:17'!
+add: anObject
+
+	first ifTrue: [ first := false ] ifFalse: [ writer listElementSeparator ].
+	writer nextPut: anObject! !
+
+!STONShortListWriter methodsFor: 'accessing' stamp: 'KenD 4/4/2022 12:07:21'!
+add: anObject
+
+	first ifTrue: [ first := false ] ifFalse: [ writer shortListElementSeparator ].
+	writer nextPut: anObject! !
+
+!STONMapWriter methodsFor: 'accessing' stamp: 'KenD 4/4/2022 12:06:11'!
+at: key put: value
+
+	first ifTrue: [ first := false ] ifFalse: [ writer mapElementSeparator ].
+	writer encodeKey: key value: value! !
+
 !STONWriter methodsFor: 'accessing' stamp: 'KenD 4/3/2022 19:06:22'!
 jsonMode
 
@@ -1929,4 +1988,348 @@ on: writeStream
 !STONWriter class methodsFor: 'private' stamp: 'KenD 4/3/2022 18:51:34'!
 isSimpleSymbolChar: char
 	^ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_./' includes: char! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:03:24'!
+fromSton: stonReader
+	"Decode non-variable classes from a map of their instance variables and values.
+	Override to customize and add a matching #toSton: (see implementors)."
+	
+	self class isVariable 
+		ifTrue: [
+			stonReader error: 'custom #fromSton: implementation needed for variable/indexable class' ]
+		ifFalse: [
+			stonReader parseNamedInstVarsFor: self ]! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:03:13'!
+isStonReference
+
+	^ false! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:03:03'!
+stonContainSubObjects
+	"Return true if I contain subObjects that should be processed, false otherwise.
+	Overwrite when necessary. See also #stonProcessSubObjects:"
+	
+	^ true! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:02:51'!
+stonOn: stonWriter
+	"Encode non-variable classes with a map of their instance variable and values.
+	Override to customize and add a matching #fromSton: (see implementors)."
+
+	self class isVariable 
+		ifTrue: [
+			stonWriter error: 'custom #stonOn: implementation needed for variable/indexable class' ]
+		ifFalse: [
+			stonWriter writeObject: self ]
+	! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:02:25'!
+stonPostReferenceResolution
+	"Hook that is called when references were resolved processing this object or one of its sub objects. This will most probably influence hash values. Override to take appropriate action."! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:02:15'!
+stonProcessSubObjects: block
+	"Execute block to (potentially) change each of my subObjects.
+	In general, all instance and indexable variables are processed.
+	Overwrite when necessary. Not used when #stonContainSubObjects returns false."
+	
+	1 to: self class instSize do: [ :each |
+		self instVarAt: each put: (block value: (self instVarAt: each)) ].
+	(self class isVariable and: [ self class isBytes not ])
+		ifTrue: [
+			1 to: self basicSize do: [ :each |
+				self basicAt: each put: (block value: (self basicAt: each)) ] ]! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:01:54'!
+stonShouldWriteNilInstVars
+	"Return true if my instance variables that are nil should be written out, 
+	false otherwise. Overwrite when necessary. By default, return false."
+	
+	^ false! !
+
+!Object class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:01:36'!
+fromSton: stonReader
+	"Create a new instance and delegate decoding to instance side.
+	Override only when new instance should be created directly (see implementors). "
+	
+	^ self new ::
+		fromSton: stonReader;
+		yourself! !
+
+!Object class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:01:20'!
+stonAllInstVarNames
+	"Override to encode my instances using a custom set of instance variables or to define their order."
+	
+	^ self allInstVarNames! !
+
+!Object class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:01:02'!
+stonName
+	"Override to encode my instances using a different class name.
+	Use symbols as class name/tag."
+	
+	"Class names are expected to conform
+	to first STONReader>>#isClassStartChar: then STONReader>>#isClassChar:"
+	
+	^ self name! !
+
+!Boolean methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:29:20'!
+stonContainSubObjects 
+
+	^ false! !
+
+!Boolean methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:29:07'!
+stonOn: stonWriter
+
+	stonWriter writeBoolean: self! !
+
+!Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:41:00'!
+stonContainSubObjects
+
+	^ false! !
+
+!Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:43:11'!
+stonOn: stonWriter
+	| name |
+	"isTranslucent -> isOpaque not"
+	((self isOpaque not) or: [ (name := self name) = #unnamed ])
+		ifTrue: [ 
+			stonWriter writeObject: self streamMap: [ :map |
+				#(red green blue alpha) do: [ :each | 
+					map at: each put: ((self perform: each) roundTo: 0.001) ] ] ]
+		ifFalse: [ 
+			stonWriter writeObject: self listSingleton: name ]! !
+
+!Color class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:39:42'!
+fromSton: stonReader
+	| representation |
+	representation := stonReader parseMapOrListRepresentation.
+	^ representation isArray
+		ifTrue: [ 
+			self named: representation first ]
+		ifFalse: [ 
+			(representation includesKey: #rgb)
+				ifTrue: [ 
+					self basicNew setRGB: (representation at: #rgb); setAlpha: 1.0 "backwards compatibility" ]
+				ifFalse: [ 
+					self 
+						r: (representation at: #red) 
+						g: (representation at: #green) 
+						b: (representation at: #blue) 
+						alpha: (representation at: #alpha) ] ]! !
+
+!ClassDescription methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:35:38'!
+stonContainSubObjects
+
+	^ false! !
+
+!Class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:35:07'!
+stonOn: stonWriter
+
+	stonWriter 
+		writeObject: self 
+		listSingleton: self name asSymbol! !
+
+!Class class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:34:32'!
+environment
+
+	^ Smalltalk! !
+
+!Class class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:33:04'!
+fromSton: stonReader
+	| theClassName theClass |
+	theClassName := stonReader parseListSingleton.
+	theClass := self environment at: theClassName.
+	^ theClass! !
+
+!DateAndTime methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:45:34'!
+stonContainSubObjects 
+
+	^ false! !
+
+!DateAndTime methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:45:21'!
+stonOn: stonWriter
+	"Use an ISO representation with all details YYYY-MM-DDTHH:MM:SS.N+TZ (with optional nanoseconds and timezone offset)"
+	
+	stonWriter writeObject: self listSingleton: 
+		(String streamContents: [ :stream |
+			self printOn: stream withLeadingSpace: false ])! !
+
+!DateAndTime class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:45:03'!
+fromSton: stonReader
+
+	^ self readFrom: stonReader parseListSingleton readStream! !
+
+!Association methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:27:29'!
+stonOn: stonWriter
+
+	self class == STON associationClass
+		ifTrue: [ stonWriter writeAssociation: self ]
+		ifFalse: [ super stonOn: stonWriter ]! !
+
+!Character methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:32:19'!
+stonOn: stonWriter
+
+	stonWriter writeObject: self listSingleton: self asString! !
+
+!Character class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:31:23'!
+fromSton: stonReader
+
+	^ stonReader parseListSingleton first! !
+
+!Date methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:44:33'!
+stonContainSubObjects 
+
+	^ false! !
+
+!Date methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:44:19'!
+stonOn: stonWriter
+	"Use an ISO style YYYY-MM-DD representation.
+	Since my current implementation is time zone offset sensitive, the offset has to be included."
+
+	| representation |
+	representation := self offset isZero
+		ifTrue: [ 
+			String new: 11 streamContents: [ :out | 
+				self printOn: out format: #(3 2 1 $- 1 1 2).
+				out nextPut: $Z ] ]
+		ifFalse: [ 
+			String new: 32 streamContents: [ :out | 
+				self printOn: out format: #(3 2 1 $- 1 1 2).
+				out nextPut: (self offset positive ifTrue: [ $+ ] ifFalse: [ $- ]).
+				self offset hours abs printOn: out base: 10 length: 2 padded: true.
+				out nextPut: $:.
+				self offset minutes abs printOn: out base: 10 length: 2 padded: true.
+				self offset seconds = 0 
+					ifFalse:[ 
+						out nextPut: $:; print: self offset seconds abs truncated ] ] ].
+	stonWriter writeObject: self listSingleton: representation! !
+
+!Date class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:43:44'!
+fromSton: stonReader
+	"Read a ISO YYYY-MM-DD format.
+	Since my current implementation is time zone offset sensitive, the offset has to be taken into account.
+	A missing offset results in the local timezone offset to be used"
+	
+	| readStream date |
+	readStream := stonReader parseListSingleton readStream.
+	date := self readFrom: readStream.
+	readStream atEnd
+		ifFalse: [ | offset |
+			offset := DateAndTime readTimezoneOffsetFrom: readStream.
+			offset = date offset 
+				ifFalse: [ date start: (date start translateTo: offset) ] ].
+	^ date! !
+
+!Collection methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:36:52'!
+stonOn: stonWriter
+	"For collections we chose to write a list of elements as delivered by #do:
+	This is not the best or most correct solution for all subclasses though,
+	so some will revert to standard object behavior or chose another solution"
+	
+	stonWriter writeObject: self do: [
+		stonWriter encodeList: self ]! !
+
+!Collection class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:36:20'!
+fromSton: stonReader
+	"For collections we chose to instanciate based a list of elements using #add:
+	This is not the best or most correct solution for all subclasses though,
+	so some will revert to standard object behavior or chose another solution."
+	
+	| collection |
+	collection := self new.
+	stonReader parseListDo: [ :each |
+		collection add: each ].
+	^ collection! !
+
+!ByteArray methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:30:16'!
+stonContainSubObjects 
+
+	^ false! !
+
+!ByteArray methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:30:08'!
+stonOn: stonWriter
+	"Use a hex representation"
+	
+	stonWriter writeObject: self listSingleton: self hex! !
+
+!ByteArray class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:29:51'!
+fromSton: stonReader
+	"Use a hex representation"
+	
+	^ self readHexFrom: stonReader parseListSingleton! !
+
+!Bag methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:28:31'!
+stonOn: stonWriter
+	"Use a map with element-occurrences pairs as representation"
+
+	stonWriter 
+		writeObject: self 
+		do: [ stonWriter encodeMap: contents ]! !
+
+!Bag class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:28:08'!
+fromSton: stonReader
+	"Read a map representation containing element/occurrences pairs"
+	
+	| bag |
+	bag := self new.
+	stonReader parseMapDo: [ :key :value |
+		bag add: key withOccurrences: value ].
+	^ bag! !
+
+!Dictionary methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:47:16'!
+stonOn: stonWriter
+	"Instances of STON mapClass will be encoded directly, without a class tag.
+	Other (sub)classes will be encoded with a class tag and will use a map representation. "
+	
+	self class == STON mapClass
+		ifTrue: [ 
+			stonWriter writeMap: self ]
+		ifFalse: [ 
+			stonWriter 
+				writeObject: self 
+				do: [ stonWriter encodeMap: self ] ]! !
+
+!Dictionary methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:48:15'!
+stonPostReferenceResolution
+	"When references were resolved in me,
+	the hash of my keys might have changed.
+	Check if I am still healthy and rehash me if not."
+	
+	self flag: #isHealthy.
+	self isHealthy ifFalse: [ self rehash ]! !
+
+!Dictionary class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:46:55'!
+fromSton: stonReader
+	"Instances of STON mapClass will be read directly and won't arrive here.
+	Other (sub)classes will use this method."
+	
+	| dictionary |
+	dictionary := self new.
+	stonReader parseMapDo: [ :key :value |
+		dictionary at: key put: value ].
+	^ dictionary! !
+
+!FileSystemEntry methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 13:24:31'!
+stonOn: stonWriter
+	 | pathString workDirEntry |
+	self flag: #KenD.
+	"in order to get $/ as delimiter and $. as working directory on all platforms"
+	workDirEntry := Smalltalk getCurrentWorkingDirectory asDirectoryEntry.
+	(self = workDirEntry)
+		ifTrue: [pathString := '.']
+		ifFalse: [
+			((self isFile) and: [self parent = workDirEntry])
+			ifTrue: [pathString := './' , self baseName] 
+			ifFalse: [pathString := self pathName]
+		].
+			
+	stonWriter 
+		writeObject: self 
+		named: STONFileReference stonName 
+		listSingleton: pathString.
+		
+
+
+		! !
 STONWriter initialize!
