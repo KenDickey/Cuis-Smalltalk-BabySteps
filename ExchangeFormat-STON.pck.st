@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 5 April 2022 at 8:40:15 am'!
+'From Cuis 6.0 [latest update: #5096] on 11 April 2022 at 4:46:17 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,8 +14,10 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 13!
+!provides: 'ExchangeFormat-STON' 1 16!
 !requires: 'Cuis-Base' 60 5096 nil!
+!requires: 'SqueakCompatibility' 1 33 nil!
+!requires: 'CSS3-NamedColors' 1 1 nil!
 SystemOrganization addCategory: 'ExchangeFormat-STON'!
 
 
@@ -57,6 +59,26 @@ TestCase subclass: #STONWriteReadTest
 	category: 'ExchangeFormat-STON'!
 !classDefinition: 'STONWriteReadTest class' category: 'ExchangeFormat-STON'!
 STONWriteReadTest class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONWriteAsciiOnlyReadTest category: 'ExchangeFormat-STON'!
+STONWriteReadTest subclass: #STONWriteAsciiOnlyReadTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONWriteAsciiOnlyReadTest class' category: 'ExchangeFormat-STON'!
+STONWriteAsciiOnlyReadTest class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONWritePrettyPrinterReadTest category: 'ExchangeFormat-STON'!
+STONWriteReadTest subclass: #STONWritePrettyPrinterReadTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONWritePrettyPrinterReadTest class' category: 'ExchangeFormat-STON'!
+STONWritePrettyPrinterReadTest class
 	instanceVariableNames: ''!
 
 !classDefinition: #STONWriteReadCommentsTest category: 'ExchangeFormat-STON'!
@@ -224,6 +246,9 @@ I am a FileEntry.!
 
 !STONWriteReadTest commentStamp: '<historical>' prior: 0!
 STONWriteReadTests test serialization followed by materialization, these tests first write then read STON.!
+
+!STONWritePrettyPrinterReadTest commentStamp: '<historical>' prior: 0!
+STONWritePrettyPrinterReadTests tests pretty printed serialization followed by materialization.!
 
 !STONWriterTest commentStamp: '<historical>' prior: 0!
 STONWriterTests test serialization.!
@@ -1037,6 +1062,42 @@ testUser2
 		users at: newUser username put: newUser ].
 	self serializeAndMaterialize: users.! !
 
+!STONWriteAsciiOnlyReadTest methodsFor: 'private' stamp: 'KenD 4/5/2022 12:22:20'!
+serialize: anObject
+
+	^ String streamContents: [ :stream |
+		STON writer 
+			on: stream; 
+			asciiOnly: true;
+			nextPut: anObject ]! !
+
+!STONWriteAsciiOnlyReadTest methodsFor: 'private' stamp: 'KenD 4/5/2022 12:22:08'!
+serializeJson: anObject
+
+	^ String streamContents: [ :stream |
+		STON jsonWriter 
+			on: stream; 
+			asciiOnly: true;
+			nextPut: anObject ]! !
+
+!STONWritePrettyPrinterReadTest methodsFor: 'private' stamp: 'KenD 4/5/2022 12:21:27'!
+serialize: anObject
+
+	^ String streamContents: [ :stream |
+		STON writer 
+			on: stream; 
+			prettyPrint: true;
+			nextPut: anObject ]! !
+
+!STONWritePrettyPrinterReadTest methodsFor: 'private' stamp: 'KenD 4/5/2022 12:21:17'!
+serializeJson: anObject
+
+	^ String streamContents: [ :stream |
+		STON jsonWriter 
+			on: stream; 
+			prettyPrint: true;
+			nextPut: anObject ]! !
+
 !STONWriteReadCommentsTest methodsFor: 'options' stamp: 'KenD 4/5/2022 08:39:36'!
 reader: string
 
@@ -1130,17 +1191,17 @@ testClass
 
 	self assert: (self serialize: Point) equals: 'Class[#Point]'! !
 
-!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/4/2022 14:59:59'!
+!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/11/2022 16:45:54'!
 testColor
 	self 
 		assert: (self serialize: Color red) 
 		equals: 'Color[#red]'.
 	self 
 		assert: (self serialize: (Color red copy setAlpha: 0.4)) 
-		equals: 'Color{#red:1.0,#green:0.0,#blue:0.0,#alpha:0.4}'.
+		equals: 'TranslucentColor{#red:0.898,#green:0.0,#blue:0.0,#alpha:0.4}'.
 	self 
 		assert: (self serialize: Color red lighter lighter) 
-		equals: 'Color{#red:1.0,#green:0.061,#blue:0.061,#alpha:1.0}'.! !
+		equals: 'Color{#red:1.0,#green:0.06,#blue:0.06,#alpha:1.0}'.! !
 
 !STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/4/2022 14:56:53'!
 testCustomNewline
@@ -2758,11 +2819,11 @@ indentedDo: block
 	block value.
 	level := level - 1! !
 
-!STONWriter methodsFor: 'private' stamp: 'KenD 4/3/2022 19:07:49'!
+!STONWriter methodsFor: 'private' stamp: 'KenD 4/5/2022 12:30:26'!
 isSimpleSymbol: symbol
 
 	self flag: #WideString.
-	(symbol isEmpty" or: [ symbol isWideString ]") 
+	(symbol isEmpty " or: [ symbol isWideString ]") 
 		ifTrue: [ ^ false ].
 	^ (symbol class 
 		findFirstInString: symbol 
@@ -3152,16 +3213,21 @@ stonOn: stonWriter
 
 	stonWriter writeBoolean: self! !
 
+!Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/11/2022 16:24:26'!
+setAlpha: alphaValue
+
+    ^ self alpha: alphaValue! !
+
 !Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:41:00'!
 stonContainSubObjects
 
 	^ false! !
 
-!Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:43:11'!
+!Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/11/2022 16:40:49'!
 stonOn: stonWriter
 	| name |
 	"isTranslucent -> isOpaque not"
-	((self isOpaque not) or: [ (name := self name) = #unnamed ])
+	((self isOpaque not) or: [ (name := self colorName) = nil ])
 		ifTrue: [ 
 			stonWriter writeObject: self streamMap: [ :map |
 				#(red green blue alpha) do: [ :each | 
@@ -3407,12 +3473,6 @@ stonContainSubObjects
 stonOn: stonWriter
 
 	stonWriter writeString: self! !
-
-!String methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:59:37'!
-withCRs
-	"Return a copy of the receiver in which backslash (\) characters have been replaced with carrage return (i.e. CR)."
-
-	^ self collect: [ :c | c = $\ ifTrue: [ Character crCharacter ] ifFalse: [ c ]].! !
 
 !Symbol methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:29:37'!
 stonOn: stonWriter
