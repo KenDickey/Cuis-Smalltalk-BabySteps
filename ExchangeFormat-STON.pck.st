@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 12 April 2022 at 1:02:07 pm'!
+'From Cuis 6.0 [latest update: #5096] on 14 April 2022 at 8:03:34 am'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 17!
+!provides: 'ExchangeFormat-STON' 1 18!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
 !requires: 'CSS3-NamedColors' 1 1 nil!
@@ -109,6 +109,16 @@ Object subclass: #STON
 	category: 'ExchangeFormat-STON'!
 !classDefinition: 'STON class' category: 'ExchangeFormat-STON'!
 STON class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONAlternativeRepresentationTestObject category: 'ExchangeFormat-STON'!
+Object subclass: #STONAlternativeRepresentationTestObject
+	instanceVariableNames: 'id time gridReference'
+	classVariableNames: 'KnownObjects'
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONAlternativeRepresentationTestObject class' category: 'ExchangeFormat-STON'!
+STONAlternativeRepresentationTestObject class
 	instanceVariableNames: ''!
 
 !classDefinition: #STONCStyleCommentsSkipStream category: 'ExchangeFormat-STON'!
@@ -420,6 +430,25 @@ S y n t a x
 	  E-
 !
 
+!STONAlternativeRepresentationTestObject commentStamp: '<historical>' prior: 0!
+I am STONAlternativeRepresentationTestObject.
+
+My properties are
+ - id <Integer>
+ - time <DateAndTime> in the local time zone
+ - gridReference <Point <Float>@<Float>> in kilometer
+
+My STON representation has the properties
+ - id <Integer>
+ - time <DateAndTime> in UTC
+ - grid_reference <Point <Float>@<Float>> in miles
+
+Note the different key, gridReference vs. grid_reference
+
+Upon serialization, the conversions local time to UTC and kilometer to mile is performed.
+Upon materialization, the convertions UTC to local tie and miles to kilometers are performed.
+ !
+
 !STONCStyleCommentsSkipStream commentStamp: '<historical>' prior: 0!
 I am STONCStyleCommentsSkipStream, a character ReadStream wrapping another character ReadStream. I skip C style comments, much like a classic C preprocessor.
 
@@ -559,6 +588,15 @@ Note that in default STON mode I only use the following named character escapes:
 stonName
 
 	^ #FILE! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'ston persistence' stamp: 'KenD 4/12/2022 13:18:49'!
+stonOn: stonWriter	
+
+	stonWriter writeObject: self streamMap: [ :dictionary |
+		dictionary
+			at: #id put: self id;
+			at: #time put: self timeUTC;
+			at: #grid_reference put: self gridReferenceImperial ]! !
 
 !STONReference methodsFor: 'printing' stamp: 'KenD 4/3/2022 18:38:05'!
 printOn: stream
@@ -1646,6 +1684,73 @@ reader
 writer
 
 	^ STONWriter new! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:20:07'!
+fromSton: stonReader
+
+	stonReader parseMapDo: [ :key :value |
+		key = #id ifTrue: [ self id: value ].
+		key = #time ifTrue: [ self timeUTC: value ].
+		key = #grid_reference ifTrue: [ self gridReferenceImperial: value ] ]! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:19:45'!
+gridReference
+
+	^ gridReference! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:19:56'!
+gridReference: value
+
+	gridReference := value! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:19:25'!
+gridReferenceImperial
+
+	^ gridReference / 1.609344! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:19:35'!
+gridReferenceImperial: value
+
+	gridReference := value * 1.609344! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:19:03'!
+id
+
+	^ id! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:19:13'!
+id: anObject
+
+	id := anObject! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:17:35'!
+time
+
+	^ time! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:18:01'!
+time: anObject
+
+	time := anObject! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/12/2022 13:12:28'!
+timeUTC
+
+	^ time asUTC! !
+
+!STONAlternativeRepresentationTestObject methodsFor: 'accessing' stamp: 'KenD 4/14/2022 08:02:46'!
+timeUTC: value
+
+	time := value asUTC "offset: DateAndTime localOffset"! !
+
+!STONAlternativeRepresentationTestObject class methodsFor: 'as yet unclassified' stamp: 'KenD 4/12/2022 13:11:57'!
+example
+
+	^ self new
+		id: 1e9 atRandom; 
+		time: DateAndTime now; 
+		gridReference: 150.75@250.25; 
+		yourself! !
 
 !STONCStyleCommentsSkipStream methodsFor: 'accessing' stamp: 'KenD 4/3/2022 16:36:26'!
 collectionSpecies
@@ -3119,6 +3224,14 @@ on: writeStream
 isSimpleSymbolChar: char
 	^ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_./' includes: char! !
 
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:56:13'!
+closeTo: anObject
+	"Answer whether the receiver and the argument represent the same
+	object. If = is redefined in any subclass, consider also redefining the
+	message hash."
+
+	^[self = anObject] ifError: [false]! !
+
 !Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:03:24'!
 fromSton: stonReader
 	"Decode non-variable classes from a map of their instance variables and values.
@@ -3307,6 +3420,13 @@ fromSton: stonReader
 	theMetaclass := theClass class.
 	^ theMetaclass! !
 
+!Number methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:57:19'!
+closeTo: num
+	"are these two numbers close?"
+
+	num isFloat ifTrue: [^ num closeTo: self asFloat].
+	^[self = num] ifError: [false]! !
+
 !Number methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:20:46'!
 stonContainSubObjects 
 
@@ -3316,6 +3436,17 @@ stonContainSubObjects
 stonOn: stonWriter
 
 	stonWriter writeFloat: self asFloat! !
+
+!Float methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:56:59'!
+closeTo: num
+ 	"are these two numbers close?"
+	num isNumber ifFalse: [^[self = num] ifError: [false]].
+	self = 0.0 ifTrue: [^num abs < 0.0001].
+	num = 0 ifTrue: [^self abs < 0.0001].
+	^self = num asFloat or: [
+		| abs |
+		(abs := self abs) < 0.0001 ifTrue: [^num abs < 0.0001].
+		(self - num) abs / (abs max: num abs) < 0.0001]! !
 
 !Fraction methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 13:27:28'!
 stonOn: stonWriter
@@ -3327,18 +3458,23 @@ stonOn: stonWriter
 
 	stonWriter writeInteger: self! !
 
+!DateAndTime methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:52:01'!
+offset: delta
+
+	offset := delta! !
+
 !DateAndTime methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:45:34'!
 stonContainSubObjects 
 
 	^ false! !
 
-!DateAndTime methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:45:21'!
+!DateAndTime methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:50:30'!
 stonOn: stonWriter
 	"Use an ISO representation with all details YYYY-MM-DDTHH:MM:SS.N+TZ (with optional nanoseconds and timezone offset)"
 	
 	stonWriter writeObject: self listSingleton: 
 		(String streamContents: [ :stream |
-			self printOn: stream withLeadingSpace: false ])! !
+			self printOn: stream "withLeadingSpace: false" ])! !
 
 !DateAndTime class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:45:03'!
 fromSton: stonReader
@@ -3682,6 +3818,11 @@ stonOn: stonWriter
 		listSingleton: pathString.
 		
 ! !
+
+!Point methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:55:31'!
+closeTo: aPoint
+
+	^(x closeTo: aPoint x) and: [y closeTo: aPoint y]! !
 
 !Point methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:23:42'!
 fromSton: stonReader
