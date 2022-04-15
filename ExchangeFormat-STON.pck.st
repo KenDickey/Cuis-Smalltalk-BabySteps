@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 14 April 2022 at 8:03:34 am'!
+'From Cuis 6.0 [latest update: #5096] on 15 April 2022 at 1:43:20 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 18!
+!provides: 'ExchangeFormat-STON' 1 22!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
 !requires: 'CSS3-NamedColors' 1 1 nil!
@@ -627,17 +627,16 @@ stonName
 
 	^ #TestUser3! !
 
-!STONReaderError methodsFor: 'accessing' stamp: 'KenD 4/3/2022 18:35:54'!
+!STONReaderError methodsFor: 'accessing' stamp: 'KenD 4/15/2022 12:04:52'!
 messageText
 
-	self flag: #Formatting.
+	"self flag: #Formatting."
 	^ streamPosition 
 		ifNil: [ 
 			super messageText ] 
 		ifNotNil: [ :pos | 
-			'At character <1P>: <2P>' 
-			  expandMacrosWith: pos 
-			  with: super messageText 
+			'At character <{1}>: <{2}>' 
+			  format: { pos .  super messageText }
 		]! !
 
 !STONReaderError methodsFor: 'accessing' stamp: 'KenD 4/3/2022 18:34:23'!
@@ -742,7 +741,7 @@ testClasses
 	classes := STON listClass withAll: { Class. Metaclass. Class class. Point class class }.
 	self serializeAndMaterialize: classes.! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:37:13'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/15/2022 13:31:01'!
 testCollections
 	| collections |
 	collections := STON listClass withAll: {
@@ -753,7 +752,7 @@ testCollections
 		Dictionary new at: 1 put: 1; at: 2 put: 2; yourself.
 		#[1 2 3].
 		#(1 2 3) asIntegerArray.
-		#(1 2 3) asFloatArray }.
+		Float64Array newFrom: #(1 2 3) "asFloatArray" }.
 	self serializeAndMaterialize: collections! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:37:03'!
@@ -2568,6 +2567,11 @@ index: integer
 
 	index := integer! !
 
+!STONReference methodsFor: 'testing' stamp: 'KenD 4/15/2022 13:24:37'!
+isStonReference
+
+	^ true! !
+
 !STONReference methodsFor: 'comparing' stamp: 'KenD 4/3/2022 18:40:06'!
 = anObject
 
@@ -2947,11 +2951,11 @@ mapElementSeparator
 	writeStream nextPut: $,.
 	self newlineIndent! !
 
-!STONWriter methodsFor: 'private' stamp: 'KenD 4/3/2022 19:04:36'!
+!STONWriter methodsFor: 'private' stamp: 'KenD 4/14/2022 08:20:11'!
 newlineIndent
 
 	prettyPrint ifTrue: [ 
-		writeStream nextPutAll: newLine.
+		writeStream newLine.
 		level timesRepeat: [ writeStream tab ] ]! !
 
 !STONWriter methodsFor: 'private' stamp: 'KenD 4/3/2022 19:03:17'!
@@ -3366,6 +3370,14 @@ fromSton: stonReader
 						b: (representation at: #blue) 
 						alpha: (representation at: #alpha) ] ]! !
 
+!Color class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/15/2022 13:42:15'!
+named: colorName
+	"Answer a Color for colorName or nil"
+	self classPool 
+		at: #ColorNamesDict
+		ifPresent: [ :dict | ^dict keyAtValue: colorName ifAbsent: [nil]].
+	^nil! !
+
 !UndefinedObject methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:31:43'!
 stonContainSubObjects 
 
@@ -3380,6 +3392,11 @@ stonOn: stonWriter
 environment
 
 	^ Smalltalk! !
+
+!ClassDescription methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/15/2022 11:56:44'!
+instanceSide
+
+	^ self theNonMetaClass ! !
 
 !ClassDescription methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:35:38'!
 stonContainSubObjects
@@ -3730,12 +3747,12 @@ fromSton: stonReader
 		bag add: key withOccurrences: value ].
 	^ bag! !
 
-!Set methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:26:34'!
+!Set methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/15/2022 13:33:01'!
 stonPostReferenceResolution
 	"When references were resolved in me, the hash of my elements might have changed.
 	Check if I am still healthy and rehash me if not."
-	self flag: #isHealthy.
-	self isHealthy ifFalse: [ self rehash ]! !
+	"self flag: #isHealthy.
+	self isHealthy ifFalse: [" self rehash "]"! !
 
 !Dictionary methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:47:16'!
 stonOn: stonWriter
