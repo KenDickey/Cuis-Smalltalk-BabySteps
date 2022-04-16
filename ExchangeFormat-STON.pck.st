@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 15 April 2022 at 1:43:20 pm'!
+'From Cuis 6.0 [latest update: #5096] on 16 April 2022 at 1:19:32 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,12 +14,22 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 22!
+!provides: 'ExchangeFormat-STON' 1 23!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
 !requires: 'CSS3-NamedColors' 1 1 nil!
 SystemOrganization addCategory: 'ExchangeFormat-STON'!
 
+
+!classDefinition: #STONTestAssociation category: 'ExchangeFormat-STON'!
+Association subclass: #STONTestAssociation
+	instanceVariableNames: 'timestamp'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONTestAssociation class' category: 'ExchangeFormat-STON'!
+STONTestAssociation class
+	instanceVariableNames: ''!
 
 !classDefinition: #STONReaderError category: 'ExchangeFormat-STON'!
 Error subclass: #STONReaderError
@@ -231,6 +241,26 @@ STONTestUser subclass: #STONTestUser3
 STONTestUser3 class
 	instanceVariableNames: ''!
 
+!classDefinition: #STONTestDomainObject category: 'ExchangeFormat-STON'!
+Object subclass: #STONTestDomainObject
+	instanceVariableNames: 'created modified integer float description color tags bytes boolean'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONTestDomainObject class' category: 'ExchangeFormat-STON'!
+STONTestDomainObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #STONTestKnownObject category: 'ExchangeFormat-STON'!
+Object subclass: #STONTestKnownObject
+	instanceVariableNames: 'id description'
+	classVariableNames: 'KnownObjects'
+	poolDictionaries: ''
+	category: 'ExchangeFormat-STON'!
+!classDefinition: 'STONTestKnownObject class' category: 'ExchangeFormat-STON'!
+STONTestKnownObject class
+	instanceVariableNames: ''!
+
 !classDefinition: #STONWriter category: 'ExchangeFormat-STON'!
 Object subclass: #STONWriter
 	instanceVariableNames: 'writeStream prettyPrint stonCharacters newLine asciiOnly jsonMode keepNewLines referencePolicy level objects'
@@ -241,6 +271,10 @@ Object subclass: #STONWriter
 STONWriter class
 	instanceVariableNames: ''!
 
+
+!STONTestAssociation commentStamp: '<historical>' prior: 0!
+STONTestAssociation is used to support unit tests.
+!
 
 !STONReaderError commentStamp: '<historical>' prior: 0!
 STONReaderError is the error/exception signalled by STONReader when illegal/incorrect input is seen. 
@@ -555,6 +589,36 @@ STONTestUser2 extends STONTestUser with explicit implementations of #fromSton: a
 !STONTestUser3 commentStamp: '<historical>' prior: 0!
 STONTestUser3 extends STONTestUser but wants nil instance variables to be written!
 
+!STONTestDomainObject commentStamp: '<historical>' prior: 0!
+STONTestDomainObject is used to support unit tests.
+
+Instance Variables
+	boolean:		<Boolean>
+	bytes:		<ByteArray>
+	color:		<Symbol>
+	created:		<DateAndTime>
+	description:	<String>
+	float:		<Float>
+	integer:		<Integer>
+	modified:		<DateAndTime>
+	tags:		<Array of: Symbol>!
+
+!STONTestKnownObject commentStamp: '<historical>' prior: 0!
+I am STONTestKnownObject. I support unit tests.
+
+I have an id and a description.
+
+When I am serialized, only my id is written out.
+
+  STONTestKnownObject['bb71b026-180c-0d00-b40c-38700aee7555']
+
+When I am materialized, the id is used to reconstruct the object, either by retrieving it from a collection of known objects, or it is created (it could also be a retrieval from somewhere else).
+
+I keep a collection of all my known instances, new instances are added to it automatically.
+
+Use my class side's #fromId: to access existing instances
+!
+
 !STONWriter commentStamp: '<historical>' prior: 0!
 STONWriter serializes objects using the Smalltalk Object Notation format. 
 
@@ -626,6 +690,43 @@ stonOn: stonWriter
 stonName
 
 	^ #TestUser3! !
+
+!STONTestDomainObject class methodsFor: 'ston-core' stamp: 'KenD 4/16/2022 13:03:19'!
+stonName
+
+	^ #TestDomainObject! !
+
+!STONTestKnownObject methodsFor: 'printing' stamp: 'KenD 4/16/2022 13:16:31'!
+printOn: stream
+
+	super printOn: stream.
+	stream nextPut: $(; print: id; nextPut: $)! !
+
+!STONTestKnownObject methodsFor: 'ston-core' stamp: 'KenD 4/16/2022 13:16:10'!
+stonOn: stonWriter
+	"We only write out our id"
+	
+	stonWriter writeObject: self listSingleton: self id asString! !
+
+!STONTestAssociation methodsFor: 'accessing' stamp: 'KenD 4/15/2022 14:55:26'!
+key: aKey value: anObject 
+
+	super key: aKey value: anObject.
+	timestamp := self now! !
+
+!STONTestAssociation methodsFor: 'accessing' stamp: 'KenD 4/15/2022 14:54:40'!
+now
+	^ DateAndTime now! !
+
+!STONTestAssociation methodsFor: 'accessing' stamp: 'KenD 4/15/2022 14:55:10'!
+timestamp
+	^ timestamp! !
+
+!STONTestAssociation methodsFor: 'accessing' stamp: 'KenD 4/15/2022 14:55:39'!
+value: anObject
+
+	super value: anObject.
+	timestamp := self now! !
 
 !STONReaderError methodsFor: 'accessing' stamp: 'KenD 4/15/2022 12:04:52'!
 messageText
@@ -842,7 +943,7 @@ testFileSystemSupport
 		FileLocator home / 'foo.txt' }.
 	self serializeAndMaterialize: fileLocators.! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:32:59'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/16/2022 12:52:11'!
 testFloats
 	| floats serialization materialization |
 	floats := STON listClass withAll: ((-10 to: 10) collect: [ :each | each * Float pi ]).
@@ -851,7 +952,7 @@ testFloats
 	self assert: floats size equals: materialization size.
 	floats with: materialization do: [ :float :materializedFloat |
 		"Use #closeTo: instead of #= to increase portability"
-		self assert: float closeTo: materializedFloat ]! !
+		self assert: (float closeTo: materializedFloat) ]! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:32:48'!
 testFractions
@@ -2711,6 +2812,223 @@ stonAllInstVarNames
 
 	^ #(username password enabled)! !
 
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:08:54'!
+boolean
+
+	^ boolean! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:09:04'!
+boolean: anObject
+
+	boolean := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:08:34'!
+bytes
+
+	^ bytes! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:08:43'!
+bytes: anObject
+
+	bytes := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:08:13'!
+color
+
+	^ color! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:08:26'!
+color: anObject
+
+	color := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:07:50'!
+created
+
+	^ created! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:07:58'!
+created: anObject
+
+	created := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:07:20'!
+description
+
+	^ description! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:07:37'!
+description: anObject
+
+	description := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:07:00'!
+float
+
+	^ float! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:07:11'!
+float: anObject
+
+	float := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:04:59'!
+integer
+
+	^ integer! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:05:11'!
+integer: anObject
+
+	integer := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:04:38'!
+modified
+
+	^ modified! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:04:47'!
+modified: anObject
+
+	modified := anObject! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:04:20'!
+tags
+
+	^ tags! !
+
+!STONTestDomainObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:04:29'!
+tags: anObject
+
+	tags := anObject! !
+
+!STONTestDomainObject methodsFor: 'comparing' stamp: 'KenD 4/16/2022 13:06:34'!
+= anObject
+	"Answer whether the receiver and anObject represent the same object."
+
+	self == anObject
+		ifTrue: [ ^ true ].
+	self class = anObject class
+		ifFalse: [ ^ false ].
+	^ color = anObject color
+		and: [ 
+			modified = anObject modified
+				and: [ 
+					created = anObject created
+						and: [ 
+							description = anObject description
+								and: [ 
+									boolean = anObject boolean
+										and: [ 
+											(float closeTo: anObject float) 		"Use #closeTo: instead of #= to increase portability"
+												and: [ 
+													bytes = anObject bytes 
+														and: [ 
+															integer = anObject integer 
+																and: [ tags = anObject tags ] ] ] ] ] ] ] ]! !
+
+!STONTestDomainObject methodsFor: 'comparing' stamp: 'KenD 4/16/2022 13:06:14'!
+hash
+	"Answer an integer value that is related to the identity of the receiver."
+
+	^ color hash
+		bitXor:
+			(modified hash
+				bitXor:
+					(created hash
+						bitXor:
+							(description hash
+								bitXor: (boolean hash bitXor: (float hash bitXor: (bytes hash bitXor: (integer hash bitXor: tags hash)))))))! !
+
+!STONTestDomainObject methodsFor: 'initialization' stamp: 'KenD 4/16/2022 13:05:58'!
+initialize
+
+	created := modified := DateAndTime now.! !
+
+!STONTestDomainObject class methodsFor: 'instance creation' stamp: 'KenD 4/16/2022 13:03:51'!
+dummy
+	^ self new
+		integer: 999999 atRandom;
+		float: 999 atRandom / Float pi;
+		boolean: #(true false) atRandom;
+		bytes: (ByteArray streamContents: [ :out | 32 timesRepeat: [ out nextPut: 255 atRandom ] ]);
+		description: (String streamContents: [ :out | 16 atRandom timesRepeat: [ out nextPutAll: 'Blah' ] ]);
+		color: #(#red #green #blue) atRandom;
+		tags: (Array 
+			with: #(#one #two #three) atRandom
+ 			with: #(#alpha #beta #gamma) atRandom 
+			with: #(#low #medium #high) atRandom);
+		yourself! !
+
+!STONTestKnownObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:17:58'!
+description
+
+	^ description! !
+
+!STONTestKnownObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:18:07'!
+description: string
+
+	description := string! !
+
+!STONTestKnownObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:17:13'!
+id
+
+	^ id! !
+
+!STONTestKnownObject methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:17:24'!
+id: uuid
+
+	id := uuid.
+	self description: 'I am a complex object known under the ID ', id asString, ' - I was created @ ', DateAndTime now asString! !
+
+!STONTestKnownObject methodsFor: 'comparing' stamp: 'KenD 4/16/2022 13:17:46'!
+= object
+
+	self class == object class ifFalse: [ ^ false ].
+	^ self id = object id! !
+
+!STONTestKnownObject methodsFor: 'comparing' stamp: 'KenD 4/16/2022 13:17:36'!
+hash
+
+	^ self id hash! !
+
+!STONTestKnownObject methodsFor: 'initialization' stamp: 'KenD 4/16/2022 13:16:58'!
+initialize
+
+	super initialize.
+	self id: UUID new.
+	self class addKnownObject: self! !
+
+!STONTestKnownObject class methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:14:56'!
+addKnownObject: object
+
+	^ self knownObjects addIfNotPresent: object! !
+
+!STONTestKnownObject class methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:13:57'!
+knownObjects
+
+	^ KnownObjects ifNil: [ KnownObjects := OrderedCollection new ]! !
+
+!STONTestKnownObject class methodsFor: 'accessing' stamp: 'KenD 4/16/2022 13:14:04'!
+resetKnownObjects
+
+	KnownObjects ifNotNil: [ :collection | collection removeAll ]! !
+
+!STONTestKnownObject class methodsFor: 'instance creation' stamp: 'KenD 4/16/2022 13:14:41'!
+fromId: idString
+	"Given id, return a matching instance of me, either by returning an existing known instance or by creating a new one (that is automatically added to the known instances)"
+	
+	| uuid |
+	uuid := UUID fromString: idString.
+	^ self knownObjects 
+		detect: [ :each | each id = uuid ] 
+		ifNone: [ self new id: uuid ]! !
+
+!STONTestKnownObject class methodsFor: 'ston-core' stamp: 'KenD 4/16/2022 13:14:30'!
+fromSton: stonReader
+
+	^ self fromId: stonReader parseListSingleton! !
+
 !STONWriter methodsFor: 'accessing' stamp: 'KenD 4/3/2022 19:06:22'!
 jsonMode
 
@@ -3330,6 +3648,12 @@ stonOn: stonWriter
 
 	stonWriter writeBoolean: self! !
 
+!Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/16/2022 12:55:35'!
+closeTo: another 
+	self == another ifTrue: [ ^ true ].
+	self class == another class ifFalse: [ ^ false ].
+	^ (self rgbDistance: another) < 0.0001! !
+
 !Color methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/11/2022 16:24:26'!
 setAlpha: alphaValue
 
@@ -3370,12 +3694,12 @@ fromSton: stonReader
 						b: (representation at: #blue) 
 						alpha: (representation at: #alpha) ] ]! !
 
-!Color class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/15/2022 13:42:15'!
+!Color class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/15/2022 15:02:40'!
 named: colorName
 	"Answer a Color for colorName or nil"
 	self classPool 
 		at: #ColorNamesDict
-		ifPresent: [ :dict | ^dict keyAtValue: colorName ifAbsent: [nil]].
+		ifPresent: [ :dict | ^dict at: colorName ifAbsent: [nil]].
 	^nil! !
 
 !UndefinedObject methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:31:43'!
@@ -3538,13 +3862,13 @@ stonContainSubObjects
 
 	^ false! !
 
-!Date methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:44:19'!
+!Date methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/16/2022 12:50:29'!
 stonOn: stonWriter
 	"Use an ISO style YYYY-MM-DD representation.
 	Since my current implementation is time zone offset sensitive, the offset has to be included."
 
 	| representation |
-	representation := self offset isZero
+"	representation := self offset isZero
 		ifTrue: [ 
 			String new: 11 streamContents: [ :out | 
 				self printOn: out format: #(3 2 1 $- 1 1 2).
@@ -3558,7 +3882,8 @@ stonOn: stonWriter
 				self offset minutes abs printOn: out base: 10 length: 2 padded: true.
 				self offset seconds = 0 
 					ifFalse:[ 
-						out nextPut: $:; print: self offset seconds abs truncated ] ] ].
+						out nextPut: $:; print: self offset seconds abs truncated ] ] ]."
+	representation := self yyyymmdd.
 	stonWriter writeObject: self listSingleton: representation! !
 
 !Date class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:43:44'!
@@ -3767,14 +4092,14 @@ stonOn: stonWriter
 				writeObject: self 
 				do: [ stonWriter encodeMap: self ] ]! !
 
-!Dictionary methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:48:15'!
+!Dictionary methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/16/2022 13:18:51'!
 stonPostReferenceResolution
 	"When references were resolved in me,
 	the hash of my keys might have changed.
 	Check if I am still healthy and rehash me if not."
 	
-	self flag: #isHealthy.
-	self isHealthy ifFalse: [ self rehash ]! !
+	"self flag: #isHealthy.
+	self isHealthy ifFalse: [" self rehash "]"! !
 
 !Dictionary class methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:46:55'!
 fromSton: stonReader
