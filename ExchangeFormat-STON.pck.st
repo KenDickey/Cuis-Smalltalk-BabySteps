@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 16 April 2022 at 1:19:32 pm'!
+'From Cuis 6.0 [latest update: #5096] on 16 April 2022 at 3:05:08 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,8 +14,9 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 23!
+!provides: 'ExchangeFormat-STON' 1 25!
 !requires: 'Cuis-Base' 60 5096 nil!
+!requires: 'Identities-UUID' 1 9 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
 !requires: 'CSS3-NamedColors' 1 1 nil!
 SystemOrganization addCategory: 'ExchangeFormat-STON'!
@@ -994,19 +995,19 @@ testJsonMode
 	}.
 	self serializeAndMaterializeJsonMode: object! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:32:11'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/16/2022 15:02:37'!
 testKnownObjects
 	| knownObject ston object |
 	knownObject := STONTestKnownObject new.
 	"make sure the system of remembering instances works"
 	self assert: (STONTestKnownObject fromId: knownObject id asString) equals: knownObject.
-	self assert: (STONTestKnownObject fromId: knownObject id asString) identicalTo: knownObject.
+	self assert: ((STONTestKnownObject fromId: knownObject id asString) == knownObject).
 	"only the id string is serialized"
 	ston := self serialize: knownObject.
 	"upon serialization, objects with known id strings come from the remembered instances"
 	object := self materialize: ston.
 	self assert: object equals: knownObject.
-	self assert: object identicalTo: knownObject.
+	self assert: (object == knownObject).
 	"not just the id is equal, but the rest of the object too"
 	self assert: object description equals: knownObject description.
 
@@ -3546,6 +3547,12 @@ on: writeStream
 isSimpleSymbolChar: char
 	^ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_./' includes: char! !
 
+!ProtoObject methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/16/2022 15:04:47'!
+environment
+	"Necessary to support disjoint class hierarchies."
+
+	^Smalltalk		"No environments in Cuis..."! !
+
 !Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:56:13'!
 closeTo: anObject
 	"Answer whether the receiver and the argument represent the same
@@ -3569,6 +3576,12 @@ fromSton: stonReader
 isStonReference
 
 	^ false! !
+
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/16/2022 14:48:22'!
+parserClass
+	"Answer a parser class to use for parsing methods compiled by instances of the receiver."
+
+	^Parser! !
 
 !Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:03:03'!
 stonContainSubObjects
@@ -3993,6 +4006,11 @@ fromSton: stonReader
 	^ self new ::
 		fromSton: stonReader;
 		yourself! !
+
+!OrderedCollection methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/16/2022 15:00:19'!
+addIfNotPresent: object
+
+	self detect: [ :elt | elt == object ] ifNone: [ self add: object ]! !
 
 !SortedCollection methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:28:13'!
 fromSton: stonReader
