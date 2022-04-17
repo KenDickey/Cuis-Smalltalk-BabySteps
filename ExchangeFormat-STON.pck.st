@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 16 April 2022 at 3:05:08 pm'!
+'From Cuis 6.0 [latest update: #5096] on 17 April 2022 at 1:40:06 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 25!
+!provides: 'ExchangeFormat-STON' 1 27!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'Identities-UUID' 1 9 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
@@ -1031,13 +1031,14 @@ testMemoryFileReferences
 	self assert: result first fileSystem isMemoryFileSystem.
 	self assert: result second contents equals: 'ABC'! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:30:46'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 11:45:38'!
 testMimeTypes
-	| mimeTypes |
+	self flag: #Unsupported
+	"| mimeTypes |
 	mimeTypes := STON listClass withAll: { 
 		ZnMimeType applicationJson.
 		ZnMimeType textPlain }.
-	self serializeAndMaterialize: mimeTypes! !
+	self serializeAndMaterialize: mimeTypes"! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:30:29'!
 testOrderedDictionary
@@ -1076,22 +1077,25 @@ testSmallIntegers
 	integers := STON listClass withAll: (-10 to: 10).
 	self serializeAndMaterialize: integers! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:29:43'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 13:36:30'!
 testSortedCollections
 	| collections |
 	collections := STON listClass withAll: {
 		SortedCollection new.
 		SortedCollection new: 0.
 		#(5 3 7 2 1 4 10 9 8 6) asSortedCollection.
-		#(5 3 7 2 1 4 10 9 8 6) asSortedCollection: #yourself ascending.
+		"self flag: #Unsupported.   No SortFunctions"
+"		#(5 3 7 2 1 4 10 9 8 6) asSortedCollection: #yourself ascending.
 		#(5 3 7 2 1 4 10 9 8 6) asSortedCollection: #yourself descending.
 		#('****' '*' '*****' '**' '***') asSortedCollection: #size ascending.
 		#('****' '*' '*****' '**' '***') asSortedCollection: #size descending.
 		#(5 3 7 2 1 4 10 nil 9 8 6) asSortedCollection: #yourself ascending undefinedFirst.
-		#(5 3 7 2 1 4 10 nil 9 8 6) asSortedCollection: #yourself ascending reversed undefinedLast }.
+		#(5 3 7 2 1 4 10 nil 9 8 6) asSortedCollection: #yourself ascending reversed undefinedLast.
+		#(5 3 7 2 1 4 10 nil 9 8 6) asSortedCollection: #yourself ascending undefinedFirst.
+		#(5 3 7 2 1 4 10 nil 9 8 6) asSortedCollection: #yourself ascending reversed undefinedLast" }.
 	self serializeAndMaterialize: collections! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:29:31'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 11:47:29'!
 testSpecialCharacters
 	| primitives |
 	primitives := STON listClass withAll: { 
@@ -1099,12 +1103,13 @@ testSpecialCharacters
 		String withAll: { $'. $". $\. $/ }.
 		'élèves français'.
 		'Düsseldorf Königsallee'.
-		#(1 10 20 30 127 140 150 160 200 255) collect: #asCharacter as: String }.
+		(#(1 10 20 30 127 140 150 160 200 255) collect: #asCharacter) as: String }.
 	self serializeAndMaterialize: primitives! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:29:21'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 11:49:03'!
 testSpecialClassNames
-	| specialClass key specialInstance ston reader object |
+	self flag: #Unsupported. "AnonymousSubclass"
+"	| specialClass key specialInstance ston reader object |
 	specialClass := LookupKey newAnonymousSubclass.
 	specialClass setName: #'STONTest_Lärm'.
 	key := 999 atRandom asString asSymbol.
@@ -1117,9 +1122,9 @@ testSpecialClassNames
 	object := reader next.
 	self assert: object equals: specialInstance.
 	self assert: object class equals: specialClass.
-	self assert: object key equals: key! !
+	self assert: object key equals: key"! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:29:14'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 11:42:42'!
 testStrings
 	| strings |
 	strings := Collection allSubclasses 
@@ -1128,7 +1133,7 @@ testStrings
 	strings := { 
 		'foo'. 'Foo BAR'. ''. '	\\'''. 
 		'élève en Français'. 
-		String with: (Character codePoint: 12354) "HIRAGANA LETTER A" }.
+		String with: (Character codePoint: 16r20AC) " $� " }.
 	self serializeAndMaterialize: strings.! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:29:05'!
@@ -1154,15 +1159,16 @@ testTextAndRunArray
 		Text new }.
 	self serializeAndMaterialize: texts! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:28:50'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 11:53:42'!
 testURLs
-	| urls |
+	self flag: #Unsupported.
+"	| urls |
 	urls := STON listClass withAll: { 
 		'https://pharo.org/files/pharo.png' asUrl. 
 		'mailto:sven@stfx.eu' asUrl. 
 		'file:///var/log/system.log' asUrl.
 		'scheme://user:password@host:123/var/log/system.log?foo=1&bar#frag' asUrl }.
-	self serializeAndMaterialize: urls! !
+	self serializeAndMaterialize: urls"! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:26:17'!
 testUUIDs
@@ -1354,15 +1360,7 @@ testCustomNewline
 		assert: output 
 		equals: ('[\	1\]' withCRs replaceAll: Character cr with: Character lf)! !
 
-!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/4/2022 14:56:40'!
-testDate
-	| date |
-	date := (Date year: 2012 month: 1 day: 1) translateToUTC.
-	self assert: (self serialize: date) equals: 'Date[''2012-01-01Z'']'.
-	date := (Date year: 2012 month: 1 day: 1) translateTo: 1 hour.
-	self assert: (self serialize: date) equals: 'Date[''2012-01-01+01:00'']'.! !
-
-!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/4/2022 14:56:33'!
+!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 13:16:19'!
 testDateAndTime
 	| dateAndTime |
 	dateAndTime := DateAndTime
@@ -1372,7 +1370,7 @@ testDateAndTime
 		hour: 6
 		minute: 30
 		second: 15
-		offset: 1 hour.
+		offset: (Duration hours: 1).
 	self assert: (self serialize: dateAndTime) equals: 'DateAndTime[''2012-01-01T06:30:15+01:00'']'! !
 
 !STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/12/2022 07:47:29'!
@@ -1519,15 +1517,15 @@ testNil
 
 	self assert: (self serialize: nil) equals: 'nil'! !
 
-!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/4/2022 14:51:22'!
+!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 13:19:59'!
 testNonBMPCharacterEncoding
 	"Characters not in the Basic Multilingual Plane are encoded as a UTF-16 surrogate pair"
-
-	| string json |
-	string := String with: 16r1D11E asCharacter. "MUSICAL SYMBOL G CLEF"
+	self flag: #Unsupported.
+	"| string json |
+	string := String with: 16r1D11E asCharacter. ""MUSICAL SYMBOL G CLEF""
 	json := String streamContents: [ :out |
 		(STON writer on: out) asciiOnly: true; nextPut: string ].
-	self assert: json equals: '''\uD834\uDD1E'''! !
+	self assert: json equals: '''\uD834\uDD1E'''"! !
 
 !STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/4/2022 14:51:08'!
 testNull
@@ -1629,9 +1627,10 @@ testTime
 	time := Time hour: 6 minute: 30 second: 15 nanoSecond: 123.
 	self assert: (self serialize: time) equals: 'Time[''06:30:15.000000123'']'.! !
 
-!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/4/2022 14:48:25'!
+!STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 11:54:27'!
 testURL
-	self
+	self flag: #Unsupported.
+"	self
 		assert: (self serialize: 'https://pharo.org/files/pharo.png' asUrl)
 		equals: 'URL[''https://pharo.org/files/pharo.png'']'.
 	self
@@ -1642,7 +1641,7 @@ testURL
 		equals: 'URL[''file:///var/log/system.log'']'.
 	self
 		assert: (self serialize: 'scheme://user:password@host:123/var/log/system.log?foo=1&bar#frag' asUrl)
-		equals: 'URL[''scheme://user:password@host:123/var/log/system.log?foo=1&bar#frag'']'.! !
+		equals: 'URL[''scheme://user:password@host:123/var/log/system.log?foo=1&bar#frag'']'."! !
 
 !STONWriterTest methodsFor: 'testing' stamp: 'KenD 4/12/2022 12:55:06'!
 testUser
@@ -3583,6 +3582,12 @@ parserClass
 
 	^Parser! !
 
+!Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 12:00:15'!
+putOn:aStream
+
+	^ aStream nextPut:self.
+! !
+
 !Object methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:03:03'!
 stonContainSubObjects
 	"Return true if I contain subObjects that should be processed, false otherwise.
@@ -3774,6 +3779,11 @@ fromSton: stonReader
 	theMetaclass := theClass class.
 	^ theMetaclass! !
 
+!Magnitude methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 12:02:22'!
+putOn: aStream
+
+	(aStream isBinary ifTrue: [ self asByteArray ] ifFalse: [ self asString]) putOn: aStream! !
+
 !Number methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 14:57:19'!
 closeTo: num
 	"are these two numbers close?"
@@ -3936,6 +3946,11 @@ fromSton: stonReader
 		collection add: each ].
 	^ collection! !
 
+!SequenceableCollection methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 12:02:56'!
+putOn: aStream
+
+	self do: [ :each | each putOn: aStream ]! !
+
 !SequenceableCollection methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:25:37'!
 stonOn: stonWriter
 	"Instances of STON listClass will be encoded directly, without a class tag.
@@ -3955,6 +3970,12 @@ fromSton: stonReader
 			stream nextPut: each ] 
 	  ]! !
 
+!String methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 12:01:05'!
+putOn:aStream
+
+	^ aStream nextPutAll: self.
+! !
+
 !String methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 14:29:12'!
 stonContainSubObjects
 
@@ -3969,6 +3990,11 @@ stonOn: stonWriter
 stonOn: stonWriter
 
 	stonWriter writeSymbol: self! !
+
+!ByteArray methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 12:01:44'!
+putOn: aStream
+
+	aStream nextPutAll: self! !
 
 !ByteArray methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/4/2022 12:30:16'!
 stonContainSubObjects 
@@ -4154,6 +4180,30 @@ fromSton: stonReader
 	stonReader parseMapDo: [ :key :value |
 		dictionary at: key put: value ].
 	^ dictionary! !
+
+!WriteStream methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 11:58:12'!
+<< aCollection
+	"we want a readable version of nextPutAll however it may be difficult to fully recreate nextPutAll:
+	for all the different types of stream. Rather then simply send to nextPutAll:
+	we handle the String (or ByteArray) argument
+	as fast as possible - the rest we delegate to putOn: This means that we handle single characters and bytes 
+	whereas nextPutAll: is only for sequencable collections.
+	.
+	Note this may not work in every case that nextPutAll: does subject to extensive testing, 
+	but it should work in the important cases"
+
+	| newEnd |
+	collection class == aCollection class ifFalse:
+		[ aCollection putOn: self. ^ self ].
+
+	newEnd := position + aCollection size.
+	newEnd > writeLimit ifTrue:
+		[self growTo: newEnd].
+
+	collection replaceFrom: position+1 to: newEnd  with: aCollection startingAt: 1.
+	position := newEnd.
+
+! !
 
 !FileSystemEntry methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 12:42:52'!
 stonOn: stonWriter
