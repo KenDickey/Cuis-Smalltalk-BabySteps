@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 18 April 2022 at 8:05:37 am'!
+'From Cuis 6.0 [latest update: #5096] on 18 April 2022 at 1:25:22 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 28!
+!provides: 'ExchangeFormat-STON' 1 29!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'Identities-UUID' 1 9 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
@@ -790,6 +790,13 @@ serializeAndMaterialize: object
 	materialization := self materialize: serialization.
 	self assert: object equals: materialization! !
 
+!STONWriteReadTest methodsFor: 'private' stamp: 'KenD 4/18/2022 13:21:54'!
+serializeAndMaterializeClose: object
+	| serialization materialization |
+	serialization := self serialize: object.
+	materialization := self materialize: serialization.
+	self assert: (object closeTo: materialization)! !
+
 !STONWriteReadTest methodsFor: 'private' stamp: 'KenD 4/5/2022 08:28:05'!
 serializeAndMaterializeJsonMode: object
 	| serialization materialization |
@@ -895,7 +902,7 @@ testDatesAndTimes
 		DateAndTime now }.
 	self serializeAndMaterialize: datesAndTimes! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 13:53:42'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/18/2022 13:24:26'!
 testDiskFiles
 	| diskFiles |
 	self flag: #NeedsFileEntry.
@@ -904,7 +911,7 @@ testDiskFiles
 		DirectoryEntry currentDirectory.
 		'foo/bar/readme.txt' asFileEntry .
 		'./readme.txt' asFileEntry. }.
-	self serializeAndMaterialize: diskFiles! !
+	self serializeAndMaterializeClose: diskFiles! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:35:53'!
 testDomainObject
@@ -3947,6 +3954,21 @@ fromSton: stonReader
 		collection add: each ].
 	^ collection! !
 
+!SequenceableCollection methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/18/2022 13:23:12'!
+closeTo: otherCollection
+	"Answer whether the receiver's size is the same as otherCollection's
+	size, and each of the receiver's elements equal the corresponding 
+	element of otherCollection.
+	This should probably replace the current definition of #= ."
+
+	| size |
+	otherCollection isSequenceable ifFalse: [^ false].
+	(size _ self size) = otherCollection size ifFalse: [^ false].
+	1 to: size do:
+		[:index |
+		((self at: index) closeTo: (otherCollection at: index)) ifFalse: [^ false]].
+	^ true! !
+
 !SequenceableCollection methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 12:02:56'!
 putOn: aStream
 
@@ -4210,6 +4232,42 @@ fromSton: stonReader
 	position := newEnd.
 
 ! !
+
+!FileSystemEntry methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/18/2022 13:25:02'!
+closeTo: aFileEntry
+	| isCaseSensitive myDrive otherDrive theirs mine |
+
+	self == aFileEntry ifTrue: [ ^ true ].
+	((self isKindOf: FileSystemEntry) 
+	   and: [aFileEntry isKindOf: FileSystemEntry]) 
+		ifFalse: [ ^false ].
+
+	isCaseSensitive _ self fileAccessor isCaseSensitive.
+
+	"Check for drive nil or same."
+	myDrive _ self drive.
+	otherDrive _ aFileEntry drive.
+	isCaseSensitive
+		ifTrue: [ self drive = aFileEntry drive ifFalse: [ ^false ]]
+		ifFalse: [
+			myDrive isNil = otherDrive isNil ifFalse: [ ^false ].		"only one of them is nil"
+			myDrive ifNotNil: [											"none is nil"
+				(myDrive sameAs: otherDrive) ifFalse: [ ^false ]]].
+
+	"Check for all path components same."
+	mine _ self pathComponents.
+	theirs _ aFileEntry pathComponents.
+
+	isCaseSensitive ifTrue: [
+		^mine = theirs ].
+
+	mine size = theirs size ifFalse: [
+		^false ].
+
+	mine with: theirs do: [ :m :t |
+		(m sameAs: t) ifFalse: [ ^false ]].
+
+	^ true! !
 
 !FileSystemEntry methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/12/2022 12:42:52'!
 stonOn: stonWriter
