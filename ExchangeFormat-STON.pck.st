@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 18 April 2022 at 1:25:22 pm'!
+'From Cuis 6.0 [latest update: #5096] on 18 April 2022 at 1:29:31 pm'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 29!
+!provides: 'ExchangeFormat-STON' 1 30!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'Identities-UUID' 1 9 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
@@ -876,14 +876,14 @@ testCollectionsStructured
 	}.
 	self serializeAndMaterialize: collections! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:36:56'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/18/2022 13:29:27'!
 testColors
 	| colors |
 	colors := STON listClass withAll: { 
 		Color red.
 		Color red copy setAlpha: 0.4.
 		Color red lighter lighter }.
-	self serializeAndMaterialize: colors! !
+	self serializeAndMaterializeClose: colors! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:36:45'!
 testCustomAssociations
