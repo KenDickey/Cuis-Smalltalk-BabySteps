@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5096] on 17 April 2022 at 1:40:06 pm'!
+'From Cuis 6.0 [latest update: #5096] on 18 April 2022 at 8:05:37 am'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 27!
+!provides: 'ExchangeFormat-STON' 1 28!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'Identities-UUID' 1 9 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
@@ -758,10 +758,10 @@ signal: aString streamPosition: streamPosition
 		signal: aString;
 		yourself! !
 
-!STONFileReference class methodsFor: 'instance creation' stamp: 'KenD 4/3/2022 16:49:52'!
+!STONFileReference class methodsFor: 'instance creation' stamp: 'KenD 4/18/2022 08:04:51'!
 fromSton: stonReader
 
-	^ stonReader parseListSingleton asFileEntry! !
+	^ stonReader parseListSingleton asFileSystemEntry! !
 
 !STONWriteReadTest methodsFor: 'options' stamp: 'KenD 4/5/2022 08:27:45'!
 reader: string
@@ -895,16 +895,15 @@ testDatesAndTimes
 		DateAndTime now }.
 	self serializeAndMaterialize: datesAndTimes! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:36:30'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 13:53:42'!
 testDiskFiles
 	| diskFiles |
 	self flag: #NeedsFileEntry.
 	diskFiles := STON listClass withAll: { 
-		FileLocator image asFileReference.
-		FileLocator workingDirectory asAbsolute.
-		'foo/bar/readme.txt' asFileReference.
-		'./readme.txt' asFileReference.
-		(FileLocator home / 'foo.txt') asFileReference }.
+		DirectoryEntry smalltalkImageDirectory.
+		DirectoryEntry currentDirectory.
+		'foo/bar/readme.txt' asFileEntry .
+		'./readme.txt' asFileEntry. }.
 	self serializeAndMaterialize: diskFiles! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:35:53'!
@@ -929,9 +928,10 @@ testEmpty
 	empty := STON mapClass new.
 	self serializeAndMaterialize: empty.! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:33:56'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/18/2022 08:03:38'!
 testFileSystemSupport
-	| fileReferences fileLocators |
+	self flag: #Unsupported.
+"	| fileReferences fileLocators |
 	self flag: #NeedsFileEntry.
 	fileReferences := STON listClass withAll: { 
 		FileLocator image asFileReference.
@@ -942,7 +942,7 @@ testFileSystemSupport
 		FileLocator image.
 		FileLocator workingDirectory.
 		FileLocator home / 'foo.txt' }.
-	self serializeAndMaterialize: fileLocators.! !
+	self serializeAndMaterialize: fileLocators."! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/16/2022 12:52:11'!
 testFloats
@@ -1013,9 +1013,10 @@ testKnownObjects
 
 	STONTestKnownObject resetKnownObjects! !
 
-!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/5/2022 08:31:59'!
+!STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/18/2022 08:04:18'!
 testMemoryFileReferences
-	| root dir1 file1 references ston result |
+	self flag: #Unsupported.
+"	| root dir1 file1 references ston result |
 	self flag: #NeedsFileEntry.
 	root := FileSystem memory root.
 	dir1 := (root / 'dir1') ensureCreateDirectory.
@@ -1029,7 +1030,7 @@ testMemoryFileReferences
 	self assert: result first fileSystem equals: result second fileSystem. 
 	self assert: result first fileSystem identicalTo: result second fileSystem. 
 	self assert: result first fileSystem isMemoryFileSystem.
-	self assert: result second contents equals: 'ABC'! !
+	self assert: result second contents equals: 'ABC'"! !
 
 !STONWriteReadTest methodsFor: 'testing' stamp: 'KenD 4/17/2022 11:45:38'!
 testMimeTypes
@@ -3969,6 +3970,11 @@ fromSton: stonReader
 		stonReader parseListDo: [ :each |
 			stream nextPut: each ] 
 	  ]! !
+
+!String methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 14:35:11'!
+asFileSystemEntry
+	"See examples in #asFileEntry method comment"
+	^FileSystemEntry withPathName: self! !
 
 !String methodsFor: '*ExchangeFormat-STON' stamp: 'KenD 4/17/2022 12:01:05'!
 putOn:aStream
