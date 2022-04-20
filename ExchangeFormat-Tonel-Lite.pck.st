@@ -1,9 +1,23 @@
-'From Cuis 6.0 [latest update: #5107] on 19 April 2022 at 8:05:23 am'!
-'Description Just enough here to read/write basic Tonel file format'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 1!
+'From Cuis 6.0 [latest update: #5107] on 19 April 2022 at 2:44:49 pm'!
+'Description Just enough here to read/write basic Tonel file format.
+Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
+Copyright (c) 2021 Quorum Software.
+	See (MIT) license in LICENCES directory.'!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 6!
+!requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
 
+
+!classDefinition: #TonelTest category: 'ExchangeFormat-Tonel-Lite'!
+TestCase subclass: #TonelTest
+	instanceVariableNames: 'streams'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-Tonel-Lite'!
+!classDefinition: 'TonelTest class' category: 'ExchangeFormat-Tonel-Lite'!
+TonelTest class
+	instanceVariableNames: ''!
 
 !classDefinition: #TonelReader category: 'ExchangeFormat-Tonel-Lite'!
 Object subclass: #TonelReader
@@ -13,6 +27,16 @@ Object subclass: #TonelReader
 	category: 'ExchangeFormat-Tonel-Lite'!
 !classDefinition: 'TonelReader class' category: 'ExchangeFormat-Tonel-Lite'!
 TonelReader class
+	instanceVariableNames: ''!
+
+!classDefinition: #TonelWriter category: 'ExchangeFormat-Tonel-Lite'!
+Object subclass: #TonelWriter
+	instanceVariableNames: 'stream class category methods'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ExchangeFormat-Tonel-Lite'!
+!classDefinition: 'TonelWriter class' category: 'ExchangeFormat-Tonel-Lite'!
+TonelWriter class
 	instanceVariableNames: ''!
 
 
@@ -25,6 +49,195 @@ definition
 methods
 
 	^ methods! !
+
+!TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 08:11:43'!
+category: aString 
+
+	category := aString! !
+
+!TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 10:36:31'!
+methods 
+
+	methods notNil ifTrue: [ ^methods ].
+	class isNil ifTrue: [ ^#() ].
+	^ class class methodDictionary asArray & class methodDictionary asArray! !
+
+!TonelWriter methodsFor: 'private' stamp: 'KenD 4/19/2022 10:34:29'!
+definition 
+	| map supername |
+	map := OrderedDictionary new.
+	self isExtension
+		ifTrue: [^ map
+			at: #name put: methods anyOne classBinding name asSymbol;
+			yourself].
+	supername := (class respondsTo: #supername)
+		ifTrue: [class supername]
+		ifFalse: [class superclass ifNotNil: [:c | c name]].
+	map
+		at: #name put: class name asSymbol;
+		at: #superclass put: supername asSymbol.
+	class _instancesHavePointers
+		ifTrue: [class _instancesAreArrayed ifTrue: [map at: #type put: #variable]]
+		ifFalse: [map at: #type put: #bytes].
+	map
+		at: #instVars put: class instVarNames;
+		at: #classVars put: class classVarNames asSortedCollection asArray.
+	category notNil ifTrue: [map at: #category put: category asSymbol].
+	
+	^ map! !
+
+!TonelTest methodsFor: 'private' stamp: 'KenD 4/19/2022 12:39:07'!
+fileEntryFor: aClassSpec 
+
+	^ (aClassSpec name , '.class.st') asFileEntry ! !
+
+!TonelTest methodsFor: 'private' stamp: 'KenD 4/19/2022 12:43:58'!
+readerFor: aClass 
+	
+	^ TonelReader on: (self fileEntryFor: aClass) readStream! !
+
+!TonelTest methodsFor: 'private' stamp: 'KenD 4/19/2022 12:52:38'!
+writerFor: aClass 
+	"Create new file for aClass"
+	^ TonelWriter on: (self fileEntryFor: aClass) forceWriteStream ! !
+
+!TonelTest methodsFor: 'set up' stamp: 'KenD 4/19/2022 12:21:11'!
+setUp 
+
+	streams := Dictionary new! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:21:39'!
+test010writeObjectDefinition 
+	| writer definition reader |
+	writer := self writerFor: Object.
+	writer writeClass: Object category: #Kernel.
+	reader := self readerFor: Object.
+	definition := reader read; definition.
+	self
+		assert: (definition at: #name) = #Object;
+		assert: (definition at: #superclass) = #ProtoObject;
+		assert: (definition at: #category) = #Kernel! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:22:32'!
+test014writeDefinitionWithClassVars 
+	| writer definition reader |
+	writer := self writerFor: SmallInteger.
+	writer writeClass: SmallInteger category: #Kernel.
+	reader := self readerFor: SmallInteger.
+	definition := reader read; definition.
+	self
+		assert: (definition at: #name) = #SmallInteger;
+		assert: (definition at: #superclass) = #Integer;
+		assert: (definition at: #classVars) = #('Maximum' 'Minimum');
+		assert: (definition at: #category) = #Kernel
+		! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:22:55'!
+test016writeDefinitionWithInstAndClassVars 
+	| writer definition reader |
+	writer := self writerFor: CompiledMethod.
+	writer writeClass: CompiledMethod category: #Kernel.
+	reader := self readerFor: CompiledMethod.
+	definition := reader read; definition.
+	self
+		assert: (definition at: #name) = #CompiledMethod;
+		assert: (definition at: #superclass) = CompiledMethod superclass symbol;
+		assert: (definition at: #instVars) = CompiledMethod instVarNames;
+		assert: (definition at: #classVars) = #('Flags');
+		assert: (definition at: #category) = #Kernel! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:25:29'!
+test020writeOneMethod 
+	| writer reader methods cm |
+	writer := self writerFor: Object.
+	cm := Object >> #species.
+	writer writeMethod: cm.
+	reader := self readerFor: Object.
+	methods := reader readMethods; methods.
+	self
+		assert: methods size = 1;
+		assert: (methods first at: #class) = 'Object';
+		assert: (methods first at: #selector) = #species;
+		assert: cm source lines size = 2;
+		assert: (methods first at: #body) withBlanksTrimmed = cm source lines last! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:26:22'!
+test025writeOneMethodWithArguments 
+	| writer reader methods cm |
+	writer := self writerFor: Object.
+	cm := Object >> #byteAt:put:.
+	writer writeMethod: cm.
+	reader := self readerFor: Object.
+	methods := reader readMethods; methods.
+	self
+		assert: methods size = 1;
+		assert: (methods first at: #class) = 'Object';
+		assert: cm source lines size = 2;
+		assert: (methods first at: #selector) = cm selector;
+		assert: (methods first at: #body) trimBlanks = cm source lines last! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:26:46'!
+test030writeTwoMethods 
+	| cm1 cm2 writer reader methods |
+	cm1 := Object >> #species.
+	cm2 := Object >> #value.
+	writer := self writerFor: Object.
+	writer writeMethod: cm1; writeMethod: cm2.
+	reader := self readerFor: Object.
+	methods := reader readMethods; methods.
+	self
+		assert: methods size = 2;
+		assert: (methods first at: #class) = 'Object';
+		assert: (methods first at: #selector) = #species;
+		assert: cm1 source lines size = 2;
+		assert: (methods first at: #body) trimBlanks = cm1 source lines last;
+		assert: (methods second at: #class) = 'Object';
+		assert: (methods second at: #selector) = #value;
+		assert: cm2 source lines size = 2;
+		assert: (methods second at: #body) trimBlanks = cm2 source lines last! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:27:10'!
+testClassDefinition 
+	| tonel writer reader definition |
+	tonel := '' writeStream.
+	writer := TonelWriter on: tonel.
+	writer writeClass: Point.
+	reader := TonelReader on: tonel contents readStream.
+	reader read.
+	definition := reader definition.
+	self
+		assert: (definition at: #name) = #Point;
+		assert: (definition at: #instVars) = #('x' 'y')! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:28:01'!
+testExtension 
+	| tonel writer reader method |
+	tonel := '' writeStream.
+	writer := TonelWriter on: tonel.
+	writer writeMethods: {TonelTest >> #testExtension}.
+	reader := TonelReader on: tonel contents readStream.
+	reader read.
+	self assert: reader methods size = 1.
+	method := reader methods anyOne.
+	self
+		assert: (method at: #class) = 'TonelTest';
+		assert: (method at: #selector) == #testExtension! !
+
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:33:33'!
+testReadMethodWithLiteralBracket 
+	| tonel reader |
+	tonel := 'Extension { #name : #TonelTest }
+{
+	#category : #accessing
+}
+TestClass >> m [
+	$]]'.
+
+	reader := TonelReader on: tonel readStream.
+	reader read.
+	self
+		assert: reader methods size = 1;
+		assert: (reader methods anyOne at: #body) trimBlanks = '$]' ! !
 
 !TonelReader methodsFor: 'accessing' stamp: 'KenD 4/19/2022 08:05:10'!
 stream: aReadStream 
@@ -131,3 +344,163 @@ new
 on: aStream 
 
 	^ self new stream: aStream! !
+
+!TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 10:31:50'!
+class: aClass 
+
+	class := aClass! !
+
+!TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 10:36:59'!
+methods: aCollection 
+
+	methods := aCollection.
+	self assert: (methods isEmptyOrNil or: [| classes |
+		classes := methods collect: #classBinding in: Set new.
+		classes size = 1 or: [
+			classes size = 2 and: [| meta |
+				meta := classes detect: [:cls | cls isMetaclass] ifNone: nil.
+				meta notNil and: [classes anySatisfy: [:cls | cls = meta instanceClass]]]]])! !
+
+!TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 11:05:27'!
+stream: aWriteStream 
+
+	stream := aWriteStream! !
+
+!TonelWriter methodsFor: 'private' stamp: 'KenD 4/19/2022 10:32:20'!
+crtab 
+
+	stream crtab! !
+
+!TonelWriter methodsFor: 'private' stamp: 'KenD 4/19/2022 10:40:19'!
+position: aStream afterSelector: aSymbol 
+	| c |
+	aSymbol arity = 0
+		ifTrue: [aStream skipSeparators; skip: aSymbol size]
+		ifFalse: [
+			aSymbol keywords do: [:part | 
+				aStream
+					skipSeparators;
+					skip: part size;
+					skipSeparators;
+					nextKeyword
+			]
+		].
+	[aStream atEnd ifTrue: [^self].
+	 c := aStream peek.
+	 c isSeparator andNot: [c isLineSeparator]]
+		whileTrue: [aStream next].
+	c isLineSeparator ifTrue: [aStream next]
+! !
+
+!TonelWriter methodsFor: 'private' stamp: 'KenD 4/19/2022 11:06:04'!
+type 
+
+	^ class notNil ifTrue: [ 'Class' ] ifFalse: [ 'Extension' ]! !
+
+!TonelWriter methodsFor: 'testing' stamp: 'KenD 4/19/2022 10:35:06'!
+isExtension 
+
+	^ self type = 'Extension'! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:06:46'!
+write 
+
+	self
+		writeComments;
+		writeType;
+		writeDefinition;
+		writeMethods! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:07:34'!
+writeClass: aClass 
+
+	self writeClass: aClass category: nil! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:07:47'!
+writeClass: aClass category: aString 
+
+	self
+		class: aClass;
+		category: aString;
+		methods: nil;
+		write! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:08:26'!
+writeComments
+
+	"ignore comments"! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:08:41'!
+writeDefinition 
+
+	(STONWriter on: stream) writeMap: self definition.
+	stream cr; cr! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:10:05'!
+writeMethod: method 
+	| source head body metadata |
+	source := method sourceCode readStream.
+	self position: source afterSelector: method selector.
+	head := source copyFrom: 1 to: source position.
+	body := source upToEnd.
+	metadata := OrderedDictionary new.
+	metadata at: #category put: method category.
+	(STONWriter on: stream) writeMap: metadata.
+	stream cr; print: method classBinding name; nextPutAll: ' >> '.
+	head lines
+		do: [:line | stream nextPutAll: line "utf8"]
+		separatedBy: [stream cr].
+	stream nextPutAll: ' ['.
+	body := body readStream.
+	[
+		stream cr; nextPutAll: body nextLine "utf8".
+		body atEnd] whileFalse.
+	stream nextPutAll: ']'; cr; cr! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:10:19'!
+writeMethods 
+
+	self methods do: [:m | self writeMethod: m]! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:10:30'!
+writeMethods: aCollection 
+
+	self class: nil; methods: aCollection; write! !
+
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:10:43'!
+writeType 
+
+	stream nextPutAll: self type; space! !
+
+!TonelWriter class methodsFor: 'instance creation' stamp: 'KenD 4/19/2022 08:09:27'!
+on: aWriteStream 
+
+	^ self new stream: aWriteStream! !
+
+!TonelWriter class methodsFor: 'instance creation' stamp: 'KenD 4/19/2022 08:09:47'!
+writeClass: aClass 
+	"
+	TonelWriter writeClass: Point
+	"
+	^self writeClass: aClass category: nil! !
+
+!TonelWriter class methodsFor: 'instance creation' stamp: 'KenD 4/19/2022 08:10:14'!
+writeClass: aClass category: aString 
+	"
+	TonelWriter writeClass: Point category: 'Kernel'
+	"
+	| tonel |
+	tonel := '' writeStream.
+	(self on: tonel) writeClass: aClass category: aString.
+	^tonel contents! !
+
+!TonelWriter class methodsFor: 'instance creation' stamp: 'KenD 4/19/2022 08:10:43'!
+writeMethods: aCollection 
+	"
+	TonelWriter writeMethods: Point methodDictionary asArray
+	"
+	| tonel |
+	tonel := '' writeStream.
+	(self on: tonel) writeMethods: aCollection.
+	
+	^ tonel contents! !
