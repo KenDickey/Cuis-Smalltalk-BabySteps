@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5107] on 19 April 2022 at 11:03:44 am'!
+'From Cuis 6.0 [latest update: #5107] on 21 April 2022 at 8:46:43 am'!
 'Description STON implements serialization and materialization using the Smalltalk Object Notation format.
 
 Ported from:
@@ -14,7 +14,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'!
-!provides: 'ExchangeFormat-STON' 1 32!
+!provides: 'ExchangeFormat-STON' 1 33!
 !requires: 'Cuis-Base' 60 5096 nil!
 !requires: 'Identities-UUID' 1 9 nil!
 !requires: 'SqueakCompatibility' 1 33 nil!
@@ -3086,7 +3086,7 @@ escape: char with: anObject
 	"self assert: char isOctetCharacter."
 	self writeableStonCharacters at: char codePoint + 1 put: anObject! !
 
-!STONWriter methodsFor: 'initialization' stamp: 'KenD 4/3/2022 18:53:58'!
+!STONWriter methodsFor: 'initialization' stamp: 'KenD 4/21/2022 08:45:40'!
 initialize
 
 	super initialize.
@@ -3152,13 +3152,13 @@ encodeCharacter: char
 				ifTrue: [ writeStream nextPut: char ]
 				ifFalse: [ self escapeUnicode: code ] ]! !
 
-!STONWriter methodsFor: 'private' stamp: 'KenD 4/3/2022 19:11:44'!
+!STONWriter methodsFor: 'private' stamp: 'KenD 4/21/2022 08:38:20'!
 encodeKey: key value: value
 	(jsonMode and: [ key isString not ])
 		ifTrue: [ self error: 'JSON key names in objects must be strings' ].
 	self nextPut: key.
 	self prettyPrintSpace.
-	writeStream nextPut: $:.
+	writeStream nextPut: $: .
 	self prettyPrintSpace.
 	self nextPut: value! !
 
@@ -3271,10 +3271,10 @@ listElementSeparator
 	writeStream nextPut: $,.
 	self newlineIndent! !
 
-!STONWriter methodsFor: 'private' stamp: 'KenD 4/3/2022 19:05:28'!
+!STONWriter methodsFor: 'private' stamp: 'KenD 4/21/2022 08:37:18'!
 mapElementSeparator
 
-	writeStream nextPut: $,.
+	writeStream nextPut: $, .
 	self newlineIndent! !
 
 !STONWriter methodsFor: 'private' stamp: 'KenD 4/14/2022 08:20:11'!

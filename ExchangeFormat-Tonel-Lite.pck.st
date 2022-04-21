@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 19 April 2022 at 2:44:49 pm'!
+'From Cuis 6.0 [latest update: #5107] on 21 April 2022 at 8:46:46 am'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 6!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 8!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -250,7 +250,24 @@ initialize
 	class      := OrderedDictionary new.
 	methods := OrderedCollection new! !
 
-!TonelReader methodsFor: 'private' stamp: 'KenD 4/19/2022 08:04:55'!
+!TonelReader methodsFor: 'private' stamp: 'KenD 4/20/2022 14:18:18'!
+skipComment 
+
+	self skipToMatch: $"! !
+
+!TonelReader methodsFor: 'private' stamp: 'KenD 4/20/2022 14:29:43'!
+skipLine
+
+	[stream atEnd]
+		whileFalse:
+		[stream next isLineSeparator ifTrue: [^ self ]]! !
+
+!TonelReader methodsFor: 'private' stamp: 'KenD 4/20/2022 14:18:33'!
+skipString 
+
+	self skipToMatch: $'! !
+
+!TonelReader methodsFor: 'private' stamp: 'KenD 4/20/2022 14:18:51'!
 skipToMatch: aCharacter 
 	[| found |
 		found := stream skipTo: aCharacter.
@@ -260,13 +277,14 @@ skipToMatch: aCharacter
 			found := false].
 		found] whileFalse! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 07:54:33'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/21/2022 08:00:49'!
 nextBlock 
 	| nested char start eol prev |
 	nested := 0.
 	prev := nil.
 	char := $[.
-	start := stream skipLine; position.
+	self skipLine.
+	start := stream position.
 	[
 		(char == $[ andNot: [prev == $$]) ifTrue: [nested := nested + 1].
 		(char = $] andNot: [prev == $$]) ifTrue: [nested := nested - 1].
@@ -275,9 +293,10 @@ nextBlock
 		char = $" ifTrue: [self skipComment].
 		nested = 0]
 		whileFalse: [char := stream next].
-	eol := stream eol size. 
+	"eol := stream eol size. "
+	self skipLine.
 	
-	^ stream copyFrom: start + eol - 1 to: stream position - 1
+	^ stream copyFrom: start "+ eol - 1" to: stream position - 1
 ! !
 
 !TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 07:55:02'!
@@ -306,13 +325,13 @@ readDefinition
 		on: stream skipSeparators;
 		parseMapDo: [:key :value | class at: key put: value]! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 08:02:53'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/20/2022 14:12:17'!
 readMethod 
 	| metadata classname signature selector method |
 	metadata := STON fromStream: stream.
 	classname := stream skipSeparators; upToAll: '>>'.
 	signature := stream upTo: $[.
-	selector := Parser parseSelector: signature.
+	selector := Parser selectorFrom: signature.
 	method := OrderedDictionary new.
 	method
 		addAll: metadata;
@@ -371,6 +390,11 @@ crtab
 
 	stream crtab! !
 
+!TonelWriter methodsFor: 'private' stamp: 'KenD 4/20/2022 14:03:20'!
+flush
+
+	stream flush! !
+
 !TonelWriter methodsFor: 'private' stamp: 'KenD 4/19/2022 10:40:19'!
 position: aStream afterSelector: aSymbol 
 	| c |
@@ -402,14 +426,15 @@ isExtension
 
 	^ self type = 'Extension'! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:06:46'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/20/2022 14:03:40'!
 write 
 
 	self
 		writeComments;
 		writeType;
 		writeDefinition;
-		writeMethods! !
+		writeMethods;
+		flush! !
 
 !TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:07:34'!
 writeClass: aClass 
@@ -436,7 +461,7 @@ writeDefinition
 	(STONWriter on: stream) writeMap: self definition.
 	stream cr; cr! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:10:05'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/21/2022 08:46:02'!
 writeMethod: method 
 	| source head body metadata |
 	source := method sourceCode readStream.
@@ -445,17 +470,18 @@ writeMethod: method
 	body := source upToEnd.
 	metadata := OrderedDictionary new.
 	metadata at: #category put: method category.
-	(STONWriter on: stream) writeMap: metadata.
-	stream cr; print: method classBinding name; nextPutAll: ' >> '.
+	(STONWriter on: stream) prettyPrint: true; writeMap: metadata.
+	stream newLine; nextPutAll: method classBinding name asString; nextPutAll: ' >> '.
 	head lines
-		do: [:line | stream nextPutAll: line "utf8"]
-		separatedBy: [stream cr].
+		do: [:line | stream nextPutAll: line asUtf8]
+		separatedBy: [stream newLine].
 	stream nextPutAll: ' ['.
 	body := body readStream.
 	[
-		stream cr; nextPutAll: body nextLine "utf8".
+		stream newLine; nextPutAll: body nextLine asUtf8.
 		body atEnd] whileFalse.
-	stream nextPutAll: ']'; cr; cr! !
+	stream nextPutAll: ']'; newLine; newLine;
+		flush! !
 
 !TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:10:19'!
 writeMethods 
