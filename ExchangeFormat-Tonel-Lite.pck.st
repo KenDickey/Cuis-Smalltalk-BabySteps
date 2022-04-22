@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 21 April 2022 at 8:46:46 am'!
+'From Cuis 6.0 [latest update: #5107] on 21 April 2022 at 6:10:21 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 8!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 9!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -146,7 +146,7 @@ test016writeDefinitionWithInstAndClassVars
 		assert: (definition at: #classVars) = #('Flags');
 		assert: (definition at: #category) = #Kernel! !
 
-!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:25:29'!
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/21/2022 14:58:58'!
 test020writeOneMethod 
 	| writer reader methods cm |
 	writer := self writerFor: Object.
@@ -158,8 +158,8 @@ test020writeOneMethod
 		assert: methods size = 1;
 		assert: (methods first at: #class) = 'Object';
 		assert: (methods first at: #selector) = #species;
-		assert: cm source lines size = 2;
-		assert: (methods first at: #body) withBlanksTrimmed = cm source lines last! !
+		assert: cm source lines size = 8;
+		assert: (methods first at: #body) lines last withBlanksTrimmed = cm source lines last withBlanksTrimmed! !
 
 !TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:26:22'!
 test025writeOneMethodWithArguments 
@@ -277,9 +277,9 @@ skipToMatch: aCharacter
 			found := false].
 		found] whileFalse! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/21/2022 08:00:49'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/21/2022 14:25:10'!
 nextBlock 
-	| nested char start eol prev |
+	| nested char start  prev |
 	nested := 0.
 	prev := nil.
 	char := $[.
@@ -296,7 +296,7 @@ nextBlock
 	"eol := stream eol size. "
 	self skipLine.
 	
-	^ stream copyFrom: start "+ eol - 1" to: stream position - 1
+	^ stream copyFrom: start "+ eol - 1" to: stream position - 2 "Elide $]"
 ! !
 
 !TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 07:55:02'!
@@ -325,11 +325,11 @@ readDefinition
 		on: stream skipSeparators;
 		parseMapDo: [:key :value | class at: key put: value]! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/20/2022 14:12:17'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/21/2022 12:33:06'!
 readMethod 
 	| metadata classname signature selector method |
 	metadata := STON fromStream: stream.
-	classname := stream skipSeparators; upToAll: '>>'.
+	classname := (stream skipSeparators; upToAll: '>>') withBlanksTrimmed.
 	signature := stream upTo: $[.
 	selector := Parser selectorFrom: signature.
 	method := OrderedDictionary new.
@@ -455,11 +455,11 @@ writeComments
 
 	"ignore comments"! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:08:41'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/21/2022 12:52:21'!
 writeDefinition 
 
 	(STONWriter on: stream) writeMap: self definition.
-	stream cr; cr! !
+	stream newLine ; newLine! !
 
 !TonelWriter methodsFor: 'writing' stamp: 'KenD 4/21/2022 08:46:02'!
 writeMethod: method 
