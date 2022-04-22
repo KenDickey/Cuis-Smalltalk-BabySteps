@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 21 April 2022 at 6:10:21 pm'!
+'From Cuis 6.0 [latest update: #5107] on 22 April 2022 at 3:30:50 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 9!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 11!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -146,55 +146,67 @@ test016writeDefinitionWithInstAndClassVars
 		assert: (definition at: #classVars) = #('Flags');
 		assert: (definition at: #category) = #Kernel! !
 
-!TonelTest methodsFor: 'testing' stamp: 'KenD 4/21/2022 14:58:58'!
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 14:50:09'!
 test020writeOneMethod 
-	| writer reader methods cm |
+	| writer reader methods cm reconsitutedMethod |
 	writer := self writerFor: Object.
 	cm := Object >> #species.
 	writer writeMethod: cm.
 	reader := self readerFor: Object.
 	methods := reader readMethods; methods.
+	reconsitutedMethod := 
+		(methods first at: #signature) , 
+		(methods first at: #body).
 	self
 		assert: methods size = 1;
 		assert: (methods first at: #class) = 'Object';
 		assert: (methods first at: #selector) = #species;
 		assert: cm source lines size = 8;
-		assert: (methods first at: #body) lines last withBlanksTrimmed = cm source lines last withBlanksTrimmed! !
+		assert: reconsitutedMethod withBlanksTrimmed lines
+				= cm source withBlanksTrimmed lines! !
 
-!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:26:22'!
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 15:16:08'!
 test025writeOneMethodWithArguments 
-	| writer reader methods cm |
+	| writer reader methods cm reconsitutedMethod |
 	writer := self writerFor: Object.
-	cm := Object >> #byteAt:put:.
+	cm := Object >> #adaptToFloat:andSend: .
 	writer writeMethod: cm.
 	reader := self readerFor: Object.
 	methods := reader readMethods; methods.
+	reconsitutedMethod := 
+		(methods first at: #signature) , 
+		(methods first at: #body).
 	self
 		assert: methods size = 1;
 		assert: (methods first at: #class) = 'Object';
-		assert: cm source lines size = 2;
+		assert: cm source lines size = 4;
 		assert: (methods first at: #selector) = cm selector;
-		assert: (methods first at: #body) trimBlanks = cm source lines last! !
+		assert: reconsitutedMethod withBlanksTrimmed lines
+				= cm source withBlanksTrimmed lines! !
 
-!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:26:46'!
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 15:10:50'!
 test030writeTwoMethods 
-	| cm1 cm2 writer reader methods |
+	| cm1 cm2 writer reader methods m1 m2 |
 	cm1 := Object >> #species.
 	cm2 := Object >> #value.
 	writer := self writerFor: Object.
 	writer writeMethod: cm1; writeMethod: cm2.
 	reader := self readerFor: Object.
 	methods := reader readMethods; methods.
+	m1 := (methods first at: #signature) , 
+		  (methods first at: #body).
+	m2 := (methods second at: #signature) , 
+		  (methods second at: #body).
 	self
 		assert: methods size = 2;
 		assert: (methods first at: #class) = 'Object';
 		assert: (methods first at: #selector) = #species;
-		assert: cm1 source lines size = 2;
-		assert: (methods first at: #body) trimBlanks = cm1 source lines last;
+		assert: cm1 source lines size = 8;
+		assert: m1 withBlanksTrimmed lines = cm1 source withBlanksTrimmed lines;
 		assert: (methods second at: #class) = 'Object';
 		assert: (methods second at: #selector) = #value;
-		assert: cm2 source lines size = 2;
-		assert: (methods second at: #body) trimBlanks = cm2 source lines last! !
+		assert: cm2 source lines size = 3;
+		assert: m2 withBlanksTrimmed lines = cm2 source withBlanksTrimmed lines! !
 
 !TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:27:10'!
 testClassDefinition 
@@ -325,7 +337,7 @@ readDefinition
 		on: stream skipSeparators;
 		parseMapDo: [:key :value | class at: key put: value]! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/21/2022 12:33:06'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/22/2022 15:30:26'!
 readMethod 
 	| metadata classname signature selector method |
 	metadata := STON fromStream: stream.
@@ -335,10 +347,14 @@ readMethod
 	method := OrderedDictionary new.
 	method
 		addAll: metadata;
-		at: #class put: classname withoutSeparators;
-		at: #signature put: signature withoutSeparators;
-		at: #selector put: selector;
-		at: #body put: self nextBlock.
+		at: #class 
+			put: classname withoutSeparators;
+		at: #signature 
+			put: signature withoutLineSeparators withBlanksTrimmed;
+		at: #selector 
+			put: selector;
+		at: #body 
+			put: self nextBlock.
 	methods add: method! !
 
 !TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 08:03:23'!
