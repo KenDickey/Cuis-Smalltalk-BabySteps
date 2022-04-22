@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 22 April 2022 at 3:30:50 pm'!
+'From Cuis 6.0 [latest update: #5107] on 22 April 2022 at 3:54:24 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 11!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 12!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -118,33 +118,34 @@ test010writeObjectDefinition
 		assert: (definition at: #superclass) = #ProtoObject;
 		assert: (definition at: #category) = #Kernel! !
 
-!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:22:32'!
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 15:44:34'!
 test014writeDefinitionWithClassVars 
 	| writer definition reader |
-	writer := self writerFor: SmallInteger.
-	writer writeClass: SmallInteger category: #Kernel.
+	writer := self writerFor: Random.
+	writer writeClass: Random category: #'Kernel-Numbers'.
 	reader := self readerFor: SmallInteger.
 	definition := reader read; definition.
 	self
-		assert: (definition at: #name) = #SmallInteger;
-		assert: (definition at: #superclass) = #Integer;
-		assert: (definition at: #classVars) = #('Maximum' 'Minimum');
-		assert: (definition at: #category) = #Kernel
+		assert: (definition at: #name) = #Random;
+		assert: (definition at: #superclass) = #Object;
+		assert: (definition at: #classVars) = #('DefaultInstance' 'MutexForDefaultInstance');
+		assert: (definition at: #category) = #'Kernel-Numbers'
 		! !
 
-!TonelTest methodsFor: 'testing' stamp: 'KenD 4/19/2022 12:22:55'!
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 15:51:50'!
 test016writeDefinitionWithInstAndClassVars 
 	| writer definition reader |
-	writer := self writerFor: CompiledMethod.
-	writer writeClass: CompiledMethod category: #Kernel.
-	reader := self readerFor: CompiledMethod.
+	writer := self writerFor: ContextPart.
+	writer writeClass: ContextPart category: #'Kernel-Methods'.
+	reader := self readerFor: ContextPart.
 	definition := reader read; definition.
 	self
-		assert: (definition at: #name) = #CompiledMethod;
-		assert: (definition at: #superclass) = CompiledMethod superclass symbol;
-		assert: (definition at: #instVars) = CompiledMethod instVarNames;
-		assert: (definition at: #classVars) = #('Flags');
-		assert: (definition at: #category) = #Kernel! !
+		assert: (definition at: #name) = #ContextPart;
+		assert: (definition at: #superclass) = ContextPart superclass name asSymbol;
+		assert: (definition at: #instVars) = ContextPart instVarNames;
+		assert: (definition at: #classVars) 
+				= #('PrimitiveFailToken' 'QuickStep' 'ValueIndex');
+		assert: (definition at: #category) = #'Kernel-Methods'! !
 
 !TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 14:50:09'!
 test020writeOneMethod 
@@ -471,10 +472,12 @@ writeComments
 
 	"ignore comments"! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/21/2022 12:52:21'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/22/2022 15:39:34'!
 writeDefinition 
 
-	(STONWriter on: stream) writeMap: self definition.
+	(STONWriter on: stream) 
+		prettyPrint: true;
+		writeMap: self definition.
 	stream newLine ; newLine! !
 
 !TonelWriter methodsFor: 'writing' stamp: 'KenD 4/21/2022 08:46:02'!
