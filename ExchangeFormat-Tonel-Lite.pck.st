@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 22 April 2022 at 3:54:24 pm'!
+'From Cuis 6.0 [latest update: #5107] on 22 April 2022 at 4:35:55 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 12!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 14!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -290,26 +290,25 @@ skipToMatch: aCharacter
 			found := false].
 		found] whileFalse! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/21/2022 14:25:10'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/22/2022 16:35:23'!
 nextBlock 
+	"(stream at: position) is $[, find matching unnested $]
+	 and answer the body "
 	| nested char start  prev |
 	nested := 0.
 	prev := nil.
 	char := $[.
 	self skipLine.
 	start := stream position.
-	[
-		(char == $[ andNot: [prev == $$]) ifTrue: [nested := nested + 1].
-		(char = $] andNot: [prev == $$]) ifTrue: [nested := nested - 1].
+	[	(char == $[ andNot: [prev == $$]) ifTrue: [nested := nested + 1].
+		(char = $]   andNot: [prev == $$]) ifTrue: [nested := nested - 1].
 		prev := char.
 		char = $' ifTrue: [self skipString].
 		char = $" ifTrue: [self skipComment].
 		nested = 0]
 		whileFalse: [char := stream next].
-	"eol := stream eol size. "
-	self skipLine.
 	
-	^ stream copyFrom: start "+ eol - 1" to: stream position - 2 "Elide $]"
+	^ stream copyFrom: start to: stream position - 1 "Elide final $]"
 ! !
 
 !TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 07:55:02'!
@@ -386,16 +385,16 @@ class: aClass
 
 	class := aClass! !
 
-!TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 10:36:59'!
+!TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/22/2022 16:17:36'!
 methods: aCollection 
 
 	methods := aCollection.
 	self assert: (methods isEmptyOrNil or: [| classes |
-		classes := methods collect: #classBinding in: Set new.
+		classes := methods collect: [ :m |m classBinding] in: Set new.
 		classes size = 1 or: [
 			classes size = 2 and: [| meta |
 				meta := classes detect: [:cls | cls isMetaclass] ifNone: nil.
-				meta notNil and: [classes anySatisfy: [:cls | cls = meta instanceClass]]]]])! !
+				meta notNil and: [classes anySatisfy: [:cls | cls isKindOf:  meta]]]]])! !
 
 !TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 11:05:27'!
 stream: aWriteStream 
@@ -480,7 +479,7 @@ writeDefinition
 		writeMap: self definition.
 	stream newLine ; newLine! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/21/2022 08:46:02'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/22/2022 16:08:00'!
 writeMethod: method 
 	| source head body metadata |
 	source := method sourceCode readStream.
@@ -492,12 +491,12 @@ writeMethod: method
 	(STONWriter on: stream) prettyPrint: true; writeMap: metadata.
 	stream newLine; nextPutAll: method classBinding name asString; nextPutAll: ' >> '.
 	head lines
-		do: [:line | stream nextPutAll: line asUtf8]
+		do: [:line | stream nextPutAll: line]
 		separatedBy: [stream newLine].
 	stream nextPutAll: ' ['.
 	body := body readStream.
 	[
-		stream newLine; nextPutAll: body nextLine asUtf8.
+		stream newLine; nextPutAll: body nextLine.
 		body atEnd] whileFalse.
 	stream nextPutAll: ']'; newLine; newLine;
 		flush! !
