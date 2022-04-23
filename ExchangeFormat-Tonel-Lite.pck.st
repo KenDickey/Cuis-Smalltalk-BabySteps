@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 22 April 2022 at 4:35:55 pm'!
+'From Cuis 6.0 [latest update: #5113] on 22 April 2022 at 6:13:49 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 14!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 15!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -118,12 +118,12 @@ test010writeObjectDefinition
 		assert: (definition at: #superclass) = #ProtoObject;
 		assert: (definition at: #category) = #Kernel! !
 
-!TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 15:44:34'!
+!TonelTest methodsFor: 'testing' stamp: 'KenD 4/22/2022 18:12:37'!
 test014writeDefinitionWithClassVars 
 	| writer definition reader |
 	writer := self writerFor: Random.
 	writer writeClass: Random category: #'Kernel-Numbers'.
-	reader := self readerFor: SmallInteger.
+	reader := self readerFor: Random.
 	definition := reader read; definition.
 	self
 		assert: (definition at: #name) = #Random;
