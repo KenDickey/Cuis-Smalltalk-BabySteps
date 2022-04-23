@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 23 April 2022 at 2:06:00 pm'!
+'From Cuis 6.0 [latest update: #5107] on 23 April 2022 at 3:18:52 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 16!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 17!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -479,7 +479,7 @@ writeDefinition
 		writeMap: self definition.
 	stream newLine ; newLine! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/22/2022 16:08:00'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/23/2022 15:13:50'!
 writeMethod: method 
 	| source head body metadata |
 	source := method sourceCode readStream.
@@ -489,17 +489,21 @@ writeMethod: method
 	metadata := OrderedDictionary new.
 	metadata at: #category put: method category.
 	(STONWriter on: stream) prettyPrint: true; writeMap: metadata.
-	stream newLine; nextPutAll: method classBinding name asString; nextPutAll: ' >> '.
-	head lines
-		do: [:line | stream nextPutAll: line]
-		separatedBy: [stream newLine].
-	stream nextPutAll: ' ['.
-	body := body readStream.
-	[
-		stream newLine; nextPutAll: body nextLine.
-		body atEnd] whileFalse.
+	stream 
+		newLine; 
+		nextPutAll: method classBinding name asString; 
+		nextPutAll: ' >> ';
+		nextPutAll: head withoutLineSeparators;
+		nextPutAll: ' ['.
+	"body := body readStream.
+	[	stream 
+			newLine; 
+			nextPutAll: body nextLine.
+		body atEnd] whileFalse."
+	stream newLine; nextPutAll: body.
+	
 	stream nextPutAll: ']'; newLine; newLine;
-		flush! !
+	flush! !
 
 !TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:10:19'!
 writeMethods 
