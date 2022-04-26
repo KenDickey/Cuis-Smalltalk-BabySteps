@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 23 April 2022 at 3:18:52 pm'!
+'From Cuis 6.0 [latest update: #5107] on 26 April 2022 at 4:06:52 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 17!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 18!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -21,7 +21,7 @@ TonelTest class
 
 !classDefinition: #TonelReader category: 'ExchangeFormat-Tonel-Lite'!
 Object subclass: #TonelReader
-	instanceVariableNames: 'class methods stream'
+	instanceVariableNames: 'comment class methods stream'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ExchangeFormat-Tonel-Lite'!
@@ -40,15 +40,28 @@ TonelWriter class
 	instanceVariableNames: ''!
 
 
-!TonelReader methodsFor: 'accessing' stamp: 'KenD 4/19/2022 07:52:39'!
-definition 
+!TonelReader commentStamp: '<historical>' prior: 0!
+stream is a StandardFileStream, whose #name is a file path.
 
-	^ class! !
+comment is nil or a class comment String.
 
-!TonelReader methodsFor: 'accessing' stamp: 'KenD 4/19/2022 07:53:22'!
-methods
+class   is an OrderedDictionary of class information, typical keys are:
+   #category #name #superclass #classVars #instVars
 
-	^ methods! !
+methods is an OrderedCollection of OrderedDictionaries -- one for each method
+  Typical method keys are 
+	#class ('CName' or 'CName class', a String)
+	#category (a Symbol)
+	#selector (e.g. #fooMeWith: , a Symbol)
+	#signiture (e.g. 'fooMeWith: anotherFooBar' , a String )
+	#body (a String which, composed with the #signiture, is the method's code)
+!
+
+!TonelWriter commentStamp: '<historical>' prior: 0!
+I take a Cuis Class and write it out to a file in the Tonel exchange format.
+
+I am not very bright, but perhaps you could fix that!!
+!
 
 !TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 08:11:43'!
 category: aString 
@@ -252,6 +265,26 @@ TestClass >> m [
 		assert: reader methods size = 1;
 		assert: (reader methods anyOne at: #body) trimBlanks = '$]' ! !
 
+!TonelReader methodsFor: 'accessing' stamp: 'KenD 4/26/2022 15:37:24'!
+classComment
+
+	^ comment! !
+
+!TonelReader methodsFor: 'accessing' stamp: 'KenD 4/26/2022 16:02:41'!
+classInfo 
+
+	^ class! !
+
+!TonelReader methodsFor: 'accessing' stamp: 'KenD 4/26/2022 16:04:17'!
+filePath
+
+	^ stream name! !
+
+!TonelReader methodsFor: 'accessing' stamp: 'KenD 4/26/2022 16:03:25'!
+methodInfos
+
+	^ methods! !
+
 !TonelReader methodsFor: 'accessing' stamp: 'KenD 4/19/2022 08:05:10'!
 stream: aReadStream 
 
@@ -311,23 +344,39 @@ nextBlock
 	^ stream copyFrom: start to: stream position - 1 "Elide final $]"
 ! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 07:55:02'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/26/2022 15:38:06'!
 read
 
 	self
-		readComments;
+		readClassComment;
 		readType;
 		readDefinition;
 		readMethods! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 07:55:34'!
-readComments 
-
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/26/2022 15:39:34'!
+readClassComment 
+	"A Class Comment is the first bit of syntax in a Tonel class codefile"
 	stream skipSeparators.
 	stream peek = $" ifTrue: [
-		stream next.
-		self skipComment
+		comment := self readComment
 	]
+! !
+
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/26/2022 15:58:01'!
+readComment 
+	"(stream at: position) is $"", find matching $""
+	 and answer the body "
+	
+	| char start |
+	char := stream next. "We know it is $"" ; consume it".
+	start := stream position.
+	char := stream next.
+	[ (char = $") and: [(stream peek = $") not] ] "Doubled quotes OK"
+	whileFalse: [char := stream next].
+	char := stream next. "Consume last $"" "
+	
+	^ stream copyFrom: start to: stream position - 1
+	
 ! !
 
 !TonelReader methodsFor: 'reading' stamp: 'KenD 4/19/2022 07:57:20'!
@@ -466,10 +515,14 @@ writeClass: aClass category: aString
 		methods: nil;
 		write! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:08:26'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/26/2022 15:10:48'!
 writeComments
 
-	"ignore comments"! !
+	stream 
+		nextPut: $" ;
+		nextPutAll: class comment ; 
+		nextPut: $" ;
+		newLine! !
 
 !TonelWriter methodsFor: 'writing' stamp: 'KenD 4/22/2022 15:39:34'!
 writeDefinition 
