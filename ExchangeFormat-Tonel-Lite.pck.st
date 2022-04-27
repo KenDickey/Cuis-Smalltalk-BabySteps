@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 26 April 2022 at 4:06:52 pm'!
+'From Cuis 6.0 [latest update: #5107] on 27 April 2022 at 10:40:53 am'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 18!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 20!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -62,6 +62,16 @@ I take a Cuis Class and write it out to a file in the Tonel exchange format.
 
 I am not very bright, but perhaps you could fix that!!
 !
+
+!TonelReader methodsFor: 'test access' stamp: 'KenD 4/26/2022 16:19:53'!
+definition
+
+	^ self classInfo ! !
+
+!TonelReader methodsFor: 'test access' stamp: 'KenD 4/26/2022 16:20:19'!
+methods
+
+	^ self methodInfos ! !
 
 !TonelWriter methodsFor: 'accessing' stamp: 'KenD 4/19/2022 08:11:43'!
 category: aString 
@@ -353,29 +363,35 @@ read
 		readDefinition;
 		readMethods! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/26/2022 15:39:34'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/27/2022 07:13:54'!
 readClassComment 
-	"A Class Comment is the first bit of syntax in a Tonel class codefile"
+	"A Class Comment, if used, 
+	 is the first bit of syntax in a Tonel class codefile"
 	stream skipSeparators.
 	stream peek = $" ifTrue: [
 		comment := self readComment
 	]
 ! !
 
-!TonelReader methodsFor: 'reading' stamp: 'KenD 4/26/2022 15:58:01'!
+!TonelReader methodsFor: 'reading' stamp: 'KenD 4/27/2022 10:29:43'!
 readComment 
 	"(stream at: position) is $"", find matching $""
 	 and answer the body "
 	
-	| char start |
-	char := stream next. "We know it is $"" ; consume it".
-	start := stream position.
+	| char commentStream |
+	char := stream next. "We know it is $"" ; skip it".
+	commentStream := String new writeStream.
 	char := stream next.
-	[ (char = $") and: [(stream peek = $") not] ] "Doubled quotes OK"
-	whileFalse: [char := stream next].
-	char := stream next. "Consume last $"" "
-	
-	^ stream copyFrom: start to: stream position - 1
+	[ [ char = $" ] 
+	  whileFalse: [ commentStream nextPut: char. char := stream next].
+	  (stream peek = $") 
+	]
+	whileTrue: [ char := stream next. "Step over 1st dquote"
+		commentStream nextPut: char.  "Add single dquote"
+		char := stream next "Step over 2nd dquote"
+	].
+
+	^ commentStream contents
 	
 ! !
 
@@ -491,11 +507,11 @@ isExtension
 
 	^ self type = 'Extension'! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/20/2022 14:03:40'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/27/2022 07:18:57'!
 write 
 
 	self
-		writeComments;
+		writeClassComment;
 		writeType;
 		writeDefinition;
 		writeMethods;
@@ -506,23 +522,35 @@ writeClass: aClass
 
 	self writeClass: aClass category: nil! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/19/2022 11:07:47'!
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/27/2022 10:37:22'!
 writeClass: aClass category: aString 
 
-	self
-		class: aClass;
-		category: aString;
-		methods: nil;
-		write! !
+	aClass ifNotNil: [ :cls |
+		self
+			class: aClass;
+			category: aString;
+			methods: nil;
+			write
+	]! !
 
-!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/26/2022 15:10:48'!
-writeComments
-
-	stream 
-		nextPut: $" ;
-		nextPutAll: class comment ; 
-		nextPut: $" ;
-		newLine! !
+!TonelWriter methodsFor: 'writing' stamp: 'KenD 4/27/2022 10:36:12'!
+writeClassComment
+	"Class comment String needs double quotes
+	 on each end; interior double quotes doubled"
+	| quoteString |
+	quoteString := class ifNotNil: [ :cl | cl comment ] ifNil: [ nil ].
+	quoteString ifNotNil: [ :str |
+		stream nextPut: $" .
+		str do: [ :char |
+			stream  nextPut: char.
+			(char = $") ifTrue: [ stream  nextPut: char ]
+		].
+		stream
+			nextPut: $" ;
+			newLine;
+			newLine
+	].
+	! !
 
 !TonelWriter methodsFor: 'writing' stamp: 'KenD 4/22/2022 15:39:34'!
 writeDefinition 
