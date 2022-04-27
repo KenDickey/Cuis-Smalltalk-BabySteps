@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5107] on 27 April 2022 at 10:40:53 am'!
+'From Cuis 6.0 [latest update: #5107] on 27 April 2022 at 12:49:44 pm'!
 'Description Just enough here to read/write basic Tonel file format.
 Ported from  https://github.com/aucerna/bee-dmr/tree/master/Tonel
 Copyright (c) 2021 Quorum Software.
 	See (MIT) license in LICENCES directory.'!
-!provides: 'ExchangeFormat-Tonel-Lite' 1 20!
+!provides: 'ExchangeFormat-Tonel-Lite' 1 21!
 !requires: 'BeeCompatibility' 1 4 nil!
 !requires: 'ExchangeFormat-STON' 1 31 nil!
 SystemOrganization addCategory: 'ExchangeFormat-Tonel-Lite'!
@@ -17,6 +17,16 @@ TestCase subclass: #TonelTest
 	category: 'ExchangeFormat-Tonel-Lite'!
 !classDefinition: 'TonelTest class' category: 'ExchangeFormat-Tonel-Lite'!
 TonelTest class
+	instanceVariableNames: ''!
+
+!classDefinition: #TrivialExample category: 'ExchangeFormat-Tonel-Lite'!
+TonelTest subclass: #TrivialExample
+	instanceVariableNames: 'larry joe curley'
+	classVariableNames: 'Stooges'
+	poolDictionaries: ''
+	category: 'ExchangeFormat-Tonel-Lite'!
+!classDefinition: 'TrivialExample class' category: 'ExchangeFormat-Tonel-Lite'!
+TrivialExample class
 	instanceVariableNames: ''!
 
 !classDefinition: #TonelReader category: 'ExchangeFormat-Tonel-Lite'!
@@ -39,6 +49,20 @@ Object subclass: #TonelWriter
 TonelWriter class
 	instanceVariableNames: ''!
 
+
+!TrivialExample commentStamp: '<historical>' prior: 0!
+I am a trivial Class which should never be instantiated.
+
+	"Send $25 for Your Name Here"
+	
+Time donated to Cuis pays for itself!!
+
+writer :=  TonelWriter on: 'TrivialExample.class.st' asFileEntry forceWriteStream.
+writer writeClass: TrivialExample category: #'ExchangeFormat-Tonel-Lite'.
+reader := TonelReader on: ('TrivialExample.class.st' asFileEntry) readStream.
+reader read.
+reader inspect.
+!
 
 !TonelReader commentStamp: '<historical>' prior: 0!
 stream is a StandardFileStream, whose #name is a file path.
@@ -274,6 +298,20 @@ TestClass >> m [
 	self
 		assert: reader methods size = 1;
 		assert: (reader methods anyOne at: #body) trimBlanks = '$]' ! !
+
+!TrivialExample methodsFor: 'failing' stamp: 'KenD 4/27/2022 12:42:09'!
+explain: rationale to: entity
+
+	"No answers to some questions"
+	self flag: #RationaleIsBogus.
+	entity add: rationale.
+! !
+
+!TrivialExample class methodsFor: 'class initialization' stamp: 'KenD 4/27/2022 12:38:58'!
+initialize
+
+	Stooges := {}.
+	! !
 
 !TonelReader methodsFor: 'accessing' stamp: 'KenD 4/26/2022 15:37:24'!
 classComment
@@ -633,3 +671,4 @@ writeMethods: aCollection
 	(self on: tonel) writeMethods: aCollection.
 	
 	^ tonel contents! !
+TrivialExample initialize!
