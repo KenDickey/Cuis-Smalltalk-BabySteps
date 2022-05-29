@@ -1,9 +1,8 @@
-'From Cuis 5.0 [latest update: #4589] on 10 May 2021 at 11:40:12 am'!
+'From Cuis 6.0 [latest update: #5202] on 29 May 2022 at 7:13:35 am'!
 'Description Simple animation for random Morph instances'!
-!provides: 'Animator' 1 23!
+!provides: 'Animator' 1 25!
 !requires: 'Cuis-Base' 50 4413 nil!
-!requires: 'Morphic-Misc1' 1 175 nil!
-!requires: 'Graphics-Files-Additional' 1 22 nil!
+!requires: 'UI-Components' 1 4 nil!
 SystemOrganization addCategory: 'Animator'!
 
 
@@ -379,13 +378,13 @@ bouncingBallExample    "Bounces off walls of container"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 10/16/2020 15:32:18'!
+!Animator class methodsFor: 'examples' stamp: 'KenD 5/29/2022 07:08:54'!
 colorCyclingExample  "Color Cycling"
 "
 	self colorCyclingExample.  
 "
 	| morph colors animator |
-	morph := WidgetMorph initializedInstance.
+	morph := BoxedMorph initializedInstance.
 	morph borderWidth: 6;
 		      morphPosition: 100@200.
 	colors := { Color green. Color red. Color blue. Color yellow.  }.
@@ -398,15 +397,15 @@ colorCyclingExample  "Color Cycling"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 10/16/2020 15:32:32'!
-composedActionExample1  "Compose actions:  grow&shring + path"
+!Animator class methodsFor: 'examples' stamp: 'KenD 5/29/2022 07:13:04'!
+composedActionExample  "Compose actions:  grow&shring + path"
 "
 	self composedActionExample1.  
 	
 	Animator stopStepping.
 "
 	| morph actions animator |
-	morph := WidgetMorph initializedInstance.
+	morph := BoxedMorph initializedInstance.
 	morph morphPosition: 120@120;
 	 		 openInWorld.
 	actions := { 
@@ -421,33 +420,7 @@ composedActionExample1  "Compose actions:  grow&shring + path"
 	animator startStepping.
 	^ animator ! !
 
-!Animator class methodsFor: 'examples' stamp: 'KenD 5/13/2015 14:08'!
-composedActionExample2  "Compose actions -- alternative:  grow&shring + path"
-"
-	self composedActionExample2.  
-	
-	Animator stopStepping.
-"
-	| morph originalAction newAction animator |
-	morph := EllipseMorph initializedInstance.
-	morph morphPosition: 120@120;
-	 		 openInWorld.
-			
-	animator := self actor: morph 
-			  			 action: (Animator growShrinkAction: 20 numSteps: 6)
-						 stepTime: 200.
-	"compose actions"
-	originalAction := animator action.
-	newAction := Animator followPathAction: 
-			{ 120@120. 140@126. 180@130. 
-			   190@140. 190@180. 170@200.  140@190.  130@160. 134@140. } .
-	"Update with composed action"
-	animator action: [ :m | originalAction value: m. newAction value: m ].
-	
-	animator startStepping.
-	^ animator ! !
-
-!Animator class methodsFor: 'examples' stamp: 'KenD 10/16/2020 15:32:49'!
+!Animator class methodsFor: 'examples' stamp: 'KenD 5/29/2022 07:09:16'!
 growAndShrinkExample    "Grow &Shrink"
 "
 	self growAndShrinkExample.
@@ -455,7 +428,7 @@ growAndShrinkExample    "Grow &Shrink"
 	Animator stopStepping.
 "
 	| morph animator |
-	morph := WidgetMorph initializedInstance openInWorld.
+	morph := BoxedMorph initializedInstance openInWorld.
 	morph morphPosition: 200 @ 100.
 	animator := Animator
 						 actor: morph 
