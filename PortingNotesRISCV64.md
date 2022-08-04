@@ -65,6 +65,27 @@ We want to genetrate a file _src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c_.
 So we need to add code to category _VMMaker-Plugins-FFI_
 as a subclass of _ThreadedFFIPlugin_.
 
+The purpose of life for this plugin is to be able to call C library functions.
+Basically, the float and integer registers are set up, values pushed on the stack,
+and values transliterated between Smalltalk and C.  Fortunately, there is plenty
+of code which does this, so a basic understanding of how bytecodes work and how
+objects are represented, how values are found and translated should get you through this.
+
+For details see
+ * http://www.mirandabanda.org/cogblog/on-line-papers-and-presentations/
+
+Looking at ThreadedARM64FFIPlugin, I saw that most code would be identical, so just
+subclassed for ThreadedRiscV64FFIPlugin.  I was also fortunate to be able to subclass
+ThreadedFFICalloutStateForARM64 as ThreadedFFICalloutStateForRiscV64.
+
+If you have built the VMMaker image as above, a browse of
+```Smalltalk
+  ThreadedRiscV64FFIPlugin class>>calloutStateClass
+```
+should show ^ThreadedFFICalloutStateForRiscV64.
+
+The class method #moduleName is ^'RiscV64FFIPlugin', so the generated file
+is _src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c_.
 
 ## makefiles, configure
 
