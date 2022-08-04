@@ -17,8 +17,8 @@ build a working VM which works with a keyboard, display, and mouse.
 To get a working VM, one needs to
 [A] know the processor ABI
 (register and stack conventions, how to call C code),
-[B] write the VMMaker Smalltalk classes which get trtanslated into C,
-and [C] write some C glue code for some VM primitive operations.
+[B] write the VMMaker Smalltalk classes which get translated into C,
+and [C] write some C glue code for required VM primitive operations.
 
 It is good to have some basic understanding of the directory framework
 to look for Smalltalk and C code which is close to what is needed.
@@ -43,7 +43,7 @@ The _image_ directory contains a number of scripts and Smalltalk files.  In this
 ./buildspurtrunkvmmaker64image.sh
 ```
 Should download a Squeak trunk image and then run
-	buildspurtrunkreaderimage.sh
+	buildspurtrunkreaderimage.sh trunk6-64.image
 
 Note that this sometimes breaks.
 In my case, my desktop computer is a Raspberry Pi 4 running Linux.
@@ -52,9 +52,9 @@ downloaded VM is _sqcogspur64ARMv8linuxht/squeak_.
 
 As the recent trunk image is proper, I just run
 ```
-sqcogspur64ARMv8linuxht/squeak
+sqcogspur64ARMv8linuxht/squeak trunk6-64.image
 ```
-then open a File List and load _ buildspurtrunkreader64image.sh_.
+then open a File List and load _Buildspurtrunkvmmaker64image.st_.
 This should load the proper code and quit the image.  If a problem here,
 just save the image as VMMaker.image.
 
