@@ -28,7 +28,7 @@ In this case, the ARMv8 (aarch64/arm64) RISC architecture is
 fairly close in design to riscv64.
 
 You will want to make a directory in which to work and create a VMMaker image.
-For riscv64, this directory was _opensmalltalk-vm-rv64_.
+For riscv64, this directory was `opensmalltalk-vm-rv64`.
 ```
 git clone https://github.com/OpenSmalltalk/opensmalltalk-vm opensmalltalk-vm-rv64
 cd opensmalltalk-vm-rv64/image
@@ -38,7 +38,7 @@ cd opensmalltalk-vm-rv64/image
 
 The first thing to do is create a VMMaker image.
 
-The _image_ directory contains a number of scripts and Smalltalk files.  In this case
+The `image` directory contains a number of scripts and Smalltalk files.  In this case
 ```
 ./buildspurtrunkvmmaker64image.sh
 ```
@@ -47,23 +47,23 @@ Should download a Squeak trunk image and then run
 
 Note that this sometimes breaks.
 In my case, my desktop computer is a Raspberry Pi 4 running Linux.
-Instead of _sqcogspur64linuxht/squeak_, the
-downloaded VM is _sqcogspur64ARMv8linuxht/squeak_.
+Instead of `sqcogspur64linuxht/squeak`, the
+downloaded VM is `sqcogspur64ARMv8linuxht/squeak`.
 
 As the recent trunk image is proper, I just run
 ```
 sqcogspur64ARMv8linuxht/squeak trunk6-64.image
 ```
-then open a File List and load _Buildspurtrunkvmmaker64image.st_.
+then open a File List and load `Buildspurtrunkvmmaker64image.st`.
 This should load the proper code and quit the image.  If a problem here,
 just save the image as VMMaker.image.
 
 ### VMMaker Changes
 
-We want to genetrate a file _src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c_.
+We want to genetrate a file `src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c`.
 
-So we need to add code to category _VMMaker-Plugins-FFI_
-as a subclass of _ThreadedFFIPlugin_.
+So we need to add code to category `VMMaker-Plugins-FFI`
+as a subclass of `ThreadedFFIPlugin`.
 
 The purpose of life for this plugin is to be able to call C library functions.
 Basically, the float and integer registers are set up, values pushed on the stack,
@@ -82,10 +82,10 @@ If you have built the VMMaker image as above, a browse of
 ```Smalltalk
   ThreadedRiscV64FFIPlugin class>>calloutStateClass
 ```
-should show ^ThreadedFFICalloutStateForRiscV64.
+should show `^ThreadedFFICalloutStateForRiscV64`.
 
-The class method #moduleName is ^'RiscV64FFIPlugin', so the generated file
-is _src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c_.
+The class method `#moduleName` is `^'RiscV64FFIPlugin'`, so the generated file
+is `src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c`.
 
 ## makefiles, configure
 
