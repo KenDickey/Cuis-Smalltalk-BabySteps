@@ -103,5 +103,36 @@ is `src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c`.
 
 
 
+### Files
 
+'*' -> changed; else new
 
+#### VMMaker
+```
+ CallbackForRiscV64
+ ThreadedFFICalloutStateForRiscV64
+ ThreadedRiscV64FFIPlugin
+* ThreadedFFIPluginClass-preambleCCode
+```
+#### opensmalltalk-vm
+```
+ platforms/unix/config/
+	* configure.ac
+	* configure
+ platforms/unix/vm
+	* include_ucontext.h
+	* sqUnixITimerHeartbeat.c
+	* sqUnixHeartbeat.c
+	* sqUnixITimerTickerHeartbeat.c
+ platforms/Cross/plugins/IA32ABI/
+	riscv64abicc.c
+	* ia32abi.h
+	* xabicc.c
+ src/plugins/SqueakFFIPrims
+	* RiscV64FFIPlugin.c [VMMaker generated]
+	* SqueakFFIPrims.c [VMMaker generated]
+* build/linux64riscv/squeak.stack.spur
+	* plugins.ext
+	* plugins.int
+	build{,.debug,.assert}/mvm
+```
