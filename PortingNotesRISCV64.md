@@ -26,6 +26,11 @@ The basic strategy is to "copy and change" or to subclass what exists.
 
 In this case, the ARMv8 (aarch64/arm64) RISC architecture is
 fairly close in design to riscv64.
+The spur stack vm (no JIT) is the simplest to start with.
+
+## VMMaker Image
+
+The first thing to do is create a VMMaker image.
 
 You will want to make a directory in which to work and create a VMMaker image.
 For riscv64, this directory was `opensmalltalk-vm-rv64`.
@@ -33,10 +38,6 @@ For riscv64, this directory was `opensmalltalk-vm-rv64`.
 git clone https://github.com/OpenSmalltalk/opensmalltalk-vm opensmalltalk-vm-rv64
 cd opensmalltalk-vm-rv64/image
 ```
-
-## VMMaker Image
-
-The first thing to do is create a VMMaker image.
 
 The `image` directory contains a number of scripts and Smalltalk files.  In this case
 ```
@@ -65,14 +66,28 @@ We want to genetrate a file `src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c`.
 So we need to add code to category `VMMaker-Plugins-FFI`
 as a subclass of `ThreadedFFIPlugin`.
 
-The purpose of life for this plugin is to be able to call C library functions.
+The purpose of life for this plugin is to be able to
+call C Plugins and library functions.
 Basically, the float and integer registers are set up, values pushed on the stack,
-and values transliterated between Smalltalk and C.  Fortunately, there is plenty
-of code which does this, so a basic understanding of how bytecodes work and how
-objects are represented, how values are found and translated should get you through this.
+and values transliterated between Smalltalk and C.
 
+For RiscV64, like ARMv8, floats are generally in float registers, integers in
+integer registers, small structs in integer registers, larger structs caller
+allocated and pointer in integer register gets filled in.  Many details on
+ABI rules for this.
+
+A basic understanding of how bytecodes work and how
+objects are represented, how values are found and
+translated should get you through this.
 For details see
  * http://www.mirandabanda.org/cogblog/on-line-papers-and-presentations/
+
+Most of the value translation mechanics (e.g.
+a float represented in Smalltalk vs a machine float,
+getting a value from an instance variable, strings,.. ) is already
+done for you.
+The bulk of the detail work has to do with register and stack usage for passing
+arguments and results.  
 
 Looking at ThreadedARM64FFIPlugin, I saw that most code would be identical, so just
 subclassed for ThreadedRiscV64FFIPlugin.  I was also fortunate to be able to subclass
@@ -84,8 +99,27 @@ If you have built the VMMaker image as above, a browse of
 ```
 should show `^ThreadedFFICalloutStateForRiscV64`.
 
+The basic strategy is to set up a ThreadedFFICalloutState with register values.
+See `>>ffiCalloutTo:SpecOnStack:in:`, `>>ffiCall:ArgArrayOrNil:NumArgs:` for details.
+
 The class method `#moduleName` is `^'RiscV64FFIPlugin'`, so the generated file
 is `src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c`.
+
+Note also `ThreadedRiscV64FFIPlugin class>>identifyingPredefinedMacros`, which
+is explained a bit below on configuration.
+
+When all is set up, one can use a Workspace to generate the C files.
+```Smalltalk
+ plugins := #(ThreadedRiscV64FFIPlugin SqueakFFIPrims FFIPlugin).
+ plugins do: [:pluginName| (Smalltalk classNamed: pluginName) touch].
+ (VMMaker
+	makerFor: StackInterpreter
+	and: nil with: #()
+	to: VMMaker sourceTree, '/src'
+	platformDir: VMMaker sourceTree, '/platforms'
+	including: plugins) generateExternalPlugins.
+```
+
 
 ## makefiles, configure
 
@@ -129,10 +163,17 @@ is `src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c`.
 	* ia32abi.h
 	* xabicc.c
  src/plugins/SqueakFFIPrims
-	* RiscV64FFIPlugin.c [VMMaker generated]
+	RiscV64FFIPlugin.c [VMMaker generated]
 	* SqueakFFIPrims.c [VMMaker generated]
 * build/linux64riscv/squeak.stack.spur
-	* plugins.ext
-	* plugins.int
+	plugins.ext [copy, without 'B3DAcceleratorPlugin']
+	plugins.int [copy]
 	build{,.debug,.assert}/mvm
 ```
+#### Alien
+  Alien-Core
+	CallbackForRiscV64
+	* FFICallbackThunk class>>initializerForPlatform
+	FFICallbackThunk>>initializeRiscV64st
+	
+#
