@@ -272,7 +272,7 @@ pixel-for-pixel.  The very definition of portability!
 
 Also, being a part of a community means you don't have to do everything yourself.
 
-`http://lists.squeakfoundation.org/mailman/listinfo/vm-dev`
+* http://lists.squeakfoundation.org/mailman/listinfo/vm-dev
 
 
 ### Files
