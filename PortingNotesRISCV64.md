@@ -190,12 +190,67 @@ The `include_ucontext.h` file specifies how to access register values
 from a Unix/Linux signal context. `sqUnixMain.c` has code which uses
 this to dump register information on faults.
 
+Once all these bits are working, you should be able to run an image!
+
+Next to get up is the FFI.
+
 ## FFI, the Foreign Function Interface
+
+There is a file which you don't need to change, but is good to know about
+`platforms/Cross/plugins/SqueakFFIPrims/sqFFITestFuncs.c`.
+These functions exercise the generated YourCPUFFIPlugin.c
+(src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c).
+
+If you use Cuis Smalltalk, you can open a workspace and
+```Smalltalk
+Feature require: 'Tests-FFI'.
+```
+Then open the SUnit Test Runner and run FFIPluginTests.
+If you started Cuis in a terminal, there will be some disgnostic output.
+If you need more, you can add to `sqFFITestFuncs.c`.
+
+This should let you update the VMMaker code to get the right results with value passing on calls.
 
 ### Alien
 
+Once FFI calling works well, one would like to be able to call C and recusively call back into Smalltalk.
 
+The base exercise requires the Alien-Core package to be loaded into a Squeak image.
+For this we use the Monticello Browser on HTTP Repository `www.squeaksource.com/Alien`,
+open it and select and load the latest Alien-Core-eem.<whatever>.  You may have to use the
+VM downloaded for the VMMaker build on the Squeak image to get a proper SSL connection.
 
+You should be able browse the Alien-Core category and look at class `CallBack`.
+You will need to subclass this.  For RV64 we have `CallbackForRiscV64` which has
+class methods to return the ABI string ('RiscV64') and test method `isForCurrentPlatform`
+which checks that the image is running on your CPU.
+There are a couple of simple instance side helper methods here.
+
+The interesting bit of business to get done here is to define a machine code trampoline,
+in our case, `FFICallbackThunk>>initializeRiscV64` and
+updating `FFICallbackThunk class>>initializerForPlatform` to know about it.
+
+The job of the initializer is to create an Alien bytecode array with the hand assembled machine code
+which sets up the registers, calls thunkEntry(), cleans up, and returns.
+
+The `Alien class>>exampleCqsort` gives a good example to get working.
+
+## Sharing your work with the opensmalltalk-vm commuity.
+
+By now, you will certainly be subscribed to the vm-dev email list for questions.
+
+You will have a github repository which is a clone of opensmalltalk-vm.
+For this code, open a new `pull request`.
+
+For the VMMaker and Alien-Core updates, save to their inboxes in monticello:
+```
+http://source.squeak.org/VMMakerInbox
+http://www.squeaksource.com/AlienInbox
+```
+and possibly
+```
+http://source.squeak.org/FFIinbox
+```
 
 
 ### Files
