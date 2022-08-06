@@ -108,6 +108,9 @@ is `src/plugins/SqueakFFIPrims/RiscV64FFIPlugin.c`.
 Note also `ThreadedRiscV64FFIPlugin class>>identifyingPredefinedMacros`, which
 is explained a bit below on configuration.
 
+In addition, the `ThreadedFFIPlugin class>>preambleCCode` defines C macros for getting and
+setting the stack pointer.
+
 When all is set up, one can use the VMMaker tool or
 a simple Workspace to generate the C files.  In a workspace:
 ```Smalltalk
