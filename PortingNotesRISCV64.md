@@ -67,7 +67,7 @@ So we need to add code to category `VMMaker-Plugins-FFI`
 as a subclass of `ThreadedFFIPlugin`.
 
 The purpose of life for this plugin is to be able to
-call C Plugins and library functions.
+call C plugins and library functions.
 Basically, the float and integer registers are set up, values pushed on the stack,
 and values transliterated between Smalltalk and C.
 
@@ -86,6 +86,10 @@ Most of the value translation mechanics (e.g.
 a float represented in Smalltalk vs a machine float,
 getting a value from an instance variable, strings,.. ) is already
 done for you.
+
+You should not need to make changes, but the primitive access functions
+are defined in `src/plugins/IA32ABI/ia32abi.c`.
+
 The bulk of the detail work has to do with register and stack usage for passing
 arguments and results.  
 
@@ -183,11 +187,11 @@ defines the basic call mechanics.  One thing to note here is `VMCallbackContext`
 which is part of the mechanics of calling C which calls Smalltalk which may call
 C which may again call Smalltalk which ... (Again, note Alien section, below).
 
-An interesting directory for Linux is `platforms/unix/vm/'.
+An interesting directory for Linux is `platforms/unix/vm/`.
 
 Most SOCs these days have a hardware clock available, typically
 supported by a standard ABI (Application Binary Interface).
-The `HeartBeat` files support this.
+The `*HeartBeat*.c` files support this.
 
 The `include_ucontext.h` file specifies how to access register values
 from a Unix/Linux signal context. `sqUnixMain.c` has code which uses
@@ -254,6 +258,21 @@ and possibly
 ```
 http://source.squeak.org/FFIinbox
 ```
+
+## In Closing
+
+Each port has a specific context and set of special challanges, but we hope that recap of
+this particular port gives an introduction and hints as to the bits and bobs which need
+to be taken care of to assemble a working VM.
+
+The good news here is that this code has been ported many times, people have commented the code,
+and it is quite worthwhile to be able to save an image running on one CPU and OS and open it on
+another CPU architecture using a different OS and generally have the same windows appear in the same locations
+pixel-for-pixel.  The very definition of portability!
+
+Also, being a part of a community means you don't have to do everything yourself.
+
+`http://lists.squeakfoundation.org/mailman/listinfo/vm-dev`
 
 
 ### Files
