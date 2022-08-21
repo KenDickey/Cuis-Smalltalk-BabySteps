@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5442] on 11 August 2022 at 7:07:10 pm'!
+'From Cuis 6.0 [latest update: #5463] on 21 August 2022 at 2:20:25 pm'!
 'Description '!
-!provides: 'P4' 1 0!
+!provides: 'P4' 1 5!
 SystemOrganization addCategory: 'P4-Kernel-Object'!
 SystemOrganization addCategory: 'P4-Kernel-Package'!
 SystemOrganization addCategory: 'P4-Kernel-String'!
@@ -2454,6 +2454,16 @@ P4Object subclass: #P4SmalltalkConfiguration
 P4SmalltalkConfiguration class
 	instanceVariableNames: 'instance'!
 
+!classDefinition: #P4ELF category: 'P4-Exec-ELF'!
+Object subclass: #P4ELF
+	instanceVariableNames: 'processor symbolTable os programs sectionTable sectionTablePointerOffset'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELF class' category: 'P4-Exec-ELF'!
+P4ELF class
+	instanceVariableNames: ''!
+
 !classDefinition: #NameOfSubclass category: 'P4-Kernel-Collection'!
 Object subclass: #NameOfSubclass
 	instanceVariableNames: ''
@@ -2552,16 +2562,6 @@ ProtoObject subclass: #P4MessageLogBehavior
 	category: 'P4-Examples'!
 !classDefinition: 'P4MessageLogBehavior class' category: 'P4-Examples'!
 P4MessageLogBehavior class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4ELF category: 'P4-Exec-ELF'!
-ProtoObject subclass: #P4ELF
-	instanceVariableNames: 'os programs sectionTable sectionTablePointerOffset'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELF class' category: 'P4-Exec-ELF'!
-P4ELF class
 	instanceVariableNames: ''!
 
 !classDefinition: #P4MethodDictionary category: 'P4-Kernel-Behavior'!
@@ -3304,12 +3304,12 @@ loadClass: aClass
 loadClasses
 	P4RootPackage flushPackages.! !
 
-!P4Package class methodsFor: 'pharo package loading' stamp: 'OliFlueckiger 7/25/2011 17:03'!
+!P4Package class methodsFor: 'pharo package loading' stamp: 'KenD 8/21/2022 14:19:41'!
 packageOfClass: aClass
 	| path |
 	path := '-' split: aClass theNonMetaClass category.
 	path removeFirst.
-	path := path collect: #asSymbol.
+	path := path collect: [ :someName | someName asSymbol].
 	^ P4RootPackage ensurePath: path! !
 
 !P4RootPackage methodsFor: 'filesystem' stamp: 'ToonVerwaest 7/18/2011 21:53'!
@@ -14775,6 +14775,165 @@ doesNotUnderstand: aName
 instance
 	^ instance ifNil: [ instance := self new ]! !
 
+!P4ELF methodsFor: 'accessing' stamp: 'ToonVerwaest 5/10/2011 17:48'!
+createRelocationTable
+	processor elfClass = 1 ifTrue: [ ^ P4ELFRelocationTableImplicitAddends new ].
+	processor elfClass = 2 ifTrue: [ ^ P4ELFRelocationTableExplicitAddends new ].
+	self error: 'Invalid processor class'! !
+
+!P4ELF methodsFor: 'accessing' stamp: 'CamilloBruni 7/26/2011 15:05'!
+nextPut: object
+	currentStream nextPut: object ! !
+
+!P4ELF methodsFor: 'accessing' stamp: 'ToonVerwaest 6/24/2011 16:30'!
+os: anObject
+	os := anObject! !
+
+!P4ELF methodsFor: 'accessing' stamp: 'KenD 8/21/2022 12:54:45'!
+processor
+	
+	^processor! !
+
+!P4ELF methodsFor: 'accessing' stamp: 'KenD 8/21/2022 12:54:25'!
+processor: aProcessor
+	processor := aProcessor.
+	sectionTable := P4ELFSectionTable newFor: self.
+	symbolTable := sectionTable symbolTable.
+	programs := P4ELFProgramTable new.! !
+
+!P4ELF methodsFor: 'accessing' stamp: 'CamilloBruni 7/26/2011 15:06'!
+readWriteExec
+	currentSection := sectionTable code.
+	currentStream := currentSection data.! !
+
+!P4ELF methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 11:58'!
+staticLibraryExtension
+	^ '.o'! !
+
+!P4ELF methodsFor: 'accessing' stamp: 'KenD 8/21/2022 12:55:12'!
+symbolTable
+
+	^symbolTable! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:54'!
+entry
+	" This member gives the virtual address to which the system first transfers control, thus
+	starting the process. If the file has no associated entry point, this member holds zero "
+	^ 0! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 7/29/2011 18:42'!
+header
+	currentStream nextPutAll: self magicIdent.
+
+	currentStream halfWordPut: self type.
+	currentStream halfWordPut: self machine.
+	currentStream wordPut: self version.
+	
+	currentStream pointerPut: self entry.
+	
+	currentStream pointerPut: self programHeaderOffset.
+	
+	" Keep position so that we can fill it in after writing the sections "
+	sectionTablePointerOffset := currentStream position.
+	currentStream pointerPut: self sectionHeaderOffset.
+	
+	currentStream wordPut: processor flags.
+	currentStream halfWordPut: processor elfHeaderSize.
+	currentStream halfWordPut: (programs entrySize: currentStream).
+	
+	currentStream halfWordPut: programs entryCount.
+	currentStream halfWordPut: (sectionTable entrySize: currentStream).
+	currentStream halfWordPut: sectionTable entryCount.
+	currentStream halfWordPut:sectionTable sectionHeaderStringTableIndex.! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:41'!
+machine
+	^ processor elfMachine! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/10/2011 22:11'!
+magicIdent
+	^ { 16r7f. $E. $L. $F.
+		processor elfClass.
+		processor elfDataEncoding.
+		self version.
+		os elfABI.
+		os elfABIVersion.
+		16r00. 16r00. 16r00. 16r00. 16r00. 16r00. 16r00. }! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:59'!
+programHeaderOffset
+	" This member holds the program header table's file offset in bytes. If the file has no program header table, this member holds zero "
+	^ 0! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:59'!
+sectionHeaderOffset
+	" This member holds the section header table's file offset in bytes. If the file has no section header table, this member holds zero "
+	" TODO we'll need a section header :-) "
+	^ 0! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/9/2011 14:37'!
+type
+	"
+	0 NONE none 
+	1 REL relocatable 
+	2 EXEC executable 
+	3 DYN shared 
+	4 CORE core 
+	0xFF00 LOPROC processor specific
+	0xFFFF HIPROC processor specific
+	
+	Current we'll only generate relocatable files, letting LD link them
+	"
+	^ 16r0001! !
+
+!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:44'!
+version
+	" 
+	0 NONE Invalid version
+	1 CURRENT Current version
+	"
+	^ 1! !
+
+!P4ELF methodsFor: 'flushing' stamp: 'OliFlueckiger 6/23/2011 17:20'!
+flushCache
+	self flag: 'install self as method installer target'.
+	"voodoo ahead:"
+	self processor: processor.! !
+
+!P4ELF methodsFor: 'printing' stamp: 'OliFlueckiger 7/14/2011 16:54'!
+functionFor: anObject
+	^sectionTable functionFor: anObject on: currentSection  ! !
+
+!P4ELF methodsFor: 'printing' stamp: 'OliFlueckiger 6/23/2011 14:54'!
+target
+	^sectionTable! !
+
+!P4ELF methodsFor: 'file writing' stamp: 'ToonVerwaest 6/24/2011 18:45'!
+pack: filename
+	" Add source filename to the symbol table "
+	sectionTable filename: (filename, self sourceExtension).
+	super pack: filename! !
+
+!P4ELF methodsFor: 'file writing' stamp: 'CamilloBruni 7/26/2011 15:04'!
+programHeaderTable
+	programs writeHeaderOn: currentStream! !
+
+!P4ELF methodsFor: 'file writing' stamp: 'ToonVerwaest 7/29/2011 18:42'!
+sectionHeaderTable
+	| sectionHeaderTablePosition offset |
+	sectionHeaderTablePosition := currentStream position.
+	currentStream position: sectionTablePointerOffset.
+	currentStream pointerPut: sectionHeaderTablePosition.
+	currentStream position: sectionHeaderTablePosition.
+	sectionTable writeHeaderOn: currentStream.! !
+
+!P4ELF methodsFor: 'file writing' stamp: 'CamilloBruni 7/26/2011 15:04'!
+sections
+	sectionTable writeOn: currentStream! !
+
+!P4ELF methodsFor: 'program header' stamp: 'ToonVerwaest 5/8/2011 22:42'!
+programHeader! !
+
 !P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 17:32'!
 asPClass
 	^ self! !
@@ -15191,155 +15350,6 @@ wrap: anObject
 lookup: selector for: object
 	^ P4MessageLogProxy wrap: (wrap lookup: selector for: object) logger: logger! !
 
-!P4ELF methodsFor: 'accessing' stamp: 'ToonVerwaest 5/10/2011 17:48'!
-createRelocationTable
-	processor elfClass = 1 ifTrue: [ ^ P4ELFRelocationTableImplicitAddends new ].
-	processor elfClass = 2 ifTrue: [ ^ P4ELFRelocationTableExplicitAddends new ].
-	self error: 'Invalid processor class'! !
-
-!P4ELF methodsFor: 'accessing' stamp: 'CamilloBruni 7/26/2011 15:05'!
-nextPut: object
-	currentStream nextPut: object ! !
-
-!P4ELF methodsFor: 'accessing' stamp: 'ToonVerwaest 6/24/2011 16:30'!
-os: anObject
-	os := anObject! !
-
-!P4ELF methodsFor: 'accessing' stamp: 'CamilloBruni 7/27/2011 14:37'!
-processor: aProcessor
-	super processor: aProcessor.
-	sectionTable := P4ELFSectionTable newFor: self.
-	symbolTable := sectionTable symbolTable.
-	programs := P4ELFProgramTable new.! !
-
-!P4ELF methodsFor: 'accessing' stamp: 'CamilloBruni 7/26/2011 15:06'!
-readWriteExec
-	currentSection := sectionTable code.
-	currentStream := currentSection data.! !
-
-!P4ELF methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 11:58'!
-staticLibraryExtension
-	^ '.o'! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:54'!
-entry
-	" This member gives the virtual address to which the system first transfers control, thus
-	starting the process. If the file has no associated entry point, this member holds zero "
-	^ 0! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 7/29/2011 18:42'!
-header
-	currentStream nextPutAll: self magicIdent.
-
-	currentStream halfWordPut: self type.
-	currentStream halfWordPut: self machine.
-	currentStream wordPut: self version.
-	
-	currentStream pointerPut: self entry.
-	
-	currentStream pointerPut: self programHeaderOffset.
-	
-	" Keep position so that we can fill it in after writing the sections "
-	sectionTablePointerOffset := currentStream position.
-	currentStream pointerPut: self sectionHeaderOffset.
-	
-	currentStream wordPut: processor flags.
-	currentStream halfWordPut: processor elfHeaderSize.
-	currentStream halfWordPut: (programs entrySize: currentStream).
-	
-	currentStream halfWordPut: programs entryCount.
-	currentStream halfWordPut: (sectionTable entrySize: currentStream).
-	currentStream halfWordPut: sectionTable entryCount.
-	currentStream halfWordPut:sectionTable sectionHeaderStringTableIndex.! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:41'!
-machine
-	^ processor elfMachine! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/10/2011 22:11'!
-magicIdent
-	^ { 16r7f. $E. $L. $F.
-		processor elfClass.
-		processor elfDataEncoding.
-		self version.
-		os elfABI.
-		os elfABIVersion.
-		16r00. 16r00. 16r00. 16r00. 16r00. 16r00. 16r00. }! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:59'!
-programHeaderOffset
-	" This member holds the program header table's file offset in bytes. If the file has no program header table, this member holds zero "
-	^ 0! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:59'!
-sectionHeaderOffset
-	" This member holds the section header table's file offset in bytes. If the file has no section header table, this member holds zero "
-	" TODO we'll need a section header :-) "
-	^ 0! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/9/2011 14:37'!
-type
-	"
-	0 NONE none 
-	1 REL relocatable 
-	2 EXEC executable 
-	3 DYN shared 
-	4 CORE core 
-	0xFF00 LOPROC processor specific
-	0xFFFF HIPROC processor specific
-	
-	Current we'll only generate relocatable files, letting LD link them
-	"
-	^ 16r0001! !
-
-!P4ELF methodsFor: 'header' stamp: 'ToonVerwaest 5/8/2011 21:44'!
-version
-	" 
-	0 NONE Invalid version
-	1 CURRENT Current version
-	"
-	^ 1! !
-
-!P4ELF methodsFor: 'flushing' stamp: 'OliFlueckiger 6/23/2011 17:20'!
-flushCache
-	self flag: 'install self as method installer target'.
-	"voodoo ahead:"
-	self processor: processor.! !
-
-!P4ELF methodsFor: 'printing' stamp: 'OliFlueckiger 7/14/2011 16:54'!
-functionFor: anObject
-	^sectionTable functionFor: anObject on: currentSection  ! !
-
-!P4ELF methodsFor: 'printing' stamp: 'OliFlueckiger 6/23/2011 14:54'!
-target
-	^sectionTable! !
-
-!P4ELF methodsFor: 'file writing' stamp: 'ToonVerwaest 6/24/2011 18:45'!
-pack: filename
-	" Add source filename to the symbol table "
-	sectionTable filename: (filename, self sourceExtension).
-	super pack: filename! !
-
-!P4ELF methodsFor: 'file writing' stamp: 'CamilloBruni 7/26/2011 15:04'!
-programHeaderTable
-	programs writeHeaderOn: currentStream! !
-
-!P4ELF methodsFor: 'file writing' stamp: 'ToonVerwaest 7/29/2011 18:42'!
-sectionHeaderTable
-	| sectionHeaderTablePosition offset |
-	sectionHeaderTablePosition := currentStream position.
-	currentStream position: sectionTablePointerOffset.
-	currentStream pointerPut: sectionHeaderTablePosition.
-	currentStream position: sectionHeaderTablePosition.
-	sectionTable writeHeaderOn: currentStream.! !
-
-!P4ELF methodsFor: 'file writing' stamp: 'CamilloBruni 7/26/2011 15:04'!
-sections
-	sectionTable writeOn: currentStream! !
-
-!P4ELF methodsFor: 'program header' stamp: 'ToonVerwaest 5/8/2011 22:42'!
-programHeader! !
-
 !P4MethodDictionary methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 9/7/2011 16:26'!
 at: key
 	<groundTypes>
@@ -15358,3 +15368,233 @@ typeHints
 	{
 		#self-> #'Kernel.Behavior.MethodDictionary'
 	} asDictionary! !
+
+!Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/28/2011 16:35'!
+dump: var on: binaryOut for: aReference at: offset
+	| instVarReference |
+	(var isKindOf: SmallInteger) 
+		ifTrue: [	binaryOut pointerPut: var asTaggedInteger at: aReference pointerOffset: offset-1 ]
+		ifFalse: [instVarReference := binaryOut localDump: var.
+				binaryOut pointerPut: instVarReference addend at: aReference pointerOffset: offset - 1.
+			 	binaryOut referTo: instVarReference at: aReference pointerOffset: offset-1 ]
+! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 16:13'!
+dumpGlobalOn: binaryOut
+	self error: 'not a global object'  ! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 18:39'!
+dumpLocalOn: binaryOut
+	^ self dumpOn: binaryOut! !
+
+!Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/19/2011 12:59'!
+dumpOn: binaryOut
+	| myRef var |
+	myRef := binaryOut allocate: self.
+	
+	1 to: self pclass pInstSize do: [ :i |
+		var := self pInstVarAt: i.
+		self dump: var on: binaryOut for: myRef at: i ].
+	
+	1 to: self pVariableSize do: [ :i |
+		var := self pVariableAt: i.
+		self dump: var on: binaryOut for: myRef at: i+self pclass pInstSize ].
+	
+	^ myRef
+! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/8/2011 12:36'!
+flush
+! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:30'!
+pByteAt: i
+	^ self basicAt: i    ! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 16:47'!
+pByteName
+	^ nil! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:34'!
+pByteSize 
+	self class isBytes 
+		ifTrue: [ ^ self basicSize ].
+	^ 0! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/15/2011 14:50'!
+pExportedName 
+	^ nil! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 10/4/2011 15:49'!
+pHash
+	^ self hash! !
+
+!Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/23/2011 18:39'!
+pHeader
+	| base variable bytes hash |
+	base := self pclass pInstSize.
+	variable := self pclass pIsVariable ifTrue: [ 1 ] ifFalse: [ 0 ].
+	bytes := self pclass pIsBytes ifTrue: [ 1 ] ifFalse: [ 0 ].
+	hash := self identityHash.
+	^ (hash bitShift: 12) + (bytes bitShift: 9) + (variable bitShift: 8) + base! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:23'!
+pInstSize 
+	^ self instSize ! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:35'!
+pInstVarAt: i
+	^ self instVarAt: i  ! !
+
+!Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/19/2011 18:26'!
+pIsBytes
+	^ self isBytes! !
+
+!Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/19/2011 18:32'!
+pIsVariable
+	^ self isBytes not and: [ self isVariable ]! !
+
+!Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 18:04'!
+pIsVariableOrBytes
+	^ self isVariable! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:30'!
+pVariableAt: i
+	^ self basicAt: i    ! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:34'!
+pVariableSize 
+	self class isBytes 
+		ifFalse: [ ^ self basicSize ].
+	^ 0! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:19'!
+pVariableSizeHeader 
+	^ self basicSize ! !
+
+!Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 17:33'!
+pclass
+	^ self class asPClass! !
+
+!Object methodsFor: '*P4' stamp: 'OliFlueckiger 8/5/2011 18:40'!
+printObj
+	<preventExport>! !
+
+!Boolean methodsFor: '*P4' stamp: 'ToonVerwaest 7/18/2011 17:08'!
+dumpGlobalOn: executableFormat
+	^ self dumpOn: executableFormat.! !
+
+!Boolean methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 16:59'!
+dumpLocalOn: executableFormat
+	^ executableFormat postpone: self! !
+
+!Boolean methodsFor: '*P4' stamp: 'OliFlueckiger 7/15/2011 14:51'!
+pExportedName 
+	^ self name asSymbol! !
+
+!UndefinedObject methodsFor: '*P4' stamp: 'ToonVerwaest 7/18/2011 17:09'!
+dumpGlobalOn: executableFormat
+	^ self dumpOn: executableFormat.! !
+
+!UndefinedObject methodsFor: '*P4' stamp: 'ToonVerwaest 7/19/2011 00:20'!
+dumpLocalOn: executableFormat
+	^ executableFormat postpone: self! !
+
+!UndefinedObject methodsFor: '*P4' stamp: 'OliFlueckiger 7/15/2011 14:47'!
+pExportedName 
+	^ #nil! !
+
+!Behavior methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:01:16'!
+mapToPclass
+	^ {
+	
+	Object 				-> P4Object. 
+	Behavior 			-> P4Behavior.
+	Metaclass 			-> P4Metaclass.
+	Class 				-> P4Class.
+	IdentityDictionary 	-> P4IdentityDictionary.
+	Dictionary 			-> P4Dictionary.
+	Array 				-> P4Array.
+	Symbol 		-> P4Symbol.
+	String 			-> P4String.
+	UndefinedObject 	-> P4UndefinedObject.
+	True 				-> P4True.
+	False 				-> P4False.
+	SmallInteger 		-> P4SmallInteger.
+	
+	} asDictionary at: self ifAbsent: [ self error: 'Trying to export invalid class' ]
+		
+  ! !
+
+!Behavior methodsFor: '*P4' stamp: 'OliFlueckiger 8/18/2011 13:46'!
+pLookupSelector: aSelector
+	| method |
+	method := self lookupSelector: aSelector.
+	^ (method methodClass mapToPclass methodDict) 	at: aSelector! !
+
+!Class methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 17:23'!
+asPClass
+	^ P4Package loadClass: self mapToPclass		
+		
+		
+  ! !
+
+!Class methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 16:34'!
+dumpGlobalOn: binaryOut
+	^ self dumpOn: binaryOut! !
+
+!Class methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 16:34'!
+dumpLocalOn: binaryOut
+	^ binaryOut postpone: self  ! !
+
+!Metaclass methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 17:34'!
+asPClass
+	^ thisClass asPClass pclass! !
+
+!Metaclass methodsFor: '*P4' stamp: 'OliFlueckiger 8/18/2011 13:39'!
+earlySelectorAddress: aSelector
+	| method |
+	method := self pLookupSelector: aSelector.
+	^ method earlySelectorAddress.! !
+
+!Metaclass methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 17:23'!
+mapToPclass
+	^ thisClass mapToPclass class! !
+
+!Metaclass methodsFor: '*P4' stamp: 'OliFlueckiger 7/20/2011 16:07'!
+p4super
+	self == P4Object class ifTrue: [ ^ P4Class ].
+	^ self super! !
+
+!Metaclass methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 18:25'!
+pInstSize
+	^ self instSize - P4Object class instSize + P4Class instSize! !
+
+!SmallInteger methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 18:20'!
+asTaggedInteger 
+	^ 1+(self bitShift: 1)! !
+
+!SmallInteger methodsFor: '*P4' stamp: 'OliFlueckiger 10/4/2011 15:58'!
+pHash 
+	^ self! !
+
+!Character methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:16:06'!
+split: aString
+
+	^ aString findTokens: self asString! !
+
+!CharacterSequence methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:17:23'!
+split: aString
+	"I am a string of delimiters"
+	^ aString findTokens: self! !
+
+!Symbol methodsFor: '*P4' stamp: 'ToonVerwaest 7/23/2011 18:57'!
+pHash
+	| hash maxInt |
+	self flag: 'Not a super fast implementation; but it matches what we have in C...'.
+	maxInt := (1 bitShift: 64) - 1.
+	hash := 5381.
+	1 to: self size do: [ :i |
+		hash := (hash + ((hash bitShift: 5) bitAnd: maxInt) + (self at: i) asInteger) bitAnd: maxInt ].
+	((hash bitShift: -63) bitAnd: 1) = 1 ifTrue: [ hash := hash bitShift: -1].
+	^ hash! !
