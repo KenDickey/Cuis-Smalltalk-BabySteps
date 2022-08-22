@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5463] on 21 August 2022 at 2:20:25 pm'!
+'From Cuis 6.0 [latest update: #5463] on 22 August 2022 at 12:26:33 pm'!
 'Description '!
-!provides: 'P4' 1 5!
+!provides: 'P4' 1 6!
 SystemOrganization addCategory: 'P4-Kernel-Object'!
 SystemOrganization addCategory: 'P4-Kernel-Package'!
 SystemOrganization addCategory: 'P4-Kernel-String'!
@@ -2464,16 +2464,6 @@ Object subclass: #P4ELF
 P4ELF class
 	instanceVariableNames: ''!
 
-!classDefinition: #NameOfSubclass category: 'P4-Kernel-Collection'!
-Object subclass: #NameOfSubclass
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Kernel-Collection'!
-!classDefinition: 'NameOfSubclass class' category: 'P4-Kernel-Collection'!
-NameOfSubclass class
-	instanceVariableNames: ''!
-
 !classDefinition: #P4PharoBehavior category: 'P4-PharoBridge'!
 Object subclass: #P4PharoBehavior
 	instanceVariableNames: 'pharoInstance p4instance'
@@ -3224,13 +3214,12 @@ packageOfClass: aClass
 	path := path collect: #asSymbol.
 	^ P4RootPackage ensurePath: path! !
 
-!P4Package methodsFor: 'filesystem' stamp: 'ToonVerwaest 7/18/2011 21:53'!
+!P4Package methodsFor: 'filesystem' stamp: 'KenD 8/22/2022 11:51:30'!
 ensureDirectory
 	<preventExport>
 	| parentDir |
 	parentDir := parent ensureDirectory.
-	(parentDir directoryExists: name) ifFalse: [ parentDir createDirectory: name ].
-	^ parentDir directoryNamed: name.
+	^ parentDir assureExistenceDirNamed: name.
 	! !
 
 !P4Package methodsFor: 'filesystem' stamp: 'ToonVerwaest 5/16/2011 18:40'!
@@ -3282,10 +3271,10 @@ pExportedName
 printOn: aStream 
 	self printOn: aStream separatedBy: '.'  ! !
 
-!P4Package class methodsFor: 'instance creation' stamp: 'ToonVerwaest 5/17/2011 02:56'!
+!P4Package class methodsFor: 'instance creation' stamp: 'KenD 8/22/2022 11:46:07'!
 byPathName: aName
 	| segments |
-	segments := ('.' split: aName) collect: #asSymbol.
+	segments := ('.' split: aName) collect: [:elt | elt asSymbol].
 	^ P4RootPackage resolve: segments
 	! !
 
@@ -3312,10 +3301,10 @@ packageOfClass: aClass
 	path := path collect: [ :someName | someName asSymbol].
 	^ P4RootPackage ensurePath: path! !
 
-!P4RootPackage methodsFor: 'filesystem' stamp: 'ToonVerwaest 7/18/2011 21:53'!
+!P4RootPackage methodsFor: 'filesystem' stamp: 'KenD 8/22/2022 11:47:45'!
 ensureDirectory
 	<preventExport>
-	^ FileDirectory default! !
+	^ DirectoryEntry smalltalkImageDirectory ! !
 
 !P4RootPackage methodsFor: 'filesystem' stamp: 'ToonVerwaest 5/16/2011 18:37'!
 printOn: aStream separatedBy: separator! !
@@ -15406,6 +15395,10 @@ dumpOn: binaryOut
 !Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/8/2011 12:36'!
 flush
 ! !
+
+!Object methodsFor: '*P4' stamp: 'KenD 8/22/2022 12:16:53'!
+haltIf: aBool
+	aBool ifTrue: [self halt]! !
 
 !Object methodsFor: '*P4' stamp: 'OliFlueckiger 7/14/2011 15:30'!
 pByteAt: i
