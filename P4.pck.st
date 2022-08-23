@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5463] on 22 August 2022 at 12:26:33 pm'!
+'From Cuis 6.0 [latest update: #5463] on 23 August 2022 at 1:34:26 pm'!
 'Description '!
-!provides: 'P4' 1 6!
+!provides: 'P4' 1 8!
 SystemOrganization addCategory: 'P4-Kernel-Object'!
 SystemOrganization addCategory: 'P4-Kernel-Package'!
 SystemOrganization addCategory: 'P4-Kernel-String'!
@@ -3342,9 +3342,10 @@ flushPackages
 	instance ifNotNil: [ instance classesDo: #flush ].
 	instance := nil! !
 
-!P4ClassReference methodsFor: 'iterating' stamp: 'ToonVerwaest 5/24/2011 17:50'!
+!P4ClassReference methodsFor: 'iterating' stamp: 'KenD 8/23/2022 13:29:06'!
 classesDo: action
-	action value: cls! !
+	"action value: cls"
+	cls perform: action! !
 
 !P4ClassReference methodsFor: 'iterating' stamp: 'ToonVerwaest 7/19/2011 13:46'!
 packagesDo: action
@@ -15358,6 +15359,11 @@ typeHints
 		#self-> #'Kernel.Behavior.MethodDictionary'
 	} asDictionary! !
 
+!ProtoObject methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:34:08'!
+printString
+
+	^ 'ProtoObject instance'! !
+
 !Object methodsFor: '*P4' stamp: 'ToonVerwaest 7/28/2011 16:35'!
 dump: var on: binaryOut for: aReference at: offset
 	| instVarReference |
@@ -15591,3 +15597,26 @@ pHash
 		hash := (hash + ((hash bitShift: 5) bitAnd: maxInt) + (self at: i) asInteger) bitAnd: maxInt ].
 	((hash bitShift: -63) bitAnd: 1) = 1 ifTrue: [ hash := hash bitShift: -1].
 	^ hash! !
+
+!Stream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:05:58'!
+<< anObject
+
+	anObject putOn: self! !
+
+!Stream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:06:47'!
+putOn: aStream
+
+	aStream nextPutAll: self contents! !
+
+!WriteStream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:07:49'!
+<< anObject
+	"Write anObject to the receiver, dispatching using #putOn:
+	This is a shortcut for both nextPut: and nextPutAll: since anObject can be both
+	the element type of the receiver as well as a collection of those elements.
+	No further conversions of anObject are applied.
+	This is an optimisation.
+	Return self to accomodate chaining."
+
+ 	anObject class == collection class
+		ifTrue: [ self nextPutAll: anObject ]
+		ifFalse: [ anObject putOn: self ]! !
