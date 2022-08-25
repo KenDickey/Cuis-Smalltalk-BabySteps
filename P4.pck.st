@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5466] on 25 August 2022 at 8:52:09 am'!
+'From Cuis 6.0 [latest update: #5466] on 25 August 2022 at 4:15:49 pm'!
 'Description Pinocchio  Version 4'!
-!provides: 'P4' 1 19!
+!provides: 'P4' 1 20!
 !requires: 'PEG' 1 7 nil!
 SystemOrganization addCategory: #'P4-ASM'!
 SystemOrganization addCategory: #'P4-ASM-Values'!
@@ -34,6 +34,26 @@ SystemOrganization addCategory: #'P4-TAC-IR'!
 SystemOrganization addCategory: #'P4-TAC-Values'!
 SystemOrganization addCategory: #'P4-Test'!
 
+
+!classDefinition: #P4Exception category: #'P4-Exception'!
+Exception subclass: #P4Exception
+	instanceVariableNames: 'environment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Exception'!
+!classDefinition: 'P4Exception class' category: #'P4-Exception'!
+P4Exception class
+	instanceVariableNames: ''!
+
+!classDefinition: #P4KeyNotFound category: #'P4-Kernel-Collection'!
+P4Exception subclass: #P4KeyNotFound
+	instanceVariableNames: 'dictionary key'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4KeyNotFound class' category: #'P4-Kernel-Collection'!
+P4KeyNotFound class
+	instanceVariableNames: ''!
 
 !classDefinition: #P4Object category: #'P4-Kernel-Object'!
 Object subclass: #P4Object
@@ -553,26 +573,6 @@ P4Object subclass: #P4PrototypeBehavior
 	category: 'P4-Examples'!
 !classDefinition: 'P4PrototypeBehavior class' category: #'P4-Examples'!
 P4PrototypeBehavior class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4Exception category: #'P4-Exception'!
-P4Object subclass: #P4Exception
-	instanceVariableNames: 'environment'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Exception'!
-!classDefinition: 'P4Exception class' category: #'P4-Exception'!
-P4Exception class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4KeyNotFound category: #'P4-Kernel-Collection'!
-P4Exception subclass: #P4KeyNotFound
-	instanceVariableNames: 'dictionary key'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4KeyNotFound class' category: #'P4-Kernel-Collection'!
-P4KeyNotFound class
 	instanceVariableNames: ''!
 
 !classDefinition: #P4BinaryOut category: #'P4-Exec'!
@@ -2809,6 +2809,77 @@ Jumps and calls can be direct to an address, or indirect via a register (which c
 If a call is done to a register it is encoded in the same way as a "constant/register combination", meaning that it will be prefixed with 0x41 if the register is a register(1).
 
 !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
+defaultAction
+	"No one has handled this error, but now give them a chance to decide
+	how to debug it. If none handle this either then open debugger (see
+	UnhandedError-defaultAction) "
+	<preventExport>
+	UnhandledError signalForException: self! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:31'!
+description
+	<preventExport>
+	"Return a textual description of the exception."
+	| desc mt |
+	desc := self class name asString.
+	^ (mt := self messageText) == nil
+		ifTrue: [desc]
+		ifFalse: [desc , ': ' , mt]! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:32'!
+messageText
+	<preventExport>
+	| stream |
+	stream := WriteStream on: ''.
+	self warnOn: stream.
+	^ stream contents! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 8/9/2011 13:38'!
+pSignal
+	<renameExport: #signal>
+	'---> signalled:' print.
+	self printObj.
+	self pHalt.
+	
+	! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:52'!
+signal
+	"Ask ContextHandlers in the sender chain to handle this signal. The
+	default is to execute and return my defaultAction."
+	<preventExport>
+	environment := thisContext contextTag.
+	^ environment nextHandlerContext handleSignal: self! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
+signalerContext
+	<preventExport>
+	^ environment
+		findContextSuchThat: [:ctxt | (ctxt receiver == self
+				or: [ctxt receiver == self class]) not]! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+dictionary
+	^ dictionary! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+dictionary: anObject
+	dictionary := anObject! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+key
+	^ key! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+key: anObject
+	key := anObject! !
+
+!P4KeyNotFound methodsFor: 'printing' stamp: 'ToonVerwaest 8/20/2010 12:00'!
+warnOn: aStream
+	aStream << 'Key not found: '.
+	key printOn: aStream.! !
 
 !P4Object methodsFor: 'testing' stamp: 'OliFlueckiger 7/28/2011 20:02'!
 = other
@@ -5080,77 +5151,6 @@ lookup: selector for: object
 		currentObj := currentObj delegate ].
 
 	^ P4DoesNotUnderstand new! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
-defaultAction
-	"No one has handled this error, but now give them a chance to decide
-	how to debug it. If none handle this either then open debugger (see
-	UnhandedError-defaultAction) "
-	<preventExport>
-	UnhandledError signalForException: self! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:31'!
-description
-	<preventExport>
-	"Return a textual description of the exception."
-	| desc mt |
-	desc := self class name asString.
-	^ (mt := self messageText) == nil
-		ifTrue: [desc]
-		ifFalse: [desc , ': ' , mt]! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:32'!
-messageText
-	<preventExport>
-	| stream |
-	stream := WriteStream on: ''.
-	self warnOn: stream.
-	^ stream contents! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 8/9/2011 13:38'!
-pSignal
-	<renameExport: #signal>
-	'---> signalled:' print.
-	self printObj.
-	self pHalt.
-	
-	! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:52'!
-signal
-	"Ask ContextHandlers in the sender chain to handle this signal. The
-	default is to execute and return my defaultAction."
-	<preventExport>
-	environment := thisContext contextTag.
-	^ environment nextHandlerContext handleSignal: self! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
-signalerContext
-	<preventExport>
-	^ environment
-		findContextSuchThat: [:ctxt | (ctxt receiver == self
-				or: [ctxt receiver == self class]) not]! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-dictionary
-	^ dictionary! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-dictionary: anObject
-	dictionary := anObject! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-key
-	^ key! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-key: anObject
-	key := anObject! !
-
-!P4KeyNotFound methodsFor: 'printing' stamp: 'ToonVerwaest 8/20/2010 12:00'!
-warnOn: aStream
-	aStream << 'Key not found: '.
-	key printOn: aStream.! !
 
 !P4BinaryOut methodsFor: 'initialize-release' stamp: 'OliFlueckiger 12/7/2011 20:19'!
 addClassReference: class for: allocated
