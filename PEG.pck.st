@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5466] on 25 August 2022 at 4:15:46 pm'!
+'From Cuis 6.0 [latest update: #5466] on 25 August 2022 at 5:09:19 pm'!
 'Description Parsing Expression Grammar -- yet another parser..'!
-!provides: 'PEG' 1 11!
+!provides: 'PEG' 1 14!
 SystemOrganization addCategory: #PEG!
 
 
@@ -446,10 +446,10 @@ scanPush: subCollection
 	position := position + s.
 	^ true! !
 
-!PEGStringScanner methodsFor: 'matching' stamp: 'ToonVerwaest 8/19/2010 17:26'!
+!PEGStringScanner methodsFor: 'matching' stamp: 'KenD 8/25/2022 17:05:18'!
 scanPushCharacter: character
 	self atEnd ifTrue: [ ^ false ].
-	(collection at: position + 1) asInteger = character ifFalse: [ ^ false ].
+	(collection at: position + 1) asInteger = character asInteger ifFalse: [ ^ false ].
 	stack push: character asCharacter.
 	position := position + 1.
 	^ true! !
@@ -1390,133 +1390,132 @@ testOneOrMoreExpression
 	exp := PEGOneOrMoreExpression on: exp3.
 	self should: [exp match: string] raise: PEGParsingFailure.! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 7/29/2010 11:25'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:20:04'!
 testOptionalExpression
 	| string exp1 exp2 exp |
 	string := PEGStringScanner on: 'teesest'.
-	exp1 := PEGTerminal new: 'te'.
-	exp2 := PEGTerminal new: 'es'.
-	exp := PEGOptionalExpression new: exp1.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp := PEGOptionalExpression on: exp1.
 	((exp match: string) resultIfFailed: [ 10 ]).
-	string position should = 2.
-	((exp match: string) resultIfFailed: [ 10 ]) should = 10.
-	string position should = 2.
-	exp := PEGOptionalExpression new: exp2.
+	self assert: string position equals: 2.
+	self assert: ((exp match: string) resultIfFailed: [ 10 ]) equals: 10.
+	self assert: string position equals: 2.
+	exp := PEGOptionalExpression on: exp2.
 	((exp match: string) resultIfFailed: [ 10 ]).
-	string position should = 4! !
+	self assert: string position equals: 4! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 3/25/2010 12:44'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:26:25'!
 testOrderedChoiceExpression
-	| string exp1 exp2 exp3 seq1 |
+	| string exp1 exp2  seq1 |
 	string := PEGStringScanner on: 'teest'.
-	exp1 := PEGTerminal new: 'te'.
-	exp2 := PEGTerminal new: 'es'.
-	exp3 := PEGTerminal new: 't'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+
 	seq1 := PEGOrderedChoiceExpression new.
 	seq1 <= exp1 <= exp2.
 	seq1 match: string.
-	string position should = 2.
+	self assert: string position equals: 2.
 	seq1 match: string.
-	string position should = 4.
-	seq1 match: string.
-	string position should = 4! !
+	self assert: string position equals: 4.
+	self should: [seq1 match: string] raise: PEGParsingFailure.! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 7/27/2010 14:44'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:29:39'!
 testRange
 	| string |
 	string := PEGStringScanner on: 'p'.
-	((PEGRange between: $a and: $z) match: string) should = $p.
-	string position should = 1.
+	self assert: ((PEGRange between: $a and: $z) match: string) equals: $p.
+	self assert: string position equals: 1.
 	string := PEGStringScanner on: 'a'.
-	((PEGRange between: $a and: $z) match: string) should = $a.
-	string position should = 1.
+	self assert: ((PEGRange between: $a and: $z) match: string) equals: $a.
+	self assert: string position equals: 1.
 	string := PEGStringScanner on: 'z'.
-	((PEGRange between: $a and: $z) match: string) should = $z.
-	string position should = 1.
+	self assert: ((PEGRange between: $a and: $z) match: string) equals: $z.
+	self assert: string position equals: 1.
 	string := PEGStringScanner on: ' '.
-	((PEGRange between: $a and: $z) match: string) should be isNil.
-	string position should = 0.
+	self should: [(PEGRange between: $a and: $z) match: string] raise: PEGParsingFailure.
+	self assert: string position equals: 0.
 	string := PEGStringScanner on: ''.
-	((PEGRange between: $a and: $z) match: string) should be isNil.
-	string position should = 0! !
+	self should: [(PEGRange between: $a and: $z) match: string] raise: PEGParsingFailure.
+	self assert: string position equals: 0! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 7/27/2010 12:06'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:31:32'!
 testResultEquals
 	| string exp1 result exp2 |
 	string := PEGStringScanner on: 'te'.
-	exp1 := PEGTerminal new: 'te'.
-	exp2 := PEGZeroOrMoreExpression new: exp1.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGZeroOrMoreExpression on: exp1.
 	result := exp2 match: string.
-	result should not be isNil.
-	string position should = 2.
+	self deny: result isNil.
+	self assert: string position equals: 2.
 	string position: 0.
-	(exp2 match: string) should = result! !
+	self assert: (exp2 match: string) equals: result! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 3/25/2010 12:44'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:32:54'!
 testSeparator
 	| string |
 	string := PEGStringScanner on: ' a'.
-	(PEGParser separator match: string) should not be isNil.
-	string position should = 1.
+	self deny: (PEGParser separator match: string) isNil.
+	self assert: string position equals: 1.
 	string := PEGStringScanner on: ' 	 a'.
-	(PEGParser separator match: string) should not be isNil.
-	string position should = 3! !
+	self deny: (PEGParser separator match: string) isNil.
+	self assert: string position equals: 3! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 3/25/2010 12:44'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:39:19'!
 testSequenceExpression
 	| string exp1 exp2 exp3 seq1 seq2 seq3 |
 	string := PEGStringScanner on: 'teest'.
-	exp1 := PEGTerminal new: 'te'.
-	exp2 := PEGTerminal new: 'es'.
-	exp3 := PEGTerminal new: 't'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp3 := PEGTerminal on: 't'.
 	seq1 := PEGSequenceExpression new.
 	seq1 <& exp1 <& exp2.
 	seq1 match: string.
-	string position should = 4.
-	seq1 match: string.
-	string position should = 4.
+	self assert: string position equals: 4.
+	
+	string := PEGStringScanner on: 'test'.
 	seq2 := PEGSequenceExpression new.
 	seq2 <& exp3 <& exp2.
 	seq2 match: string.
-	string position should = 4.
+	self assert: string position equals: 3.
 	seq3 := PEGSequenceExpression new.
 	seq3 <& exp3.
 	seq3 match: string.
-	string position should = 5! !
+	self assert: string position equals: 4! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 9/30/2010 15:08'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:40:11'!
 testSequenceOmit
 	| string exp1 exp2 seq1 |
 	string := PEGStringScanner on: 'abc'.
 	exp1 := 'a' asParser omit.
 	exp2 := 'b' asParser.
 	seq1 := exp1 && exp2.
-	(seq1 match: string) should = $b.
-	string position should = 2! !
+	self assert: (seq1 match: string) equals: $b.
+	self assert: string position equals: 2! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 9/30/2010 15:08'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 17:06:11'!
 testSingleCharacterParse
-	| string exp1 exp2 seq1 |
+	| string exp1 |
 	string := PEGStringScanner on: 'abc'.
 	exp1 := 'a' asParser.
-	(exp1 match: string) should = $a.
-	string position should = 1! !
+	self assert: (exp1 match: string) equals: $a.
+	self assert: string position equals: 1! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 3/25/2010 12:44'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 17:09:01'!
 testZeroOrMoreExpression
 	| string exp1 exp2 exp3 exp |
 	string := PEGStringScanner on: 'teesest'.
-	exp1 := PEGTerminal new: 'te'.
-	exp2 := PEGTerminal new: 'es'.
-	exp3 := PEGTerminal new: 't'.
-	exp := PEGZeroOrMoreExpression new: exp1.
-	(exp match: string) should not be isNil.
-	string position should = 2.
-	exp := PEGZeroOrMoreExpression new: exp2.
-	(exp match: string) should not be isNil.
-	string position should = 6.
-	(exp match: string) should not be isNil.
-	string position should = 6! !
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp3 := PEGTerminal on: 't'.
+	exp := PEGZeroOrMoreExpression on: exp1.
+	self deny: (exp match: string) isNil.
+	self assert: string position equals: 2.
+	exp := PEGZeroOrMoreExpression on: exp2.
+	self deny: (exp match: string) isNil.
+	self assert: string position equals: 6.
+	self deny: (exp match: string) isNil.
+	self assert: string position equals: 6! !
 
 !String methodsFor: '*PEG' stamp: 'ToonVerwaest 7/29/2010 23:17'!
 asPEGChoice
@@ -1550,9 +1549,9 @@ asInteger
 
 	^self codePoint ! !
 
-!Character methodsFor: '*PEG' stamp: 'ToonVerwaest 9/30/2010 15:08'!
+!Character methodsFor: '*PEG' stamp: 'KenD 8/25/2022 16:56:42'!
 asParser
-	^ PEGCharacterTerminal on: self! !
+	^ PEGPushCharacterTerminal on: self! !
 
 !Character methodsFor: '*PEG' stamp: 'KenD 8/21/2022 14:28:24'!
 max: other
