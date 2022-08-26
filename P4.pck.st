@@ -1,2568 +1,2568 @@
-'From Cuis 6.0 [latest update: #5467] on 25 August 2022 at 7:43:44 pm'!
+'From Cuis 6.0 [latest update: #5466] on 26 August 2022 at 12:17:52 pm'!
 'Description Pinocchio  Version 4'!
-!provides: 'P4' 1 21!
+!provides: 'P4' 1 23!
 !requires: 'PEG' 1 7 nil!
-SystemOrganization addCategory: 'P4-ASM'!
-SystemOrganization addCategory: 'P4-ASM-Values'!
-SystemOrganization addCategory: 'P4-AST'!
-SystemOrganization addCategory: 'P4-Compiler'!
-SystemOrganization addCategory: 'P4-Examples'!
-SystemOrganization addCategory: 'P4-Exception'!
-SystemOrganization addCategory: 'P4-Exec'!
-SystemOrganization addCategory: 'P4-Exec-ELF'!
-SystemOrganization addCategory: 'P4-Exec-ELF-Dwarf'!
-SystemOrganization addCategory: 'P4-Exec-MachO'!
-SystemOrganization addCategory: 'P4-Kernel-Behavior'!
-SystemOrganization addCategory: 'P4-Kernel-Boolean'!
-SystemOrganization addCategory: 'P4-Kernel-Callable'!
-SystemOrganization addCategory: 'P4-Kernel-Collection'!
-SystemOrganization addCategory: 'P4-Kernel-IO'!
-SystemOrganization addCategory: 'P4-Kernel-Memory'!
-SystemOrganization addCategory: 'P4-Kernel-Number'!
-SystemOrganization addCategory: 'P4-Kernel-Object'!
-SystemOrganization addCategory: 'P4-Kernel-Package'!
-SystemOrganization addCategory: 'P4-Kernel-String'!
-SystemOrganization addCategory: 'P4-Kernel-Structure'!
-SystemOrganization addCategory: 'P4-Parser'!
-SystemOrganization addCategory: 'P4-PharoBridge'!
-SystemOrganization addCategory: 'P4-Presentation'!
-SystemOrganization addCategory: 'P4-Stream'!
-SystemOrganization addCategory: 'P4-SystemInstaller'!
-SystemOrganization addCategory: 'P4-SystemSpec'!
-SystemOrganization addCategory: 'P4-TAC'!
-SystemOrganization addCategory: 'P4-TAC-IR'!
-SystemOrganization addCategory: 'P4-TAC-Values'!
-SystemOrganization addCategory: 'P4-Test'!
+SystemOrganization addCategory: #'P4-ASM'!
+SystemOrganization addCategory: #'P4-ASM-Values'!
+SystemOrganization addCategory: #'P4-AST'!
+SystemOrganization addCategory: #'P4-Compiler'!
+SystemOrganization addCategory: #'P4-Examples'!
+SystemOrganization addCategory: #'P4-Exception'!
+SystemOrganization addCategory: #'P4-Exec'!
+SystemOrganization addCategory: #'P4-Exec-ELF'!
+SystemOrganization addCategory: #'P4-Exec-ELF-Dwarf'!
+SystemOrganization addCategory: #'P4-Exec-MachO'!
+SystemOrganization addCategory: #'P4-Kernel-Behavior'!
+SystemOrganization addCategory: #'P4-Kernel-Boolean'!
+SystemOrganization addCategory: #'P4-Kernel-Callable'!
+SystemOrganization addCategory: #'P4-Kernel-Collection'!
+SystemOrganization addCategory: #'P4-Kernel-IO'!
+SystemOrganization addCategory: #'P4-Kernel-Memory'!
+SystemOrganization addCategory: #'P4-Kernel-Number'!
+SystemOrganization addCategory: #'P4-Kernel-Object'!
+SystemOrganization addCategory: #'P4-Kernel-Package'!
+SystemOrganization addCategory: #'P4-Kernel-String'!
+SystemOrganization addCategory: #'P4-Kernel-Structure'!
+SystemOrganization addCategory: #'P4-Parser'!
+SystemOrganization addCategory: #'P4-PharoBridge'!
+SystemOrganization addCategory: #'P4-Presentation'!
+SystemOrganization addCategory: #'P4-Stream'!
+SystemOrganization addCategory: #'P4-SystemInstaller'!
+SystemOrganization addCategory: #'P4-SystemSpec'!
+SystemOrganization addCategory: #'P4-TAC'!
+SystemOrganization addCategory: #'P4-TAC-IR'!
+SystemOrganization addCategory: #'P4-TAC-Values'!
+SystemOrganization addCategory: #'P4-Test'!
 
 
-!classDefinition: #P4Exception category: 'P4-Exception'!
-Exception subclass: #P4Exception
-	instanceVariableNames: 'environment'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Exception'!
-!classDefinition: 'P4Exception class' category: 'P4-Exception'!
-P4Exception class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4KeyNotFound category: 'P4-Kernel-Collection'!
-P4Exception subclass: #P4KeyNotFound
-	instanceVariableNames: 'dictionary key'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4KeyNotFound class' category: 'P4-Kernel-Collection'!
-P4KeyNotFound class
-	instanceVariableNames: ''!
-
-!classDefinition: #ASTTest category: 'P4-AST'!
-TestCase subclass: #ASTTest
-	instanceVariableNames: 'scparser parser'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-AST'!
-!classDefinition: 'ASTTest class' category: 'P4-AST'!
-ASTTest class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4Object category: 'P4-Kernel-Object'!
+!classDefinition: #P4Object category: #'P4-Kernel-Object'!
 Object subclass: #P4Object
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Object'!
-!classDefinition: 'P4Object class' category: 'P4-Kernel-Object'!
+!classDefinition: 'P4Object class' category: #'P4-Kernel-Object'!
 P4Object class
 	instanceVariableNames: 'pname'!
 
-!classDefinition: #P4TAC2ASM category: 'P4-ASM'!
+!classDefinition: #P4TAC2ASM category: #'P4-ASM'!
 P4Object subclass: #P4TAC2ASM
 	instanceVariableNames: 'processor currentCallable methods'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM'!
-!classDefinition: 'P4TAC2ASM class' category: 'P4-ASM'!
+!classDefinition: 'P4TAC2ASM class' category: #'P4-ASM'!
 P4TAC2ASM class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMValue category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMValue category: #'P4-ASM-Values'!
 P4Object subclass: #P4ASMValue
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMValue class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMValue class' category: #'P4-ASM-Values'!
 P4ASMValue class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMConstant category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMConstant category: #'P4-ASM-Values'!
 P4ASMValue subclass: #P4ASMConstant
 	instanceVariableNames: 'constantValue'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMConstant class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMConstant class' category: #'P4-ASM-Values'!
 P4ASMConstant class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMExternalReference category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMExternalReference category: #'P4-ASM-Values'!
 P4ASMConstant subclass: #P4ASMExternalReference
 	instanceVariableNames: 'label'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMExternalReference class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMExternalReference class' category: #'P4-ASM-Values'!
 P4ASMExternalReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMReference category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMReference category: #'P4-ASM-Values'!
 P4ASMValue subclass: #P4ASMReference
 	instanceVariableNames: 'target label'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMReference class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMReference class' category: #'P4-ASM-Values'!
 P4ASMReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMObjectAccess category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMObjectAccess category: #'P4-ASM-Values'!
 P4ASMReference subclass: #P4ASMObjectAccess
 	instanceVariableNames: 'offset'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMObjectAccess class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMObjectAccess class' category: #'P4-ASM-Values'!
 P4ASMObjectAccess class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMRegister category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMRegister category: #'P4-ASM-Values'!
 P4ASMValue subclass: #P4ASMRegister
 	instanceVariableNames: 'name index combination'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMRegister class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMRegister class' category: #'P4-ASM-Values'!
 P4ASMRegister class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMRegisterAccess category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMRegisterAccess category: #'P4-ASM-Values'!
 P4ASMValue subclass: #P4ASMRegisterAccess
 	instanceVariableNames: 'register offset'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMRegisterAccess class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMRegisterAccess class' category: #'P4-ASM-Values'!
 P4ASMRegisterAccess class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ASMRegisterDynAccess category: 'P4-ASM-Values'!
+!classDefinition: #P4ASMRegisterDynAccess category: #'P4-ASM-Values'!
 P4ASMRegisterAccess subclass: #P4ASMRegisterDynAccess
 	instanceVariableNames: 'offsetRegister'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-ASM-Values'!
-!classDefinition: 'P4ASMRegisterDynAccess class' category: 'P4-ASM-Values'!
+!classDefinition: 'P4ASMRegisterDynAccess class' category: #'P4-ASM-Values'!
 P4ASMRegisterDynAccess class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTNode category: 'P4-AST'!
+!classDefinition: #ASTNode category: #'P4-AST'!
 P4Object subclass: #ASTNode
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTNode class' category: 'P4-AST'!
+!classDefinition: 'ASTNode class' category: #'P4-AST'!
 ASTNode class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTBlock category: 'P4-AST'!
+!classDefinition: #ASTBlock category: #'P4-AST'!
 ASTNode subclass: #ASTBlock
 	instanceVariableNames: 'parameters temporaries statements'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTBlock class' category: 'P4-AST'!
+!classDefinition: 'ASTBlock class' category: #'P4-AST'!
 ASTBlock class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTExpression category: 'P4-AST'!
+!classDefinition: #ASTExpression category: #'P4-AST'!
 ASTNode subclass: #ASTExpression
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTExpression class' category: #'P4-AST'!
 ASTExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTAssignmentExpression category: 'P4-AST'!
+!classDefinition: #ASTAssignmentExpression category: #'P4-AST'!
 ASTExpression subclass: #ASTAssignmentExpression
 	instanceVariableNames: 'variable expression'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTAssignmentExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTAssignmentExpression class' category: #'P4-AST'!
 ASTAssignmentExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTBraceExpression category: 'P4-AST'!
+!classDefinition: #ASTBraceExpression category: #'P4-AST'!
 ASTExpression subclass: #ASTBraceExpression
 	instanceVariableNames: 'expressions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTBraceExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTBraceExpression class' category: #'P4-AST'!
 ASTBraceExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTMessageCascadeExpression category: 'P4-AST'!
+!classDefinition: #ASTMessageCascadeExpression category: #'P4-AST'!
 ASTExpression subclass: #ASTMessageCascadeExpression
 	instanceVariableNames: 'receiver cascades'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTMessageCascadeExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTMessageCascadeExpression class' category: #'P4-AST'!
 ASTMessageCascadeExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTReturnExpression category: 'P4-AST'!
+!classDefinition: #ASTReturnExpression category: #'P4-AST'!
 ASTExpression subclass: #ASTReturnExpression
 	instanceVariableNames: 'expression'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTReturnExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTReturnExpression class' category: #'P4-AST'!
 ASTReturnExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTLiteral category: 'P4-AST'!
+!classDefinition: #ASTLiteral category: #'P4-AST'!
 ASTNode subclass: #ASTLiteral
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTLiteral class' category: 'P4-AST'!
+!classDefinition: 'ASTLiteral class' category: #'P4-AST'!
 ASTLiteral class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTArray category: 'P4-AST'!
+!classDefinition: #ASTArray category: #'P4-AST'!
 ASTLiteral subclass: #ASTArray
 	instanceVariableNames: 'literals'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTArray class' category: 'P4-AST'!
+!classDefinition: 'ASTArray class' category: #'P4-AST'!
 ASTArray class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTCharacter category: 'P4-AST'!
+!classDefinition: #ASTCharacter category: #'P4-AST'!
 ASTLiteral subclass: #ASTCharacter
 	instanceVariableNames: 'char'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTCharacter class' category: 'P4-AST'!
+!classDefinition: 'ASTCharacter class' category: #'P4-AST'!
 ASTCharacter class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTFloat category: 'P4-AST'!
+!classDefinition: #ASTFloat category: #'P4-AST'!
 ASTLiteral subclass: #ASTFloat
 	instanceVariableNames: 'high low'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTFloat class' category: 'P4-AST'!
+!classDefinition: 'ASTFloat class' category: #'P4-AST'!
 ASTFloat class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTNumber category: 'P4-AST'!
+!classDefinition: #ASTNumber category: #'P4-AST'!
 ASTLiteral subclass: #ASTNumber
 	instanceVariableNames: 'number base'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTNumber class' category: 'P4-AST'!
+!classDefinition: 'ASTNumber class' category: #'P4-AST'!
 ASTNumber class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTString category: 'P4-AST'!
+!classDefinition: #ASTString category: #'P4-AST'!
 ASTLiteral subclass: #ASTString
 	instanceVariableNames: 'string'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTString class' category: 'P4-AST'!
+!classDefinition: 'ASTString class' category: #'P4-AST'!
 ASTString class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTSymbol category: 'P4-AST'!
+!classDefinition: #ASTSymbol category: #'P4-AST'!
 ASTLiteral subclass: #ASTSymbol
 	instanceVariableNames: 'symbol'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTSymbol class' category: 'P4-AST'!
+!classDefinition: 'ASTSymbol class' category: #'P4-AST'!
 ASTSymbol class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTMethod category: 'P4-AST'!
+!classDefinition: #ASTMethod category: #'P4-AST'!
 ASTNode subclass: #ASTMethod
 	instanceVariableNames: 'message annotations temporaries statements sourceObject'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTMethod class' category: 'P4-AST'!
+!classDefinition: 'ASTMethod class' category: #'P4-AST'!
 ASTMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTPath category: 'P4-AST'!
+!classDefinition: #ASTPath category: #'P4-AST'!
 ASTNode subclass: #ASTPath
 	instanceVariableNames: 'path'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTPath class' category: 'P4-AST'!
+!classDefinition: 'ASTPath class' category: #'P4-AST'!
 ASTPath class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTSelector category: 'P4-AST'!
+!classDefinition: #ASTSelector category: #'P4-AST'!
 ASTNode subclass: #ASTSelector
 	instanceVariableNames: 'selector'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTSelector class' category: 'P4-AST'!
+!classDefinition: 'ASTSelector class' category: #'P4-AST'!
 ASTSelector class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTBinarySelector category: 'P4-AST'!
+!classDefinition: #ASTBinarySelector category: #'P4-AST'!
 ASTSelector subclass: #ASTBinarySelector
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTBinarySelector class' category: 'P4-AST'!
+!classDefinition: 'ASTBinarySelector class' category: #'P4-AST'!
 ASTBinarySelector class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTBinaryExpression category: 'P4-AST'!
+!classDefinition: #ASTBinaryExpression category: #'P4-AST'!
 ASTBinarySelector subclass: #ASTBinaryExpression
 	instanceVariableNames: 'receiver argument scoped'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTBinaryExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTBinaryExpression class' category: #'P4-AST'!
 ASTBinaryExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTBinaryMessageDefinition category: 'P4-AST'!
+!classDefinition: #ASTBinaryMessageDefinition category: #'P4-AST'!
 ASTBinarySelector subclass: #ASTBinaryMessageDefinition
 	instanceVariableNames: 'parameter'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTBinaryMessageDefinition class' category: 'P4-AST'!
+!classDefinition: 'ASTBinaryMessageDefinition class' category: #'P4-AST'!
 ASTBinaryMessageDefinition class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTKeywordSelector category: 'P4-AST'!
+!classDefinition: #ASTKeywordSelector category: #'P4-AST'!
 ASTSelector subclass: #ASTKeywordSelector
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTKeywordSelector class' category: 'P4-AST'!
+!classDefinition: 'ASTKeywordSelector class' category: #'P4-AST'!
 ASTKeywordSelector class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTKeywordAnnotation category: 'P4-AST'!
+!classDefinition: #ASTKeywordAnnotation category: #'P4-AST'!
 ASTKeywordSelector subclass: #ASTKeywordAnnotation
 	instanceVariableNames: 'arguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTKeywordAnnotation class' category: 'P4-AST'!
+!classDefinition: 'ASTKeywordAnnotation class' category: #'P4-AST'!
 ASTKeywordAnnotation class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTKeywordMessageDefinition category: 'P4-AST'!
+!classDefinition: #ASTKeywordMessageDefinition category: #'P4-AST'!
 ASTKeywordSelector subclass: #ASTKeywordMessageDefinition
 	instanceVariableNames: 'parameters'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTKeywordMessageDefinition class' category: 'P4-AST'!
+!classDefinition: 'ASTKeywordMessageDefinition class' category: #'P4-AST'!
 ASTKeywordMessageDefinition class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTMessageExpression category: 'P4-AST'!
+!classDefinition: #ASTMessageExpression category: #'P4-AST'!
 ASTKeywordSelector subclass: #ASTMessageExpression
 	instanceVariableNames: 'receiver arguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTMessageExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTMessageExpression class' category: #'P4-AST'!
 ASTMessageExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTUnarySelector category: 'P4-AST'!
+!classDefinition: #ASTUnarySelector category: #'P4-AST'!
 ASTSelector subclass: #ASTUnarySelector
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTUnarySelector class' category: 'P4-AST'!
+!classDefinition: 'ASTUnarySelector class' category: #'P4-AST'!
 ASTUnarySelector class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTUnaryAnnotation category: 'P4-AST'!
+!classDefinition: #ASTUnaryAnnotation category: #'P4-AST'!
 ASTUnarySelector subclass: #ASTUnaryAnnotation
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTUnaryAnnotation class' category: 'P4-AST'!
+!classDefinition: 'ASTUnaryAnnotation class' category: #'P4-AST'!
 ASTUnaryAnnotation class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTUnaryExpression category: 'P4-AST'!
+!classDefinition: #ASTUnaryExpression category: #'P4-AST'!
 ASTUnarySelector subclass: #ASTUnaryExpression
 	instanceVariableNames: 'receiver'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTUnaryExpression class' category: 'P4-AST'!
+!classDefinition: 'ASTUnaryExpression class' category: #'P4-AST'!
 ASTUnaryExpression class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTUnaryMessageDefinition category: 'P4-AST'!
+!classDefinition: #ASTUnaryMessageDefinition category: #'P4-AST'!
 ASTUnarySelector subclass: #ASTUnaryMessageDefinition
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTUnaryMessageDefinition class' category: 'P4-AST'!
+!classDefinition: 'ASTUnaryMessageDefinition class' category: #'P4-AST'!
 ASTUnaryMessageDefinition class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTSelf category: 'P4-AST'!
+!classDefinition: #ASTSelf category: #'P4-AST'!
 ASTNode subclass: #ASTSelf
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTSelf class' category: 'P4-AST'!
+!classDefinition: 'ASTSelf class' category: #'P4-AST'!
 ASTSelf class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTSuper category: 'P4-AST'!
+!classDefinition: #ASTSuper category: #'P4-AST'!
 ASTNode subclass: #ASTSuper
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTSuper class' category: 'P4-AST'!
+!classDefinition: 'ASTSuper class' category: #'P4-AST'!
 ASTSuper class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTVariable category: 'P4-AST'!
+!classDefinition: #ASTVariable category: #'P4-AST'!
 ASTNode subclass: #ASTVariable
 	instanceVariableNames: 'name type'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTVariable class' category: 'P4-AST'!
+!classDefinition: 'ASTVariable class' category: #'P4-AST'!
 ASTVariable class
 	instanceVariableNames: ''!
 
-!classDefinition: #ASTVisitor category: 'P4-AST'!
+!classDefinition: #ASTVisitor category: #'P4-AST'!
 P4Object subclass: #ASTVisitor
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-AST'!
-!classDefinition: 'ASTVisitor class' category: 'P4-AST'!
+!classDefinition: 'ASTVisitor class' category: #'P4-AST'!
 ASTVisitor class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4AST2TAC category: 'P4-TAC'!
+!classDefinition: #P4AST2TAC category: #'P4-TAC'!
 ASTVisitor subclass: #P4AST2TAC
 	instanceVariableNames: 'builder closureCaptures helper callable currentInstVars'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4AST2TAC class' category: 'P4-TAC'!
+!classDefinition: 'P4AST2TAC class' category: #'P4-TAC'!
 P4AST2TAC class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4A2TClosure category: 'P4-TAC'!
+!classDefinition: #P4A2TClosure category: #'P4-TAC'!
 P4AST2TAC subclass: #P4A2TClosure
 	instanceVariableNames: 'methodCompiler'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4A2TClosure class' category: 'P4-TAC'!
+!classDefinition: 'P4A2TClosure class' category: #'P4-TAC'!
 P4A2TClosure class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4A2TMethod category: 'P4-TAC'!
+!classDefinition: #P4A2TMethod category: #'P4-TAC'!
 P4AST2TAC subclass: #P4A2TMethod
 	instanceVariableNames: 'closureCompiler host'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4A2TMethod class' category: 'P4-TAC'!
+!classDefinition: 'P4A2TMethod class' category: #'P4-TAC'!
 P4A2TMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SmalltalkCompiler category: 'P4-Compiler'!
+!classDefinition: #P4SmalltalkCompiler category: #'P4-Compiler'!
 P4Object subclass: #P4SmalltalkCompiler
 	instanceVariableNames: 'parser ast2tac tac2asm registerAllocator registerSwapper assignmentRemover host livenessAnalyzer analyzeRemote closureInstaller classInstaller processor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Compiler'!
-!classDefinition: 'P4SmalltalkCompiler class' category: 'P4-Compiler'!
+!classDefinition: 'P4SmalltalkCompiler class' category: #'P4-Compiler'!
 P4SmalltalkCompiler class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SmalltalkKernelCompiler category: 'P4-Compiler'!
+!classDefinition: #P4SmalltalkKernelCompiler category: #'P4-Compiler'!
 P4SmalltalkCompiler subclass: #P4SmalltalkKernelCompiler
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Compiler'!
-!classDefinition: 'P4SmalltalkKernelCompiler class' category: 'P4-Compiler'!
+!classDefinition: 'P4SmalltalkKernelCompiler class' category: #'P4-Compiler'!
 P4SmalltalkKernelCompiler class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ExamplesTest category: 'P4-Examples'!
+!classDefinition: #P4ExamplesTest category: #'P4-Examples'!
 P4Object subclass: #P4ExamplesTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Examples'!
-!classDefinition: 'P4ExamplesTest class' category: 'P4-Examples'!
+!classDefinition: 'P4ExamplesTest class' category: #'P4-Examples'!
 P4ExamplesTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MessageLogProxy category: 'P4-Examples'!
+!classDefinition: #P4MessageLogProxy category: #'P4-Examples'!
 P4Object subclass: #P4MessageLogProxy
 	instanceVariableNames: 'method logger'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Examples'!
-!classDefinition: 'P4MessageLogProxy class' category: 'P4-Examples'!
+!classDefinition: 'P4MessageLogProxy class' category: #'P4-Examples'!
 P4MessageLogProxy class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ProbeMethod category: 'P4-Examples'!
+!classDefinition: #P4ProbeMethod category: #'P4-Examples'!
 P4Object subclass: #P4ProbeMethod
 	instanceVariableNames: 'returnValues arguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Examples'!
-!classDefinition: 'P4ProbeMethod class' category: 'P4-Examples'!
+!classDefinition: 'P4ProbeMethod class' category: #'P4-Examples'!
 P4ProbeMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Prototype category: 'P4-Examples'!
+!classDefinition: #P4Prototype category: #'P4-Examples'!
 P4Object subclass: #P4Prototype
 	instanceVariableNames: 'slots delegate'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Examples'!
-!classDefinition: 'P4Prototype class' category: 'P4-Examples'!
+!classDefinition: 'P4Prototype class' category: #'P4-Examples'!
 P4Prototype class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PrototypeBehavior category: 'P4-Examples'!
+!classDefinition: #P4PrototypeBehavior category: #'P4-Examples'!
 P4Object subclass: #P4PrototypeBehavior
 	instanceVariableNames: 'originalMethods'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Examples'!
-!classDefinition: 'P4PrototypeBehavior class' category: 'P4-Examples'!
+!classDefinition: 'P4PrototypeBehavior class' category: #'P4-Examples'!
 P4PrototypeBehavior class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4BinaryOut category: 'P4-Exec'!
+!classDefinition: #P4Exception category: #'P4-Exception'!
+P4Object subclass: #P4Exception
+	instanceVariableNames: 'environment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Exception'!
+!classDefinition: 'P4Exception class' category: #'P4-Exception'!
+P4Exception class
+	instanceVariableNames: ''!
+
+!classDefinition: #P4KeyNotFound category: #'P4-Kernel-Collection'!
+P4Exception subclass: #P4KeyNotFound
+	instanceVariableNames: 'dictionary key'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4KeyNotFound class' category: #'P4-Kernel-Collection'!
+P4KeyNotFound class
+	instanceVariableNames: ''!
+
+!classDefinition: #P4BinaryOut category: #'P4-Exec'!
 P4Object subclass: #P4BinaryOut
 	instanceVariableNames: 'executableFormat symbolTable dumped todo done processor os'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec'!
-!classDefinition: 'P4BinaryOut class' category: 'P4-Exec'!
+!classDefinition: 'P4BinaryOut class' category: #'P4-Exec'!
 P4BinaryOut class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4BinarySymbolOut category: 'P4-Exec'!
+!classDefinition: #P4BinarySymbolOut category: #'P4-Exec'!
 P4BinaryOut subclass: #P4BinarySymbolOut
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec'!
-!classDefinition: 'P4BinarySymbolOut class' category: 'P4-Exec'!
+!classDefinition: 'P4BinarySymbolOut class' category: #'P4-Exec'!
 P4BinarySymbolOut class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ExecutableFormat category: 'P4-Exec'!
+!classDefinition: #P4ExecutableFormat category: #'P4-Exec'!
 P4Object subclass: #P4ExecutableFormat
 	instanceVariableNames: 'processor currentStream globals symbolTable currentSection'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec'!
-!classDefinition: 'P4ExecutableFormat class' category: 'P4-Exec'!
+!classDefinition: 'P4ExecutableFormat class' category: #'P4-Exec'!
 P4ExecutableFormat class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELF category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELF category: #'P4-Exec-ELF'!
 P4ExecutableFormat subclass: #P4ELF
 	instanceVariableNames: 'os programs sectionTable sectionTablePointerOffset'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELF class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELF class' category: #'P4-Exec-ELF'!
 P4ELF class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ExportedReference category: 'P4-Exec'!
+!classDefinition: #P4ExportedReference category: #'P4-Exec'!
 P4Object subclass: #P4ExportedReference
 	instanceVariableNames: 'target offset'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec'!
-!classDefinition: 'P4ExportedReference class' category: 'P4-Exec'!
+!classDefinition: 'P4ExportedReference class' category: #'P4-Exec'!
 P4ExportedReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ExportedObjectReference category: 'P4-Exec'!
+!classDefinition: #P4ExportedObjectReference category: #'P4-Exec'!
 P4ExportedReference subclass: #P4ExportedObjectReference
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec'!
-!classDefinition: 'P4ExportedObjectReference class' category: 'P4-Exec'!
+!classDefinition: 'P4ExportedObjectReference class' category: #'P4-Exec'!
 P4ExportedObjectReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ExternalObjectReference category: 'P4-Exec'!
+!classDefinition: #P4ExternalObjectReference category: #'P4-Exec'!
 P4ExportedObjectReference subclass: #P4ExternalObjectReference
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec'!
-!classDefinition: 'P4ExternalObjectReference class' category: 'P4-Exec'!
+!classDefinition: 'P4ExternalObjectReference class' category: #'P4-Exec'!
 P4ExternalObjectReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ExportedSectionReference category: 'P4-Exec'!
+!classDefinition: #P4ExportedSectionReference category: #'P4-Exec'!
 P4ExportedReference subclass: #P4ExportedSectionReference
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec'!
-!classDefinition: 'P4ExportedSectionReference class' category: 'P4-Exec'!
+!classDefinition: 'P4ExportedSectionReference class' category: #'P4-Exec'!
 P4ExportedSectionReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELF64RelocationEntry category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELF64RelocationEntry category: #'P4-Exec-ELF'!
 P4Object subclass: #P4ELF64RelocationEntry
 	instanceVariableNames: 'offset symbol type'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELF64RelocationEntry class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELF64RelocationEntry class' category: #'P4-Exec-ELF'!
 P4ELF64RelocationEntry class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELF64RelocationEntryWithAddend category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELF64RelocationEntryWithAddend category: #'P4-Exec-ELF'!
 P4ELF64RelocationEntry subclass: #P4ELF64RelocationEntryWithAddend
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELF64RelocationEntryWithAddend class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELF64RelocationEntryWithAddend class' category: #'P4-Exec-ELF'!
 P4ELF64RelocationEntryWithAddend class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFIndexable category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFIndexable category: #'P4-Exec-ELF'!
 P4Object subclass: #P4ELFIndexable
 	instanceVariableNames: 'name nameIndex symbolTableIndex symbolTable'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFIndexable class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFIndexable class' category: #'P4-Exec-ELF'!
 P4ELFIndexable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFSection category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFSection category: #'P4-Exec-ELF'!
 P4ELFIndexable subclass: #P4ELFSection
 	instanceVariableNames: 'headerIndex offset addrAlign flags'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFSection class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFSection class' category: #'P4-Exec-ELF'!
 P4ELFSection class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFMarkerSection category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFMarkerSection category: #'P4-Exec-ELF'!
 P4ELFSection subclass: #P4ELFMarkerSection
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFMarkerSection class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFMarkerSection class' category: #'P4-Exec-ELF'!
 P4ELFMarkerSection class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFSectionWithData category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFSectionWithData category: #'P4-Exec-ELF'!
 P4ELFSection subclass: #P4ELFSectionWithData
 	instanceVariableNames: 'data elfSymbol'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFSectionWithData class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFSectionWithData class' category: #'P4-Exec-ELF'!
 P4ELFSectionWithData class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFNote category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFNote category: #'P4-Exec-ELF'!
 P4ELFSectionWithData subclass: #P4ELFNote
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFNote class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFNote class' category: #'P4-Exec-ELF'!
 P4ELFNote class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFProgramSection category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFProgramSection category: #'P4-Exec-ELF'!
 P4ELFSectionWithData subclass: #P4ELFProgramSection
 	instanceVariableNames: 'relocation'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFProgramSection class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFProgramSection class' category: #'P4-Exec-ELF'!
 P4ELFProgramSection class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFRelocationTableExplicitAddends category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFRelocationTableExplicitAddends category: #'P4-Exec-ELF'!
 P4ELFSectionWithData subclass: #P4ELFRelocationTableExplicitAddends
 	instanceVariableNames: 'target'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFRelocationTableExplicitAddends class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFRelocationTableExplicitAddends class' category: #'P4-Exec-ELF'!
 P4ELFRelocationTableExplicitAddends class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFRelocationTableImplicitAddends category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFRelocationTableImplicitAddends category: #'P4-Exec-ELF'!
 P4ELFRelocationTableExplicitAddends subclass: #P4ELFRelocationTableImplicitAddends
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFRelocationTableImplicitAddends class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFRelocationTableImplicitAddends class' category: #'P4-Exec-ELF'!
 P4ELFRelocationTableImplicitAddends class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFTable category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFTable category: #'P4-Exec-ELF'!
 P4ELFSectionWithData subclass: #P4ELFTable
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFTable class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFTable class' category: #'P4-Exec-ELF'!
 P4ELFTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFHashTable category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFHashTable category: #'P4-Exec-ELF'!
 P4ELFTable subclass: #P4ELFHashTable
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFHashTable class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFHashTable class' category: #'P4-Exec-ELF'!
 P4ELFHashTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFStringTable category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFStringTable category: #'P4-Exec-ELF'!
 P4ELFTable subclass: #P4ELFStringTable
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFStringTable class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFStringTable class' category: #'P4-Exec-ELF'!
 P4ELFStringTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFSymbolTable category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFSymbolTable category: #'P4-Exec-ELF'!
 P4ELFTable subclass: #P4ELFSymbolTable
 	instanceVariableNames: 'locals stringTable symbols'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFSymbolTable class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFSymbolTable class' category: #'P4-Exec-ELF'!
 P4ELFSymbolTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFSectionWithoutData category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFSectionWithoutData category: #'P4-Exec-ELF'!
 P4ELFSection subclass: #P4ELFSectionWithoutData
 	instanceVariableNames: 'size siblingSection'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFSectionWithoutData class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFSectionWithoutData class' category: #'P4-Exec-ELF'!
 P4ELFSectionWithoutData class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFSymbol category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFSymbol category: #'P4-Exec-ELF'!
 P4ELFIndexable subclass: #P4ELFSymbol
 	instanceVariableNames: 'value size visibility bind'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFSymbol class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFSymbol class' category: #'P4-Exec-ELF'!
 P4ELFSymbol class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFFileSymbol category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFFileSymbol category: #'P4-Exec-ELF'!
 P4ELFSymbol subclass: #P4ELFFileSymbol
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFFileSymbol class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFFileSymbol class' category: #'P4-Exec-ELF'!
 P4ELFFileSymbol class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFNoTypeSymbol category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFNoTypeSymbol category: #'P4-Exec-ELF'!
 P4ELFSymbol subclass: #P4ELFNoTypeSymbol
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFNoTypeSymbol class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFNoTypeSymbol class' category: #'P4-Exec-ELF'!
 P4ELFNoTypeSymbol class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFObjectSymbol category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFObjectSymbol category: #'P4-Exec-ELF'!
 P4ELFSymbol subclass: #P4ELFObjectSymbol
 	instanceVariableNames: 'section'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFObjectSymbol class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFObjectSymbol class' category: #'P4-Exec-ELF'!
 P4ELFObjectSymbol class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFFuncSymbol category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFFuncSymbol category: #'P4-Exec-ELF'!
 P4ELFObjectSymbol subclass: #P4ELFFuncSymbol
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFFuncSymbol class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFFuncSymbol class' category: #'P4-Exec-ELF'!
 P4ELFFuncSymbol class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFProgramTable category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFProgramTable category: #'P4-Exec-ELF'!
 P4Object subclass: #P4ELFProgramTable
 	instanceVariableNames: 'segments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFProgramTable class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFProgramTable class' category: #'P4-Exec-ELF'!
 P4ELFProgramTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFSectionTable category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFSectionTable category: #'P4-Exec-ELF'!
 P4Object subclass: #P4ELFSectionTable
 	instanceVariableNames: 'sections symbolTable stringTable sectionHeaderStringTable elf markerSection globals methodTag'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFSectionTable class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFSectionTable class' category: #'P4-Exec-ELF'!
 P4ELFSectionTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ELFStringSet category: 'P4-Exec-ELF'!
+!classDefinition: #P4ELFStringSet category: #'P4-Exec-ELF'!
 P4Object subclass: #P4ELFStringSet
 	instanceVariableNames: 'strings size'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF'!
-!classDefinition: 'P4ELFStringSet class' category: 'P4-Exec-ELF'!
+!classDefinition: 'P4ELFStringSet class' category: #'P4-Exec-ELF'!
 P4ELFStringSet class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DwarfCallFrameInstruction category: 'P4-Exec-ELF-Dwarf'!
+!classDefinition: #P4DwarfCallFrameInstruction category: #'P4-Exec-ELF-Dwarf'!
 P4Object subclass: #P4DwarfCallFrameInstruction
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF-Dwarf'!
-!classDefinition: 'P4DwarfCallFrameInstruction class' category: 'P4-Exec-ELF-Dwarf'!
+!classDefinition: 'P4DwarfCallFrameInstruction class' category: #'P4-Exec-ELF-Dwarf'!
 P4DwarfCallFrameInstruction class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DwarfCommonInformationEntry category: 'P4-Exec-ELF-Dwarf'!
+!classDefinition: #P4DwarfCommonInformationEntry category: #'P4-Exec-ELF-Dwarf'!
 P4Object subclass: #P4DwarfCommonInformationEntry
 	instanceVariableNames: 'dataAlignFactor codeAlignFactor returnAddressRegister'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF-Dwarf'!
-!classDefinition: 'P4DwarfCommonInformationEntry class' category: 'P4-Exec-ELF-Dwarf'!
+!classDefinition: 'P4DwarfCommonInformationEntry class' category: #'P4-Exec-ELF-Dwarf'!
 P4DwarfCommonInformationEntry class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DwarfFrameDescriptorEntry category: 'P4-Exec-ELF-Dwarf'!
+!classDefinition: #P4DwarfFrameDescriptorEntry category: #'P4-Exec-ELF-Dwarf'!
 P4Object subclass: #P4DwarfFrameDescriptorEntry
 	instanceVariableNames: 'ciePointer initialLocation addressRange callFrameInstructions'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-ELF-Dwarf'!
-!classDefinition: 'P4DwarfFrameDescriptorEntry class' category: 'P4-Exec-ELF-Dwarf'!
+!classDefinition: 'P4DwarfFrameDescriptorEntry class' category: #'P4-Exec-ELF-Dwarf'!
 P4DwarfFrameDescriptorEntry class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MOCommand category: 'P4-Exec-MachO'!
+!classDefinition: #P4MOCommand category: #'P4-Exec-MachO'!
 P4Object subclass: #P4MOCommand
 	instanceVariableNames: 'size'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-MachO'!
-!classDefinition: 'P4MOCommand class' category: 'P4-Exec-MachO'!
+!classDefinition: 'P4MOCommand class' category: #'P4-Exec-MachO'!
 P4MOCommand class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MORelocation category: 'P4-Exec-MachO'!
+!classDefinition: #P4MORelocation category: #'P4-Exec-MachO'!
 P4Object subclass: #P4MORelocation
 	instanceVariableNames: 'isAbsolute symbol address'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-MachO'!
-!classDefinition: 'P4MORelocation class' category: 'P4-Exec-MachO'!
+!classDefinition: 'P4MORelocation class' category: #'P4-Exec-MachO'!
 P4MORelocation class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MORelocationTable category: 'P4-Exec-MachO'!
+!classDefinition: #P4MORelocationTable category: #'P4-Exec-MachO'!
 P4Object subclass: #P4MORelocationTable
 	instanceVariableNames: 'entries fileOffset'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-MachO'!
-!classDefinition: 'P4MORelocationTable class' category: 'P4-Exec-MachO'!
+!classDefinition: 'P4MORelocationTable class' category: #'P4-Exec-MachO'!
 P4MORelocationTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MOSection category: 'P4-Exec-MachO'!
+!classDefinition: #P4MOSection category: #'P4-Exec-MachO'!
 P4Object subclass: #P4MOSection
 	instanceVariableNames: 'name segment fileOffset byteAlignment relocationTable index'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Exec-MachO'!
-!classDefinition: 'P4MOSection class' category: 'P4-Exec-MachO'!
+!classDefinition: 'P4MOSection class' category: #'P4-Exec-MachO'!
 P4MOSection class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Behavior category: 'P4-Kernel-Behavior'!
+!classDefinition: #P4Behavior category: #'P4-Kernel-Behavior'!
 P4Object subclass: #P4Behavior
 	instanceVariableNames: 'instanceHeader behavior layout'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Behavior'!
-!classDefinition: 'P4Behavior class' category: 'P4-Kernel-Behavior'!
+!classDefinition: 'P4Behavior class' category: #'P4-Kernel-Behavior'!
 P4Behavior class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Class category: 'P4-Kernel-Behavior'!
+!classDefinition: #P4Class category: #'P4-Kernel-Behavior'!
 P4Behavior subclass: #P4Class
 	instanceVariableNames: 'name package'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Behavior'!
-!classDefinition: 'P4Class class' category: 'P4-Kernel-Behavior'!
+!classDefinition: 'P4Class class' category: #'P4-Kernel-Behavior'!
 P4Class class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Metaclass category: 'P4-Kernel-Behavior'!
+!classDefinition: #P4Metaclass category: #'P4-Kernel-Behavior'!
 P4Behavior subclass: #P4Metaclass
 	instanceVariableNames: 'instance'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Behavior'!
-!classDefinition: 'P4Metaclass class' category: 'P4-Kernel-Behavior'!
+!classDefinition: 'P4Metaclass class' category: #'P4-Kernel-Behavior'!
 P4Metaclass class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SmalltalkBehavior category: 'P4-Kernel-Behavior'!
+!classDefinition: #P4SmalltalkBehavior category: #'P4-Kernel-Behavior'!
 P4Object subclass: #P4SmalltalkBehavior
 	instanceVariableNames: 'methodDictionary class superbehavior'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Behavior'!
-!classDefinition: 'P4SmalltalkBehavior class' category: 'P4-Kernel-Behavior'!
+!classDefinition: 'P4SmalltalkBehavior class' category: #'P4-Kernel-Behavior'!
 P4SmalltalkBehavior class
 	instanceVariableNames: 'instance'!
 
-!classDefinition: #P4MessageLog category: 'P4-Examples'!
+!classDefinition: #P4MessageLog category: #'P4-Examples'!
 P4SmalltalkBehavior subclass: #P4MessageLog
 	instanceVariableNames: 'log tally'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Examples'!
-!classDefinition: 'P4MessageLog class' category: 'P4-Examples'!
+!classDefinition: 'P4MessageLog class' category: #'P4-Examples'!
 P4MessageLog class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MessageLogBehavior category: 'P4-Examples'!
+!classDefinition: #P4MessageLogBehavior category: #'P4-Examples'!
 P4SmalltalkBehavior subclass: #P4MessageLogBehavior
 	instanceVariableNames: 'logger wrap'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Examples'!
-!classDefinition: 'P4MessageLogBehavior class' category: 'P4-Examples'!
+!classDefinition: 'P4MessageLogBehavior class' category: #'P4-Examples'!
 P4MessageLogBehavior class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Boolean category: 'P4-Kernel-Boolean'!
+!classDefinition: #P4Boolean category: #'P4-Kernel-Boolean'!
 P4Object subclass: #P4Boolean
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Boolean'!
-!classDefinition: 'P4Boolean class' category: 'P4-Kernel-Boolean'!
+!classDefinition: 'P4Boolean class' category: #'P4-Kernel-Boolean'!
 P4Boolean class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4False category: 'P4-Kernel-Boolean'!
+!classDefinition: #P4False category: #'P4-Kernel-Boolean'!
 P4Boolean subclass: #P4False
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Boolean'!
-!classDefinition: 'P4False class' category: 'P4-Kernel-Boolean'!
+!classDefinition: 'P4False class' category: #'P4-Kernel-Boolean'!
 P4False class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4True category: 'P4-Kernel-Boolean'!
+!classDefinition: #P4True category: #'P4-Kernel-Boolean'!
 P4Boolean subclass: #P4True
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Boolean'!
-!classDefinition: 'P4True class' category: 'P4-Kernel-Boolean'!
+!classDefinition: 'P4True class' category: #'P4-Kernel-Boolean'!
 P4True class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Callable category: 'P4-Kernel-Callable'!
+!classDefinition: #P4Callable category: #'P4-Kernel-Callable'!
 P4Object subclass: #P4Callable
 	instanceVariableNames: 'code arguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4Callable class' category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4Callable class' category: #'P4-Kernel-Callable'!
 P4Callable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Closure category: 'P4-Kernel-Callable'!
+!classDefinition: #P4Closure category: #'P4-Kernel-Callable'!
 P4Callable variableSubclass: #P4Closure
 	instanceVariableNames: 'outerScope'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4Closure class' category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4Closure class' category: #'P4-Kernel-Callable'!
 P4Closure class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Method category: 'P4-Kernel-Callable'!
+!classDefinition: #P4Method category: #'P4-Kernel-Callable'!
 P4Callable variableSubclass: #P4Method
 	instanceVariableNames: 'selector host package usedGlobals usedReferences'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4Method class' category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4Method class' category: #'P4-Kernel-Callable'!
 P4Method class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DoesNotUnderstand category: 'P4-Kernel-Callable'!
+!classDefinition: #P4DoesNotUnderstand category: #'P4-Kernel-Callable'!
 P4Object variableSubclass: #P4DoesNotUnderstand
 	instanceVariableNames: 'selector arguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4DoesNotUnderstand class' category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4DoesNotUnderstand class' category: #'P4-Kernel-Callable'!
 P4DoesNotUnderstand class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Array category: 'P4-Kernel-Collection'!
+!classDefinition: #P4Array category: #'P4-Kernel-Collection'!
 P4Object variableSubclass: #P4Array
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4Array class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4Array class' category: #'P4-Kernel-Collection'!
 P4Array class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4AbstractBucket category: 'P4-Kernel-Collection'!
+!classDefinition: #P4AbstractBucket category: #'P4-Kernel-Collection'!
 P4Array variableSubclass: #P4AbstractBucket
 	instanceVariableNames: 'bucketSize'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4AbstractBucket class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4AbstractBucket class' category: #'P4-Kernel-Collection'!
 P4AbstractBucket class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DictBucket category: 'P4-Kernel-Collection'!
+!classDefinition: #P4DictBucket category: #'P4-Kernel-Collection'!
 P4AbstractBucket variableSubclass: #P4DictBucket
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4DictBucket class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4DictBucket class' category: #'P4-Kernel-Collection'!
 P4DictBucket class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4IdentityDictBucket category: 'P4-Kernel-Collection'!
+!classDefinition: #P4IdentityDictBucket category: #'P4-Kernel-Collection'!
 P4DictBucket variableSubclass: #P4IdentityDictBucket
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4IdentityDictBucket class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4IdentityDictBucket class' category: #'P4-Kernel-Collection'!
 P4IdentityDictBucket class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SetBucket category: 'P4-Kernel-Collection'!
+!classDefinition: #P4SetBucket category: #'P4-Kernel-Collection'!
 P4AbstractBucket variableSubclass: #P4SetBucket
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4SetBucket class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4SetBucket class' category: #'P4-Kernel-Collection'!
 P4SetBucket class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4IdentitySetBucket category: 'P4-Kernel-Collection'!
+!classDefinition: #P4IdentitySetBucket category: #'P4-Kernel-Collection'!
 P4SetBucket variableSubclass: #P4IdentitySetBucket
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4IdentitySetBucket class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4IdentitySetBucket class' category: #'P4-Kernel-Collection'!
 P4IdentitySetBucket class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4RemoteArray category: 'P4-Kernel-Collection'!
+!classDefinition: #P4RemoteArray category: #'P4-Kernel-Collection'!
 P4Array variableSubclass: #P4RemoteArray
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4RemoteArray class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4RemoteArray class' category: #'P4-Kernel-Collection'!
 P4RemoteArray class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4HashedCollection category: 'P4-Kernel-Collection'!
+!classDefinition: #P4HashedCollection category: #'P4-Kernel-Collection'!
 P4Object subclass: #P4HashedCollection
 	instanceVariableNames: 'size maxLinear ratio buckets linear'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4HashedCollection class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4HashedCollection class' category: #'P4-Kernel-Collection'!
 P4HashedCollection class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Dictionary category: 'P4-Kernel-Collection'!
+!classDefinition: #P4Dictionary category: #'P4-Kernel-Collection'!
 P4HashedCollection subclass: #P4Dictionary
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4Dictionary class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4Dictionary class' category: #'P4-Kernel-Collection'!
 P4Dictionary class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4IdentityDictionary category: 'P4-Kernel-Collection'!
+!classDefinition: #P4IdentityDictionary category: #'P4-Kernel-Collection'!
 P4Dictionary subclass: #P4IdentityDictionary
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4IdentityDictionary class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4IdentityDictionary class' category: #'P4-Kernel-Collection'!
 P4IdentityDictionary class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MethodDictionary category: 'P4-Kernel-Behavior'!
+!classDefinition: #P4MethodDictionary category: #'P4-Kernel-Behavior'!
 P4IdentityDictionary subclass: #P4MethodDictionary
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Behavior'!
-!classDefinition: 'P4MethodDictionary class' category: 'P4-Kernel-Behavior'!
+!classDefinition: 'P4MethodDictionary class' category: #'P4-Kernel-Behavior'!
 P4MethodDictionary class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Set category: 'P4-Kernel-Collection'!
+!classDefinition: #P4Set category: #'P4-Kernel-Collection'!
 P4HashedCollection subclass: #P4Set
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4Set class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4Set class' category: #'P4-Kernel-Collection'!
 P4Set class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4IdentitySet category: 'P4-Kernel-Collection'!
+!classDefinition: #P4IdentitySet category: #'P4-Kernel-Collection'!
 P4Set subclass: #P4IdentitySet
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Collection'!
-!classDefinition: 'P4IdentitySet class' category: 'P4-Kernel-Collection'!
+!classDefinition: 'P4IdentitySet class' category: #'P4-Kernel-Collection'!
 P4IdentitySet class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SymbolTable category: 'P4-Kernel-String'!
+!classDefinition: #P4SymbolTable category: #'P4-Kernel-String'!
 P4Set subclass: #P4SymbolTable
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-String'!
-!classDefinition: 'P4SymbolTable class' category: 'P4-Kernel-String'!
+!classDefinition: 'P4SymbolTable class' category: #'P4-Kernel-String'!
 P4SymbolTable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Console category: 'P4-Kernel-IO'!
+!classDefinition: #P4Console category: #'P4-Kernel-IO'!
 P4Object subclass: #P4Console
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-IO'!
-!classDefinition: 'P4Console class' category: 'P4-Kernel-IO'!
+!classDefinition: 'P4Console class' category: #'P4-Kernel-IO'!
 P4Console class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MemoryManager category: 'P4-Kernel-Memory'!
+!classDefinition: #P4MemoryManager category: #'P4-Kernel-Memory'!
 P4Object subclass: #P4MemoryManager
 	instanceVariableNames: 'memory position limit root'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Memory'!
-!classDefinition: 'P4MemoryManager class' category: 'P4-Kernel-Memory'!
+!classDefinition: 'P4MemoryManager class' category: #'P4-Kernel-Memory'!
 P4MemoryManager class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4RawCell category: 'P4-Kernel-Memory'!
+!classDefinition: #P4RawCell category: #'P4-Kernel-Memory'!
 P4Object subclass: #P4RawCell
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Memory'!
-!classDefinition: 'P4RawCell class' category: 'P4-Kernel-Memory'!
+!classDefinition: 'P4RawCell class' category: #'P4-Kernel-Memory'!
 P4RawCell class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ObjectHeader category: 'P4-Kernel-Memory'!
+!classDefinition: #P4ObjectHeader category: #'P4-Kernel-Memory'!
 P4RawCell subclass: #P4ObjectHeader
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Memory'!
-!classDefinition: 'P4ObjectHeader class' category: 'P4-Kernel-Memory'!
+!classDefinition: 'P4ObjectHeader class' category: #'P4-Kernel-Memory'!
 P4ObjectHeader class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ObjectReference category: 'P4-Kernel-Memory'!
+!classDefinition: #P4ObjectReference category: #'P4-Kernel-Memory'!
 P4RawCell subclass: #P4ObjectReference
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Memory'!
-!classDefinition: 'P4ObjectReference class' category: 'P4-Kernel-Memory'!
+!classDefinition: 'P4ObjectReference class' category: #'P4-Kernel-Memory'!
 P4ObjectReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Float category: 'P4-Kernel-Number'!
+!classDefinition: #P4Float category: #'P4-Kernel-Number'!
 P4Object subclass: #P4Float
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Number'!
-!classDefinition: 'P4Float class' category: 'P4-Kernel-Number'!
+!classDefinition: 'P4Float class' category: #'P4-Kernel-Number'!
 P4Float class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SmallInteger category: 'P4-Kernel-Number'!
+!classDefinition: #P4SmallInteger category: #'P4-Kernel-Number'!
 P4Object subclass: #P4SmallInteger
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Number'!
-!classDefinition: 'P4SmallInteger class' category: 'P4-Kernel-Number'!
+!classDefinition: 'P4SmallInteger class' category: #'P4-Kernel-Number'!
 P4SmallInteger class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4UndefinedObject category: 'P4-Kernel-Object'!
+!classDefinition: #P4UndefinedObject category: #'P4-Kernel-Object'!
 P4Object subclass: #P4UndefinedObject
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Object'!
-!classDefinition: 'P4UndefinedObject class' category: 'P4-Kernel-Object'!
+!classDefinition: 'P4UndefinedObject class' category: #'P4-Kernel-Object'!
 P4UndefinedObject class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4AbstractPackage category: 'P4-Kernel-Package'!
+!classDefinition: #P4AbstractPackage category: #'P4-Kernel-Package'!
 P4Object subclass: #P4AbstractPackage
 	instanceVariableNames: 'members'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Package'!
-!classDefinition: 'P4AbstractPackage class' category: 'P4-Kernel-Package'!
+!classDefinition: 'P4AbstractPackage class' category: #'P4-Kernel-Package'!
 P4AbstractPackage class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Package category: 'P4-Kernel-Package'!
+!classDefinition: #P4Package category: #'P4-Kernel-Package'!
 P4AbstractPackage subclass: #P4Package
 	instanceVariableNames: 'parent name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Package'!
-!classDefinition: 'P4Package class' category: 'P4-Kernel-Package'!
+!classDefinition: 'P4Package class' category: #'P4-Kernel-Package'!
 P4Package class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4RootPackage category: 'P4-Kernel-Package'!
+!classDefinition: #P4RootPackage category: #'P4-Kernel-Package'!
 P4AbstractPackage subclass: #P4RootPackage
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Package'!
-!classDefinition: 'P4RootPackage class' category: 'P4-Kernel-Package'!
+!classDefinition: 'P4RootPackage class' category: #'P4-Kernel-Package'!
 P4RootPackage class
 	instanceVariableNames: 'instance'!
 
-!classDefinition: #P4ClassReference category: 'P4-Kernel-Package'!
+!classDefinition: #P4ClassReference category: #'P4-Kernel-Package'!
 P4Object subclass: #P4ClassReference
 	instanceVariableNames: 'cls package'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Package'!
-!classDefinition: 'P4ClassReference class' category: 'P4-Kernel-Package'!
+!classDefinition: 'P4ClassReference class' category: #'P4-Kernel-Package'!
 P4ClassReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Character category: 'P4-Kernel-String'!
+!classDefinition: #P4Character category: #'P4-Kernel-String'!
 P4Object subclass: #P4Character
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-String'!
-!classDefinition: 'P4Character class' category: 'P4-Kernel-String'!
+!classDefinition: 'P4Character class' category: #'P4-Kernel-String'!
 P4Character class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4String category: 'P4-Kernel-String'!
+!classDefinition: #P4String category: #'P4-Kernel-String'!
 P4Object variableByteSubclass: #P4String
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-String'!
-!classDefinition: 'P4String class' category: 'P4-Kernel-String'!
+!classDefinition: 'P4String class' category: #'P4-Kernel-String'!
 P4String class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Symbol category: 'P4-Kernel-String'!
+!classDefinition: #P4Symbol category: #'P4-Kernel-String'!
 P4String variableByteSubclass: #P4Symbol
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-String'!
-!classDefinition: 'P4Symbol class' category: 'P4-Kernel-String'!
+!classDefinition: 'P4Symbol class' category: #'P4-Kernel-String'!
 P4Symbol class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Layout category: 'P4-Kernel-Structure'!
+!classDefinition: #P4Layout category: #'P4-Kernel-Structure'!
 P4Object subclass: #P4Layout
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4Layout class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4Layout class' category: #'P4-Kernel-Structure'!
 P4Layout class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LByte category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LByte category: #'P4-Kernel-Structure'!
 P4Layout subclass: #P4LByte
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LByte class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LByte class' category: #'P4-Kernel-Structure'!
 P4LByte class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LLong category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LLong category: #'P4-Kernel-Structure'!
 P4Layout subclass: #P4LLong
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LLong class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LLong class' category: #'P4-Kernel-Structure'!
 P4LLong class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LSized category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LSized category: #'P4-Kernel-Structure'!
 P4Layout subclass: #P4LSized
 	instanceVariableNames: 'size'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LSized class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LSized class' category: #'P4-Kernel-Structure'!
 P4LSized class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LBytes category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LBytes category: #'P4-Kernel-Structure'!
 P4LSized subclass: #P4LBytes
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LBytes class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LBytes class' category: #'P4-Kernel-Structure'!
 P4LBytes class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LPointers category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LPointers category: #'P4-Kernel-Structure'!
 P4LSized subclass: #P4LPointers
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LPointers class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LPointers class' category: #'P4-Kernel-Structure'!
 P4LPointers class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LVariable category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LVariable category: #'P4-Kernel-Structure'!
 P4LSized subclass: #P4LVariable
 	instanceVariableNames: 'extra'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LVariable class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LVariable class' category: #'P4-Kernel-Structure'!
 P4LVariable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LWords category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LWords category: #'P4-Kernel-Structure'!
 P4LSized subclass: #P4LWords
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LWords class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LWords class' category: #'P4-Kernel-Structure'!
 P4LWords class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LWord category: 'P4-Kernel-Structure'!
+!classDefinition: #P4LWord category: #'P4-Kernel-Structure'!
 P4Layout subclass: #P4LWord
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4LWord class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4LWord class' category: #'P4-Kernel-Structure'!
 P4LWord class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Slot category: 'P4-Kernel-Structure'!
+!classDefinition: #P4Slot category: #'P4-Kernel-Structure'!
 P4Object subclass: #P4Slot
 	instanceVariableNames: 'name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Kernel-Structure'!
-!classDefinition: 'P4Slot class' category: 'P4-Kernel-Structure'!
+!classDefinition: 'P4Slot class' category: #'P4-Kernel-Structure'!
 P4Slot class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4AbstractGrammar category: 'P4-Parser'!
+!classDefinition: #P4AbstractGrammar category: #'P4-Parser'!
 P4Object subclass: #P4AbstractGrammar
 	instanceVariableNames: 'parsers'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Parser'!
-!classDefinition: 'P4AbstractGrammar class' category: 'P4-Parser'!
+!classDefinition: 'P4AbstractGrammar class' category: #'P4-Parser'!
 P4AbstractGrammar class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SmalltalkGrammar category: 'P4-Parser'!
+!classDefinition: #P4SmalltalkGrammar category: #'P4-Parser'!
 P4AbstractGrammar subclass: #P4SmalltalkGrammar
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Parser'!
-!classDefinition: 'P4SmalltalkGrammar class' category: 'P4-Parser'!
+!classDefinition: 'P4SmalltalkGrammar class' category: #'P4-Parser'!
 P4SmalltalkGrammar class
 	instanceVariableNames: 'instance'!
 
-!classDefinition: #P4SmalltalkParser category: 'P4-Parser'!
+!classDefinition: #P4SmalltalkParser category: #'P4-Parser'!
 P4SmalltalkGrammar subclass: #P4SmalltalkParser
 	instanceVariableNames: 'stream'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Parser'!
-!classDefinition: 'P4SmalltalkParser class' category: 'P4-Parser'!
+!classDefinition: 'P4SmalltalkParser class' category: #'P4-Parser'!
 P4SmalltalkParser class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4FakeDictionary category: 'P4-Presentation'!
+!classDefinition: #P4FakeDictionary category: #'P4-Presentation'!
 P4Object subclass: #P4FakeDictionary
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Presentation'!
-!classDefinition: 'P4FakeDictionary class' category: 'P4-Presentation'!
+!classDefinition: 'P4FakeDictionary class' category: #'P4-Presentation'!
 P4FakeDictionary class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4FakeMethod category: 'P4-Presentation'!
+!classDefinition: #P4FakeMethod category: #'P4-Presentation'!
 P4Object subclass: #P4FakeMethod
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Presentation'!
-!classDefinition: 'P4FakeMethod class' category: 'P4-Presentation'!
+!classDefinition: 'P4FakeMethod class' category: #'P4-Presentation'!
 P4FakeMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LogBehavior category: 'P4-Presentation'!
+!classDefinition: #P4LogBehavior category: #'P4-Presentation'!
 P4Object subclass: #P4LogBehavior
 	instanceVariableNames: 'realBehavior'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Presentation'!
-!classDefinition: 'P4LogBehavior class' category: 'P4-Presentation'!
+!classDefinition: 'P4LogBehavior class' category: #'P4-Presentation'!
 P4LogBehavior class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LogMethod category: 'P4-Presentation'!
+!classDefinition: #P4LogMethod category: #'P4-Presentation'!
 P4Object subclass: #P4LogMethod
 	instanceVariableNames: 'realMethod'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Presentation'!
-!classDefinition: 'P4LogMethod class' category: 'P4-Presentation'!
+!classDefinition: 'P4LogMethod class' category: #'P4-Presentation'!
 P4LogMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Presentation category: 'P4-Presentation'!
+!classDefinition: #P4Presentation category: #'P4-Presentation'!
 P4Object subclass: #P4Presentation
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Presentation'!
-!classDefinition: 'P4Presentation class' category: 'P4-Presentation'!
+!classDefinition: 'P4Presentation class' category: #'P4-Presentation'!
 P4Presentation class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4BinaryWriteStream category: 'P4-Stream'!
+!classDefinition: #P4BinaryWriteStream category: #'P4-Stream'!
 P4Object subclass: #P4BinaryWriteStream
 	instanceVariableNames: 'stream'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Stream'!
-!classDefinition: 'P4BinaryWriteStream class' category: 'P4-Stream'!
+!classDefinition: 'P4BinaryWriteStream class' category: #'P4-Stream'!
 P4BinaryWriteStream class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4LittleEndianWriteStream category: 'P4-Stream'!
+!classDefinition: #P4LittleEndianWriteStream category: #'P4-Stream'!
 P4BinaryWriteStream subclass: #P4LittleEndianWriteStream
 	instanceVariableNames: 'wordSize pointerSize'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Stream'!
-!classDefinition: 'P4LittleEndianWriteStream class' category: 'P4-Stream'!
+!classDefinition: 'P4LittleEndianWriteStream class' category: #'P4-Stream'!
 P4LittleEndianWriteStream class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ClassInstaller category: 'P4-SystemInstaller'!
+!classDefinition: #P4ClassInstaller category: #'P4-SystemInstaller'!
 P4Object subclass: #P4ClassInstaller
 	instanceVariableNames: 'methodInstaller'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemInstaller'!
-!classDefinition: 'P4ClassInstaller class' category: 'P4-SystemInstaller'!
+!classDefinition: 'P4ClassInstaller class' category: #'P4-SystemInstaller'!
 P4ClassInstaller class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DynamicClassInstaller category: 'P4-SystemInstaller'!
+!classDefinition: #P4DynamicClassInstaller category: #'P4-SystemInstaller'!
 P4ClassInstaller subclass: #P4DynamicClassInstaller
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemInstaller'!
-!classDefinition: 'P4DynamicClassInstaller class' category: 'P4-SystemInstaller'!
+!classDefinition: 'P4DynamicClassInstaller class' category: #'P4-SystemInstaller'!
 P4DynamicClassInstaller class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4StaticClassInstaller category: 'P4-SystemInstaller'!
+!classDefinition: #P4StaticClassInstaller category: #'P4-SystemInstaller'!
 P4ClassInstaller subclass: #P4StaticClassInstaller
 	instanceVariableNames: 'dumper'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemInstaller'!
-!classDefinition: 'P4StaticClassInstaller class' category: 'P4-SystemInstaller'!
+!classDefinition: 'P4StaticClassInstaller class' category: #'P4-SystemInstaller'!
 P4StaticClassInstaller class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MethodInstaller category: 'P4-SystemInstaller'!
+!classDefinition: #P4MethodInstaller category: #'P4-SystemInstaller'!
 P4Object subclass: #P4MethodInstaller
 	instanceVariableNames: 'compiler'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemInstaller'!
-!classDefinition: 'P4MethodInstaller class' category: 'P4-SystemInstaller'!
+!classDefinition: 'P4MethodInstaller class' category: #'P4-SystemInstaller'!
 P4MethodInstaller class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DynamicMethodInstaller category: 'P4-SystemInstaller'!
+!classDefinition: #P4DynamicMethodInstaller category: #'P4-SystemInstaller'!
 P4MethodInstaller subclass: #P4DynamicMethodInstaller
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemInstaller'!
-!classDefinition: 'P4DynamicMethodInstaller class' category: 'P4-SystemInstaller'!
+!classDefinition: 'P4DynamicMethodInstaller class' category: #'P4-SystemInstaller'!
 P4DynamicMethodInstaller class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4StaticMethodInstaller category: 'P4-SystemInstaller'!
+!classDefinition: #P4StaticMethodInstaller category: #'P4-SystemInstaller'!
 P4MethodInstaller subclass: #P4StaticMethodInstaller
 	instanceVariableNames: 'globals references'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemInstaller'!
-!classDefinition: 'P4StaticMethodInstaller class' category: 'P4-SystemInstaller'!
+!classDefinition: 'P4StaticMethodInstaller class' category: #'P4-SystemInstaller'!
 P4StaticMethodInstaller class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4AbstractOS category: 'P4-SystemSpec'!
+!classDefinition: #P4AbstractOS category: #'P4-SystemSpec'!
 P4Object subclass: #P4AbstractOS
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemSpec'!
-!classDefinition: 'P4AbstractOS class' category: 'P4-SystemSpec'!
+!classDefinition: 'P4AbstractOS class' category: #'P4-SystemSpec'!
 P4AbstractOS class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Linux category: 'P4-SystemSpec'!
+!classDefinition: #P4Linux category: #'P4-SystemSpec'!
 P4AbstractOS subclass: #P4Linux
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemSpec'!
-!classDefinition: 'P4Linux class' category: 'P4-SystemSpec'!
+!classDefinition: 'P4Linux class' category: #'P4-SystemSpec'!
 P4Linux class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4OSX category: 'P4-SystemSpec'!
+!classDefinition: #P4OSX category: #'P4-SystemSpec'!
 P4AbstractOS subclass: #P4OSX
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemSpec'!
-!classDefinition: 'P4OSX class' category: 'P4-SystemSpec'!
+!classDefinition: 'P4OSX class' category: #'P4-SystemSpec'!
 P4OSX class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Assembler category: 'P4-SystemSpec'!
+!classDefinition: #P4Assembler category: #'P4-SystemSpec'!
 P4Object subclass: #P4Assembler
 	instanceVariableNames: 'stream linker installer forceShortJump'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemSpec'!
-!classDefinition: 'P4Assembler class' category: 'P4-SystemSpec'!
+!classDefinition: 'P4Assembler class' category: #'P4-SystemSpec'!
 P4Assembler class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4X86_64 category: 'P4-SystemSpec'!
+!classDefinition: #P4X86_64 category: #'P4-SystemSpec'!
 P4Assembler subclass: #P4X86_64
 	instanceVariableNames: 'rax rsp rdi rsi rdx rcx r8 r9 rbx rbp r10 r11 r12 r13 r14 r15 rip'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemSpec'!
-!classDefinition: 'P4X86_64 class' category: 'P4-SystemSpec'!
+!classDefinition: 'P4X86_64 class' category: #'P4-SystemSpec'!
 P4X86_64 class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4Linker category: 'P4-SystemSpec'!
+!classDefinition: #P4Linker category: #'P4-SystemSpec'!
 P4Object subclass: #P4Linker
 	instanceVariableNames: 'danglingReferences labels'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemSpec'!
-!classDefinition: 'P4Linker class' category: 'P4-SystemSpec'!
+!classDefinition: 'P4Linker class' category: #'P4-SystemSpec'!
 P4Linker class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4SmalltalkConfiguration category: 'P4-SystemSpec'!
+!classDefinition: #P4SmalltalkConfiguration category: #'P4-SystemSpec'!
 P4Object subclass: #P4SmalltalkConfiguration
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-SystemSpec'!
-!classDefinition: 'P4SmalltalkConfiguration class' category: 'P4-SystemSpec'!
+!classDefinition: 'P4SmalltalkConfiguration class' category: #'P4-SystemSpec'!
 P4SmalltalkConfiguration class
 	instanceVariableNames: 'instance'!
 
-!classDefinition: #P4A2THelper category: 'P4-TAC'!
+!classDefinition: #P4A2THelper category: #'P4-TAC'!
 P4Object subclass: #P4A2THelper
 	instanceVariableNames: 'builder processor methodCompiler resultVariable groundTypes inlinedMethods'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4A2THelper class' category: 'P4-TAC'!
+!classDefinition: 'P4A2THelper class' category: #'P4-TAC'!
 P4A2THelper class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4A2TStatic category: 'P4-TAC'!
+!classDefinition: #P4A2TStatic category: #'P4-TAC'!
 P4A2THelper subclass: #P4A2TStatic
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4A2TStatic class' category: 'P4-TAC'!
+!classDefinition: 'P4A2TStatic class' category: #'P4-TAC'!
 P4A2TStatic class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4A2TKernel category: 'P4-TAC'!
+!classDefinition: #P4A2TKernel category: #'P4-TAC'!
 P4A2TStatic subclass: #P4A2TKernel
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4A2TKernel class' category: 'P4-TAC'!
+!classDefinition: 'P4A2TKernel class' category: #'P4-TAC'!
 P4A2TKernel class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4A2TInvoke category: 'P4-TAC'!
+!classDefinition: #P4A2TInvoke category: #'P4-TAC'!
 P4A2TKernel subclass: #P4A2TInvoke
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4A2TInvoke class' category: 'P4-TAC'!
+!classDefinition: 'P4A2TInvoke class' category: #'P4-TAC'!
 P4A2TInvoke class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACBuilder category: 'P4-TAC'!
+!classDefinition: #P4TACBuilder category: #'P4-TAC'!
 P4Object subclass: #P4TACBuilder
 	instanceVariableNames: 'currentBasicBlock locals temps instVars instVarsIdx literals resultVariable globals method klass selfImport'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACBuilder class' category: 'P4-TAC'!
+!classDefinition: 'P4TACBuilder class' category: #'P4-TAC'!
 P4TACBuilder class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACInlineMessages category: 'P4-TAC'!
+!classDefinition: #P4TACInlineMessages category: #'P4-TAC'!
 P4Object subclass: #P4TACInlineMessages
 	instanceVariableNames: 'visitor builder receiver helper'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACInlineMessages class' category: 'P4-TAC'!
+!classDefinition: 'P4TACInlineMessages class' category: #'P4-TAC'!
 P4TACInlineMessages class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACLinearScanRegisterAllocator category: 'P4-TAC'!
+!classDefinition: #P4TACLinearScanRegisterAllocator category: #'P4-TAC'!
 P4Object subclass: #P4TACLinearScanRegisterAllocator
 	instanceVariableNames: 'processor usedRegisters maxUsedRegisters stackSize variables actives usedVolatileRegisters'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACLinearScanRegisterAllocator class' category: 'P4-TAC'!
+!classDefinition: 'P4TACLinearScanRegisterAllocator class' category: #'P4-TAC'!
 P4TACLinearScanRegisterAllocator class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACLivenessAnalysis category: 'P4-TAC'!
+!classDefinition: #P4TACLivenessAnalysis category: #'P4-TAC'!
 P4Object subclass: #P4TACLivenessAnalysis
 	instanceVariableNames: 'position callable'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACLivenessAnalysis class' category: 'P4-TAC'!
+!classDefinition: 'P4TACLivenessAnalysis class' category: #'P4-TAC'!
 P4TACLivenessAnalysis class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACPostCompiler category: 'P4-TAC'!
+!classDefinition: #P4TACPostCompiler category: #'P4-TAC'!
 P4Object subclass: #P4TACPostCompiler
 	instanceVariableNames: 'toReplace callable basicBlock'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACPostCompiler class' category: 'P4-TAC'!
+!classDefinition: 'P4TACPostCompiler class' category: #'P4-TAC'!
 P4TACPostCompiler class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACAnalyzeRemote category: 'P4-TAC'!
+!classDefinition: #P4TACAnalyzeRemote category: #'P4-TAC'!
 P4TACPostCompiler subclass: #P4TACAnalyzeRemote
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACAnalyzeRemote class' category: 'P4-TAC'!
+!classDefinition: 'P4TACAnalyzeRemote class' category: #'P4-TAC'!
 P4TACAnalyzeRemote class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACAssignmentRemover category: 'P4-TAC'!
+!classDefinition: #P4TACAssignmentRemover category: #'P4-TAC'!
 P4TACPostCompiler subclass: #P4TACAssignmentRemover
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACAssignmentRemover class' category: 'P4-TAC'!
+!classDefinition: 'P4TACAssignmentRemover class' category: #'P4-TAC'!
 P4TACAssignmentRemover class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACClosureInstaller category: 'P4-TAC'!
+!classDefinition: #P4TACClosureInstaller category: #'P4-TAC'!
 P4TACPostCompiler subclass: #P4TACClosureInstaller
 	instanceVariableNames: 'helper importedRemotes'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACClosureInstaller class' category: 'P4-TAC'!
+!classDefinition: 'P4TACClosureInstaller class' category: #'P4-TAC'!
 P4TACClosureInstaller class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACRegisterSwapper category: 'P4-TAC'!
+!classDefinition: #P4TACRegisterSwapper category: #'P4-TAC'!
 P4TACPostCompiler subclass: #P4TACRegisterSwapper
 	instanceVariableNames: 'helper'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC'!
-!classDefinition: 'P4TACRegisterSwapper class' category: 'P4-TAC'!
+!classDefinition: 'P4TACRegisterSwapper class' category: #'P4-TAC'!
 P4TACRegisterSwapper class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACCodePoint category: 'P4-TAC-IR'!
+!classDefinition: #P4TACCodePoint category: #'P4-TAC-IR'!
 P4Object subclass: #P4TACCodePoint
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACCodePoint class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACCodePoint class' category: #'P4-TAC-IR'!
 P4TACCodePoint class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACCodeBlock category: 'P4-TAC-IR'!
+!classDefinition: #P4TACCodeBlock category: #'P4-TAC-IR'!
 P4TACCodePoint subclass: #P4TACCodeBlock
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACCodeBlock class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACCodeBlock class' category: #'P4-TAC-IR'!
 P4TACCodeBlock class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4ObjectStream category: 'P4-Stream'!
+!classDefinition: #P4ObjectStream category: #'P4-Stream'!
 P4TACCodeBlock subclass: #P4ObjectStream
 	instanceVariableNames: 'instructions currentPosition substreams'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Stream'!
-!classDefinition: 'P4ObjectStream class' category: 'P4-Stream'!
+!classDefinition: 'P4ObjectStream class' category: #'P4-Stream'!
 P4ObjectStream class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4EmptyStreamObject category: 'P4-Stream'!
+!classDefinition: #P4EmptyStreamObject category: #'P4-Stream'!
 P4ObjectStream subclass: #P4EmptyStreamObject
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Stream'!
-!classDefinition: 'P4EmptyStreamObject class' category: 'P4-Stream'!
+!classDefinition: 'P4EmptyStreamObject class' category: #'P4-Stream'!
 P4EmptyStreamObject class
 	instanceVariableNames: 'instance'!
 
-!classDefinition: #P4TACBasicBlock category: 'P4-TAC-IR'!
+!classDefinition: #P4TACBasicBlock category: #'P4-TAC-IR'!
 P4ObjectStream subclass: #P4TACBasicBlock
 	instanceVariableNames: 'nextBlock number'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACBasicBlock class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACBasicBlock class' category: #'P4-TAC-IR'!
 P4TACBasicBlock class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACCallable category: 'P4-TAC-IR'!
+!classDefinition: #P4TACCallable category: #'P4-TAC-IR'!
 P4TACCodeBlock subclass: #P4TACCallable
 	instanceVariableNames: 'preamble registerPushing argumentLoading primitiveCalling entry postamble popArguments invokeBlock locals temporaries frameSize usedRegisters remoteVariables'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACCallable class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACCallable class' category: #'P4-TAC-IR'!
 P4TACCallable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACClosure category: 'P4-TAC-IR'!
+!classDefinition: #P4TACClosure category: #'P4-TAC-IR'!
 P4TACCallable subclass: #P4TACClosure
 	instanceVariableNames: 'code outerScope imports'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACClosure class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACClosure class' category: #'P4-TAC-IR'!
 P4TACClosure class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACMethod category: 'P4-TAC-IR'!
+!classDefinition: #P4TACMethod category: #'P4-TAC-IR'!
 P4TACCallable subclass: #P4TACMethod
 	instanceVariableNames: 'host message literals closures uid codeUid methodObject codeStream primitive returnAddress nonLocalReturn'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACMethod class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACMethod class' category: #'P4-TAC-IR'!
 P4TACMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACEndBlock category: 'P4-TAC-IR'!
+!classDefinition: #P4TACEndBlock category: #'P4-TAC-IR'!
 P4TACCodeBlock subclass: #P4TACEndBlock
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACEndBlock class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACEndBlock class' category: #'P4-TAC-IR'!
 P4TACEndBlock class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACInstruction category: 'P4-TAC-IR'!
+!classDefinition: #P4TACInstruction category: #'P4-TAC-IR'!
 P4TACCodePoint subclass: #P4TACInstruction
 	instanceVariableNames: 'flowNumber'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACInstruction class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACInstruction class' category: #'P4-TAC-IR'!
 P4TACInstruction class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACBitShift category: 'P4-TAC-IR'!
+!classDefinition: #P4TACBitShift category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACBitShift
 	instanceVariableNames: 'target bits'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACBitShift class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACBitShift class' category: #'P4-TAC-IR'!
 P4TACBitShift class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACBitShiftRight category: 'P4-TAC-IR'!
+!classDefinition: #P4TACBitShiftRight category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACBitShiftRight
 	instanceVariableNames: 'target bits'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACBitShiftRight class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACBitShiftRight class' category: #'P4-TAC-IR'!
 P4TACBitShiftRight class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACBitTest category: 'P4-TAC-IR'!
+!classDefinition: #P4TACBitTest category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACBitTest
 	instanceVariableNames: 'bit location'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACBitTest class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACBitTest class' category: #'P4-TAC-IR'!
 P4TACBitTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACCall category: 'P4-TAC-IR'!
+!classDefinition: #P4TACCall category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACCall
 	instanceVariableNames: 'method offset'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACCall class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACCall class' category: #'P4-TAC-IR'!
 P4TACCall class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACCaptureClosure category: 'P4-TAC-IR'!
+!classDefinition: #P4TACCaptureClosure category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACCaptureClosure
 	instanceVariableNames: 'closure capturedAt resultVariable'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACCaptureClosure class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACCaptureClosure class' category: #'P4-TAC-IR'!
 P4TACCaptureClosure class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACHalt category: 'P4-TAC-IR'!
+!classDefinition: #P4TACHalt category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACHalt
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACHalt class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACHalt class' category: #'P4-TAC-IR'!
 P4TACHalt class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACIndirectCall category: 'P4-TAC-IR'!
+!classDefinition: #P4TACIndirectCall category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACIndirectCall
 	instanceVariableNames: 'register'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACIndirectCall class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACIndirectCall class' category: #'P4-TAC-IR'!
 P4TACIndirectCall class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACIndirectJump category: 'P4-TAC-IR'!
+!classDefinition: #P4TACIndirectJump category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACIndirectJump
 	instanceVariableNames: 'register'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACIndirectJump class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACIndirectJump class' category: #'P4-TAC-IR'!
 P4TACIndirectJump class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACJump category: 'P4-TAC-IR'!
+!classDefinition: #P4TACJump category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACJump
 	instanceVariableNames: 'target zero carry short'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACJump class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACJump class' category: #'P4-TAC-IR'!
 P4TACJump class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACNilInstruction category: 'P4-TAC-IR'!
+!classDefinition: #P4TACNilInstruction category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACNilInstruction
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACNilInstruction class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACNilInstruction class' category: #'P4-TAC-IR'!
 P4TACNilInstruction class
 	instanceVariableNames: 'instance'!
 
-!classDefinition: #P4TACOperation category: 'P4-TAC-IR'!
+!classDefinition: #P4TACOperation category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACOperation
 	instanceVariableNames: 'left right'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACOperation class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACOperation class' category: #'P4-TAC-IR'!
 P4TACOperation class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACAdd category: 'P4-TAC-IR'!
+!classDefinition: #P4TACAdd category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACAdd
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACAdd class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACAdd class' category: #'P4-TAC-IR'!
 P4TACAdd class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACAnd category: 'P4-TAC-IR'!
+!classDefinition: #P4TACAnd category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACAnd
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACAnd class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACAnd class' category: #'P4-TAC-IR'!
 P4TACAnd class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACAssigning category: 'P4-TAC-IR'!
+!classDefinition: #P4TACAssigning category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACAssigning
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACAssigning class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACAssigning class' category: #'P4-TAC-IR'!
 P4TACAssigning class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACAssignment category: 'P4-TAC-IR'!
+!classDefinition: #P4TACAssignment category: #'P4-TAC-IR'!
 P4TACAssigning subclass: #P4TACAssignment
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACAssignment class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACAssignment class' category: #'P4-TAC-IR'!
 P4TACAssignment class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACLoadAddress category: 'P4-TAC-IR'!
+!classDefinition: #P4TACLoadAddress category: #'P4-TAC-IR'!
 P4TACAssigning subclass: #P4TACLoadAddress
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACLoadAddress class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACLoadAddress class' category: #'P4-TAC-IR'!
 P4TACLoadAddress class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACCompare category: 'P4-TAC-IR'!
+!classDefinition: #P4TACCompare category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACCompare
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACCompare class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACCompare class' category: #'P4-TAC-IR'!
 P4TACCompare class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACOr category: 'P4-TAC-IR'!
+!classDefinition: #P4TACOr category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACOr
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACOr class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACOr class' category: #'P4-TAC-IR'!
 P4TACOr class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACSub category: 'P4-TAC-IR'!
+!classDefinition: #P4TACSub category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACSub
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACSub class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACSub class' category: #'P4-TAC-IR'!
 P4TACSub class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACTest category: 'P4-TAC-IR'!
+!classDefinition: #P4TACTest category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACTest class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACTest class' category: #'P4-TAC-IR'!
 P4TACTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACXOr category: 'P4-TAC-IR'!
+!classDefinition: #P4TACXOr category: #'P4-TAC-IR'!
 P4TACOperation subclass: #P4TACXOr
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACXOr class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACXOr class' category: #'P4-TAC-IR'!
 P4TACXOr class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACPop category: 'P4-TAC-IR'!
+!classDefinition: #P4TACPop category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACPop
 	instanceVariableNames: 'register'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACPop class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACPop class' category: #'P4-TAC-IR'!
 P4TACPop class
 	instanceVariableNames: 'register'!
 
-!classDefinition: #P4TACPush category: 'P4-TAC-IR'!
+!classDefinition: #P4TACPush category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACPush
 	instanceVariableNames: 'variable register'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACPush class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACPush class' category: #'P4-TAC-IR'!
 P4TACPush class
 	instanceVariableNames: 'register'!
 
-!classDefinition: #P4TACReturn category: 'P4-TAC-IR'!
+!classDefinition: #P4TACReturn category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACReturn
 	instanceVariableNames: 'teardown'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACReturn class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACReturn class' category: #'P4-TAC-IR'!
 P4TACReturn class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACTeardown category: 'P4-TAC-IR'!
+!classDefinition: #P4TACTeardown category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACTeardown
 	instanceVariableNames: 'teardown keepArguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACTeardown class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACTeardown class' category: #'P4-TAC-IR'!
 P4TACTeardown class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACVolatileFence category: 'P4-TAC-IR'!
+!classDefinition: #P4TACVolatileFence category: #'P4-TAC-IR'!
 P4TACInstruction subclass: #P4TACVolatileFence
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-IR'!
-!classDefinition: 'P4TACVolatileFence class' category: 'P4-TAC-IR'!
+!classDefinition: 'P4TACVolatileFence class' category: #'P4-TAC-IR'!
 P4TACVolatileFence class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACMessage category: 'P4-TAC-Values'!
+!classDefinition: #P4TACMessage category: #'P4-TAC-Values'!
 P4Object subclass: #P4TACMessage
 	instanceVariableNames: 'selector numOfArguments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACMessage class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACMessage class' category: #'P4-TAC-Values'!
 P4TACMessage class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACValue category: 'P4-TAC-Values'!
+!classDefinition: #P4TACValue category: #'P4-TAC-Values'!
 P4Object subclass: #P4TACValue
 	instanceVariableNames: 'typeHint staticType'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACValue class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACValue class' category: #'P4-TAC-Values'!
 P4TACValue class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACAbstractVariable category: 'P4-TAC-Values'!
+!classDefinition: #P4TACAbstractVariable category: #'P4-TAC-Values'!
 P4TACValue subclass: #P4TACAbstractVariable
 	instanceVariableNames: 'name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACAbstractVariable class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACAbstractVariable class' category: #'P4-TAC-Values'!
 P4TACAbstractVariable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACFixedVariable category: 'P4-TAC-Values'!
+!classDefinition: #P4TACFixedVariable category: #'P4-TAC-Values'!
 P4TACAbstractVariable subclass: #P4TACFixedVariable
 	instanceVariableNames: 'register'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACFixedVariable class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACFixedVariable class' category: #'P4-TAC-Values'!
 P4TACFixedVariable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACArgument category: 'P4-TAC-Values'!
+!classDefinition: #P4TACArgument category: #'P4-TAC-Values'!
 P4TACFixedVariable subclass: #P4TACArgument
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACArgument class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACArgument class' category: #'P4-TAC-Values'!
 P4TACArgument class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACResultVariable category: 'P4-TAC-Values'!
+!classDefinition: #P4TACResultVariable category: #'P4-TAC-Values'!
 P4TACFixedVariable subclass: #P4TACResultVariable
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACResultVariable class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACResultVariable class' category: #'P4-TAC-Values'!
 P4TACResultVariable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACVariable category: 'P4-TAC-Values'!
+!classDefinition: #P4TACVariable category: #'P4-TAC-Values'!
 P4TACFixedVariable subclass: #P4TACVariable
 	instanceVariableNames: 'firstAssign lastAssign lastUse methodCalled'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACVariable class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACVariable class' category: #'P4-TAC-Values'!
 P4TACVariable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACConstantLocal category: 'P4-TAC-Values'!
+!classDefinition: #P4TACConstantLocal category: #'P4-TAC-Values'!
 P4TACVariable subclass: #P4TACConstantLocal
 	instanceVariableNames: 'remote'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACConstantLocal class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACConstantLocal class' category: #'P4-TAC-Values'!
 P4TACConstantLocal class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACExternalizableVariable category: 'P4-TAC-Values'!
+!classDefinition: #P4TACExternalizableVariable category: #'P4-TAC-Values'!
 P4TACVariable subclass: #P4TACExternalizableVariable
 	instanceVariableNames: 'remote'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACExternalizableVariable class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACExternalizableVariable class' category: #'P4-TAC-Values'!
 P4TACExternalizableVariable class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACLocal category: 'P4-TAC-Values'!
+!classDefinition: #P4TACLocal category: #'P4-TAC-Values'!
 P4TACExternalizableVariable subclass: #P4TACLocal
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACLocal class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACLocal class' category: #'P4-TAC-Values'!
 P4TACLocal class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACVariableAlias category: 'P4-TAC-Values'!
+!classDefinition: #P4TACVariableAlias category: #'P4-TAC-Values'!
 P4TACExternalizableVariable subclass: #P4TACVariableAlias
 	instanceVariableNames: 'variable'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACVariableAlias class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACVariableAlias class' category: #'P4-TAC-Values'!
 P4TACVariableAlias class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACRemoteArray category: 'P4-TAC-Values'!
+!classDefinition: #P4TACRemoteArray category: #'P4-TAC-Values'!
 P4TACVariable subclass: #P4TACRemoteArray
 	instanceVariableNames: 'remotes'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACRemoteArray class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACRemoteArray class' category: #'P4-TAC-Values'!
 P4TACRemoteArray class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACSelf category: 'P4-TAC-Values'!
+!classDefinition: #P4TACSelf category: #'P4-TAC-Values'!
 P4TACVariable subclass: #P4TACSelf
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACSelf class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACSelf class' category: #'P4-TAC-Values'!
 P4TACSelf class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACTemp category: 'P4-TAC-Values'!
+!classDefinition: #P4TACTemp category: #'P4-TAC-Values'!
 P4TACVariable subclass: #P4TACTemp
 	instanceVariableNames: 'local'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACTemp class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACTemp class' category: #'P4-TAC-Values'!
 P4TACTemp class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACClosureTemp category: 'P4-TAC-Values'!
+!classDefinition: #P4TACClosureTemp category: #'P4-TAC-Values'!
 P4TACTemp subclass: #P4TACClosureTemp
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACClosureTemp class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACClosureTemp class' category: #'P4-TAC-Values'!
 P4TACClosureTemp class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACVariableAccess category: 'P4-TAC-Values'!
+!classDefinition: #P4TACVariableAccess category: #'P4-TAC-Values'!
 P4TACAbstractVariable subclass: #P4TACVariableAccess
 	instanceVariableNames: 'index variable cachedRegister'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACVariableAccess class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACVariableAccess class' category: #'P4-TAC-Values'!
 P4TACVariableAccess class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACConstant category: 'P4-TAC-Values'!
+!classDefinition: #P4TACConstant category: #'P4-TAC-Values'!
 P4TACValue subclass: #P4TACConstant
 	instanceVariableNames: 'value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACConstant class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACConstant class' category: #'P4-TAC-Values'!
 P4TACConstant class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACMethodObject category: 'P4-TAC-Values'!
+!classDefinition: #P4TACMethodObject category: #'P4-TAC-Values'!
 P4TACValue subclass: #P4TACMethodObject
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACMethodObject class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACMethodObject class' category: #'P4-TAC-Values'!
 P4TACMethodObject class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACMethodObjectAccess category: 'P4-TAC-Values'!
+!classDefinition: #P4TACMethodObjectAccess category: #'P4-TAC-Values'!
 P4TACValue subclass: #P4TACMethodObjectAccess
 	instanceVariableNames: 'methodObject index'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACMethodObjectAccess class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACMethodObjectAccess class' category: #'P4-TAC-Values'!
 P4TACMethodObjectAccess class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACReference category: 'P4-TAC-Values'!
+!classDefinition: #P4TACReference category: #'P4-TAC-Values'!
 P4TACValue subclass: #P4TACReference
 	instanceVariableNames: 'target'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACReference class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACReference class' category: #'P4-TAC-Values'!
 P4TACReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACExternalReference category: 'P4-TAC-Values'!
+!classDefinition: #P4TACExternalReference category: #'P4-TAC-Values'!
 P4TACReference subclass: #P4TACExternalReference
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACExternalReference class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACExternalReference class' category: #'P4-TAC-Values'!
 P4TACExternalReference class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACVariableName category: 'P4-TAC-Values'!
+!classDefinition: #P4TACVariableName category: #'P4-TAC-Values'!
 P4Object subclass: #P4TACVariableName
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACVariableName class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACVariableName class' category: #'P4-TAC-Values'!
 P4TACVariableName class
 	instanceVariableNames: 'inst'!
 
-!classDefinition: #P4TACBasePointerName category: 'P4-TAC-Values'!
+!classDefinition: #P4TACBasePointerName category: #'P4-TAC-Values'!
 P4TACVariableName subclass: #P4TACBasePointerName
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACBasePointerName class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACBasePointerName class' category: #'P4-TAC-Values'!
 P4TACBasePointerName class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TACReturnTokenName category: 'P4-TAC-Values'!
+!classDefinition: #P4TACReturnTokenName category: #'P4-TAC-Values'!
 P4TACVariableName subclass: #P4TACReturnTokenName
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-TAC-Values'!
-!classDefinition: 'P4TACReturnTokenName class' category: 'P4-TAC-Values'!
+!classDefinition: 'P4TACReturnTokenName class' category: #'P4-TAC-Values'!
 P4TACReturnTokenName class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4CustomMethodDictionary category: 'P4-Test'!
+!classDefinition: #P4CustomMethodDictionary category: #'P4-Test'!
 P4Object variableSubclass: #P4CustomMethodDictionary
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4CustomMethodDictionary class' category: 'P4-Test'!
+!classDefinition: 'P4CustomMethodDictionary class' category: #'P4-Test'!
 P4CustomMethodDictionary class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4DoesUnderstand category: 'P4-Test'!
+!classDefinition: #P4DoesUnderstand category: #'P4-Test'!
 P4Object variableSubclass: #P4DoesUnderstand
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4DoesUnderstand class' category: 'P4-Test'!
+!classDefinition: 'P4DoesUnderstand class' category: #'P4-Test'!
 P4DoesUnderstand class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4KernelTest category: 'P4-Test'!
+!classDefinition: #P4KernelTest category: #'P4-Test'!
 P4Object variableSubclass: #P4KernelTest
 	instanceVariableNames: 'a b'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4KernelTest class' category: 'P4-Test'!
+!classDefinition: 'P4KernelTest class' category: #'P4-Test'!
 P4KernelTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4MessageProxy category: 'P4-Test'!
+!classDefinition: #P4MessageProxy category: #'P4-Test'!
 P4Object variableSubclass: #P4MessageProxy
 	instanceVariableNames: 'proxiedMethod counter'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4MessageProxy class' category: 'P4-Test'!
+!classDefinition: 'P4MessageProxy class' category: #'P4-Test'!
 P4MessageProxy class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PerformanceTest category: 'P4-Test'!
+!classDefinition: #P4PerformanceTest category: #'P4-Test'!
 P4Object variableSubclass: #P4PerformanceTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4PerformanceTest class' category: 'P4-Test'!
+!classDefinition: 'P4PerformanceTest class' category: #'P4-Test'!
 P4PerformanceTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4StaticKernelTest category: 'P4-Test'!
+!classDefinition: #P4StaticKernelTest category: #'P4-Test'!
 P4Object variableSubclass: #P4StaticKernelTest
 	instanceVariableNames: 'a b c d'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4StaticKernelTest class' category: 'P4-Test'!
+!classDefinition: 'P4StaticKernelTest class' category: #'P4-Test'!
 P4StaticKernelTest class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TestMethod category: 'P4-Test'!
+!classDefinition: #P4TestMethod category: #'P4-Test'!
 P4Object subclass: #P4TestMethod
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4TestMethod class' category: 'P4-Test'!
+!classDefinition: 'P4TestMethod class' category: #'P4-Test'!
 P4TestMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TestMethod2 category: 'P4-Test'!
+!classDefinition: #P4TestMethod2 category: #'P4-Test'!
 P4TestMethod subclass: #P4TestMethod2
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4TestMethod2 class' category: 'P4-Test'!
+!classDefinition: 'P4TestMethod2 class' category: #'P4-Test'!
 P4TestMethod2 class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4TestObject category: 'P4-Test'!
+!classDefinition: #P4TestObject category: #'P4-Test'!
 P4Object variableSubclass: #P4TestObject
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-Test'!
-!classDefinition: 'P4TestObject class' category: 'P4-Test'!
+!classDefinition: 'P4TestObject class' category: #'P4-Test'!
 P4TestObject class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PharoBehavior category: 'P4-PharoBridge'!
+!classDefinition: #P4PharoBehavior category: #'P4-PharoBridge'!
 Object subclass: #P4PharoBehavior
 	instanceVariableNames: 'pharoInstance p4instance'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-PharoBridge'!
-!classDefinition: 'P4PharoBehavior class' category: 'P4-PharoBridge'!
+!classDefinition: 'P4PharoBehavior class' category: #'P4-PharoBridge'!
 P4PharoBehavior class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PharoClass category: 'P4-PharoBridge'!
+!classDefinition: #P4PharoClass category: #'P4-PharoBridge'!
 P4PharoBehavior subclass: #P4PharoClass
 	instanceVariableNames: 'p4class'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-PharoBridge'!
-!classDefinition: 'P4PharoClass class' category: 'P4-PharoBridge'!
+!classDefinition: 'P4PharoClass class' category: #'P4-PharoBridge'!
 P4PharoClass class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PharoMetaclass category: 'P4-PharoBridge'!
+!classDefinition: #P4PharoMetaclass category: #'P4-PharoBridge'!
 P4PharoBehavior subclass: #P4PharoMetaclass
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'P4-PharoBridge'!
-!classDefinition: 'P4PharoMetaclass class' category: 'P4-PharoBridge'!
+!classDefinition: 'P4PharoMetaclass class' category: #'P4-PharoBridge'!
 P4PharoMetaclass class
+	instanceVariableNames: ''!
+
+!classDefinition: #ASTTest category: #'P4-AST'!
+TestCase subclass: #ASTTest
+	instanceVariableNames: 'scparser parser'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-AST'!
+!classDefinition: 'ASTTest class' category: #'P4-AST'!
+ASTTest class
 	instanceVariableNames: ''!
 
 
@@ -2809,97 +2809,6 @@ Jumps and calls can be direct to an address, or indirect via a register (which c
 If a call is done to a register it is encoded in the same way as a "constant/register combination", meaning that it will be prefixed with 0x41 if the register is a register(1).
 
 !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
-defaultAction
-	"No one has handled this error, but now give them a chance to decide
-	how to debug it. If none handle this either then open debugger (see
-	UnhandedError-defaultAction) "
-	<preventExport>
-	UnhandledError signalForException: self! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:31'!
-description
-	<preventExport>
-	"Return a textual description of the exception."
-	| desc mt |
-	desc := self class name asString.
-	^ (mt := self messageText) == nil
-		ifTrue: [desc]
-		ifFalse: [desc , ': ' , mt]! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:32'!
-messageText
-	<preventExport>
-	| stream |
-	stream := WriteStream on: ''.
-	self warnOn: stream.
-	^ stream contents! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 8/9/2011 13:38'!
-pSignal
-	<renameExport: #signal>
-	'---> signalled:' print.
-	self printObj.
-	self pHalt.
-	
-	! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:52'!
-signal
-	"Ask ContextHandlers in the sender chain to handle this signal. The
-	default is to execute and return my defaultAction."
-	<preventExport>
-	environment := thisContext contextTag.
-	^ environment nextHandlerContext handleSignal: self! !
-
-!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
-signalerContext
-	<preventExport>
-	^ environment
-		findContextSuchThat: [:ctxt | (ctxt receiver == self
-				or: [ctxt receiver == self class]) not]! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-dictionary
-	^ dictionary! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-dictionary: anObject
-	dictionary := anObject! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-key
-	^ key! !
-
-!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
-key: anObject
-	key := anObject! !
-
-!P4KeyNotFound methodsFor: 'printing' stamp: 'ToonVerwaest 8/20/2010 12:00'!
-warnOn: aStream
-	aStream << 'Key not found: '.
-	key printOn: aStream.! !
-
-!ASTTest methodsFor: 'accessing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
-ast: aString
-	^ parser match: (PEGStringScanner on: aString)! !
-
-!ASTTest methodsFor: 'running' stamp: 'OliFlueckiger 5/4/2011 16:49'!
-setUp
-	scparser := P4SmalltalkParser new.
-	parser := scparser expression! !
-
-!ASTTest methodsFor: 'testing' stamp: 'KenD 8/25/2022 18:39:35'!
-testHasReturnExpression
-	parser := scparser method.
-	self assert: (self ast: 'method' , String newLineString , '^ 1') hasReturnExpression.
-	self deny: (self ast: 'method' , String newLineString , '1') hasReturnExpression.
-	self assert: (self ast: 'method' , String newLineString , 'true ifFalse: [^ true]') hasReturnExpression.
-	self deny: (self ast: 'method' , String newLineString , 'true ifFalse: [ 2 ]') hasReturnExpression.
-	self assert: (self ast: 'method' , String newLineString , 'true ifFalse: [^ true] ifTrue: [ ^ 2]') hasReturnExpression.
-	self assert: (self ast: 'method' , String newLineString , 'self isNil ifFalse: [^ true]') hasReturnExpression.
-	self assert: (self ast: 'method' , String newLineString , '[true] whileTrue: [^ true] doBo: 1') hasReturnExpression! !
 
 !P4Object methodsFor: 'testing' stamp: 'OliFlueckiger 7/28/2011 20:02'!
 = other
@@ -5171,6 +5080,92 @@ lookup: selector for: object
 		currentObj := currentObj delegate ].
 
 	^ P4DoesNotUnderstand new! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
+defaultAction
+	"No one has handled this error, but now give them a chance to decide
+	how to debug it. If none handle this either then open debugger (see
+	UnhandedError-defaultAction) "
+	<preventExport>
+	UnhandledError signalForException: self! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:31'!
+description
+	<preventExport>
+	"Return a textual description of the exception."
+	| desc mt |
+	desc := self class name asString.
+	^ (mt := self messageText) == nil
+		ifTrue: [desc]
+		ifFalse: [desc , ': ' , mt]! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'ToonVerwaest 7/19/2011 17:32'!
+messageText
+	<preventExport>
+	| stream |
+	stream := WriteStream on: ''.
+	self warnOn: stream.
+	^ stream contents! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 8/9/2011 13:38'!
+pSignal
+	<renameExport: #signal>
+	'---> signalled:' print.
+	self printObj.
+	self pHalt.
+	
+	! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:52'!
+signal
+	"Ask ContextHandlers in the sender chain to handle this signal. The
+	default is to execute and return my defaultAction."
+	<preventExport>
+	environment := thisContext contextTag.
+	^ environment nextHandlerContext handleSignal: self! !
+
+!P4Exception methodsFor: 'PharoIntegration' stamp: 'OliFlueckiger 5/5/2011 17:54'!
+signalerContext
+	<preventExport>
+	^ environment
+		findContextSuchThat: [:ctxt | (ctxt receiver == self
+				or: [ctxt receiver == self class]) not]! !
+
+!P4Exception class methodsFor: 'accessing' stamp: 'KenD 8/26/2022 11:15:13'!
+asPClass
+
+	^ self! !
+
+!P4Exception class methodsFor: 'accessing' stamp: 'KenD 8/26/2022 12:17:39'!
+pExportedName
+	"@@KenD@@ revisit?"
+	^ #Exception! !
+
+!P4Exception class methodsFor: 'accessing' stamp: 'KenD 8/26/2022 11:21:27'!
+relativeNameFor: aName
+	"@@KenD@@ revisit?"
+	^aName! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+dictionary
+	^ dictionary! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+dictionary: anObject
+	dictionary := anObject! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+key
+	^ key! !
+
+!P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
+key: anObject
+	key := anObject! !
+
+!P4KeyNotFound methodsFor: 'printing' stamp: 'ToonVerwaest 8/20/2010 12:00'!
+warnOn: aStream
+	aStream << 'Key not found: '.
+	key printOn: aStream.! !
 
 !P4BinaryOut methodsFor: 'initialize-release' stamp: 'OliFlueckiger 12/7/2011 20:19'!
 addClassReference: class for: allocated
@@ -11359,9 +11354,9 @@ invokeBlockFor: method
 		<< ((builder loadConstant: method selector ) moveTo: self resultVariable);
 		<< (P4TACJump to: (P4Object earlySelectorAddress: #invoke:)).! !
 
-!P4A2TStatic methodsFor: 'convenience' stamp: 'OliFlueckiger 7/22/2011 16:13'!
+!P4A2TStatic methodsFor: 'convenience' stamp: 'KenD 8/26/2022 10:44:40'!
 currentHost: host 
-	(host inPharo class canPerform: #typeHints) ifTrue: [
+	(host inPharo class includesSelector: #typeHints) ifTrue: [
 		host inPharo typeHints keysAndValuesDo: [ :name :type |
 			self typeHint: name as: type]]! !
 
@@ -11643,9 +11638,9 @@ volatileFence
 addGlobal: anObject
 	^ globals at: anObject name asSymbol  put: (P4TACExternalReference target: anObject )! !
 
-!P4TACBuilder methodsFor: 'accessing' stamp: 'OliFlueckiger 12/8/2011 14:22'!
+!P4TACBuilder methodsFor: 'accessing' stamp: 'KenD 8/26/2022 11:08:19'!
 classReferenceFor: aName
-	klass := (Smalltalk globals at: aName ifAbsent: [ self error: 'Undeclared class ', aName ]) asPClass.
+	klass := (Smalltalk at: aName ifAbsent: [ self error: 'Undeclared class ', aName ]) asPClass.
 	^ self loadConstant: klass
 ! !
 
@@ -15363,6 +15358,26 @@ pIsVariableOrBytes
 pclass
 	^ P4Metaclass asPClass! !
 
+!ASTTest methodsFor: 'accessing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
+ast: aString
+	^ parser match: (PEGStringScanner on: aString)! !
+
+!ASTTest methodsFor: 'running' stamp: 'OliFlueckiger 5/4/2011 16:49'!
+setUp
+	scparser := P4SmalltalkParser new.
+	parser := scparser expression! !
+
+!ASTTest methodsFor: 'testing' stamp: 'KenD 8/25/2022 18:39:35'!
+testHasReturnExpression
+	parser := scparser method.
+	self assert: (self ast: 'method' , String newLineString , '^ 1') hasReturnExpression.
+	self deny: (self ast: 'method' , String newLineString , '1') hasReturnExpression.
+	self assert: (self ast: 'method' , String newLineString , 'true ifFalse: [^ true]') hasReturnExpression.
+	self deny: (self ast: 'method' , String newLineString , 'true ifFalse: [ 2 ]') hasReturnExpression.
+	self assert: (self ast: 'method' , String newLineString , 'true ifFalse: [^ true] ifTrue: [ ^ 2]') hasReturnExpression.
+	self assert: (self ast: 'method' , String newLineString , 'self isNil ifFalse: [^ true]') hasReturnExpression.
+	self assert: (self ast: 'method' , String newLineString , '[true] whileTrue: [^ true] doBo: 1') hasReturnExpression! !
+
 !ProtoObject methodsFor: '*P4' stamp: 'KenD 8/24/2022 16:05:30'!
 basicIdentityHash
 	"Answer a SmallInteger whose value is related to the receiver's identity.
@@ -15514,34 +15529,75 @@ p4super
 pname
 	^self name! !
 
-!Boolean methodsFor: '*P4' stamp: 'ToonVerwaest 7/18/2011 17:08'!
-dumpGlobalOn: executableFormat
-	^ self dumpOn: executableFormat.! !
+!CompiledMethod methodsFor: '*P4' stamp: 'KenD 8/26/2022 10:51:45'!
+earlySelectorAddress
+	| realSelector |
+	(self pragmaAt: #globalName: ) ifNotNil: [ :pragma |
+		^ pragma argumentAt: 1 ].
+	
+	(self pragmaAt: #renameExport: ) 
+		ifNil: [ realSelector := self selector ]
+		ifNotNil: [ :pragma | realSelector := pragma argumentAt: 1 ].
 
-!Boolean methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 16:59'!
-dumpLocalOn: executableFormat
-	^ executableFormat postpone: self! !
+	^ (self pMethodClass pExportedName, '__', realSelector) asSymbol! !
 
-!Boolean methodsFor: '*P4' stamp: 'OliFlueckiger 7/15/2011 14:51'!
-pExportedName 
-	^ self name asSymbol! !
+!CompiledMethod methodsFor: '*P4' stamp: 'KenD 8/26/2022 10:51:29'!
+pMethodClass 
+	^ self methodClass asPClass! !
 
-!UndefinedObject methodsFor: '*P4' stamp: 'ToonVerwaest 7/18/2011 17:09'!
-dumpGlobalOn: executableFormat
-	^ self dumpOn: executableFormat.! !
+!CharacterSequence methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:17:23'!
+split: aString
+	"I am a string of delimiters"
+	^ aString findTokens: self! !
 
-!UndefinedObject methodsFor: '*P4' stamp: 'ToonVerwaest 7/19/2011 00:20'!
-dumpLocalOn: executableFormat
-	^ executableFormat postpone: self! !
+!String class methodsFor: '*P4' stamp: 'KenD 8/26/2022 10:42:04'!
+newFromAll: strings 
+	| size result position |
+	size := 0.
+	strings
+		do: [:s | size := size + s size].
+	result := self new: size.
+	position := 1.
+	strings
+		do: [:s | s
+				do: [:c | 
+					result at: position put: c.
+					position := position + 1]].
+	^ result! !
 
-!UndefinedObject methodsFor: '*P4' stamp: 'KenD 8/24/2022 16:39:46'!
-ifNotNilDo: aBlock
+!Symbol methodsFor: '*P4' stamp: 'ToonVerwaest 7/23/2011 18:57'!
+pHash
+	| hash maxInt |
+	self flag: 'Not a super fast implementation; but it matches what we have in C...'.
+	maxInt := (1 bitShift: 64) - 1.
+	hash := 5381.
+	1 to: self size do: [ :i |
+		hash := (hash + ((hash bitShift: 5) bitAnd: maxInt) + (self at: i) asInteger) bitAnd: maxInt ].
+	((hash bitShift: -63) bitAnd: 1) = 1 ifTrue: [ hash := hash bitShift: -1].
+	^ hash! !
 
-	"just ignore"! !
+!Stream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:05:58'!
+<< anObject
 
-!UndefinedObject methodsFor: '*P4' stamp: 'OliFlueckiger 7/15/2011 14:47'!
-pExportedName 
-	^ #nil! !
+	anObject putOn: self! !
+
+!Stream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:06:47'!
+putOn: aStream
+
+	aStream nextPutAll: self contents! !
+
+!WriteStream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:07:49'!
+<< anObject
+	"Write anObject to the receiver, dispatching using #putOn:
+	This is a shortcut for both nextPut: and nextPutAll: since anObject can be both
+	the element type of the receiver as well as a collection of those elements.
+	No further conversions of anObject are applied.
+	This is an optimisation.
+	Return self to accomodate chaining."
+
+ 	anObject class == collection class
+		ifTrue: [ self nextPutAll: anObject ]
+		ifFalse: [ anObject putOn: self ]! !
 
 !Behavior methodsFor: '*P4' stamp: 'KenD 8/24/2022 13:14:44'!
 mapToPclass
@@ -15638,46 +15694,36 @@ basicIdentityHash
 pHash 
 	^ self! !
 
+!Boolean methodsFor: '*P4' stamp: 'ToonVerwaest 7/18/2011 17:08'!
+dumpGlobalOn: executableFormat
+	^ self dumpOn: executableFormat.! !
+
+!Boolean methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 16:59'!
+dumpLocalOn: executableFormat
+	^ executableFormat postpone: self! !
+
+!Boolean methodsFor: '*P4' stamp: 'OliFlueckiger 7/15/2011 14:51'!
+pExportedName 
+	^ self name asSymbol! !
+
+!UndefinedObject methodsFor: '*P4' stamp: 'ToonVerwaest 7/18/2011 17:09'!
+dumpGlobalOn: executableFormat
+	^ self dumpOn: executableFormat.! !
+
+!UndefinedObject methodsFor: '*P4' stamp: 'ToonVerwaest 7/19/2011 00:20'!
+dumpLocalOn: executableFormat
+	^ executableFormat postpone: self! !
+
+!UndefinedObject methodsFor: '*P4' stamp: 'KenD 8/24/2022 16:39:46'!
+ifNotNilDo: aBlock
+
+	"just ignore"! !
+
+!UndefinedObject methodsFor: '*P4' stamp: 'OliFlueckiger 7/15/2011 14:47'!
+pExportedName 
+	^ #nil! !
+
 !Character methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:16:06'!
 split: aString
 
 	^ aString findTokens: self asString! !
-
-!CharacterSequence methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:17:23'!
-split: aString
-	"I am a string of delimiters"
-	^ aString findTokens: self! !
-
-!Symbol methodsFor: '*P4' stamp: 'ToonVerwaest 7/23/2011 18:57'!
-pHash
-	| hash maxInt |
-	self flag: 'Not a super fast implementation; but it matches what we have in C...'.
-	maxInt := (1 bitShift: 64) - 1.
-	hash := 5381.
-	1 to: self size do: [ :i |
-		hash := (hash + ((hash bitShift: 5) bitAnd: maxInt) + (self at: i) asInteger) bitAnd: maxInt ].
-	((hash bitShift: -63) bitAnd: 1) = 1 ifTrue: [ hash := hash bitShift: -1].
-	^ hash! !
-
-!Stream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:05:58'!
-<< anObject
-
-	anObject putOn: self! !
-
-!Stream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:06:47'!
-putOn: aStream
-
-	aStream nextPutAll: self contents! !
-
-!WriteStream methodsFor: '*P4' stamp: 'KenD 8/23/2022 13:07:49'!
-<< anObject
-	"Write anObject to the receiver, dispatching using #putOn:
-	This is a shortcut for both nextPut: and nextPutAll: since anObject can be both
-	the element type of the receiver as well as a collection of those elements.
-	No further conversions of anObject are applied.
-	This is an optimisation.
-	Return self to accomodate chaining."
-
- 	anObject class == collection class
-		ifTrue: [ self nextPutAll: anObject ]
-		ifFalse: [ anObject putOn: self ]! !
