@@ -1,317 +1,327 @@
-'From Cuis 6.0 [latest update: #5466] on 25 August 2022 at 5:09:19 pm'!
+'From Cuis 6.0 [latest update: #5467] on 25 August 2022 at 7:43:53 pm'!
 'Description Parsing Expression Grammar -- yet another parser..'!
-!provides: 'PEG' 1 14!
-SystemOrganization addCategory: #PEG!
+!provides: 'PEG' 1 15!
+SystemOrganization addCategory: 'PEG'!
 
 
-!classDefinition: #PEGStringScanner category: #PEG!
+!classDefinition: #PEGStringScanner category: 'PEG'!
 ReadStream subclass: #PEGStringScanner
 	instanceVariableNames: 'separator cache stack longestMatch'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PEG'!
-!classDefinition: 'PEGStringScanner class' category: #PEG!
+!classDefinition: 'PEGStringScanner class' category: 'PEG'!
 PEGStringScanner class
 	instanceVariableNames: ''!
 
-!classDefinition: #PEGParsingFailure category: #PEG!
-P4Exception subclass: #PEGParsingFailure
+!classDefinition: #PEGException category: 'PEG'!
+Exception subclass: #PEGException
+	instanceVariableNames: 'environment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGException class' category: 'PEG'!
+PEGException class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGParsingFailure category: 'PEG'!
+PEGException subclass: #PEGParsingFailure
 	instanceVariableNames: 'input'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PEG'!
-!classDefinition: 'PEGParsingFailure class' category: #PEG!
+!classDefinition: 'PEGParsingFailure class' category: 'PEG'!
 PEGParsingFailure class
 	instanceVariableNames: ''!
 
-!classDefinition: #PEGExpression category: #PEG!
-Object subclass: #PEGExpression
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGExpression class' category: #PEG!
-PEGExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGAtEnd category: #PEG!
-PEGExpression subclass: #PEGAtEnd
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGAtEnd class' category: #PEG!
-PEGAtEnd class
-	instanceVariableNames: 'instance'!
-
-!classDefinition: #PEGBlock category: #PEG!
-PEGExpression subclass: #PEGBlock
-	instanceVariableNames: 'block'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGBlock class' category: #PEG!
-PEGBlock class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGMemo category: #PEG!
-PEGExpression subclass: #PEGMemo
-	instanceVariableNames: 'parser'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGMemo class' category: #PEG!
-PEGMemo class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGNotTerminal category: #PEG!
-PEGExpression subclass: #PEGNotTerminal
-	instanceVariableNames: 'char'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGNotTerminal class' category: #PEG!
-PEGNotTerminal class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGConsumingNotTerminal category: #PEG!
-PEGNotTerminal subclass: #PEGConsumingNotTerminal
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGConsumingNotTerminal class' category: #PEG!
-PEGConsumingNotTerminal class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGConsumingNotTerminalStrongTimes category: #PEG!
-PEGConsumingNotTerminal subclass: #PEGConsumingNotTerminalStrongTimes
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGConsumingNotTerminalStrongTimes class' category: #PEG!
-PEGConsumingNotTerminalStrongTimes class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGOmit category: #PEG!
-PEGExpression subclass: #PEGOmit
-	instanceVariableNames: 'parser'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGOmit class' category: #PEG!
-PEGOmit class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGOptionalExpression category: #PEG!
-PEGExpression subclass: #PEGOptionalExpression
-	instanceVariableNames: 'child'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGOptionalExpression class' category: #PEG!
-PEGOptionalExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGOrderedChoiceExpression category: #PEG!
-PEGExpression subclass: #PEGOrderedChoiceExpression
-	instanceVariableNames: 'children'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGOrderedChoiceExpression class' category: #PEG!
-PEGOrderedChoiceExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGParser category: #PEG!
-PEGExpression subclass: #PEGParser
-	instanceVariableNames: 'expression semantics scopeClass separator name'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGParser class' category: #PEG!
-PEGParser class
-	instanceVariableNames: 'separator separators stream'!
-
-!classDefinition: #PEGMultiParser category: #PEG!
-PEGParser subclass: #PEGMultiParser
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGMultiParser class' category: #PEG!
-PEGMultiParser class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGRange category: #PEG!
-PEGExpression subclass: #PEGRange
-	instanceVariableNames: 'start stop'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGRange class' category: #PEG!
-PEGRange class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGSequenceExpression category: #PEG!
-PEGExpression subclass: #PEGSequenceExpression
-	instanceVariableNames: 'children'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGSequenceExpression class' category: #PEG!
-PEGSequenceExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGStrongSequenceExpression category: #PEG!
-PEGSequenceExpression subclass: #PEGStrongSequenceExpression
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGStrongSequenceExpression class' category: #PEG!
-PEGStrongSequenceExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGTerminal category: #PEG!
-PEGExpression subclass: #PEGTerminal
-	instanceVariableNames: 'terminal'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGTerminal class' category: #PEG!
-PEGTerminal class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGCharacterTerminal category: #PEG!
-PEGTerminal subclass: #PEGCharacterTerminal
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGCharacterTerminal class' category: #PEG!
-PEGCharacterTerminal class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGPushCharacterTerminal category: #PEG!
-PEGCharacterTerminal subclass: #PEGPushCharacterTerminal
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGPushCharacterTerminal class' category: #PEG!
-PEGPushCharacterTerminal class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGTerminalChoice category: #PEG!
-PEGTerminal subclass: #PEGTerminalChoice
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGTerminalChoice class' category: #PEG!
-PEGTerminalChoice class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGTerminalChoiceStrongTimes category: #PEG!
-PEGTerminalChoice subclass: #PEGTerminalChoiceStrongTimes
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGTerminalChoiceStrongTimes class' category: #PEG!
-PEGTerminalChoiceStrongTimes class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGZeroOrMoreExpression category: #PEG!
-PEGExpression subclass: #PEGZeroOrMoreExpression
-	instanceVariableNames: 'child'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGZeroOrMoreExpression class' category: #PEG!
-PEGZeroOrMoreExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGOneOrMoreExpression category: #PEG!
-PEGZeroOrMoreExpression subclass: #PEGOneOrMoreExpression
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGOneOrMoreExpression class' category: #PEG!
-PEGOneOrMoreExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGStrongZeroOrMoreExpression category: #PEG!
-PEGZeroOrMoreExpression subclass: #PEGStrongZeroOrMoreExpression
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGStrongZeroOrMoreExpression class' category: #PEG!
-PEGStrongZeroOrMoreExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGStrongOneOrMoreExpression category: #PEG!
-PEGStrongZeroOrMoreExpression subclass: #PEGStrongOneOrMoreExpression
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGStrongOneOrMoreExpression class' category: #PEG!
-PEGStrongOneOrMoreExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGOptionalResult category: #PEG!
-Object subclass: #PEGOptionalResult
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGOptionalResult class' category: #PEG!
-PEGOptionalResult class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGFailedOptionalResult category: #PEG!
-PEGOptionalResult subclass: #PEGFailedOptionalResult
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGFailedOptionalResult class' category: #PEG!
-PEGFailedOptionalResult class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGSucceededOptionalResult category: #PEG!
-PEGOptionalResult subclass: #PEGSucceededOptionalResult
-	instanceVariableNames: 'result'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGSucceededOptionalResult class' category: #PEG!
-PEGSucceededOptionalResult class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGStack category: #PEG!
-Object subclass: #PEGStack
-	instanceVariableNames: 'array size position mark'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'PEG'!
-!classDefinition: 'PEGStack class' category: #PEG!
-PEGStack class
-	instanceVariableNames: ''!
-
-!classDefinition: #PEGTest category: #PEG!
+!classDefinition: #PEGTest category: 'PEG'!
 TestCase subclass: #PEGTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PEG'!
-!classDefinition: 'PEGTest class' category: #PEG!
+!classDefinition: 'PEGTest class' category: 'PEG'!
 PEGTest class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGExpression category: 'PEG'!
+Object subclass: #PEGExpression
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGExpression class' category: 'PEG'!
+PEGExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGAtEnd category: 'PEG'!
+PEGExpression subclass: #PEGAtEnd
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGAtEnd class' category: 'PEG'!
+PEGAtEnd class
+	instanceVariableNames: 'instance'!
+
+!classDefinition: #PEGBlock category: 'PEG'!
+PEGExpression subclass: #PEGBlock
+	instanceVariableNames: 'block'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGBlock class' category: 'PEG'!
+PEGBlock class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGMemo category: 'PEG'!
+PEGExpression subclass: #PEGMemo
+	instanceVariableNames: 'parser'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGMemo class' category: 'PEG'!
+PEGMemo class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGNotTerminal category: 'PEG'!
+PEGExpression subclass: #PEGNotTerminal
+	instanceVariableNames: 'char'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGNotTerminal class' category: 'PEG'!
+PEGNotTerminal class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGConsumingNotTerminal category: 'PEG'!
+PEGNotTerminal subclass: #PEGConsumingNotTerminal
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGConsumingNotTerminal class' category: 'PEG'!
+PEGConsumingNotTerminal class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGConsumingNotTerminalStrongTimes category: 'PEG'!
+PEGConsumingNotTerminal subclass: #PEGConsumingNotTerminalStrongTimes
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGConsumingNotTerminalStrongTimes class' category: 'PEG'!
+PEGConsumingNotTerminalStrongTimes class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGOmit category: 'PEG'!
+PEGExpression subclass: #PEGOmit
+	instanceVariableNames: 'parser'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGOmit class' category: 'PEG'!
+PEGOmit class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGOptionalExpression category: 'PEG'!
+PEGExpression subclass: #PEGOptionalExpression
+	instanceVariableNames: 'child'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGOptionalExpression class' category: 'PEG'!
+PEGOptionalExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGOrderedChoiceExpression category: 'PEG'!
+PEGExpression subclass: #PEGOrderedChoiceExpression
+	instanceVariableNames: 'children'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGOrderedChoiceExpression class' category: 'PEG'!
+PEGOrderedChoiceExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGParser category: 'PEG'!
+PEGExpression subclass: #PEGParser
+	instanceVariableNames: 'expression semantics scopeClass separator name'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGParser class' category: 'PEG'!
+PEGParser class
+	instanceVariableNames: 'separator separators stream'!
+
+!classDefinition: #PEGMultiParser category: 'PEG'!
+PEGParser subclass: #PEGMultiParser
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGMultiParser class' category: 'PEG'!
+PEGMultiParser class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGRange category: 'PEG'!
+PEGExpression subclass: #PEGRange
+	instanceVariableNames: 'start stop'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGRange class' category: 'PEG'!
+PEGRange class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGSequenceExpression category: 'PEG'!
+PEGExpression subclass: #PEGSequenceExpression
+	instanceVariableNames: 'children'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGSequenceExpression class' category: 'PEG'!
+PEGSequenceExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGStrongSequenceExpression category: 'PEG'!
+PEGSequenceExpression subclass: #PEGStrongSequenceExpression
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGStrongSequenceExpression class' category: 'PEG'!
+PEGStrongSequenceExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGTerminal category: 'PEG'!
+PEGExpression subclass: #PEGTerminal
+	instanceVariableNames: 'terminal'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGTerminal class' category: 'PEG'!
+PEGTerminal class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGCharacterTerminal category: 'PEG'!
+PEGTerminal subclass: #PEGCharacterTerminal
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGCharacterTerminal class' category: 'PEG'!
+PEGCharacterTerminal class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGPushCharacterTerminal category: 'PEG'!
+PEGCharacterTerminal subclass: #PEGPushCharacterTerminal
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGPushCharacterTerminal class' category: 'PEG'!
+PEGPushCharacterTerminal class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGTerminalChoice category: 'PEG'!
+PEGTerminal subclass: #PEGTerminalChoice
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGTerminalChoice class' category: 'PEG'!
+PEGTerminalChoice class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGTerminalChoiceStrongTimes category: 'PEG'!
+PEGTerminalChoice subclass: #PEGTerminalChoiceStrongTimes
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGTerminalChoiceStrongTimes class' category: 'PEG'!
+PEGTerminalChoiceStrongTimes class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGZeroOrMoreExpression category: 'PEG'!
+PEGExpression subclass: #PEGZeroOrMoreExpression
+	instanceVariableNames: 'child'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGZeroOrMoreExpression class' category: 'PEG'!
+PEGZeroOrMoreExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGOneOrMoreExpression category: 'PEG'!
+PEGZeroOrMoreExpression subclass: #PEGOneOrMoreExpression
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGOneOrMoreExpression class' category: 'PEG'!
+PEGOneOrMoreExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGStrongZeroOrMoreExpression category: 'PEG'!
+PEGZeroOrMoreExpression subclass: #PEGStrongZeroOrMoreExpression
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGStrongZeroOrMoreExpression class' category: 'PEG'!
+PEGStrongZeroOrMoreExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGStrongOneOrMoreExpression category: 'PEG'!
+PEGStrongZeroOrMoreExpression subclass: #PEGStrongOneOrMoreExpression
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGStrongOneOrMoreExpression class' category: 'PEG'!
+PEGStrongOneOrMoreExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGOptionalResult category: 'PEG'!
+Object subclass: #PEGOptionalResult
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGOptionalResult class' category: 'PEG'!
+PEGOptionalResult class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGFailedOptionalResult category: 'PEG'!
+PEGOptionalResult subclass: #PEGFailedOptionalResult
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGFailedOptionalResult class' category: 'PEG'!
+PEGFailedOptionalResult class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGSucceededOptionalResult category: 'PEG'!
+PEGOptionalResult subclass: #PEGSucceededOptionalResult
+	instanceVariableNames: 'result'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGSucceededOptionalResult class' category: 'PEG'!
+PEGSucceededOptionalResult class
+	instanceVariableNames: ''!
+
+!classDefinition: #PEGStack category: 'PEG'!
+Object subclass: #PEGStack
+	instanceVariableNames: 'array size position mark'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PEG'!
+!classDefinition: 'PEGStack class' category: 'PEG'!
+PEGStack class
 	instanceVariableNames: ''!
 
 
@@ -498,6 +508,207 @@ warnOn: aStream
 	aStream << input position.
 	aStream << ': '.
 	aStream << input sample! !
+
+!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 3/25/2010 12:44'!
+setUp
+	! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 15:12:01'!
+testExpression
+	| string exp1 exp2 exp3 |
+	string := PEGStringScanner on: 'teest'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp3 := PEGTerminal on: 't'.	" test string which occurs later on. "
+	
+	self assert: string position equals: 0.
+	(exp1 match: string).
+	self assert: string position equals: 2.
+	(exp2 match: string).
+	self assert: string position equals: 4.
+	(exp3 match: string).
+	self assert: string position equals: 5! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 15:15:07'!
+testMemoizeEquals
+	| string exp1 result exp2 |
+	string := PEGStringScanner on: 'te'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGParser named: '' parsing: (PEGZeroOrMoreExpression on: exp1).
+	result := exp2 match: string.
+	self deny: result isNil.
+	self assert: string position equals: 2.
+	string position: 0.
+	self assert: (exp2 match: string) equals: result! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 15:26:23'!
+testNotExpression
+	| string exp exp3 |
+	string := PEGStringScanner on: 'teesest'.
+	exp := PEGConsumingNotTerminal on: $t.
+	self should: [exp match: string] raise: PEGParsingFailure.
+	self assert: string position equals: 0.
+	exp := PEGConsumingNotTerminal on: $e.
+	self assert: (exp match: string) equals: $t.
+	self assert: string position equals: 1.	" Fail on end of string. "
+	string := PEGStringScanner on: ''.
+	self should: [exp match: string] raise: PEGParsingFailure.
+	string := PEGStringScanner on: 'test'.
+	exp3 := 'x' asParser not omit.
+	self deny: (exp3 match: string) isNil.
+	self assert: string position equals: 0.
+	exp3 := 'x' asParser not consume.
+	self assert: (exp3 match: string) equals: $t.
+	self assert: string position equals: 1.
+	string := PEGStringScanner on: ''.
+	exp3 := 'x' asParser not.
+	self deny: (exp3 match: string) isNil.
+	self assert: string position equals: 0! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:15:29'!
+testOneOrMoreExpression
+	| string exp1 exp2 exp3 exp |
+	string := PEGStringScanner on: 'teesest'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp3 := PEGTerminal on: 't'.
+	exp := PEGOneOrMoreExpression on: exp1.
+	self assert: (exp match: string) isNil not.
+	self assert: string position equals: 2.
+	exp := PEGOneOrMoreExpression on: exp2.
+	self deny: (exp match: string) isNil.
+	self assert: string position equals: 6.
+	self deny: (exp3 match: string) isNil.
+	self assert: string position equals: 7.
+	exp := PEGOneOrMoreExpression on: exp3.
+	self should: [exp match: string] raise: PEGParsingFailure.! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:20:04'!
+testOptionalExpression
+	| string exp1 exp2 exp |
+	string := PEGStringScanner on: 'teesest'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp := PEGOptionalExpression on: exp1.
+	((exp match: string) resultIfFailed: [ 10 ]).
+	self assert: string position equals: 2.
+	self assert: ((exp match: string) resultIfFailed: [ 10 ]) equals: 10.
+	self assert: string position equals: 2.
+	exp := PEGOptionalExpression on: exp2.
+	((exp match: string) resultIfFailed: [ 10 ]).
+	self assert: string position equals: 4! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:26:25'!
+testOrderedChoiceExpression
+	| string exp1 exp2  seq1 |
+	string := PEGStringScanner on: 'teest'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+
+	seq1 := PEGOrderedChoiceExpression new.
+	seq1 <= exp1 <= exp2.
+	seq1 match: string.
+	self assert: string position equals: 2.
+	seq1 match: string.
+	self assert: string position equals: 4.
+	self should: [seq1 match: string] raise: PEGParsingFailure.! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:29:39'!
+testRange
+	| string |
+	string := PEGStringScanner on: 'p'.
+	self assert: ((PEGRange between: $a and: $z) match: string) equals: $p.
+	self assert: string position equals: 1.
+	string := PEGStringScanner on: 'a'.
+	self assert: ((PEGRange between: $a and: $z) match: string) equals: $a.
+	self assert: string position equals: 1.
+	string := PEGStringScanner on: 'z'.
+	self assert: ((PEGRange between: $a and: $z) match: string) equals: $z.
+	self assert: string position equals: 1.
+	string := PEGStringScanner on: ' '.
+	self should: [(PEGRange between: $a and: $z) match: string] raise: PEGParsingFailure.
+	self assert: string position equals: 0.
+	string := PEGStringScanner on: ''.
+	self should: [(PEGRange between: $a and: $z) match: string] raise: PEGParsingFailure.
+	self assert: string position equals: 0! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:31:32'!
+testResultEquals
+	| string exp1 result exp2 |
+	string := PEGStringScanner on: 'te'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGZeroOrMoreExpression on: exp1.
+	result := exp2 match: string.
+	self deny: result isNil.
+	self assert: string position equals: 2.
+	string position: 0.
+	self assert: (exp2 match: string) equals: result! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:32:54'!
+testSeparator
+	| string |
+	string := PEGStringScanner on: ' a'.
+	self deny: (PEGParser separator match: string) isNil.
+	self assert: string position equals: 1.
+	string := PEGStringScanner on: ' 	 a'.
+	self deny: (PEGParser separator match: string) isNil.
+	self assert: string position equals: 3! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:39:19'!
+testSequenceExpression
+	| string exp1 exp2 exp3 seq1 seq2 seq3 |
+	string := PEGStringScanner on: 'teest'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp3 := PEGTerminal on: 't'.
+	seq1 := PEGSequenceExpression new.
+	seq1 <& exp1 <& exp2.
+	seq1 match: string.
+	self assert: string position equals: 4.
+	
+	string := PEGStringScanner on: 'test'.
+	seq2 := PEGSequenceExpression new.
+	seq2 <& exp3 <& exp2.
+	seq2 match: string.
+	self assert: string position equals: 3.
+	seq3 := PEGSequenceExpression new.
+	seq3 <& exp3.
+	seq3 match: string.
+	self assert: string position equals: 4! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:40:11'!
+testSequenceOmit
+	| string exp1 exp2 seq1 |
+	string := PEGStringScanner on: 'abc'.
+	exp1 := 'a' asParser omit.
+	exp2 := 'b' asParser.
+	seq1 := exp1 && exp2.
+	self assert: (seq1 match: string) equals: $b.
+	self assert: string position equals: 2! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 17:06:11'!
+testSingleCharacterParse
+	| string exp1 |
+	string := PEGStringScanner on: 'abc'.
+	exp1 := 'a' asParser.
+	self assert: (exp1 match: string) equals: $a.
+	self assert: string position equals: 1! !
+
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 17:09:01'!
+testZeroOrMoreExpression
+	| string exp1 exp2 exp3 exp |
+	string := PEGStringScanner on: 'teesest'.
+	exp1 := PEGTerminal on: 'te'.
+	exp2 := PEGTerminal on: 'es'.
+	exp3 := PEGTerminal on: 't'.
+	exp := PEGZeroOrMoreExpression on: exp1.
+	self deny: (exp match: string) isNil.
+	self assert: string position equals: 2.
+	exp := PEGZeroOrMoreExpression on: exp2.
+	self deny: (exp match: string) isNil.
+	self assert: string position equals: 6.
+	self deny: (exp match: string) isNil.
+	self assert: string position equals: 6! !
 
 !PEGExpression methodsFor: 'logical operations' stamp: 'ToonVerwaest 7/27/2010 11:17'!
 & expression
@@ -1316,233 +1527,10 @@ pMethods
 	<preventExport>
 	^ #all! !
 
-!PEGTest methodsFor: 'tests' stamp: 'ToonVerwaest 3/25/2010 12:44'!
-setUp
-	! !
+!Object methodsFor: '*PEG' stamp: 'KenD 8/25/2022 19:10:33'!
+hasReturnExpression
 
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 15:12:01'!
-testExpression
-	| string exp1 exp2 exp3 |
-	string := PEGStringScanner on: 'teest'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGTerminal on: 'es'.
-	exp3 := PEGTerminal on: 't'.	" test string which occurs later on. "
-	
-	self assert: string position equals: 0.
-	(exp1 match: string).
-	self assert: string position equals: 2.
-	(exp2 match: string).
-	self assert: string position equals: 4.
-	(exp3 match: string).
-	self assert: string position equals: 5! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 15:15:07'!
-testMemoizeEquals
-	| string exp1 result exp2 |
-	string := PEGStringScanner on: 'te'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGParser named: '' parsing: (PEGZeroOrMoreExpression on: exp1).
-	result := exp2 match: string.
-	self deny: result isNil.
-	self assert: string position equals: 2.
-	string position: 0.
-	self assert: (exp2 match: string) equals: result! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 15:26:23'!
-testNotExpression
-	| string exp exp3 |
-	string := PEGStringScanner on: 'teesest'.
-	exp := PEGConsumingNotTerminal on: $t.
-	self should: [exp match: string] raise: PEGParsingFailure.
-	self assert: string position equals: 0.
-	exp := PEGConsumingNotTerminal on: $e.
-	self assert: (exp match: string) equals: $t.
-	self assert: string position equals: 1.	" Fail on end of string. "
-	string := PEGStringScanner on: ''.
-	self should: [exp match: string] raise: PEGParsingFailure.
-	string := PEGStringScanner on: 'test'.
-	exp3 := 'x' asParser not omit.
-	self deny: (exp3 match: string) isNil.
-	self assert: string position equals: 0.
-	exp3 := 'x' asParser not consume.
-	self assert: (exp3 match: string) equals: $t.
-	self assert: string position equals: 1.
-	string := PEGStringScanner on: ''.
-	exp3 := 'x' asParser not.
-	self deny: (exp3 match: string) isNil.
-	self assert: string position equals: 0! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:15:29'!
-testOneOrMoreExpression
-	| string exp1 exp2 exp3 exp |
-	string := PEGStringScanner on: 'teesest'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGTerminal on: 'es'.
-	exp3 := PEGTerminal on: 't'.
-	exp := PEGOneOrMoreExpression on: exp1.
-	self assert: (exp match: string) isNil not.
-	self assert: string position equals: 2.
-	exp := PEGOneOrMoreExpression on: exp2.
-	self deny: (exp match: string) isNil.
-	self assert: string position equals: 6.
-	self deny: (exp3 match: string) isNil.
-	self assert: string position equals: 7.
-	exp := PEGOneOrMoreExpression on: exp3.
-	self should: [exp match: string] raise: PEGParsingFailure.! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:20:04'!
-testOptionalExpression
-	| string exp1 exp2 exp |
-	string := PEGStringScanner on: 'teesest'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGTerminal on: 'es'.
-	exp := PEGOptionalExpression on: exp1.
-	((exp match: string) resultIfFailed: [ 10 ]).
-	self assert: string position equals: 2.
-	self assert: ((exp match: string) resultIfFailed: [ 10 ]) equals: 10.
-	self assert: string position equals: 2.
-	exp := PEGOptionalExpression on: exp2.
-	((exp match: string) resultIfFailed: [ 10 ]).
-	self assert: string position equals: 4! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:26:25'!
-testOrderedChoiceExpression
-	| string exp1 exp2  seq1 |
-	string := PEGStringScanner on: 'teest'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGTerminal on: 'es'.
-
-	seq1 := PEGOrderedChoiceExpression new.
-	seq1 <= exp1 <= exp2.
-	seq1 match: string.
-	self assert: string position equals: 2.
-	seq1 match: string.
-	self assert: string position equals: 4.
-	self should: [seq1 match: string] raise: PEGParsingFailure.! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:29:39'!
-testRange
-	| string |
-	string := PEGStringScanner on: 'p'.
-	self assert: ((PEGRange between: $a and: $z) match: string) equals: $p.
-	self assert: string position equals: 1.
-	string := PEGStringScanner on: 'a'.
-	self assert: ((PEGRange between: $a and: $z) match: string) equals: $a.
-	self assert: string position equals: 1.
-	string := PEGStringScanner on: 'z'.
-	self assert: ((PEGRange between: $a and: $z) match: string) equals: $z.
-	self assert: string position equals: 1.
-	string := PEGStringScanner on: ' '.
-	self should: [(PEGRange between: $a and: $z) match: string] raise: PEGParsingFailure.
-	self assert: string position equals: 0.
-	string := PEGStringScanner on: ''.
-	self should: [(PEGRange between: $a and: $z) match: string] raise: PEGParsingFailure.
-	self assert: string position equals: 0! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:31:32'!
-testResultEquals
-	| string exp1 result exp2 |
-	string := PEGStringScanner on: 'te'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGZeroOrMoreExpression on: exp1.
-	result := exp2 match: string.
-	self deny: result isNil.
-	self assert: string position equals: 2.
-	string position: 0.
-	self assert: (exp2 match: string) equals: result! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:32:54'!
-testSeparator
-	| string |
-	string := PEGStringScanner on: ' a'.
-	self deny: (PEGParser separator match: string) isNil.
-	self assert: string position equals: 1.
-	string := PEGStringScanner on: ' 	 a'.
-	self deny: (PEGParser separator match: string) isNil.
-	self assert: string position equals: 3! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:39:19'!
-testSequenceExpression
-	| string exp1 exp2 exp3 seq1 seq2 seq3 |
-	string := PEGStringScanner on: 'teest'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGTerminal on: 'es'.
-	exp3 := PEGTerminal on: 't'.
-	seq1 := PEGSequenceExpression new.
-	seq1 <& exp1 <& exp2.
-	seq1 match: string.
-	self assert: string position equals: 4.
-	
-	string := PEGStringScanner on: 'test'.
-	seq2 := PEGSequenceExpression new.
-	seq2 <& exp3 <& exp2.
-	seq2 match: string.
-	self assert: string position equals: 3.
-	seq3 := PEGSequenceExpression new.
-	seq3 <& exp3.
-	seq3 match: string.
-	self assert: string position equals: 4! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:40:11'!
-testSequenceOmit
-	| string exp1 exp2 seq1 |
-	string := PEGStringScanner on: 'abc'.
-	exp1 := 'a' asParser omit.
-	exp2 := 'b' asParser.
-	seq1 := exp1 && exp2.
-	self assert: (seq1 match: string) equals: $b.
-	self assert: string position equals: 2! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 17:06:11'!
-testSingleCharacterParse
-	| string exp1 |
-	string := PEGStringScanner on: 'abc'.
-	exp1 := 'a' asParser.
-	self assert: (exp1 match: string) equals: $a.
-	self assert: string position equals: 1! !
-
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 17:09:01'!
-testZeroOrMoreExpression
-	| string exp1 exp2 exp3 exp |
-	string := PEGStringScanner on: 'teesest'.
-	exp1 := PEGTerminal on: 'te'.
-	exp2 := PEGTerminal on: 'es'.
-	exp3 := PEGTerminal on: 't'.
-	exp := PEGZeroOrMoreExpression on: exp1.
-	self deny: (exp match: string) isNil.
-	self assert: string position equals: 2.
-	exp := PEGZeroOrMoreExpression on: exp2.
-	self deny: (exp match: string) isNil.
-	self assert: string position equals: 6.
-	self deny: (exp match: string) isNil.
-	self assert: string position equals: 6! !
-
-!String methodsFor: '*PEG' stamp: 'ToonVerwaest 7/29/2010 23:17'!
-asPEGChoice
-	^ PEGTerminalChoice on: self.! !
-
-!String methodsFor: '*PEG' stamp: 'KenD 8/21/2022 13:55:58'!
-asPEGRange
-	(self size = 3 and: [ (self at: 2) = $- ])
-		ifFalse: [ self error: 'Cannot convert ' , self , ' to PEG range. Expected format: beginchar-endchar' ].
-	^ PEGRange between: (self at: 1) asciiValue and: (self at: 3) asciiValue ! !
-
-!String methodsFor: '*PEG' stamp: 'ToonVerwaest 9/30/2010 15:08'!
-asParser
-	self size = 1 ifTrue: [ ^ (self at: 1) asParser ].
-	^ PEGTerminal on: self! !
-
-!String methodsFor: '*PEG' stamp: 'ToonVerwaest 8/19/2010 16:58'!
-contains: substring at: position
-	| size |
-	size := substring size.
-	position + size > self size ifTrue: [ ^ false ].
-	1 to: size do: [ :i | (self at: position + i) = (substring at: i) ifFalse: [ ^ false ]].
-	^ true! !
-
-!BlockClosure methodsFor: '*PEG' stamp: 'ToonVerwaest 9/30/2010 15:08'!
-asParser
-	^ PEGBlock on: self! !
+	^false! !
 
 !Character methodsFor: '*PEG' stamp: 'KenD 8/25/2022 14:42:46'!
 asInteger
@@ -1567,3 +1555,35 @@ min: other
 putOn: aStream
 
 	^aStream nextPut: self! !
+
+!BlockClosure methodsFor: '*PEG' stamp: 'ToonVerwaest 9/30/2010 15:08'!
+asParser
+	^ PEGBlock on: self! !
+
+!String methodsFor: '*PEG' stamp: 'ToonVerwaest 7/29/2010 23:17'!
+asPEGChoice
+	^ PEGTerminalChoice on: self.! !
+
+!String methodsFor: '*PEG' stamp: 'KenD 8/21/2022 13:55:58'!
+asPEGRange
+	(self size = 3 and: [ (self at: 2) = $- ])
+		ifFalse: [ self error: 'Cannot convert ' , self , ' to PEG range. Expected format: beginchar-endchar' ].
+	^ PEGRange between: (self at: 1) asciiValue and: (self at: 3) asciiValue ! !
+
+!String methodsFor: '*PEG' stamp: 'ToonVerwaest 9/30/2010 15:08'!
+asParser
+	self size = 1 ifTrue: [ ^ (self at: 1) asParser ].
+	^ PEGTerminal on: self! !
+
+!String methodsFor: '*PEG' stamp: 'ToonVerwaest 8/19/2010 16:58'!
+contains: substring at: position
+	| size |
+	size := substring size.
+	position + size > self size ifTrue: [ ^ false ].
+	1 to: size do: [ :i | (self at: position + i) = (substring at: i) ifFalse: [ ^ false ]].
+	^ true! !
+
+!Symbol methodsFor: '*PEG' stamp: 'KenD 8/25/2022 19:40:39'!
+value: item
+	"For  Collection anySatisfy: #boolTest"
+	^ item perform: self! !
