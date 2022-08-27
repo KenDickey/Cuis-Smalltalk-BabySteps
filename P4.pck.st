@@ -1,6 +1,13 @@
-'From Cuis 6.0 [latest update: #5466] on 26 August 2022 at 12:17:52 pm'!
-'Description Pinocchio  Version 4'!
-!provides: 'P4' 1 23!
+'From Cuis 6.0 [latest update: #5466] on 27 August 2022 at 9:42:08 am'!
+'Description Pinocchio  Version 4
+"Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
+    https://scg.unibe.ch/archive/projects/Flue11a.pdf 
+"Optimizing Pinocchio"
+    https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.225.8700&rep=rep1&type=pdf
+See also:
+    http://www.squeaksource.com/P4/
+    https://scg.unibe.ch/assets/download/pinocchio/'!
+!provides: 'P4' 1 26!
 !requires: 'PEG' 1 7 nil!
 SystemOrganization addCategory: #'P4-ASM'!
 SystemOrganization addCategory: #'P4-ASM-Values'!
@@ -5459,11 +5466,11 @@ pack
 		sections;
 		sectionHeaderTable.! !
 
-!P4ExecutableFormat methodsFor: 'binpacking' stamp: 'KenD 8/24/2022 15:35:30'!
+!P4ExecutableFormat methodsFor: 'binpacking' stamp: 'KenD 8/26/2022 12:40:58'!
 pack: filename
 	currentStream := processor createStream.
 	self pack.
-	((filename, self staticLibraryExtension) asFileEntry assureExistence writeStream)
+	((filename, self staticLibraryExtension) asFileEntry forceWriteStream)
 		binary;
 		nextPutAll: currentStream contents;
 		close.
