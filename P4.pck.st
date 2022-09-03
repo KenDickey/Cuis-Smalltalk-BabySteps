@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5467] on 27 August 2022 at 3:43:12 pm'!
+'From Cuis 6.0 [latest update: #5467] on 3 September 2022 at 11:10:25 am'!
 'Description Pinocchio  Version 4
 "Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
     https://scg.unibe.ch/archive/projects/Flue11a.pdf 
@@ -7,7 +7,7 @@
 See also:
     http://www.squeaksource.com/P4/
     https://scg.unibe.ch/assets/download/pinocchio/'!
-!provides: 'P4' 1 28!
+!provides: 'P4' 1 30!
 !requires: 'PEG' 1 15 nil!
 !requires: 'RISC5-Instructions' 1 23 nil!
 SystemOrganization addCategory: 'P4-ASM'!
@@ -1693,6 +1693,16 @@ P4Object subclass: #P4Assembler
 P4Assembler class
 	instanceVariableNames: ''!
 
+!classDefinition: #P4RiscV64 category: 'P4-SystemSpec'!
+P4Assembler subclass: #P4RiscV64
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: 'RISC5Regs'
+	category: 'P4-SystemSpec'!
+!classDefinition: 'P4RiscV64 class' category: 'P4-SystemSpec'!
+P4RiscV64 class
+	instanceVariableNames: ''!
+
 !classDefinition: #P4X86_64 category: 'P4-SystemSpec'!
 P4Assembler subclass: #P4X86_64
 	instanceVariableNames: 'rax rsp rdi rsi rdx rcx r8 r9 rbx rbp r10 r11 r12 r13 r14 r15 rip'
@@ -2770,7 +2780,25 @@ P4StaticClassInstaller new
 		P4KernelTest.
 		P4ExamplesTest. 
 	}.
+P4StaticClassInstaller new
+	processor: P4RiscV64 new
+	os: P4Linux new;
+	compileClasses: {
+		P4StaticKernelTest.
+		P4KernelTest.
+		P4ExamplesTest. 
+	}.
 	!
+
+!P4RiscV64 commentStamp: '<historical>' prior: 0!
+RISC-V 64 bit CPU: RV64g
+
+Load/store; little-endian
+
+Start  simple.  Minimal difference from x86.
+
+
+  !
 
 !P4X86_64 commentStamp: 'ToonVerwaest 5/8/2011 13:05' prior: 0!
 Documentation of the X86_64 instruction set can be found at:
@@ -9596,6 +9624,11 @@ instance
 	instance ifNil: [ instance := super new ].
 	^ instance! !
 
+!P4SmalltalkGrammar class methodsFor: 'as yet unclassified' stamp: 'KenD 8/28/2022 12:39:23'!
+resetInstance
+" self resetInstance. "
+	instance := nil! !
+
 !P4SmalltalkParser methodsFor: 'convenience' stamp: 'ToonVerwaest 9/6/2010 16:07'!
 createReference: path
 	| name |
@@ -10468,6 +10501,48 @@ label: aLabel
 !P4Assembler methodsFor: 'installing' stamp: 'OliFlueckiger 6/23/2011 17:43'!
 tagClosure: aClosure
 	^  self label: aClosure! !
+
+!P4RiscV64 methodsFor: 'instructions' stamp: 'KenD 9/1/2022 14:18:59'!
+add: firstReg to: secondReg
+
+	^ RV64ADD regDest: secondReg regA: firstReg regB: secondReg! !
+
+!P4RiscV64 methodsFor: 'instructions' stamp: 'KenD 9/1/2022 14:20:32'!
+mov: firstReg to: secondReg
+
+	^ RV64ADD regDest: secondReg regA: firstReg regB: Zero! !
+
+!P4RiscV64 methodsFor: 'elf' stamp: 'KenD 9/3/2022 07:51:44'!
+elfClass
+	"
+	0 None
+	1 32 bit
+	2 64 bit
+	"
+	^ 16r02! !
+
+!P4RiscV64 methodsFor: 'elf' stamp: 'KenD 9/3/2022 07:52:13'!
+elfHeaderSize
+
+	^ 64 "is typical"! !
+
+!P4RiscV64 methodsFor: 'elf' stamp: 'KenD 9/3/2022 08:14:36'!
+elfMachine
+"https://github.com/riscv-non-isa/riscv-elf-psabi-doc/releases/download/v1.0-rc4/riscv-abi.pdf"
+	^ 16r00F3   " EM_RISCV (243) "! !
+
+!P4RiscV64 methodsFor: 'accessing' stamp: 'KenD 9/3/2022 10:56:30'!
+flags
+
+	^ 16r4 "double float abi"! !
+
+!P4RiscV64 methodsFor: 'accessing' stamp: 'KenD 9/3/2022 07:50:24'!
+pointerSize
+	^ 8 "bytes"! !
+
+!P4RiscV64 methodsFor: 'accessing' stamp: 'KenD 9/3/2022 07:51:06'!
+wordSize
+	^ 4 "bytes -- NB: see  self>> pointerSize"! !
 
 !P4X86_64 methodsFor: 'assembling' stamp: 'CamilloBruni 7/27/2011 13:03'!
 accessMaskFor: accessReg
