@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5467] on 3 September 2022 at 11:10:25 am'!
+'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 11:37:16 am'!
 'Description Pinocchio  Version 4
 "Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
     https://scg.unibe.ch/archive/projects/Flue11a.pdf 
@@ -7,7 +7,7 @@
 See also:
     http://www.squeaksource.com/P4/
     https://scg.unibe.ch/assets/download/pinocchio/'!
-!provides: 'P4' 1 30!
+!provides: 'P4' 1 31!
 !requires: 'PEG' 1 15 nil!
 !requires: 'RISC5-Instructions' 1 23 nil!
 SystemOrganization addCategory: 'P4-ASM'!
@@ -2797,6 +2797,7 @@ Load/store; little-endian
 
 Start  simple.  Minimal difference from x86.
 
+See "https://github.com/riscv-non-isa/riscv-elf-psabi-doc"
 
   !
 
@@ -10526,9 +10527,10 @@ elfHeaderSize
 
 	^ 64 "is typical"! !
 
-!P4RiscV64 methodsFor: 'elf' stamp: 'KenD 9/3/2022 08:14:36'!
+!P4RiscV64 methodsFor: 'elf' stamp: 'KenD 9/3/2022 11:18:44'!
 elfMachine
-"https://github.com/riscv-non-isa/riscv-elf-psabi-doc/releases/download/v1.0-rc4/riscv-abi.pdf"
+"see https://github.com/riscv-non-isa/riscv-elf-psabi-doc"
+
 	^ 16r00F3   " EM_RISCV (243) "! !
 
 !P4RiscV64 methodsFor: 'accessing' stamp: 'KenD 9/3/2022 10:56:30'!
