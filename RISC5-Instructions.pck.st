@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 11:37:22 am'!
+'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 11:58:09 am'!
 'Description RISC-V Instruction opcodes for RV64G'!
-!provides: 'RISC5-Instructions' 1 24!
+!provides: 'RISC5-Instructions' 1 25!
 SystemOrganization addCategory: 'RISC5-Instructions'!
 
 
@@ -880,13 +880,14 @@ strm contents asHex.
 		
 	! !
 
-!RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 9/5/2022 11:36:49'!
+!RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 9/5/2022 11:44:04'!
 helloDataInto: byteStream
 "
 | strm |
 strm := (RWBinaryOrTextStream on: '') useBytes.
 RISC5Instructions helloDataInto: strm.
-strm contents asHex.
+strm contents. ""a ByteString""
+strm contents asString.
 "
 	'Hello RISCV World!!\n' asByteString do: [ :byte | byteStream nextPut: byte ].! !
 
@@ -1839,6 +1840,17 @@ regDest: rd immediate: imm20
 	^self new
 		destReg: rd immediate: imm20
 ! !
+
+!RV64AUIPC methodsFor: 'accessing' stamp: 'KenD 9/5/2022 11:57:39'!
+opName
+
+	"Add Upper Immediate to PC"
+	^'auIpc'! !
+
+!RV64AUIPC methodsFor: 'accessing' stamp: 'KenD 9/5/2022 11:57:54'!
+opcode
+	"Opcode for AUIPC"
+	^2r0010111! !
 
 !RV64AUIPC class methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:05:29'!
 opName
