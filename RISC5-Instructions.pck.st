@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 12:52:04 pm'!
+'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 1:03:48 pm'!
 'Description RISC-V Instruction opcodes for RV64G'!
-!provides: 'RISC5-Instructions' 1 26!
+!provides: 'RISC5-Instructions' 1 27!
 SystemOrganization addCategory: 'RISC5-Instructions'!
 
 
@@ -1607,6 +1607,11 @@ opName
 
 	^'add'! !
 
+!RV64NOOP methodsFor: 'printing' stamp: 'KenD 9/5/2022 13:01:53'!
+printString
+
+	^self opName! !
+
 !RV64NOOP methodsFor: 'accessing' stamp: 'KenD 9/5/2022 12:12:20'!
 opName
 
@@ -1868,12 +1873,12 @@ destReg: rd immediate: imm20
 	super destReg: rd.
 	immediate20 := imm20 ! !
 
-!RV64U methodsFor: 'accessing' stamp: 'KenD 9/5/2022 11:22:45'!
+!RV64U methodsFor: 'accessing' stamp: 'KenD 9/5/2022 12:57:19'!
 instruction
 " [imm20 12:31][destReg 7:11][opcode 6:0]"
 	^ (immediate20 << 12) 
 	 + (destReg << 7) 
-	 + self class opcode! !
+	 + self opcode! !
 
 !RV64U methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:07:40'!
 opCode
@@ -1885,11 +1890,11 @@ upperBits
 " [imm20 12:31][destReg 7:11][opcode 6:0]"
 	^ (immediate20 << 12) ! !
 
-!RV64U methodsFor: 'printing' stamp: 'KenD 5/11/2021 09:06:29'!
+!RV64U methodsFor: 'printing' stamp: 'KenD 9/5/2022 13:03:37'!
 printString
 	"E.g.: 'lui  rDest,immediate "
 	^ self opName, '  ',
-		(self class regName: destReg), ',  16r', 
+		(self class regName: destReg), ', 16r', 
 		(immediate20 printStringBase: 16)! !
 
 !RV64U class methodsFor: 'instance creation' stamp: 'KenD 5/11/2021 09:04:20'!
@@ -1902,46 +1907,24 @@ regDest: rd immediate: imm20
 		destReg: rd immediate: imm20
 ! !
 
-!RV64AUIPC methodsFor: 'accessing' stamp: 'KenD 9/5/2022 11:57:39'!
+!RV64AUIPC methodsFor: 'accessing' stamp: 'KenD 9/5/2022 13:00:03'!
 opName
 
 	"Add Upper Immediate to PC"
 	^'auIpc'! !
 
-!RV64AUIPC methodsFor: 'accessing' stamp: 'KenD 9/5/2022 11:57:54'!
+!RV64AUIPC methodsFor: 'accessing' stamp: 'KenD 9/5/2022 13:00:24'!
 opcode
 	"Opcode for AUIPC"
 	^2r0010111! !
 
-!RV64AUIPC class methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:05:29'!
-opName
-
-	"Add Upper Immediate to PC"
-	^'auIpc'! !
-
-!RV64AUIPC class methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:05:56'!
-opcode
-	"Opcode for AUIPC"
-	^2r0010111! !
-
-!RV64LUI methodsFor: 'accessing' stamp: 'KenD 5/11/2021 08:56:27'!
-opName
-
-	"Load Upper Immediate"
-	^'luI'! !
-
-!RV64LUI methodsFor: 'accessing' stamp: 'KenD 5/11/2021 08:46:05'!
-opcode
-	"Opcode for LUI"
-	^2r0110111! !
-
-!RV64LUI class methodsFor: 'accessing' stamp: 'KenD 9/5/2022 11:25:45'!
+!RV64LUI methodsFor: 'accessing' stamp: 'KenD 9/5/2022 12:59:17'!
 opName
 
 	"Load Upper Immediate"
 	^'lui'! !
 
-!RV64LUI class methodsFor: 'accessing' stamp: 'KenD 9/5/2022 11:26:30'!
+!RV64LUI methodsFor: 'accessing' stamp: 'KenD 9/5/2022 12:59:35'!
 opcode
 	"Opcode for LUI"
 	^2r0110111! !
