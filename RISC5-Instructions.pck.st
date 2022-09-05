@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 11:58:09 am'!
+'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 12:52:04 pm'!
 'Description RISC-V Instruction opcodes for RV64G'!
-!provides: 'RISC5-Instructions' 1 25!
+!provides: 'RISC5-Instructions' 1 26!
 SystemOrganization addCategory: 'RISC5-Instructions'!
 
 
@@ -342,6 +342,16 @@ RV64R subclass: #RV64ADD
 	category: 'RISC5-Instructions'!
 !classDefinition: 'RV64ADD class' category: 'RISC5-Instructions'!
 RV64ADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64NOOP category: 'RISC5-Instructions'!
+RV64ADD subclass: #RV64NOOP
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64NOOP class' category: 'RISC5-Instructions'!
+RV64NOOP class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64AND category: 'RISC5-Instructions'!
@@ -838,7 +848,7 @@ initialize
 		  FSav2 FSav3 FSav4 FSav5 FSav6 FSav7 FSav8 FSav9 FSav10 FSav11 
 		  FTmp8 FTmp9 FTmp10 FTmp11).! !
 
-!RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 9/5/2022 11:36:26'!
+!RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 9/5/2022 12:41:40'!
 helloCodeInto: byteStream
 "
 | strm |
@@ -869,6 +879,11 @@ strm contents asHex.
 		RV64ADDI regDest: Arg7 regSource: Zero imm12: 93. "kernel call#"
 		"ECALL"
 		RV64ECALL new.
+		"Keep prefetch happy."
+		RV64NOOP new.
+		RV64NOOP new.
+		RV64NOOP new.
+		RV64NOOP new.
 	}.
 	instructionWords := (instructionObjects collect: [ :i | i instruction ]) asWordArray.
 	1 to: instructionWords size do: [ :index | | fourByteArray |
@@ -879,6 +894,36 @@ strm contents asHex.
 		
 		
 	! !
+
+!RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 9/5/2022 12:48:56'!
+helloCodeToTranscript
+"
+  self helloCodeToTranscript.
+"
+{
+		"LI A0, STDERR" 
+		RV64ADDI regDest: Arg0 regSource: Zero imm12: 0. "StdError"
+		"LA a1, msg -- where 'msg' is the address added by the linker"
+		RV64AUIPC regDest: Arg1 immediate: 0. "msg[31:12]"
+		RV64ADDI regDest: Arg1 regSource: Arg1 imm12: 0. "msg[11:0] "
+		"LI a2,20"
+		RV64ADDI regDest: Arg2 regSource: Zero imm12: 20. "str len"
+		"LI a7, SYS_WRITE"
+		RV64ADDI regDest: Arg7 regSource: Zero imm12: 64. "kernel call#"
+		"ECALL"
+		RV64ECALL new.
+		"LI	a0, 0"
+		RV64ADDI regDest: Arg0 regSource: Zero imm12: 0. "no error"
+		"LI	a7, SYS_EXIT"
+		RV64ADDI regDest: Arg7 regSource: Zero imm12: 93. "kernel call#"
+		"ECALL"
+		RV64ECALL new.
+		"Keep prefetch happy."
+		RV64NOOP new.
+		RV64NOOP new.
+		RV64NOOP new.
+		RV64NOOP new.
+	} do: [ :op | Transcript log: op printString; newLine ].! !
 
 !RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 9/5/2022 11:44:04'!
 helloDataInto: byteStream
@@ -1561,6 +1606,22 @@ func7
 opName
 
 	^'add'! !
+
+!RV64NOOP methodsFor: 'accessing' stamp: 'KenD 9/5/2022 12:12:20'!
+opName
+
+	^'noop'! !
+
+!RV64NOOP methodsFor: 'initialization' stamp: 'KenD 9/5/2022 12:16:20'!
+destReg: regDest regA: reg1 regB: reg2
+
+	self error: 'NoOp (NoOperation) takes zero arguments'.! !
+
+!RV64NOOP methodsFor: 'initialization' stamp: 'KenD 9/5/2022 12:43:36'!
+initialize
+	"ADD Zero to Zero, and put in register Zero"
+	super destReg: Zero.
+	regA := regB := Zero.! !
 
 !RV64AND methodsFor: 'accessing' stamp: 'KenD 5/3/2021 14:15:47'!
 func3
