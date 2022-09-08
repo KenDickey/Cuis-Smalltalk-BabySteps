@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5477] on 8 September 2022 at 2:05:11 pm'!
+'From Cuis 6.0 [latest update: #5477] on 8 September 2022 at 2:13:55 pm'!
 'Description An Entity has goals/jobs, health/status, observes, reacts (corrects course), and is able to answers questions.'!
-!provides: 'Entity' 1 4!
+!provides: 'Entity' 1 5!
 SystemOrganization addCategory: 'Entity'!
 
 
@@ -24,14 +24,14 @@ Object subclass: #Entity
 Entity class
 	instanceVariableNames: ''!
 
-!classDefinition: #Objectives category: 'Entity'!
-Object subclass: #Objectives
-	instanceVariableNames: 'goals steps metrics adjustments'
+!classDefinition: #Objective category: 'Entity'!
+Object subclass: #Objective
+	instanceVariableNames: 'goal step metric adjustments'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Entity'!
-!classDefinition: 'Objectives class' category: 'Entity'!
-Objectives class
+!classDefinition: 'Objective class' category: 'Entity'!
+Objective class
 	instanceVariableNames: ''!
 
 !classDefinition: #SenseDatum category: 'Entity'!
@@ -93,10 +93,10 @@ Explain myself:
 [Sample entities: Model fish tank (fish entities); Your computer, Sally]
 !
 
-!Objectives commentStamp: '<historical>' prior: 0!
-goals - Explain my purpose in life.  What am I doing here? What am I alive for?
-steps - Incremental computations acting to carry out goals.
-metrics - measured of goodness/progress of steps.  How am I doing?  What makes me happy?
+!Objective commentStamp: '<historical>' prior: 0!
+goal - Explain my purpose in life.  What am I doing here? What am I alive for?
+step - Incremental computation(s) acting to carry out goal(s).
+metric - measured of goodness/progress of steps.  How am I doing?  What makes me happy?
 adjustments - changes to steps to correct course or make better progress.!
 
 !SenseDatum commentStamp: '<historical>' prior: 0!
@@ -199,10 +199,10 @@ whereAmI
 
 	^ self location ifNil: [ 'Unknown' ] ifNotNil: [ :somePlace | somePlace printString ]! !
 
-!Entity methodsFor: 'questions' stamp: 'KenD 9/8/2022 13:58:03'!
+!Entity methodsFor: 'questions' stamp: 'KenD 9/8/2022 14:13:45'!
 whereAmIGoing
 
-	self objectives report! !
+	self objectives do: [ :objective | objective report ]! !
 
 !Entity methodsFor: 'questions' stamp: 'KenD 9/8/2022 13:37:14'!
 whoAmI
@@ -226,7 +226,7 @@ name: aSymbolOrString objectives: aCollectionOfObjectives status: aStatus locati
 		status: aStatus
 		location: aLocation ! !
 
-!Objectives methodsFor: 'reporting' stamp: 'KenD 9/8/2022 13:54:37'!
+!Objective methodsFor: 'reporting' stamp: 'KenD 9/8/2022 13:54:37'!
 report
 	"Goals: What Am I Doing?"
 	self notYetImplemented ! !
