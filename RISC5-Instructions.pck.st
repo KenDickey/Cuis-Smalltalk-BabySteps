@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 1:03:48 pm'!
+'From Cuis 6.0 [latest update: #5467] on 9 September 2022 at 12:23:00 pm'!
 'Description RISC-V Instruction opcodes for RV64G'!
-!provides: 'RISC5-Instructions' 1 27!
+!provides: 'RISC5-Instructions' 1 28!
 SystemOrganization addCategory: 'RISC5-Instructions'!
 
 
@@ -766,7 +766,7 @@ initialize
 	F31 := FTmp11 := 31.
 ! !
 
-!RISC5InstructionsTests methodsFor: 'tests - RV64I' stamp: 'KenD 5/11/2021 08:57:57'!
+!RISC5InstructionsTests methodsFor: 'tests - RV64I' stamp: 'KenD 9/9/2022 12:22:21'!
 testRV64I
 
 	self assert: (RV64ADD regDest: X3 regA: X1 regB: X2) instruction 
@@ -802,7 +802,7 @@ testRV64I
 		= 'jal  ReturnAddr, 16r181C02' .
 	self assert:
 		(RV64LUI regDest: 1 immediate: 16rC0E03)  printString 
-		 = 'luI  ReturnAddr,  16rC0E03' 
+		 = 'lui  ReturnAddr, 16rC0E03' 
 		! !
 
 !RISC5Instructions methodsFor: 'initialization' stamp: 'KenD 5/1/2021 08:48:23'!
