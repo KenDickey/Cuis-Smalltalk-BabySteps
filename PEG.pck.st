@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5467] on 25 August 2022 at 7:43:53 pm'!
+'From Cuis 6.0 [latest update: #5467] on 9 September 2022 at 12:23:04 pm'!
 'Description Parsing Expression Grammar -- yet another parser..'!
-!provides: 'PEG' 1 15!
+!provides: 'PEG' 1 17!
 SystemOrganization addCategory: 'PEG'!
 
 
@@ -676,21 +676,21 @@ testSequenceExpression
 	seq3 match: string.
 	self assert: string position equals: 4! !
 
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:40:11'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/28/2022 12:35:36'!
 testSequenceOmit
 	| string exp1 exp2 seq1 |
 	string := PEGStringScanner on: 'abc'.
 	exp1 := 'a' asParser omit.
-	exp2 := 'b' asParser.
+	exp2 := PEGPushCharacterTerminal on: $b..
 	seq1 := exp1 && exp2.
 	self assert: (seq1 match: string) equals: $b.
 	self assert: string position equals: 2! !
 
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 17:06:11'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 8/28/2022 12:35:54'!
 testSingleCharacterParse
 	| string exp1 |
 	string := PEGStringScanner on: 'abc'.
-	exp1 := 'a' asParser.
+	exp1 := PEGPushCharacterTerminal on:  $a.
 	self assert: (exp1 match: string) equals: $a.
 	self assert: string position equals: 1! !
 
@@ -1021,15 +1021,17 @@ basicSeparator
 	" separator := nil "
 	^ separator ifNil: [ separator := self basicSeparators strongTimes omit ]! !
 
-!PEGParser class methodsFor: 'instance creation' stamp: 'ToonVerwaest 8/19/2010 12:50'!
+!PEGParser class methodsFor: 'instance creation' stamp: 'KenD 9/9/2022 12:17:33'!
 basicSeparators
 	" separator := nil. separators := nil "
+	"Note  Character>>separators "
 	^ separators ifNil: [
-		separators := ((String new: 4)
-							at: 1 put: Character space;
-							at: 2 put: Character cr;
-							at: 3 put: Character lf;
-							at: 4 put: Character tab;
+		separators := ((String new: 5)
+							at: 1 put: Character space; "32"
+							at: 2 put: Character cr; "13"
+							at: 3 put: Character lf; "10"
+							at: 4 put: Character tab; "HT: 9"
+							at: 5 put: Character newPage; "FF: 12"
 							yourself) asPEGChoice ]! !
 
 !PEGParser class methodsFor: 'instance creation' stamp: 'ToonVerwaest 3/25/2010 12:44'!
@@ -1537,9 +1539,9 @@ asInteger
 
 	^self codePoint ! !
 
-!Character methodsFor: '*PEG' stamp: 'KenD 8/25/2022 16:56:42'!
+!Character methodsFor: '*PEG' stamp: 'KenD 8/28/2022 12:23:54'!
 asParser
-	^ PEGPushCharacterTerminal on: self! !
+	^ PEGCharacterTerminal on: self! !
 
 !Character methodsFor: '*PEG' stamp: 'KenD 8/21/2022 14:28:24'!
 max: other
