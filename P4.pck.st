@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5467] on 5 September 2022 at 11:37:16 am'!
+'From Cuis 6.0 [latest update: #5463] on 14 September 2022 at 2:38:41 pm'!
 'Description Pinocchio  Version 4
 "Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
     https://scg.unibe.ch/archive/projects/Flue11a.pdf 
@@ -7,7 +7,7 @@
 See also:
     http://www.squeaksource.com/P4/
     https://scg.unibe.ch/assets/download/pinocchio/'!
-!provides: 'P4' 1 31!
+!provides: 'P4' 1 37!
 !requires: 'PEG' 1 15 nil!
 !requires: 'RISC5-Instructions' 1 23 nil!
 SystemOrganization addCategory: 'P4-ASM'!
@@ -22,7 +22,6 @@ SystemOrganization addCategory: 'P4-Exec-ELF-Dwarf'!
 SystemOrganization addCategory: 'P4-Exec-MachO'!
 SystemOrganization addCategory: 'P4-Kernel-Behavior'!
 SystemOrganization addCategory: 'P4-Kernel-Boolean'!
-SystemOrganization addCategory: 'P4-Kernel-Callable'!
 SystemOrganization addCategory: 'P4-Kernel-Collection'!
 SystemOrganization addCategory: 'P4-Kernel-IO'!
 SystemOrganization addCategory: 'P4-Kernel-Memory'!
@@ -41,6 +40,7 @@ SystemOrganization addCategory: 'P4-TAC'!
 SystemOrganization addCategory: 'P4-TAC-IR'!
 SystemOrganization addCategory: 'P4-TAC-Values'!
 SystemOrganization addCategory: 'P4-Test'!
+SystemOrganization addCategory: 'P4-Kernel-Callable'!
 
 
 !classDefinition: #ASTTest category: 'P4-AST'!
@@ -1061,46 +1061,6 @@ P4Boolean subclass: #P4True
 	category: 'P4-Kernel-Boolean'!
 !classDefinition: 'P4True class' category: 'P4-Kernel-Boolean'!
 P4True class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4Callable category: 'P4-Kernel-Callable'!
-P4Object subclass: #P4Callable
-	instanceVariableNames: 'code arguments'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4Callable class' category: 'P4-Kernel-Callable'!
-P4Callable class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4Closure category: 'P4-Kernel-Callable'!
-P4Callable variableSubclass: #P4Closure
-	instanceVariableNames: 'outerScope'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4Closure class' category: 'P4-Kernel-Callable'!
-P4Closure class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4Method category: 'P4-Kernel-Callable'!
-P4Callable variableSubclass: #P4Method
-	instanceVariableNames: 'selector host package usedGlobals usedReferences'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4Method class' category: 'P4-Kernel-Callable'!
-P4Method class
-	instanceVariableNames: ''!
-
-!classDefinition: #P4DoesNotUnderstand category: 'P4-Kernel-Callable'!
-P4Object variableSubclass: #P4DoesNotUnderstand
-	instanceVariableNames: 'selector arguments'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'P4-Kernel-Callable'!
-!classDefinition: 'P4DoesNotUnderstand class' category: 'P4-Kernel-Callable'!
-P4DoesNotUnderstand class
 	instanceVariableNames: ''!
 
 !classDefinition: #P4Array category: 'P4-Kernel-Collection'!
@@ -2553,6 +2513,46 @@ P4Object variableSubclass: #P4TestObject
 P4TestObject class
 	instanceVariableNames: ''!
 
+!classDefinition: #P4Callable category: 'P4-Kernel-Callable'!
+P4Object subclass: #P4Callable
+	instanceVariableNames: 'code arguments'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4Callable class' category: 'P4-Kernel-Callable'!
+P4Callable class
+	instanceVariableNames: ''!
+
+!classDefinition: #P4Closure category: 'P4-Kernel-Callable'!
+P4Callable variableSubclass: #P4Closure
+	instanceVariableNames: 'outerScope'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4Closure class' category: 'P4-Kernel-Callable'!
+P4Closure class
+	instanceVariableNames: ''!
+
+!classDefinition: #P4Method category: 'P4-Kernel-Callable'!
+P4Callable variableSubclass: #P4Method
+	instanceVariableNames: 'selector host package usedGlobals usedReferences'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4Method class' category: 'P4-Kernel-Callable'!
+P4Method class
+	instanceVariableNames: ''!
+
+!classDefinition: #P4DoesNotUnderstand category: 'P4-Kernel-Callable'!
+P4Object variableSubclass: #P4DoesNotUnderstand
+	instanceVariableNames: 'selector arguments'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'P4-Kernel-Callable'!
+!classDefinition: 'P4DoesNotUnderstand class' category: 'P4-Kernel-Callable'!
+P4DoesNotUnderstand class
+	instanceVariableNames: ''!
+
 !classDefinition: #P4PharoBehavior category: 'P4-PharoBridge'!
 Object subclass: #P4PharoBehavior
 	instanceVariableNames: 'pharoInstance p4instance'
@@ -2911,9 +2911,12 @@ ifTrue: aBlock
 ifTrue: aBlock ifFalse: aFalseBlock
 	^aBlock value! !
 
-!P4Object methodsFor: 'testing' stamp: 'OliFlueckiger 7/26/2011 17:23'!
+!P4Object methodsFor: 'testing' stamp: 'KenD 9/14/2022 14:02:57'!
 pHalt
-	<preventExport>! !
+	<pprimitive: #halt>
+	"<preventExport>" 
+	self flag: #KenD.
+! !
 
 !P4Object methodsFor: 'testing' stamp: 'OliFlueckiger 9/13/2011 10:44'!
 pInspect 
@@ -3642,9 +3645,9 @@ pname
 accept: visitor
 	^ visitor visitClosure: self! !
 
-!ASTBlock methodsFor: 'testing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
+!ASTBlock methodsFor: 'testing' stamp: 'KenD 9/13/2022 12:54:48'!
 hasReturnExpression
-	^ self statements anySatisfy: #hasReturnExpression! !
+	^ self statements anyPerform: #hasReturnExpression! !
 
 !ASTBlock methodsFor: 'accessing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
 parameters
@@ -3723,9 +3726,9 @@ expressions
 expressions: newExpressions
 	expressions := newExpressions! !
 
-!ASTBraceExpression methodsFor: 'testing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
+!ASTBraceExpression methodsFor: 'testing' stamp: 'KenD 9/13/2022 12:54:57'!
 hasReturnExpression
-	^ self expressions anySatisfy: #hasReturnExpression! !
+	^ self expressions anyPerform: #hasReturnExpression! !
 
 !ASTMessageCascadeExpression methodsFor: 'as yet unclassified' stamp: 'CamilloBruni 6/23/2010 18:57'!
 = other
@@ -3754,9 +3757,9 @@ receiver
 receiver: anObject
 	receiver := anObject! !
 
-!ASTMessageCascadeExpression methodsFor: 'testing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
+!ASTMessageCascadeExpression methodsFor: 'testing' stamp: 'KenD 9/13/2022 12:55:04'!
 hasReturnExpression
-	^ cascades anySatisfy: #hasReturnExpression! !
+	^ cascades anyPerform: #hasReturnExpression! !
 
 !ASTMessageCascadeExpression class methodsFor: 'accessing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
 astSelectors
@@ -4001,9 +4004,9 @@ accept: visitor
 annotatedWith: selector
 	^ self annotations anySatisfy: [ :annotation | annotation selector == selector ]! !
 
-!ASTMethod methodsFor: 'testing' stamp: 'KenD 8/25/2022 18:58:46'!
+!ASTMethod methodsFor: 'testing' stamp: 'KenD 9/13/2022 12:55:10'!
 hasReturnExpression
-	^ self statements anySatisfy: #hasReturnExpression! !
+	^ self statements anyPerform: #hasReturnExpression! !
 
 !ASTMethod methodsFor: 'accessing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
 annotations
@@ -4264,10 +4267,10 @@ receiver
 receiver: anObject
 	receiver := anObject! !
 
-!ASTMessageExpression methodsFor: 'testing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
+!ASTMessageExpression methodsFor: 'testing' stamp: 'KenD 9/13/2022 12:55:18'!
 hasReturnExpression
 	^ (receiver ifNil: [ false ] ifNotNil: [ receiver hasReturnExpression ])
-		or: [ self arguments anySatisfy: #hasReturnExpression ]! !
+		or: [ self arguments anyPerform: #hasReturnExpression ]! !
 
 !ASTMessageExpression methodsFor: 'initialization' stamp: 'ToonVerwaest 3/25/2010 12:39'!
 initialize
@@ -4368,6 +4371,10 @@ name: anObject
 printOn: aStream
 	super printOn: aStream.
 	aStream << $( << self name << $)! !
+
+!ASTVariable methodsFor: 'converting' stamp: 'ToonVerwaest 3/25/2010 13:56'!
+asVariableAt: scope
+	^ PVariable named: name at: scope depth! !
 
 !ASTVariable class methodsFor: 'accessing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
 named: aName
@@ -5103,12 +5110,12 @@ clone
 	clone delegate: self.
 	^clone! !
 
-!P4Prototype methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 12/9/2011 19:25'!
+!P4Prototype methodsFor: 'as yet unclassified' stamp: 'KenD 9/14/2022 14:34:37'!
 initialize
 	slots := P4IdentityDictionary new.
 	delegate := nil.
 	self behavior: (P4PrototypeBehavior new initialize: self).
-	P4Prototype setBehavior:  self behavior.  ! !
+	"P4Prototype setBehavior:  self behavior.  " self flag: #KenD.! !
 
 !P4Prototype methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 12/8/2011 15:42'!
 initializeClone
@@ -5198,21 +5205,6 @@ signalerContext
 	^ environment
 		findContextSuchThat: [:ctxt | (ctxt receiver == self
 				or: [ctxt receiver == self class]) not]! !
-
-!P4Exception class methodsFor: 'accessing' stamp: 'KenD 8/26/2022 11:15:13'!
-asPClass
-
-	^ self! !
-
-!P4Exception class methodsFor: 'accessing' stamp: 'KenD 8/26/2022 12:17:39'!
-pExportedName
-	"@@KenD@@ revisit?"
-	^ #Exception! !
-
-!P4Exception class methodsFor: 'accessing' stamp: 'KenD 8/26/2022 11:21:27'!
-relativeNameFor: aName
-	"@@KenD@@ revisit?"
-	^aName! !
 
 !P4KeyNotFound methodsFor: 'accessing' stamp: 'ToonVerwaest 8/20/2010 11:58'!
 dictionary
@@ -5580,9 +5572,9 @@ processor
 	
 	^processor! !
 
-!P4ELF methodsFor: 'accessing' stamp: 'KenD 8/21/2022 12:54:25'!
+!P4ELF methodsFor: 'accessing' stamp: 'CamilloBruni 7/27/2011 14:37'!
 processor: aProcessor
-	processor := aProcessor.
+	super processor: aProcessor.
 	sectionTable := P4ELFSectionTable newFor: self.
 	symbolTable := sectionTable symbolTable.
 	programs := P4ELFProgramTable new.! !
@@ -7241,6 +7233,12 @@ commandSize
 	"sizeof(section_64) = 10 * sizeof(pointer) = 80"
 	^ 80! !
 
+!P4MOSection class methodsFor: 'as yet unclassified' stamp: 'CamilloBruni 7/26/2011 17:42'!
+named: aName
+	^ self new
+		name: aName;
+		yourself! !
+
 !P4Behavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/26/2011 16:46'!
 basicNew
 	<pprimitive: #basicNew>
@@ -7436,6 +7434,10 @@ lookup: selector for: object
 for: aClass
 	^ self new setClass: aClass ! !
 
+!P4SmalltalkBehavior class methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 9/13/2011 11:03'!
+instance
+	^ instance ifNil: [ instance := self new ]! !
+
 !P4MessageLog methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 10/18/2011 17:34'!
 incTally
 	tally := tally + 1.
@@ -7537,141 +7539,6 @@ shouldBeTrue
 !P4True methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 10/4/2011 16:18'!
 xor: aBoolean
 	^aBoolean value not! !
-
-!P4Closure methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 8/1/2011 11:06'!
-return
-	<globalName: #closureReturn>
-	<preventExport>! !
-
-!P4Closure class methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 7/26/2011 19:10'!
-pNew: size
-	<globalName:#closureNew>
-	<preventExport>
-	"not really a primitive since the receiver is not passed, only the untagged size..."! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-code
-	^ code! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-code: anObject
-	code := anObject! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-host
-	^ host! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-host: anObject
-	host := anObject! !
-
-!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 9/7/2011 13:39'!
-numArgs
-	selector countArgs  ! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-package
-	^ package! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-package: anObject
-	package := anObject! !
-
-!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/15/2011 13:42'!
-printOn: aStream
-	aStream << '>>' << selector! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-selector
-	^ selector! !
-
-!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
-selector: anObject
-	selector := anObject! !
-
-!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
-usedGlobals
-	^ usedGlobals! !
-
-!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
-usedGlobals: anObject
-	usedGlobals := anObject! !
-
-!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
-usedReferences
-	^ usedReferences! !
-
-!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
-usedReferences: anObject
-	usedReferences := anObject! !
-
-!P4Method methodsFor: 'exporting' stamp: 'ToonVerwaest 7/19/2011 13:38'!
-dumpOn: binaryOut
-	<preventExport>
-	| myRef |
-	myRef := super dumpOn: binaryOut.  
-	binaryOut resolveReferences: self reference: myRef.
-	^ myRef! !
-
-!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/14/2011 16:13'!
-pByteAt: i
-	^ code at: i.
-	! !
-
-!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/14/2011 16:49'!
-pByteName
-	^ host earlySelectorAddress: selector  ! !
-
-!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/14/2011 16:07'!
-pByteSize
-	^ code size! !
-
-!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 8/9/2011 16:01'!
-pInstVarAt: i
-	<preventExport>
-	i = 1 ifTrue: [ ^ self pVariableSize + self class pInstSize  ].
-	^ super pInstVarAt: i! !
-
-!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/15/2011 15:22'!
-pVariableSize
-	^ self basicSize! !
-
-!P4Method class methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 7/14/2011 17:15'!
-fromTac: aMethod
-	| literals result |
-	literals := aMethod literals.
-	
-	result := self new: literals size.
-	1 to: literals size do: [:i | result at: i put: (literals at: i)].
-	result code: aMethod codeStream contents.
-	result host: aMethod host.
-	result selector: aMethod selector.
-	^ result
-	! !
-
-!P4Method class methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 7/14/2011 18:14'!
-pInstSize 
-	^ self instSize - 2! !
-
-!P4Method class methodsFor: 'as yet unclassified' stamp: 'ToonVerwaest 7/25/2011 21:24'!
-pIsBytes
-	^ true! !
-
-!P4DoesNotUnderstand methodsFor: 'accessing' stamp: 'OliFlueckiger 9/7/2011 16:44'!
-arguments
-	^ arguments! !
-
-!P4DoesNotUnderstand methodsFor: 'accessing' stamp: 'OliFlueckiger 9/7/2011 16:44'!
-selector
-	^ selector! !
-
-!P4DoesNotUnderstand methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 9/8/2011 16:08'!
-perform: aSelector on: receiver with: args
-	<groundTypes>
-	<typeHint: #receiver as: #'Kernel.Object.Object'>
-	arguments := args.
-	selector := aSelector.
-	^ receiver doesNotUnderstand: self  ! !
 
 !P4Array methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 1/8/2012 14:21'!
 at: index
@@ -8976,10 +8843,10 @@ packageOfClass: aClass
 	path := path collect: [ :someName | someName asSymbol].
 	^ P4RootPackage ensurePath: path! !
 
-!P4RootPackage methodsFor: 'filesystem' stamp: 'KenD 8/27/2022 15:42:01'!
+!P4RootPackage methodsFor: 'filesystem' stamp: 'KenD 9/11/2022 10:12:28'!
 ensureDirectory
 	<preventExport>
-	^ (DirectoryEntry smalltalkImageDirectory / 'Pinocchio')  assureExistence ! !
+	^ DirectoryEntry smalltalkImageDirectory ! !
 
 !P4RootPackage methodsFor: 'filesystem' stamp: 'ToonVerwaest 5/16/2011 18:37'!
 printOn: aStream separatedBy: separator! !
@@ -9017,10 +8884,9 @@ flushPackages
 	instance ifNotNil: [ instance classesDo: #flush ].
 	instance := nil! !
 
-!P4ClassReference methodsFor: 'iterating' stamp: 'KenD 8/23/2022 13:29:06'!
+!P4ClassReference methodsFor: 'iterating' stamp: 'ToonVerwaest 5/24/2011 17:50'!
 classesDo: action
-	"action value: cls"
-	cls perform: action! !
+	action value: cls! !
 
 !P4ClassReference methodsFor: 'iterating' stamp: 'ToonVerwaest 7/19/2011 13:46'!
 packagesDo: action
@@ -11470,9 +11336,9 @@ invokeBlockFor: method
 		<< ((builder loadConstant: method selector ) moveTo: self resultVariable);
 		<< (P4TACJump to: (P4Object earlySelectorAddress: #invoke:)).! !
 
-!P4A2TStatic methodsFor: 'convenience' stamp: 'KenD 8/26/2022 10:44:40'!
+!P4A2TStatic methodsFor: 'convenience' stamp: 'OliFlueckiger 7/22/2011 16:13'!
 currentHost: host 
-	(host inPharo class includesSelector: #typeHints) ifTrue: [
+	(host inPharo class canPerform: #typeHints) ifTrue: [
 		host inPharo typeHints keysAndValuesDo: [ :name :type |
 			self typeHint: name as: type]]! !
 
@@ -11608,6 +11474,10 @@ directReturn: value
 endBlock
 	currentBasicBlock nextBlock ifNotNil: [ self error: 'Trying to end non-final block' ].
 	currentBasicBlock nextBlock: P4TACEndBlock new! !
+
+!P4TACBuilder methodsFor: 'tac-value-builder' stamp: 'OliFlueckiger 9/7/2011 17:28'!
+groundedInvoke: n
+	currentBasicBlock << (P4TACCall to: (P4Object earlySelectorAddress: #groundedInvoke:) )! !
 
 !P4TACBuilder methodsFor: 'tac-value-builder' stamp: 'OliFlueckiger 8/31/2011 16:27'!
 indirectCall: target
@@ -11754,10 +11624,10 @@ volatileFence
 addGlobal: anObject
 	^ globals at: anObject name asSymbol  put: (P4TACExternalReference target: anObject )! !
 
-!P4TACBuilder methodsFor: 'accessing' stamp: 'KenD 8/26/2022 11:08:19'!
+!P4TACBuilder methodsFor: 'accessing' stamp: 'KenD 9/12/2022 12:40:13'!
 classReferenceFor: aName
 	klass := (Smalltalk at: aName ifAbsent: [ self error: 'Undeclared class ', aName ]) asPClass.
-	^ self loadConstant: klass
+	^ (self loadConstant: klass ) typeHint: klass pclass
 ! !
 
 !P4TACBuilder methodsFor: 'accessing' stamp: 'OliFlueckiger 5/10/2011 18:08'!
@@ -13624,6 +13494,15 @@ acceptCaptureClosure: aVisitor
 	
 ! !
 
+!P4TACInstruction methodsFor: 'printing' stamp: 'OliFlueckiger 5/7/2011 12:20'!
+printLineNumberOn: stream
+	flowNumber isNil ifFalse: [ stream << flowNumber << ': ' ]! !
+
+!P4TACInstruction methodsFor: 'printing' stamp: 'KenD 9/12/2022 13:13:34'!
+printRegisterOn: stream  
+	"Base case: Not Applicable"
+	stream << 'n/a' ! !
+
 !P4TACInstruction methodsFor: 'accessing' stamp: 'OliFlueckiger 5/12/2011 15:00'!
 acceptRegisterSwapper: aVisitor
 ! !
@@ -13639,10 +13518,6 @@ flowNumber: anObject
 !P4TACInstruction methodsFor: 'accessing' stamp: 'OliFlueckiger 5/7/2011 14:00'!
 isAssignment
 	^false! !
-
-!P4TACInstruction methodsFor: 'accessing' stamp: 'OliFlueckiger 5/7/2011 12:20'!
-printLineNumberOn: stream
-	flowNumber isNil ifFalse: [ stream << flowNumber << ': ' ]! !
 
 !P4TACInstruction methodsFor: 'instruction-stream' stamp: 'OliFlueckiger 6/8/2011 15:04'!
 do: aBlock
@@ -15295,6 +15170,141 @@ perform: selector on: receiver with: args
 numArgs 
 	^3! !
 
+!P4Closure methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 8/1/2011 11:06'!
+return
+	<globalName: #closureReturn>
+	<preventExport>! !
+
+!P4Closure class methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 7/26/2011 19:10'!
+pNew: size
+	<globalName:#closureNew>
+	<preventExport>
+	"not really a primitive since the receiver is not passed, only the untagged size..."! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+code
+	^ code! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+code: anObject
+	code := anObject! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+host
+	^ host! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+host: anObject
+	host := anObject! !
+
+!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 9/7/2011 13:39'!
+numArgs
+	selector countArgs  ! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+package
+	^ package! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+package: anObject
+	package := anObject! !
+
+!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/15/2011 13:42'!
+printOn: aStream
+	aStream << '>>' << selector! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+selector
+	^ selector! !
+
+!P4Method methodsFor: 'accessing' stamp: 'ToonVerwaest 5/16/2011 17:02'!
+selector: anObject
+	selector := anObject! !
+
+!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
+usedGlobals
+	^ usedGlobals! !
+
+!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
+usedGlobals: anObject
+	usedGlobals := anObject! !
+
+!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
+usedReferences
+	^ usedReferences! !
+
+!P4Method methodsFor: 'accessing' stamp: 'OliFlueckiger 7/8/2011 10:51'!
+usedReferences: anObject
+	usedReferences := anObject! !
+
+!P4Method methodsFor: 'exporting' stamp: 'ToonVerwaest 7/19/2011 13:38'!
+dumpOn: binaryOut
+	<preventExport>
+	| myRef |
+	myRef := super dumpOn: binaryOut.  
+	binaryOut resolveReferences: self reference: myRef.
+	^ myRef! !
+
+!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/14/2011 16:13'!
+pByteAt: i
+	^ code at: i.
+	! !
+
+!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/14/2011 16:49'!
+pByteName
+	^ host earlySelectorAddress: selector  ! !
+
+!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/14/2011 16:07'!
+pByteSize
+	^ code size! !
+
+!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 8/9/2011 16:01'!
+pInstVarAt: i
+	<preventExport>
+	i = 1 ifTrue: [ ^ self pVariableSize + self class pInstSize  ].
+	^ super pInstVarAt: i! !
+
+!P4Method methodsFor: 'exporting' stamp: 'OliFlueckiger 7/15/2011 15:22'!
+pVariableSize
+	^ self basicSize! !
+
+!P4Method class methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 7/14/2011 17:15'!
+fromTac: aMethod
+	| literals result |
+	literals := aMethod literals.
+	
+	result := self new: literals size.
+	1 to: literals size do: [:i | result at: i put: (literals at: i)].
+	result code: aMethod codeStream contents.
+	result host: aMethod host.
+	result selector: aMethod selector.
+	^ result
+	! !
+
+!P4Method class methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 7/14/2011 18:14'!
+pInstSize 
+	^ self instSize - 2! !
+
+!P4Method class methodsFor: 'as yet unclassified' stamp: 'ToonVerwaest 7/25/2011 21:24'!
+pIsBytes
+	^ true! !
+
+!P4DoesNotUnderstand methodsFor: 'accessing' stamp: 'OliFlueckiger 9/7/2011 16:44'!
+arguments
+	^ arguments! !
+
+!P4DoesNotUnderstand methodsFor: 'accessing' stamp: 'OliFlueckiger 9/7/2011 16:44'!
+selector
+	^ selector! !
+
+!P4DoesNotUnderstand methodsFor: 'as yet unclassified' stamp: 'OliFlueckiger 9/8/2011 16:08'!
+perform: aSelector on: receiver with: args
+	<groundTypes>
+	<typeHint: #receiver as: #'Kernel.Object.Object'>
+	arguments := args.
+	selector := aSelector.
+	^ receiver doesNotUnderstand: self  ! !
+
 !P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 17:32'!
 asPClass
 	^ self! !
@@ -15637,6 +15647,11 @@ dumpLocalOn: executableFormat
 pExportedName 
 	^ self name asSymbol! !
 
+!UndefinedObject methodsFor: '*P4' stamp: 'KenD 9/12/2022 15:45:07'!
+canHoldCodePoints
+
+	^ false! !
+
 !UndefinedObject methodsFor: '*P4' stamp: 'ToonVerwaest 7/18/2011 17:09'!
 dumpGlobalOn: executableFormat
 	^ self dumpOn: executableFormat.! !
@@ -15654,23 +15669,31 @@ ifNotNilDo: aBlock
 pExportedName 
 	^ #nil! !
 
-!Behavior methodsFor: '*P4' stamp: 'KenD 8/24/2022 13:14:44'!
+!Behavior methodsFor: '*P4' stamp: 'KenD 9/12/2022 13:03:30'!
+canPerform: aSelector
+
+	self withAllSuperclassesDo: [ :c |  
+		(c methodDictionary includesKey: aSelector ) ifTrue: [ ^ true ]
+	].
+	^ false! !
+
+!Behavior methodsFor: '*P4' stamp: 'KenD 9/13/2022 14:35:37'!
 mapToPclass
 	^ {
-	
+	ProtoObject                ->P4Object.  "@@KenD@@"
 	Object 				-> P4Object. 
 	Behavior 				-> P4Behavior.
-	Metaclass	 			-> P4Metaclass.
+	Metaclass 				-> P4Metaclass.
 	Class 				-> P4Class.
 	IdentityDictionary 	-> P4IdentityDictionary.
 	Dictionary 				-> P4Dictionary.
 	Array 				-> P4Array.
-	Symbol		 		-> P4Symbol.
+	Symbol 				-> P4Symbol.
 	String 				-> P4String.
-	UndefinedObject 	-> P4UndefinedObject.
+	UndefinedObject 	     -> P4UndefinedObject.
 	True 				-> P4True.
 	False 				-> P4False.
-	SmallInteger		 		-> P4SmallInteger.
+	SmallInteger  				-> P4SmallInteger.
 	
 	} asDictionary at: self ifAbsent: [ self error: 'Trying to export invalid class' ]
 		
@@ -15721,9 +15744,9 @@ earlySelectorAddress: aSelector
 mapToPclass
 	^ thisClass mapToPclass class! !
 
-!Metaclass methodsFor: '*P4' stamp: 'KenD 8/24/2022 15:51:21'!
+!Metaclass methodsFor: '*P4' stamp: 'OliFlueckiger 7/20/2011 16:07'!
 p4super
-	(self == P4Object class) ifTrue: [ ^ P4Class ].
+	self == P4Object class ifTrue: [ ^ P4Class ].
 	^ self super! !
 
 !Metaclass methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 18:25'!
@@ -15754,6 +15777,13 @@ split: aString
 
 	^ aString findTokens: self asString! !
 
+!Collection methodsFor: '*P4' stamp: 'KenD 9/13/2022 12:54:27'!
+anyPerform: aSymbol
+	"Perform like #anySatisfy but use a symbol rather than a block"
+	
+	self do:[:item | (item perform: aSymbol) ifTrue: [^ true]].
+	^ false! !
+
 !CharacterSequence methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:17:23'!
 split: aString
 	"I am a string of delimiters"
@@ -15773,6 +15803,15 @@ newFromAll: strings
 					result at: position put: c.
 					position := position + 1]].
 	^ result! !
+
+!Symbol methodsFor: '*P4' stamp: 'KenD 9/12/2022 10:43:37'!
+dumpLocalOn: binaryOut
+	^ binaryOut symbol: self  ! !
+
+!Symbol methodsFor: '*P4' stamp: 'KenD 9/12/2022 10:43:49'!
+pExportedName 
+
+	^('s_', self) asSymbol! !
 
 !Symbol methodsFor: '*P4' stamp: 'ToonVerwaest 7/23/2011 18:57'!
 pHash

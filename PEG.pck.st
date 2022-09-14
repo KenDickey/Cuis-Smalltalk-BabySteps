@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5467] on 9 September 2022 at 12:23:04 pm'!
+'From Cuis 6.0 [latest update: #5463] on 12 September 2022 at 3:05:27 pm'!
 'Description Parsing Expression Grammar -- yet another parser..'!
-!provides: 'PEG' 1 17!
+!provides: 'PEG' 1 18!
 SystemOrganization addCategory: 'PEG'!
 
 
@@ -613,7 +613,7 @@ testOrderedChoiceExpression
 	self assert: string position equals: 4.
 	self should: [seq1 match: string] raise: PEGParsingFailure.! !
 
-!PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:29:39'!
+!PEGTest methodsFor: 'tests' stamp: 'KenD 9/12/2022 15:04:28'!
 testRange
 	| string |
 	string := PEGStringScanner on: 'p'.
@@ -630,7 +630,13 @@ testRange
 	self assert: string position equals: 0.
 	string := PEGStringScanner on: ''.
 	self should: [(PEGRange between: $a and: $z) match: string] raise: PEGParsingFailure.
-	self assert: string position equals: 0! !
+	self assert: string position equals: 0.
+	string := PEGStringScanner on: 'father'.
+	self assert: ((PEGRange between: $a and: $f) match: string) equals: $f. 
+	self assert: ((PEGRange between: $a and: $f) match: string) equals: $a. 
+	self assert: string position equals: 2.
+	self should: [(PEGRange between: $a and: $f) match: string] raise: PEGParsingFailure.
+! !
 
 !PEGTest methodsFor: 'tests' stamp: 'KenD 8/25/2022 16:31:32'!
 testResultEquals
