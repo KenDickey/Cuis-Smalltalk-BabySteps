@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5463] on 14 September 2022 at 2:38:41 pm'!
+'From Cuis 6.0 [latest update: #5483] on 20 September 2022 at 12:20:42 pm'!
 'Description Pinocchio  Version 4
 "Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
     https://scg.unibe.ch/archive/projects/Flue11a.pdf 
@@ -7,7 +7,7 @@
 See also:
     http://www.squeaksource.com/P4/
     https://scg.unibe.ch/assets/download/pinocchio/'!
-!provides: 'P4' 1 37!
+!provides: 'P4' 1 38!
 !requires: 'PEG' 1 15 nil!
 !requires: 'RISC5-Instructions' 1 23 nil!
 SystemOrganization addCategory: 'P4-ASM'!
@@ -13084,9 +13084,11 @@ number
 number: aNumber
 	number := aNumber! !
 
-!P4TACBasicBlock methodsFor: 'printing' stamp: 'OliFlueckiger 6/8/2011 16:49'!
+!P4TACBasicBlock methodsFor: 'printing' stamp: 'KenD 9/19/2022 14:05:51'!
 printOn: stream
-	stream << 'block ' << number << ':' << Character cr.
+       number ifNotNil: [
+		stream << 'block ' << number << ':' << Character cr.
+	].
 	super printOn: stream.  
 	stream << Character cr.
 	nextBlock printOn: stream.! !
@@ -13454,9 +13456,11 @@ initialize
 	closures := OrderedCollection new.
 	nonLocalReturn := false.! !
 
-!P4TACMethod methodsFor: 'printing' stamp: 'OliFlueckiger 6/9/2011 17:33'!
+!P4TACMethod methodsFor: 'printing' stamp: 'KenD 9/19/2022 13:41:15'!
 printOn: stream
-	stream << message selector! !
+	message 
+		ifNil: [ super printOn: stream ]
+		ifNotNil: [ 	stream << message selector ]! !
 
 !P4TACMethod methodsFor: 'printing' stamp: 'OliFlueckiger 5/24/2011 14:57'!
 printSource
