@@ -11,8 +11,8 @@
 #include <stdint.h> 
 #include <alloca.h> 
 
-/* include <gc.h> @@KenD@@ */
-#include "/usr/local/include/gc/gc.h"
+#include <gc.h>
+
 
 /* ======================================================================= */
 
@@ -71,8 +71,8 @@ extern struct Class Array;
 #define SIZE(object)        ((long)((tObject*)object)[-3])
 
 /*@@Kend@@{*/
-#define BEHAVIOR_OF(object)    (((long)object) & 1?((tBehavior)&SmallInteger):((tBehavior)((tObject*)object)[-3]))
-#define SET_BEHAVIOR(object, behavior)   object->value[-3] = (tObject)behavior
+#define BEHAVIOR_OF(object) (((long)object) & 1?((tBehavior)&SmallInteger):((tBehavior)((tObject*)object)[-2]))
+#define SET_BEHAVIOR(object, behavior)   object->value[-2] = (tObject)behavior
 /*@@Kend@@}*/
 
 #ifdef __APPLE__
