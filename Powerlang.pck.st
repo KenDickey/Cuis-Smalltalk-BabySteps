@@ -1,6 +1,7 @@
-'From Cuis 6.0 [latest update: #5492] on 26 September 2022 at 4:24:15 pm'!
+'From Cuis 6.0 [latest update: #5492] on 27 September 2022 at 1:47:06 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 0!
+!provides: 'Powerlang' 1 3!
+!requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 SystemOrganization addCategory: #'Powerlang-Core-Nativization'!
 SystemOrganization addCategory: 'Powerlang-Core-Building'!
@@ -32,8 +33,8 @@ SendSiteFlags class
 !classDefinition: #RegistersRISCV category: 'Powerlang-Core-Assembly-RISCV'!
 SharedPool subclass: #RegistersRISCV
 	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
+	classVariableNames: 'RegA RegE RegFP RegFalse RegG RegIP RegM RegNextIP RegNil RegR RegS RegSP RegT RegTrue RegV RegX0 RegX1'
+	poolDictionaries: 'RISC5Regs'
 	category: 'Powerlang-Core-Assembly-RISCV'!
 !classDefinition: 'RegistersRISCV class' category: 'Powerlang-Core-Assembly-RISCV'!
 RegistersRISCV class
@@ -209,6 +210,16 @@ Object subclass: #ABI
 ABI class
 	instanceVariableNames: ''!
 
+!classDefinition: #RiscV64ABI category: 'Powerlang-Core-Assembly-RISCV'!
+ABI subclass: #RiscV64ABI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: 'RegistersRISCV'
+	category: 'Powerlang-Core-Assembly-RISCV'!
+!classDefinition: 'RiscV64ABI class' category: 'Powerlang-Core-Assembly-RISCV'!
+RiscV64ABI class
+	instanceVariableNames: ''!
+
 !classDefinition: #Assembler category: 'Powerlang-Core-Assembly'!
 Object subclass: #Assembler
 	instanceVariableNames: 'codegen labels literals'
@@ -290,6 +301,10 @@ SParseTreeVisitor class
 	instanceVariableNames: ''!
 
 
+!RegistersRISCV commentStamp: '<historical>' prior: 0!
+For now, pretend to be a register starved Intel x86-64 CPU.
+Just symbolic register indexes. See self class>>#initialize!
+
 !ABI commentStamp: '<historical>' prior: 0!
 Copyright (c) 2020 Aucerna.
 	See (MIT) license in root directory.
@@ -336,6 +351,27 @@ initialize
 		IsPolymorphic := 16r4.
 		HasBeenReset := 16r8
 	
+! !
+
+!RegistersRISCV class methodsFor: 'class initialization' stamp: 'KenD 9/27/2022 13:14:09'!
+initialize
+
+	RegA := X11. "Arg  [Arg1]"
+	RegE := X21. "Environment"
+	RegFP := FramePtr.
+	RegFalse := X26.
+	RegG := X23.
+	RegNextIP := X7. "Next Code Address to Jump to" 
+	RegM := X19.
+	RegNil := X24.
+	RegR := X10. "Receiver/Result [Arg0]"
+	RegS := X20. "Selector"
+	RegSP := StackPtr.
+	RegT := X28.
+	RegTrue := X25.
+	RegV := X22.
+	RegX0 := X14.
+	RegX1 := X15.
 ! !
 
 !NativeCode methodsFor: 'as yet unclassified' stamp: 'KenD 9/26/2022 12:35:02'!
@@ -4099,6 +4135,107 @@ is64bits
 	^self bits = 64
 ! !
 
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:26'!
+regA
+
+	^RegA! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:41'!
+regE
+
+	^RegE! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:51'!
+regFP
+
+	^RegFP! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:45:04'!
+regFalse
+
+	^RegFalse! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:45:23'!
+regG
+
+	^RegG! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:11:47'!
+regIP
+
+	self shouldNotImplement ! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:09'!
+regM
+
+	^RegM! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:12:33'!
+regNextIP
+	"This is used to synthesize a code jump target address"
+	^ RegNextIP! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:22'!
+regNil
+
+	^RegNil! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:34'!
+regR
+
+	^RegR! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:54'!
+regS
+
+	^RegS! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:47:09'!
+regSP
+
+	^RegSP! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:47:25'!
+regT
+
+	^RegT! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:07:47'!
+regTrue
+
+	^RegTrue! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:07:59'!
+regV
+
+	^RegV! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:08:17'!
+regX0
+
+	^RegX0! !
+
+!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:08:27'!
+regX1
+
+	^RegX1! !
+
+!RiscV64ABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:41:42'!
+bits
+	"Pointers are 8 bytes"
+	^ 64! !
+
+!RiscV64ABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:42:07'!
+wordSize
+	"Pointers are 8 bytes"
+	^ 8! !
+
+!RiscV64ABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:42:51'!
+wordSizeShift
+
+	^ 3
+! !
+
 !Assembler methodsFor: 'jumps' stamp: 'KenD 9/26/2022 12:38:17'!
 jumpIfEqualTo: label
 	codegen jumpIfEqualTo: label
@@ -6959,6 +7096,12 @@ subImm: anInteger from: srcAndDstReg
 
 ! !
 
+!RV64CodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
+new
+	^ self basicNew initialize.
+
+! !
+
 !NativeCodeReference methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:38:58'!
 beAbsolute
 	absolute := true
@@ -7376,4 +7519,5 @@ new
 ! !
 InlineMessageLinkerFlags initialize!
 SendSiteFlags initialize!
+RegistersRISCV initialize!
 Assembler initialize!
