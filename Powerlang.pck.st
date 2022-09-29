@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 27 September 2022 at 1:47:06 pm'!
+'From Cuis 6.0 [latest update: #5492] on 29 September 2022 at 11:02:43 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 3!
+!provides: 'Powerlang' 1 5!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 SystemOrganization addCategory: #'Powerlang-Core-Nativization'!
@@ -8,6 +8,11 @@ SystemOrganization addCategory: 'Powerlang-Core-Building'!
 SystemOrganization addCategory: 'Powerlang-Core-Assembly'!
 SystemOrganization addCategory: 'Powerlang-Core-Assembly-RISCV'!
 SystemOrganization addCategory: 'Powerlang-Core-SCompiler'!
+SystemOrganization addCategory: 'Powerlang-Core-SExpressions'!
+SystemOrganization addCategory: 'Powerlang-Core-Metaphysics'!
+SystemOrganization addCategory: 'Powerlang-Core-Mirrors'!
+SystemOrganization addCategory: 'Powerlang-Core'!
+SystemOrganization addCategory: 'Powerlang-Core-Assembler-Intel'!
 
 
 !classDefinition: #InlineMessageLinkerFlags category: #'Powerlang-Core-Nativization'!
@@ -29,6 +34,126 @@ PSharedPool subclass: #SendSiteFlags
 !classDefinition: 'SendSiteFlags class' category: #'Powerlang-Core-Nativization'!
 SendSiteFlags class
 	instanceVariableNames: 'HasBeenReset IsPolymorphic IsStaticSend IsSuperSend'!
+
+!classDefinition: #SCompiledMethodFlags category: 'Powerlang-Core-SCompiler'!
+PSharedPool subclass: #SCompiledMethodFlags
+	instanceVariableNames: ''
+	classVariableNames: 'ArgCount BlockCount CapturesSelf Debuggable EnvCount HasEnvironment HasFrame TempCount'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompiledMethodFlags class' category: 'Powerlang-Core-SCompiler'!
+SCompiledMethodFlags class
+	instanceVariableNames: 'ArgCount BlockCount CapturesSelf Debuggable EnvCount HasEnvironment HasFrame TempCount'!
+
+!classDefinition: #AstBindingTypes category: 'Powerlang-Core-SExpressions'!
+PSharedPool subclass: #AstBindingTypes
+	instanceVariableNames: ''
+	classVariableNames: 'ArgumentId ClassVarId ConstantPoolId EnsureAisSmallIntegerId EnsureRisSmallIntegerId FalseId GlobalClassId GlobalValueId InstVarId LoadAvisitingArgumentId LoadAwithArgumentId LoadAwithClassVarId LoadAwithConstPoolId LoadAwithFalseId LoadAwithGlobalId LoadAwithInstVarId LoadAwithLiteralId LoadAwithNilId LoadAwithPoolVarId LoadAwithSelfId LoadAwithTemporaryId LoadAwithTrueId LoadRvisitingReceiverId LoadRwithArgumentId LoadRwithClassVarId LoadRwithConstPoolId LoadRwithFalseId LoadRwithGlobalId LoadRwithInstVarId LoadRwithLiteralId LoadRwithNilId LoadRwithPoolVarId LoadRwithSelfId LoadRwithTemporaryId LoadRwithTrueId NilId PoolVarId PopRid PushRid SelfId SuperId TemporaryId TrueId'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstBindingTypes class' category: 'Powerlang-Core-SExpressions'!
+AstBindingTypes class
+	instanceVariableNames: ''!
+
+!classDefinition: #AstNodeTypes category: 'Powerlang-Core-SExpressions'!
+PSharedPool subclass: #AstNodeTypes
+	instanceVariableNames: ''
+	classVariableNames: 'AssignmentId BlockId BraceId CascadeId IdentifierId LiteralId MessageId MethodId PragmaId ReturnId'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstNodeTypes class' category: 'Powerlang-Core-SExpressions'!
+AstNodeTypes class
+	instanceVariableNames: 'AssignmentId BlockId BraceId CascadeId IdentifierId LiteralId MessageId MethodId PragmaId ReturnId'!
+
+!classDefinition: #ClosureElementTypes category: 'Powerlang-Core-SExpressions'!
+PSharedPool subclass: #ClosureElementTypes
+	instanceVariableNames: ''
+	classVariableNames: 'Environment EnvironmentValue LocalArgument Self'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'ClosureElementTypes class' category: 'Powerlang-Core-SExpressions'!
+ClosureElementTypes class
+	instanceVariableNames: ''!
+
+!classDefinition: #SExpressionTypes category: 'Powerlang-Core-SExpressions'!
+PSharedPool subclass: #SExpressionTypes
+	instanceVariableNames: ''
+	classVariableNames: 'AssignmentId BlockId BraceId CascadeId IdentifierId LiteralId MessageId MethodId PragmaId ReturnId'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SExpressionTypes class' category: 'Powerlang-Core-SExpressions'!
+SExpressionTypes class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectHeaderMasks category: 'Powerlang-Core-Metaphysics'!
+PSharedPool subclass: #ObjectHeaderMasks
+	instanceVariableNames: ''
+	classVariableNames: 'IsArrayed IsBytes IsNamed IsSmall'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectHeaderMasks class' category: 'Powerlang-Core-Metaphysics'!
+ObjectHeaderMasks class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectHeaderOffsets category: 'Powerlang-Core-Metaphysics'!
+PSharedPool subclass: #ObjectHeaderOffsets
+	instanceVariableNames: ''
+	classVariableNames: 'BehaviorOffset FlagsOffset HashOffset LargeSizeOffset SizeOffset'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectHeaderOffsets class' category: 'Powerlang-Core-Metaphysics'!
+ObjectHeaderOffsets class
+	instanceVariableNames: ''!
+
+!classDefinition: #CompiledBlockFormatMasks category: 'Powerlang-Core-Mirrors'!
+PSharedPool subclass: #CompiledBlockFormatMasks
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Mirrors'!
+!classDefinition: 'CompiledBlockFormatMasks class' category: 'Powerlang-Core-Mirrors'!
+CompiledBlockFormatMasks class
+	instanceVariableNames: ''!
+
+!classDefinition: #CompiledMethodFormatMasks category: 'Powerlang-Core-Mirrors'!
+PSharedPool subclass: #CompiledMethodFormatMasks
+	instanceVariableNames: ''
+	classVariableNames: 'ArgCount BlockCount TempCount'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Mirrors'!
+!classDefinition: 'CompiledMethodFormatMasks class' category: 'Powerlang-Core-Mirrors'!
+CompiledMethodFormatMasks class
+	instanceVariableNames: ''!
+
+!classDefinition: #FrameOffsets category: 'Powerlang-Core-Mirrors'!
+PSharedPool subclass: #FrameOffsets
+	instanceVariableNames: ''
+	classVariableNames: 'CallerIndex LastArgumentIndex MethodIndex ReceiverIndex ReturnAddressIndex'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Mirrors'!
+!classDefinition: 'FrameOffsets class' category: 'Powerlang-Core-Mirrors'!
+FrameOffsets class
+	instanceVariableNames: ''!
+
+!classDefinition: #CharacterConstants category: 'Powerlang-Core'!
+PSharedPool subclass: #CharacterConstants
+	instanceVariableNames: ''
+	classVariableNames: 'Cr Lf Newline Space Tab'
+	poolDictionaries: ''
+	category: 'Powerlang-Core'!
+!classDefinition: 'CharacterConstants class' category: 'Powerlang-Core'!
+CharacterConstants class
+	instanceVariableNames: ''!
+
+!classDefinition: #OperandTypeFlags category: 'Powerlang-Core-Assembler-Intel'!
+PSharedPool subclass: #OperandTypeFlags
+	instanceVariableNames: ''
+	classVariableNames: 'ConstantType ImmediateType MemoryType RegisterGP RegisterGroupMask RegisterSIMD RegisterSegment RegisterSpecific RegisterType'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Assembler-Intel'!
+!classDefinition: 'OperandTypeFlags class' category: 'Powerlang-Core-Assembler-Intel'!
+OperandTypeFlags class
+	instanceVariableNames: ''!
 
 !classDefinition: #RegistersRISCV category: 'Powerlang-Core-Assembly-RISCV'!
 SharedPool subclass: #RegistersRISCV
@@ -160,11 +285,21 @@ Object subclass: #NativizationPlatform
 NativizationPlatform class
 	instanceVariableNames: 'Default'!
 
+!classDefinition: #Opcode category: #'Powerlang-Core-Nativization'!
+Object subclass: #Opcode
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'Opcode class' category: #'Powerlang-Core-Nativization'!
+Opcode class
+	instanceVariableNames: ''!
+
 !classDefinition: #SExpressionNativizer category: #'Powerlang-Core-Nativization'!
 Object subclass: #SExpressionNativizer
 	instanceVariableNames: 'environment method remainingBlocks safepointCheck mainCode stackCount fallbacks activeScript ir'
 	classVariableNames: ''
-	poolDictionaries: 'ClosureElementTypes'
+	poolDictionaries: 'private'
 	category: 'Powerlang-Core-Nativization'!
 !classDefinition: 'SExpressionNativizer class' category: #'Powerlang-Core-Nativization'!
 SExpressionNativizer class
@@ -198,6 +333,36 @@ Object subclass: #LookupNativizer
 	category: 'Powerlang-Core-Building'!
 !classDefinition: 'LookupNativizer class' category: 'Powerlang-Core-Building'!
 LookupNativizer class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectMap category: 'Powerlang-Core-Building'!
+Object subclass: #ObjectMap
+	instanceVariableNames: 'behavior spec'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Building'!
+!classDefinition: 'ObjectMap class' category: 'Powerlang-Core-Building'!
+ObjectMap class
+	instanceVariableNames: ''!
+
+!classDefinition: #SmalltalkBootstrapper category: 'Powerlang-Core-Building'!
+Object subclass: #SmalltalkBootstrapper
+	instanceVariableNames: 'builder'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Building'!
+!classDefinition: 'SmalltalkBootstrapper class' category: 'Powerlang-Core-Building'!
+SmalltalkBootstrapper class
+	instanceVariableNames: ''!
+
+!classDefinition: #DMRBootstrapper category: 'Powerlang-Core-Building'!
+SmalltalkBootstrapper subclass: #DMRBootstrapper
+	instanceVariableNames: 'nativizer image'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Building'!
+!classDefinition: 'DMRBootstrapper class' category: 'Powerlang-Core-Building'!
+DMRBootstrapper class
 	instanceVariableNames: ''!
 
 !classDefinition: #ABI category: 'Powerlang-Core-Assembly'!
@@ -244,7 +409,7 @@ CodeGenerator class
 CodeGenerator subclass: #RISCCodeGenerator
 	instanceVariableNames: ''
 	classVariableNames: ''
-	poolDictionaries: 'RISC5Regs'
+	poolDictionaries: 'RegistersRISCV'
 	category: 'Powerlang-Core-Assembly'!
 !classDefinition: 'RISCCodeGenerator class' category: 'Powerlang-Core-Assembly'!
 RISCCodeGenerator class
@@ -254,7 +419,7 @@ RISCCodeGenerator class
 RISCCodeGenerator subclass: #RV64CodeGenerator
 	instanceVariableNames: ''
 	classVariableNames: ''
-	poolDictionaries: 'private'
+	poolDictionaries: 'RegistersRISCV'
 	category: 'Powerlang-Core-Assembly-RISCV'!
 !classDefinition: 'RV64CodeGenerator class' category: 'Powerlang-Core-Assembly-RISCV'!
 RV64CodeGenerator class
@@ -300,6 +465,89 @@ Object subclass: #SParseTreeVisitor
 SParseTreeVisitor class
 	instanceVariableNames: ''!
 
+!classDefinition: #AstcodeEncoder category: 'Powerlang-Core-SExpressions'!
+SParseTreeVisitor subclass: #AstcodeEncoder
+	instanceVariableNames: 'method stream script'
+	classVariableNames: ''
+	poolDictionaries: 'AstBindingTypes AstNodeTypes ClosureElementTypes'
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstcodeEncoder class' category: 'Powerlang-Core-SExpressions'!
+AstcodeEncoder class
+	instanceVariableNames: ''!
+
+!classDefinition: #AstcodeDecoder category: 'Powerlang-Core-SExpressions'!
+Object subclass: #AstcodeDecoder
+	instanceVariableNames: 'method stream builder'
+	classVariableNames: 'BindingTypes NodeTypes'
+	poolDictionaries: 'AstBindingTypes AstNodeTypes'
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstcodeDecoder class' category: 'Powerlang-Core-SExpressions'!
+AstcodeDecoder class
+	instanceVariableNames: 'BindingTypes NodeTypes'!
+
+!classDefinition: #SExpression category: 'Powerlang-Core-SExpressions'!
+Object subclass: #SExpression
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SExpression class' category: 'Powerlang-Core-SExpressions'!
+SExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectFormat category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #ObjectFormat
+	instanceVariableNames: 'runtime storage'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectFormat class' category: 'Powerlang-Core-Metaphysics'!
+ObjectFormat class
+	instanceVariableNames: ''!
+
+!classDefinition: #DmrObjectFormat category: 'Powerlang-Core-Metaphysics'!
+ObjectFormat subclass: #DmrObjectFormat
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: 'ObjectHeaderMasks ObjectHeaderOffsets'
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'DmrObjectFormat class' category: 'Powerlang-Core-Metaphysics'!
+DmrObjectFormat class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectShape category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #ObjectShape
+	instanceVariableNames: 'name fields'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectShape class' category: 'Powerlang-Core-Metaphysics'!
+ObjectShape class
+	instanceVariableNames: ''!
+
+!classDefinition: #SExpressionInterpreter category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #SExpressionInterpreter
+	instanceVariableNames: 'receiver arguments temporaries returned returnValue method parent gateBuilder blockAstcodes environment'
+	classVariableNames: ''
+	poolDictionaries: 'private'
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'SExpressionInterpreter class' category: 'Powerlang-Core-Metaphysics'!
+SExpressionInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #OperandEncoding category: 'Powerlang-Core-Assembler-Intel'!
+Object subclass: #OperandEncoding
+	instanceVariableNames: 'name selectors descriptions immediate modrm'
+	classVariableNames: 'Encodings'
+	poolDictionaries: 'Registers'
+	category: 'Powerlang-Core-Assembler-Intel'!
+!classDefinition: 'OperandEncoding class' category: 'Powerlang-Core-Assembler-Intel'!
+OperandEncoding class
+	instanceVariableNames: ''!
+
+
+!OperandTypeFlags commentStamp: '<historical>' prior: 0!
+WARNING: x86 specific!
 
 !RegistersRISCV commentStamp: '<historical>' prior: 0!
 For now, pretend to be a register starved Intel x86-64 CPU.
@@ -324,6 +572,11 @@ I am the JIT assembler frontend. I provide a high-level assembler interface (if 
 and delegate writing of the actual bytes to my backends.
 !
 
+!RV64CodeGenerator commentStamp: '<historical>' prior: 0!
+RISC-V RV64G
+See specs at:
+  https://riscv.org/technical/specifications/!
+
 !RelocatableBuffer commentStamp: '<historical>' prior: 0!
 Copyright (c) 2020 Aucerna.
 	See (MIT) license in root directory.
@@ -332,6 +585,10 @@ Copyright (c) 2020 Aucerna.
 !RelocationFixup commentStamp: '<historical>' prior: 0!
 Copyright (c) 2020 Aucerna.
 	See (MIT) license in root directory.
+!
+
+!SExpression commentStamp: '<historical>' prior: 0!
+I am a Smalltalk expression, the minimal unit of Smalltalk semantics, expressed as a tree.
 !
 
 !InlineMessageLinkerFlags class methodsFor: 'class initialization' stamp: 'KenD 9/26/2022 12:31:19'!
@@ -353,23 +610,184 @@ initialize
 	
 ! !
 
-!RegistersRISCV class methodsFor: 'class initialization' stamp: 'KenD 9/27/2022 13:14:09'!
+!SCompiledMethodFlags class methodsFor: 'class initialization' stamp: 'KenD 9/28/2022 13:26:58'!
+initialize
+	ArgCount := 1 thru: 6.
+	BlockCount := 7 thru: 13.
+	TempCount := 14 thru: 21.
+	CapturesSelf := 1 bitShift: 22 - 1.
+	HasEnvironment := 1 bitShift: 23 - 1.
+	HasFrame := 1 bitShift: 24 - 1.
+	Debuggable := 1 bitShift: 25 - 1.
+	EnvCount := 26 thru: 31
+! !
+
+!AstBindingTypes class methodsFor: 'class initialization' stamp: 'KenD 2/23/2021 14:51:53'!
+initialize 
+	NilId := 1.
+	TrueId := 2.
+	FalseId := 3.
+	ArgumentId := 4.
+	TemporaryId := 5.
+	SelfId := 6.
+	SuperId := 7.
+	InstVarId := 8.
+	ClassVarId := 9.
+	GlobalValueId := 10.
+	GlobalClassId := 11.
+	PoolVarId := 12.
+	ConstantPoolId := 13.
+	LoadRwithSelfId := 20.
+	LoadAwithSelfId := 21.
+	LoadRwithInstVarId := 22.
+	LoadAwithInstVarId := 23.
+	LoadRvisitingReceiverId := 24.
+	LoadAvisitingArgumentId := 25.
+	LoadRwithLiteralId := 26.
+	LoadAwithLiteralId := 27.
+	EnsureRisSmallIntegerId := 28.
+	EnsureAisSmallIntegerId := 29.
+	LoadRwithArgumentId := 30.
+	LoadAwithArgumentId := 31.
+	LoadRwithTemporaryId := 32.
+	LoadAwithTemporaryId := 33.
+	LoadRwithNilId := 34.
+	LoadAwithNilId := 35.
+	LoadRwithFalseId := 36.
+	LoadAwithFalseId := 37.
+	LoadRwithTrueId := 38.
+	LoadAwithTrueId := 39.
+	LoadRwithGlobalId := 40.
+	LoadAwithGlobalId := 41.
+	LoadRwithClassVarId := 42.
+	LoadAwithClassVarId := 43.
+	LoadRwithPoolVarId := 44.
+	LoadAwithPoolVarId := 45.
+	LoadRwithConstPoolId := 46.
+	LoadAwithConstPoolId := 47.
+	PushRid := 48.
+	PopRid := 49! !
+
+!AstNodeTypes class methodsFor: 'class initialization' stamp: 'KenD 9/28/2022 13:24:02'!
+initialize
+	MethodId := 101.
+	BlockId := 102.
+	IdentifierId := 103.
+	LiteralId := 104.
+	MessageId := 105.
+	CascadeId := 106.
+	BraceId := 107.
+	AssignmentId := 108.
+	ReturnId := 109.
+	PragmaId := 110
+! !
+
+!ClosureElementTypes class methodsFor: 'class initialization' stamp: 'KenD 2/23/2021 15:07:20'!
+initialize 
+
+	Self := 0.
+	LocalArgument := 1.
+	Environment := 2.
+	EnvironmentValue := 3! !
+
+!SExpressionTypes class methodsFor: 'class initialization' stamp: 'KenD 2/23/2021 15:04:29'!
+initialize 
+
+	MethodId := 1.
+	BlockId := 2.
+	IdentifierId := 3.
+	LiteralId := 4.
+	MessageId :=5.
+	CascadeId := 6.
+	BraceId := 7.
+	AssignmentId := 8.
+	ReturnId := 9! !
+
+!ObjectHeaderMasks class methodsFor: 'class initialization' stamp: 'KenD 2/27/2021 09:22:14'!
+initialize 
+	"Bit Flags"
+	IsBytes      := 16r01.
+	IsArrayed := 16r02.
+	IsNamed   := 16r04.
+	IsSmall     := 16r80! !
+
+!ObjectHeaderOffsets methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:18:28'!
+behaviorOffset
+
+	^BehaviorOffset! !
+
+!ObjectHeaderOffsets methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:18:43'!
+flagsOffset
+
+	^FlagsOffset! !
+
+!ObjectHeaderOffsets methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:19:02'!
+hashOffset
+
+	^HashOffset! !
+
+!ObjectHeaderOffsets methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:19:13'!
+largeSizeOffset
+
+	^LargeSizeOffset! !
+
+!ObjectHeaderOffsets methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:19:29'!
+sizeOffset
+
+	^SizeOffset! !
+
+!ObjectHeaderOffsets class methodsFor: 'class initialization' stamp: 'KenD 2/27/2021 09:17:52'!
+initialize 
+	"Offsets in Bytes"
+	BehaviorOffset := -4.
+	FlagsOffset := -5.
+	SizeOffset := -6.
+	HashOffset := -8.
+	LargeSizeOffset := -16! !
+
+!CharacterConstants class methodsFor: 'class initialization' stamp: 'KenD 5/31/2021 15:35:17'!
+initialize 
+"
+	self initialize.
+"
+	Cr        := Character cr.
+	Lf        := Character lf.
+	Tab     := Character tab.
+	Space := Character space.
+	Newline := Character newLineCharacter.! !
+
+!OperandTypeFlags class methodsFor: 'class initialization' stamp: 'KenD 5/30/2021 13:03:53'!
+initialize
+"
+	self initialize.
+"
+	MemoryType _ 4.
+	RegisterGroupMask _ 3840.
+	ConstantType _ 2.
+	RegisterSIMD _ 256.
+	ImmediateType _ 1.
+	RegisterGP _ 0.
+	RegisterType _ 8.
+	RegisterSegment _ 512.
+	RegisterSpecific _ 768.! !
+
+!RegistersRISCV class methodsFor: 'class initialization' stamp: 'KenD 9/29/2022 11:01:30'!
 initialize
 
-	RegA := X11. "Arg  [Arg1]"
-	RegE := X21. "Environment"
-	RegFP := FramePtr.
+	RegA       := X11. "Arg  [Arg1]"
+	RegE       := X21. "Environment"
+	RegFP     := FramePtr. "X8"
 	RegFalse := X26.
-	RegG := X23.
+	RegG      := X23.
 	RegNextIP := X7. "Next Code Address to Jump to" 
-	RegM := X19.
+	RegM  := X19.
 	RegNil := X24.
-	RegR := X10. "Receiver/Result [Arg0]"
-	RegS := X20. "Selector"
-	RegSP := StackPtr.
-	RegT := X28.
+	RegR   := X10. "Receiver/Result [Arg0]"
+	RegS   := X20. "Selector"
+	RegSP := StackPtr. "X2"
+	RegT   := X28.
 	RegTrue := X25.
-	RegV := X22.
+	RegV   := X22.
 	RegX0 := X14.
 	RegX1 := X15.
 ! !
@@ -2875,10 +3293,10 @@ optimizedMethods
 	^self undermethods , (self methodSubset: map)
 ! !
 
-!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 9/28/2022 11:29:49'!
 abi: anABI
-	self ASSERT: abi isNil.
-	self ASSERT: anABI notNil.
+	self assert: abi isNil.
+	self assert: anABI notNil.
 
 	abi := anABI.
 ! !
@@ -2917,9 +3335,9 @@ newAssembler
 	^ Assembler new platform: self
 ! !
 
-!NativizationPlatform methodsFor: 'instance creation' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'instance creation' stamp: 'KenD 9/28/2022 11:29:19'!
 newCodeGenerator
-	self ASSERT: codeGeneratorClass notNil.
+	self assert: codeGeneratorClass notNil.
 
 	^ codeGeneratorClass new platform: self.
 ! !
@@ -3016,6 +3434,11 @@ x86_64_win32
 		codeGeneratorClass: AMD64CodeGenerator;   
 		yourself
 ! !
+
+!Opcode methodsFor: 'codeGeneration' stamp: 'KenD 2/24/2021 14:04:47'!
+nativizeUsing: anAssembler for: messageNativizer
+
+	self nativizeUsing: anAssembler! !
 
 !SExpressionNativizer methodsFor: 'services' stamp: 'KenD 9/26/2022 12:36:28'!
 addFallback: aBlock
@@ -4044,6 +4467,559 @@ newNativizationEnvironment
 		addLinker: lookup;
 		completeInitialization
 ! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:28:54'!
+arrayedSize 
+
+	^self size! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:29:11'!
+at: index 
+
+	"Return indexed value at given index, starting with 1. This CANNOT be 
+	 used for accessing named slots (aka, instance variables), to access 
+	 them use #instVarAt:"
+	
+	self subclassResponsibility  ! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:29:24'!
+at: index put: value 
+
+	"Set indexed value at given `index` to `value`. This CANNOT be used for 
+	 setting named slots (aka, instance variables), to access them use 
+	 #instVarAt:put:"
+	
+	self subclassResponsibility  ! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:29:36'!
+behavior 
+
+	^behavior! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:29:49'!
+behavior: anObjectMap 
+
+	behavior := anObjectMap! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:30:03'!
+bodySizeInBytes 
+
+	"Return the size of object body(s) in bytes,
+	 padded if a byte object"
+	^ self subclassResponsibility ! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:30:14'!
+classname 
+
+	^spec name! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:30:30'!
+headerSizeInBytes 
+	"
+		Return the size of object header in bytes, 
+		including both small and large part (if any).
+	"
+	
+	^ self isSmall ifTrue: [ 8 ] ifFalse: [ 16 ]! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:31:00'!
+headerSmallSize 
+
+	"Return value of 'size' field of small header"
+	 | size |	
+ 	size := self size.
+  	^ size < 256 ifTrue: [ size ] ifFalse: [ 0 ]! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:33:29'!
+size 
+
+	"Return the size if this object, that this, the value of
+	 size field in object header. 
+	
+	 For slot (pointer) objects, this is a number of slots. 
+	 For byte objects, this is a number of bytes. "
+	
+	self subclassResponsibility ! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:33:43'!
+sizeInBytes 
+
+	"Return the size of object in bytes without padding"
+	^ self subclassResponsibility ! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:34:03'!
+slotAt: index 
+
+	"Get named slot at given `index`, starting with 1. This CANNOT be used 
+	 for accessing indexed slots  (i.e., variable part of array-like objects), 
+   to set them use #at:"
+	
+	self subclassResponsibility  ! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:34:26'!
+slotAt: index put: value 
+
+	"Set named slot at given `index` to `value`. This CANNOT be used 
+	 for setting indexed slots  (i.e., variable part of array-like objects), 
+   to set them use #at:put:"
+	
+	self subclassResponsibility! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:34:47'!
+slotNamed: name 
+
+	"Get a named slot with given `name`"
+
+	| index |
+	index := self allInstVarNames indexOf: name.
+	index == 0
+		ifTrue: [ ^ self error: 'No slot named "' , name , '"' ].
+	^ self slotAt: index! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:35:02'!
+slotNamed: name put: value 
+
+	"Set a named slot with given `name` to `value`"
+
+	| index |
+	index := self allInstVarNames indexOf: name.
+	index == 0
+		ifTrue: [ ^ self error: 'No slot named "' , name , '"' ].
+	^ self slotAt: index put: value! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:37:35'!
+spec 
+
+	^ spec! !
+
+!ObjectMap methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:37:51'!
+wordSize 
+
+	"Return the size in bytes of the word (i.e, a reference to an object)"
+	
+	^ 8 "For now, 64bit only!!"! !
+
+!ObjectMap methodsFor: 'initialization' stamp: 'KenD 2/22/2021 13:31:21'!
+initializeAs: anRGBehavior sized: size 
+
+	self subclassResponsibility! !
+
+!ObjectMap methodsFor: 'initialization' stamp: 'KenD 2/22/2021 13:32:33'!
+nilAll: nilObject! !
+
+!ObjectMap methodsFor: 'initialization' stamp: 'KenD 2/22/2021 13:32:41'!
+nilWith: nilObject ! !
+
+!ObjectMap methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:31:45'!
+isBytes 
+
+	^ false! !
+
+!ObjectMap methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:31:52'!
+isImmediate 
+
+	^ false! !
+
+!ObjectMap methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:32:00'!
+isPointers 
+
+	^ false! !
+
+!ObjectMap methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:32:14'!
+isSmall 
+
+	^self size < 256! !
+
+!ObjectMap methodsFor: 'iterating' stamp: 'KenD 2/22/2021 13:35:51'!
+slotsDo: aBlock
+
+	self notYetImplemented ! !
+
+!ObjectMap methodsFor: 'validation' stamp: 'KenD 2/22/2021 13:38:23'!
+validate 
+	
+	self assert: behavior notNil! !
+
+!ObjectMap class methodsFor: 'instance creation' stamp: 'KenD 2/22/2021 13:26:08'!
+classFor: anRGBehavior 
+
+	anRGBehavior name == #SmallInteger ifTrue: [^SmallintObjectMap].
+	^anRGBehavior isBytes
+		ifTrue: [ ByteObjectMap ]
+		ifFalse: [ SlotObjectMap ]! !
+
+!ObjectMap class methodsFor: 'instance creation' stamp: 'KenD 2/22/2021 13:28:00'!
+new: anRGBehavior 
+	
+	^self new: anRGBehavior size: 0! !
+
+!ObjectMap class methodsFor: 'instance creation' stamp: 'KenD 2/22/2021 13:28:19'!
+new: anRGBehavior size: size 
+
+	| class |
+	self assert: (anRGBehavior isVariable or: [ size == 0 ]).
+	class := self classFor: anRGBehavior.
+	^ class new initializeAs: anRGBehavior sized: size! !
+
+!SmalltalkBootstrapper methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:02:37'!
+builder: anImageSegmentBuilder 
+
+	builder := anImageSegmentBuilder! !
+
+!SmalltalkBootstrapper methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:03:13'!
+spec 
+
+	^builder image kernel! !
+
+!SmalltalkBootstrapper methodsFor: 'services' stamp: 'KenD 3/2/2021 13:03:02'!
+compile: anRGMethod 
+
+	^builder compile: anRGMethod! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:04:44'!
+initializeInlinedMethods 
+	| compiled |
+	compiled := self inlinedMethods
+		collect: [ :method | builder methods at: method ].
+	nativizer inlinedMethods: compiled! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:05:08'!
+initializeInvokedMethods 
+	| compiled |
+	compiled := self invokedMethods
+		collect: [ :method | builder methods at: method ].
+	nativizer invokedMethods: compiled! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:05:26'!
+initializeKernelModule 
+	| runtime smethod transferred array module |
+	module := builder module.
+	runtime := {(image => #Kernel >> #entry:argv:)}
+		collect: [ :def | 
+			smethod := builder methods at: def.
+			transferred := image surrogateFor: smethod.
+			transferred nativeCode machineCode ].
+	array := image newArray: builder classes values.
+	module
+		name: (image newString: 'Kernel');
+		version: (image newString: '0.1.0');
+		exports: array;
+		hash: image nil;
+		loadAction: builder createLoadAction;
+		runtime: (image newArray: runtime)! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:06:32'!
+initializeNativizer 
+
+	nativizer := NativizationEnvironment new.
+	self
+		initializeNativizerGlobals;
+		initializeInlinedMethods;
+		initializeInvokedMethods;
+		initializeOptimizedMethods;
+		nativizeInvoke;
+		nativizeWriteBarrier;
+		nativizeLookup;
+		transferNativizerGlobals;
+		setupMessageLinkers! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:06:55'!
+initializeNativizerGlobals 
+	| smi items |
+	smi := image classNamed: #SmallInteger.
+	nativizer globalNamed: #SmallIntegerBehavior put: smi behavior.
+	items := {(#Lookup -> (NativeCode new code: 'Lookup Placeholder')).
+	(#LookupSuper -> (NativeCode new code: 'LookupSuper Placeholder')).
+	(#DebuggableLookup
+		-> (NativeCode new code: 'DebuggableLookup placeholder')).
+	(#DebuggableLookupSuper
+		-> (NativeCode new code: 'DebuggableLookupSuper placeholder')).
+	(#Invoke -> (NativeCode new code: 'Invoke placeholder')).
+	(#Safepoint -> (NativeCode new code: 'SafepointCheck placeholder')).
+	(#WriteBarrier -> (NativeCode new code: 'Write Barrier placeholder'))}
+		asDictionary.
+	items
+		keysAndValuesDo: [ :key :placeholder | nativizer globalNamed: key put: placeholder ]! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:07:33'!
+initializeOptimizedMethods 
+	| compiled |
+	compiled := self optimizedMethods
+		collect: [ :method | builder methods at: method ].
+	nativizer optimizedMethods: compiled! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:08:08'!
+initializeSendSite 
+
+	self 
+		initializeSendSiteMIC: nativizer monomorphicCache
+		PIC: nativizer polymorphicCache! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:08:33'!
+initializeSendSiteMIC: micStub PIC: picStub 
+	| class lkup invk mic pic |
+	class := image classNamed: #SendSite.
+	lkup := nativizer globalNamed: #Lookup.
+	lkup := image surrogateFor: lkup.
+	invk := nativizer globalNamed: #Invoke.
+	invk := image surrogateFor: invk.
+	mic := image newBytesFrom: micStub.
+	pic := image newBytesFrom: picStub.
+	builder runtime
+		send: #allocateInitialCachesUsing: to: class with: {lkup};
+		send: #initializeInvoke: to: class with: {invk};
+		send: #monomorphicCache: to: class with: {mic};
+		send: #polymorphicCache: to: class with: {pic}! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:11:14'!
+inlinedMethods 
+	| map |
+	map := 
+	{(#ProtoObject
+		->
+		#(#objectAtValid: #objectAtValid:put: #behavior #class   
+		  #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
+	(#Object
+		-> 
+		#(#byteAtValid: #byteAtValid:put: #basicObjectIndexOf: #at:put:)).
+	(#Species
+		->
+		#(#instSize #_instancesAreArrayed #_instancesHavePointers 
+		    #memory #instanceBehavior #primitiveNew #primitiveNew:)).
+	(#CompiledMethod
+		->
+		#(#prepareForExecution #isNativized #nativeCode 
+		   #blockCount #literalIndexFrom:)).
+	(#CompiledBlock 
+	 	-> 
+		#(#argumentCount #blockNumber #blockCode #method)).
+	(#NativeCode -> #(#code)).
+	(#GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
+	(#CharacterArray -> #(#characterAtValid:))}.
+
+	^ builder undermethods , (builder methodSubset: map)
+	! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:22:21'!
+invokedMethods 
+	| map |
+	map := 
+	{(#ProtoObject
+		-> #(behavior class primitiveAt: #initializeExtended:contentSize:)).
+	(#Object 
+		-> #(#_replaceFrom:to:with:)).
+	(#Species
+		->
+		#(#allocate:size: instanceBehavior _instancesAreArrayed 
+		_instancesHavePointers #nil:slotsOf: memory primitiveNewBytes: 
+		primitiveNewPointers: #zero:bytesOf:))}.
+
+	^ builder undermethods , (builder methodSubset: map)! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:22:37'!
+mapNativizerGlobal: name to: transferred 
+	| placeholder |
+	placeholder := nativizer globalNamed: name.
+	image
+		map: placeholder to: transferred;
+		map: placeholder code to: transferred machineCode.
+	builder export: transferred as: name! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:22:51'!
+nativize 
+
+	self
+		initializeNativizer;
+		initializeSendSite;
+		nativizeRemainingMethods! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:23:05'!
+nativizeInvoke 
+	| invoke |
+	invoke := builder compile: builder => #SendSite >> #_invokeOn:.
+	nativizer nativizeOptimizing: invoke.
+	self transfer: invoke in: #ProtoObject asNativizerGlobal: #Invoke! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:23:20'!
+nativizeLookup 
+	| n transferred species lookup lookupSuper |
+	n := LookupNativizer new
+		bootstrapper: self;
+		nativizeMethods.
+	lookup := n methodFor: #_dispatchOn:.
+	lookupSuper := n methodFor: #_dispatchOn:startingAt:.
+	n methods
+		do: [ :m | 
+			species := image speciesFor: image => m classBinding name.
+			transferred := builder transferMethod: m in: species.
+			image map: m to: transferred ];
+		do: [ :m | 
+			transferred := image surrogateFor: m.
+			self transferNativeCode: m nativeCode of: transferred ].
+	transferred := (image surrogateFor: lookup) nativeCode.
+	self mapNativizerGlobal: #Lookup to: transferred.
+	transferred := (image surrogateFor: lookupSuper) nativeCode.
+	self mapNativizerGlobal: #LookupSuper to: transferred! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:24:59'!
+nativizeRemainingMethods 
+
+	builder classSpecs
+		do: [ :def | 
+			self
+				trace: 'nativizing ' , def name , '...';
+				nativizeRemainingMethodsIn: def;
+				nativizeRemainingMethodsIn: def metaclass ]! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:25:17'!
+nativizeRemainingMethodsIn: species 
+
+	builder methods
+		do: [ :smethod | 
+			smethod nativeCode
+				ifNil: [ "self haltIf: smethod selector == #foo."
+					nativizer nativize: smethod.
+					self transferNativeCodeOfMethod: smethod ] ]! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:25:37'!
+nativizeWriteBarrier 
+	| map inlined dispatcher barrier |
+	map := {('Memory class' -> #(current)).
+	(#Memory -> #(isYoung: isYoungSafe: remember:)).
+	(#CriticalArray -> #(unsafeAdd: #unsafeAt:put:)).
+	(#Magnitude -> #(#between:and:))}.
+	inlined := builder methodSubset: map.
+	inlined addAll: builder undermethods.
+	inlined := inlined collect: [ :m | builder compile: m ].
+	barrier := builder
+		compile: builder => #ProtoObject >> #holdRefererIfNeeded:.
+	dispatcher := LookupLinker new initializeFrom: nativizer.
+	NativizationEnvironment new
+		globals: nativizer globals;
+		inlinedMethods: inlined;
+		messageLinker: dispatcher;
+		completeInitialization;
+		nativizeOptimizing: barrier.
+	self
+		transfer: barrier
+		in: #ProtoObject
+		asNativizerGlobal: #WriteBarrier! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:28:22'!
+optimizedMethods 
+	| map |
+	map := 
+	{(#ProtoObject
+		->
+		#(behavior class primitiveAt: #primitiveAt:put: 
+		  #initializeExtended:contentSize:)).
+	(#Object
+		->
+		#(at: #at:put: basicByteAt: #basicByteAt:put: byteAtValid: 
+		  #byteAtValid:put: basicObjectAt: #basicObjectAt:put: 
+		  #replaceBytesForwardFrom:to:with:startingAt:)).
+	(#SendSite
+		->
+		#(_dispatchOn: #_dispatchOn:startingAt: 
+		  _dispatchDebuggableOn: #_dispatchDebuggableOn:startingAt:)).
+	(#Species
+		->
+		#(#allocate:size: primitiveNew primitiveNew: instSize
+		   primitiveNewBytes: primitiveNewPointers:)).
+	(#'Float class' 
+		-> #(new)).
+	(#CompiledBlock 
+		-> #(argumentCount arity blockCode method)).
+	(#Closure 
+		-> #(value value: #value:value:)).
+	(#CompiledMethod 
+		-> #(blockCount isNativized)).
+	(#String 
+		-> #(at: #at:put: byteAt: #byteAt:put:)).
+	(#GCSpace
+		-> 
+		#(lockedAllocateIfPossible: lockedAllocateUnsafe: shallowCopy:)).
+	(#Memory 
+		-> #(shallowCopy:))}.
+
+	^ builder undermethods , (builder methodSubset: map)! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:28:45'!
+setupMessageLinkers 
+	| invoker dispatcher |
+	invoker := InvokeLinker new
+		invoker: nativizer invokeStub;
+		addMethods: nativizer invokedMethods.
+	dispatcher := LookupLinker new initializeFrom: nativizer.
+	nativizer
+		addLinker: invoker;
+		addLinker: dispatcher;
+		completeInitialization! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:29:13'!
+transfer: anSMethod in: classname asNativizerGlobal: name 
+	| species transferred |
+	species := image classNamed: classname.
+	transferred := builder transferMethod: anSMethod in: species.
+	transferred := self
+		transferNativeCode: anSMethod nativeCode
+		of: transferred.
+	self mapNativizerGlobal: name to: transferred! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:29:36'!
+transferNativeCode: aNativeCode of: compiledCode 
+	| size transferred code slot callback |
+	size := aNativeCode size.
+	transferred := image newSlots: 'NativeCode' sized: size.
+	callback := compiledCode classname = #CallbackMethod.
+	code := callback
+		ifTrue: [ builder newCallback: transferred bytesFrom: aNativeCode code ]
+		ifFalse: [ image newBytesFrom: aNativeCode code ].
+	transferred
+		machineCode: code;
+		compiledCode: compiledCode.
+	compiledCode nativeCode: transferred.
+	aNativeCode
+		withIndexDo: [ :elem :i | 
+			slot := image transferLiteralDeep: elem.
+			transferred at: i put: slot ].
+	^ transferred! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:30:08'!
+transferNativeCodeOfMethod: anSCompiledMethod 
+	| transferred remaining literal block position |
+	transferred := image surrogateFor: anSCompiledMethod.
+	self transferNativeCode: anSCompiledMethod nativeCode of: transferred.
+	remaining := anSCompiledMethod blockCount.
+	position := 1.
+	[ remaining > 0 ]
+		whileTrue: [ literal := anSCompiledMethod at: position.
+			literal isBlock
+				ifTrue: [ block := transferred at: position.
+					self transferNativeCode: literal nativeCode of: block.
+					remaining := remaining - 1 ].
+			position := position + 1 ].
+	^ transferred! !
+
+!DMRBootstrapper methodsFor: 'initialization' stamp: 'KenD 3/2/2021 13:30:22'!
+transferNativizerGlobals 
+
+	image transferLiteralDeep: nativizer globals! !
+
+!DMRBootstrapper methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:04:20'!
+image: aVirtualSmalltalkImage 
+
+	image := aVirtualSmalltalkImage! !
+
+!DMRBootstrapper methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:26:05'!
+nativizer 
+
+	^nativizer! !
+
+!DMRBootstrapper methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:30:37'!
+undermethods 
+
+	^builder undermethods! !
 
 !ABI methodsFor: 'registers - IR' stamp: 'KenD 9/26/2022 12:37:49'!
 regA
@@ -7517,7 +8493,2446 @@ visitSymbolicPragma: aPragmaNode
 new
 	^super new initialize
 ! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:30:00'!
+encodeClassBinding: association 
+	| index |
+	index := method indexOf: association ifAbsent: [self assert: false].
+	stream nextPut: GlobalClassId; nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:30:25'!
+encodeClassVar: association 
+	| index |
+	index := method indexOf: association ifAbsent: [self assert: false].
+	stream nextPut: ClassVarId; nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:31:49'!
+encodeGlobalVar: association 
+	| index |
+	index := method indexOf: association ifAbsent: [ self assert: false ].
+	stream
+		nextPut: GlobalValueId;
+		nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:32:03'!
+encodeInlinedMessage: aMessageNode 
+
+	self nextTypePut: 0! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:32:18'!
+encodeInstVar: index 
+
+	stream nextPut: InstVarId; nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:32:31'!
+encodeLoadAwithArg: anInteger env: environment 
+	| encoded |
+	encoded := self encodedEnvironment: environment.
+	stream
+		nextPut: LoadAwithArgumentId;
+		nextPut: anInteger;
+		nextPut: encoded! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:32:50'!
+encodeLoadAwithClassVar: association 
+	| index |
+	index := method indexOf: association ifAbsent: [ self assert: false ].
+	stream
+		nextPut: LoadAwithClassVarId;
+		nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:33:10'!
+encodeLoadAwithConstPoolVar: value 
+	| index |
+	index := method indexOf: value ifAbsent: [ self assert: false ].
+	stream
+		nextPut: LoadAwithConstPoolId;
+		nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:33:39'!
+encodeLoadAwithGlobal: association 
+	| index |
+	index := method indexOf: association ifAbsent: [ self assert: false ].
+	stream
+		nextPut: LoadAwithGlobalId;
+		nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:33:53'!
+encodeLoadAwithInstVar: anInteger 
+
+	stream nextPut: LoadAwithInstVarId; nextPut: anInteger! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:34:04'!
+encodeLoadAwithLiteral: value 
+	| index |
+	index := method indexOf: value.
+	stream nextPut: LoadAwithLiteralId; nextPut: index.
+	index = 0 ifTrue: [stream nextPut: value]! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:34:14'!
+encodeLoadAwithNil 
+
+	stream nextPut: LoadAwithNilId! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:34:30'!
+encodeLoadAwithPoolVar: association 
+	| index |
+	index := method indexOf: association ifAbsent: [ self assert: false ].
+	stream
+		nextPut: LoadAwithPoolVarId;
+		nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:34:42'!
+encodeLoadAwithSelf 
+
+	stream nextPut: LoadAwithSelfId! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:34:57'!
+encodeLoadAwithTemp: anInteger env: environment 
+	| encoded |
+	encoded := self encodedEnvironment: environment.
+	stream
+		nextPut: LoadAwithTemporaryId;
+		nextPut: anInteger;
+		nextPut: encoded! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:35:37'!
+encodeOptimizedBinary: aMessageNode 
+	| optimizer |
+	optimizer := BinaryMessageOptimizer on: aMessageNode using: self.
+	self nestedEncode: [optimizer emitOpcodes]! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:36:00'!
+encodeOptimizedMessage: aMessageNode 
+	| selector |
+	selector := aMessageNode selector.
+	aMessageNode isInlined ifTrue: [^self encodeInlinedMessage: aMessageNode].
+	(BinaryMessageOptimizer optimizesMessage: selector value) ifFalse: [^self].
+	aMessageNode arguments size = 1
+		ifTrue: [^self encodeOptimizedBinary: aMessageNode]! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:36:12'!
+encodePoolConst: association 
+	| index |
+	index := method indexOf: association ifAbsent: [ self assert: false ].
+	stream
+		nextPut: ConstantPoolId;
+		nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:36:32'!
+encodePoolVar: association 
+	| index |
+	index := method indexOf: association ifAbsent: [self assert: false].
+	stream nextPut: PoolVarId; nextPut: index! !
+
+!AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:39:50'!
+nestedEncode: aBlock 
+	| prev nested |
+	prev := stream.
+	nested := Array streamContents: [:s | 
+		stream := s.
+		aBlock value.
+		stream contents].
+	stream := prev.
+	stream nextPut: nested
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+compiledBlockIndexOf: aBlockNode
+	| index |
+	index := method
+		findFirst: [:literal | literal isBlock
+			and: [literal id == aBlockNode index]].
+	^index
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeArgument: anInteger env: environment
+	| encoded |
+	encoded := self encodedEnvironment: environment.
+	self
+		nextPut: ArgumentId;
+		nextIntegerPut: anInteger;
+		nextIntegerPut: encoded
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeClosureElements: aBlockNode
+	| scope parent |
+	scope := aBlockNode scope.
+	parent := aBlockNode realParent.
+	^Array streamContents: [:s |
+		scope capturesSelf ifTrue: [ s nextPut: Self ].
+		scope capturedEnvironments do: [:e | | index |
+			e == parent ifTrue: [s nextPut: Environment] ifFalse: [
+				index := aBlockNode environmentIndexOf: e.
+				self ASSERT: index notNil.
+				s nextPut: EnvironmentValue; nextPut: index]].
+		scope capturedArguments do: [:a | | binding |
+			binding := aBlockNode parent scope resolve: a name.
+			s 	nextPut: binding environmentType; nextPut: binding index]]
+	
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeDynamicVar: name
+	stream nextPut: DynamicVarId.
+	self nextSymbolPut: name
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeFalse
+	stream nextPut: FalseId
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeLoadRvisitingReceiver
+	stream nextPut: LoadRvisitingReceiverId
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeNestedDynamicVar: name
+	stream nextPut: NestedDynamicVarId.
+	self nextLiteralPut: name 
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeNil
+	stream nextPut: NilId
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodePopR
+	stream nextPut: PopRid 
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodePushR
+	stream nextPut: PushRid 
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeSelf
+	stream nextPut: SelfId
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeSuper
+	stream nextPut: SuperId
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeTemporary: anInteger env: environment
+	| encoded |
+	encoded := self encodedEnvironment: environment.
+	self
+		nextPut: TemporaryId;
+		nextIntegerPut: anInteger;
+		nextIntegerPut: encoded
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodeTrue
+	stream nextPut: TrueId
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+encodedEnvironment: aLocalEnvironment
+	aLocalEnvironment isStack
+		ifTrue: [ ^ aLocalEnvironment isInlinedArgument
+				ifTrue: [ -1 ]
+				ifFalse: [ -2 ] ].
+	aLocalEnvironment isCurrent
+		ifTrue: [ ^ 0 ].
+	^ aLocalEnvironment index
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextBigIntegerPut: anInteger
+	stream
+		nextPut: 16r80;
+		int64: anInteger
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextBooleanPut: aBoolean
+	stream nextPut: aBoolean asBit
+
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextIntegerPut: anInteger
+	| value |
+	(anInteger > 127 or: [ anInteger < -127 ])
+		ifTrue: [ ^ self nextBigIntegerPut: anInteger ].
+	value := anInteger >= 0
+		ifTrue: [ anInteger ]
+		ifFalse: [ anInteger + 16r100 ].
+	stream nextPut: value
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextLiteralPut: anObject
+	| index |
+	index := method
+		indexOf: anObject
+		ifAbsent: [ self ASSERT: false ].
+	self nextIntegerPut: index
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextPut: anInteger
+	stream nextPut: anInteger
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextPutAll: aCollection
+	stream nextPut: aCollection size; nextPutAll: aCollection
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextSymbolPut: aSymbol
+	| index |
+	index := method
+		indexOf: aSymbol asSymbol
+		ifAbsent: [ self ASSERT: false ].
+	self nextIntegerPut: index
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+nextTypePut: anInteger
+	stream nextPut: anInteger
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitAssignment: anAssignmentNode
+	| assignees |
+	self nextTypePut: AssignmentId.
+	assignees := anAssignmentNode assignees.
+	self nextIntegerPut: assignees size.
+	assignees do: [ :node | node acceptVisitor: self ].
+	anAssignmentNode expression acceptVisitor: self
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitBlock: aBlockNode
+	| args inlined |
+	self nextTypePut: BlockId.
+	inlined := aBlockNode isInlined.
+	self nextBooleanPut: inlined.
+	inlined
+		ifTrue: [ args := aBlockNode arguments collect: [ :id | id binding index ].
+			self nextPutAll: args asArray ]
+		ifFalse: [ | index captured |
+			index := self compiledBlockIndexOf: aBlockNode.
+			self nextPut: index.
+			captured := self encodeClosureElements: aBlockNode.
+			self nextPutAll: captured ].
+	self visitScript: aBlockNode
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitBraceNode: aBraceNode
+	aBraceNode isLiteral
+		ifTrue: [self visitLiteral: aBraceNode asLiteralNode]
+		ifFalse: [self visitCascade: aBraceNode asMessageNode]
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitCascade: aCascadeNode
+	| messages |
+	self nextTypePut: CascadeId.
+	aCascadeNode receiver acceptVisitor: self.
+	messages := aCascadeNode messages.
+	self nextIntegerPut: messages size.
+	messages do: [ :node | self visitCascadeMessage: node ]
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitCascadeMessage: aCascadeMessageNode
+	| arguments |
+	self nextSymbolPut: aCascadeMessageNode selector symbol.
+	arguments := aCascadeMessageNode arguments.
+	self nextIntegerPut: arguments size.
+	arguments do: [ :arg | arg acceptVisitor: self ]
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitIdentifier: anIdentifierNode
+	self nextTypePut: IdentifierId.
+	anIdentifierNode binding encodeUsing: self
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitLiteral: aLiteralNode
+	| index |
+	index := method indexOf: aLiteralNode value.
+	self
+		nextTypePut: LiteralId;
+		nextIntegerPut: index.
+	index = 0
+		ifTrue: [ self nextIntegerPut: aLiteralNode value ]
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitMessage: aMessageNode
+	| arguments |
+	self
+		nextTypePut: MessageId;
+		nextBooleanPut: aMessageNode isInlined;
+		nextSymbolPut: aMessageNode selector symbol.
+	aMessageNode receiver acceptVisitor: self.
+	arguments := aMessageNode arguments.
+	self nextIntegerPut: arguments size.
+	arguments do: [ :arg | arg acceptVisitor: self ]
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitMethod: aMethodNode
+	| pragma |
+	self nextTypePut: MethodId.
+	pragma := aMethodNode pragma.
+	pragma isUsed
+		ifTrue: [ self nextTypePut: PragmaId.
+			pragma name
+				ifNotNil: [ self nextSymbolPut: pragma name ]
+				ifNil: [ self nextPut: 0 ] ].
+	self visitScript: aMethodNode.
+	^ stream contents 
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitParseNode: aParseNode
+	^self ASSERT: false
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitReturn: aReturnNode
+	self
+		nextTypePut: ReturnId;
+		nextBooleanPut: script realScript isMethod.
+	
+		aReturnNode expression acceptVisitor: self
+! !
+
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+visitScript: aScriptNode
+	| prev statements |
+	prev := script.
+	script := aScriptNode.
+	statements := aScriptNode statements.
+	self nextIntegerPut: statements size.
+	statements do: [ :node | node acceptVisitor: self ].
+	script := prev
+! !
+
+!AstcodeEncoder methodsFor: 'accessing' stamp: 'KenD 9/28/2022 13:23:46'!
+initialize
+	stream := #[] writeStream
+! !
+
+!AstcodeEncoder methodsFor: 'accessing' stamp: 'KenD 9/28/2022 13:23:46'!
+method: aCompiledMethod
+	method := aCompiledMethod
+! !
+
+!AstcodeEncoder class methodsFor: 'instance creation' stamp: 'KenD 9/28/2022 13:23:46'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:32:30'!
+decodeClassBinding 
+	| index assoc |
+		index := self nextInteger.
+
+	assoc := method at: index.
+	^ SClassBinding new index: index; association: assoc! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:32:45'!
+decodeClassVar 
+	| index assoc |
+	index := self nextInteger.
+	assoc := method at: index.
+	^ SClassVarBinding new index: index; association: assoc! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:33:08'!
+decodeConstantPoolVar 
+	| index assoc |
+	index := self nextInteger.
+	assoc := method at: index.
+	^ SConstantPoolBinding new
+		index: index;
+		association: assoc! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:33:31'!
+decodeGlobalBinding 
+	| index assoc |
+	index := self nextInteger.
+	assoc := method at: index.
+	^ SGlobalBinding new index: index; association: assoc! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:35:05'!
+decodeInlineNodes: anArray
+	| prev result type decoded |
+	anArray ifNil: [ ^ #() ].
+	prev _ stream.
+	result _ OrderedCollection new.
+	stream _ anArray readStream.
+	[ stream atEnd ] whileFalse: [
+		type _ self nodeTypeOf: stream next.
+		decoded _ type decodeUsing: self.
+		result add: decoded ].
+	stream _ prev.
+	^ result! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:35:26'!
+decodeInstVar 
+
+	^SInstVarBinding new index: self nextInteger! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:37:06'!
+decodeNode: anArray 
+	| prev type result |
+	prev := stream.
+	stream := anArray readStream.
+	type := self nodeTypeOf: stream next.
+	result := type decodeUsing: self.
+	stream := prev.
+	^result
+! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:37:21'!
+decodeNodes: anArray 
+	anArray ifNil: [^#(  )].
+	^anArray collect: [:arg | self decodeNode: arg  ]! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:37:34'!
+decodePoolVar 
+	| index assoc |
+	index := self nextInteger.
+
+	assoc := method at: index.
+	^ SPoolVarBinding new index: index; association: assoc! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:38:15'!
+decodeStatement: anArray 
+
+	^self decodeNode: anArray! !
+
+!AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:38:29'!
+decodeStatements 
+
+	^stream upToEnd collect: [:statement | self decodeStatement: statement]! !
+
+!AstcodeDecoder methodsFor: 'accessing' stamp: 'KenD 9/28/2022 13:22:49'!
+builder: aRuntime
+	builder := aRuntime
+! !
+
+!AstcodeDecoder methodsFor: 'accessing' stamp: 'KenD 9/28/2022 13:22:49'!
+method: aMethod
+	method := aMethod
+! !
+
+!AstcodeDecoder methodsFor: 'accessing' stamp: 'KenD 2/24/2021 11:41:43'!
+next 
+
+	^stream next! !
+
+!AstcodeDecoder methodsFor: 'accessing' stamp: 'KenD 9/28/2022 13:22:49'!
+stream: aStream
+	stream := aStream
+! !
+
+!AstcodeDecoder methodsFor: 'initialization' stamp: 'KenD 2/24/2021 11:39:27'!
+initialize 
+	nodeTypes := Dictionary new: 40.
+	bindingTypes := Dictionary new: 20.
+	nodeTypes
+		at: AssignmentId put: SAssignment;
+		at: BlockId put: SBlock;
+		at: CascadeId put: SCascade;
+		at: LiteralId put: SLiteral;
+		at: IdentifierId put: SIdentifier;
+		at: MessageId put: SMessage;
+		at: ReturnId put: SReturn;
+		at: LoadRwithSelfId put: LoadRwithSelf;
+		at: LoadAwithSelfId put: LoadAwithSelf;
+		at: LoadRwithNilId put: LoadRwithNil;
+		at: LoadAwithNilId put: LoadAwithNil;
+		at: LoadRwithFalseId put: LoadRwithFalse;
+		at: LoadAwithFalseId put: LoadAwithFalse;
+		at: LoadRwithTrueId put: LoadRwithTrue;
+		at: LoadAwithTrueId put: LoadAwithTrue;
+		at: LoadRwithArgumentId put: LoadRwithArgument;
+		at: LoadAwithArgumentId put: LoadAwithArgument;
+		at: LoadRwithTemporaryId put: LoadRwithTemporary;
+		at: LoadAwithTemporaryId put: LoadAwithTemporary;
+		at: LoadRwithInstVarId put: LoadRwithInstVar;
+		at: LoadAwithInstVarId put: LoadAwithInstVar;
+		at: LoadAwithGlobalId put: LoadAwithGlobal;
+		at: LoadAwithClassVarId put: LoadAwithClassVar;
+		at: LoadAwithPoolVarId put: LoadAwithPoolVar;
+		at: LoadAwithConstPoolId put: LoadAwithConstPoolVar;
+		at: LoadRvisitingReceiverId put: LoadRvisitingReceiver;
+		at: LoadAvisitingArgumentId put: LoadAvisitingArgument;
+		"		at: LoadRwithLiteralId put: LoadRwithLiteral;"
+			at: LoadAwithLiteralId put: LoadAwithLiteral;
+		at: EnsureRisSmallIntegerId put: EnsureRSmallInteger;
+		at: EnsureAisSmallIntegerId put: EnsureASmallInteger;
+		at: PushRid put: PushRopcode;
+		at: PopRid put: PopRopcode.
+	bindingTypes
+		at: NilId put: SNilBinding;
+		at: TrueId put: STrueBinding;
+		at: FalseId put: SFalseBinding;
+		at: ArgumentId put: SArgumentBinding;
+		at: TemporaryId put: STemporaryBinding;
+		at: SelfId put: SSelfBinding;
+		at: SuperId put: SSuperBinding;
+		at: InstVarId put: SInstVarBinding;
+		at: ClassVarId put: SClassVarBinding;
+		at: GlobalValueId put: SGlobalBinding;
+		at: GlobalClassId put: SClassBinding;
+		at: PoolVarId put: SPoolVarBinding;
+		at: ConstantPoolId put: SConstantPoolBinding! !
+
+!AstcodeDecoder methodsFor: 'initialization' stamp: 'KenD 9/28/2022 13:22:49'!
+nextBoolean
+	^ stream next = 1
+! !
+
+!AstcodeDecoder methodsFor: 'initialization' stamp: 'KenD 9/28/2022 13:22:49'!
+nextInteger
+	| value |
+	value := stream next.
+	value = 16r80
+		ifTrue: [ ^ stream int64 ].
+	^ value <= 127
+		ifTrue: [ value ]
+		ifFalse: [ value - 16r100 ]
+! !
+
+!AstcodeDecoder methodsFor: 'initialization' stamp: 'KenD 9/28/2022 13:22:49'!
+nextUnsignedInteger
+	| value |
+	value := self nextByte.
+	^value < 128
+		ifTrue: [value]
+		ifFalse: [value - 128 + (self nextUnsignedInteger bitShift: 7)]
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+bindingTypeOf: id
+	^ BindingTypes at: id
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeArgument
+	^ SArgumentBinding new
+		index: self nextInteger;
+		environment: self nextEnvironment
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeAssignment
+	| assignment assignees |
+	assignment := SAssignment new.
+	
+	assignees := self nextExpressionArray.
+	assignment expression: self nextExpression.
+	assignees do: [ :identifier | assignment assign: identifier ].
+	^ assignment
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeBlock
+	| expression inlined block index |
+	expression := SBlock new.
+	inlined := self nextBoolean.
+	inlined
+		ifTrue: [ expression inlinedArgs: self nextArray ]
+		ifFalse: [ index := self nextInteger.
+			block := self literalAt: index.
+			builder ifNotNil: [ builder blockOptimizedCode: block put: expression ].
+			expression
+				compiledCode: block;
+				index: index;
+				capturedVariables: self nextArray ].
+	expression statements: self nextExpressionArray.
+	^ expression
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeCascade
+	| cascade receiver messages message count |
+	cascade := SCascade new.
+	receiver := self nextExpression.
+	count := self nextInteger.
+	messages := (1 to: count)
+		collect: [ :i | 
+			message := SCascadeMessage decodeUsing: self.
+			message cascade: cascade ].
+	^ cascade
+		receiver: receiver;
+		messages: messages
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeCascadeMessage
+	| selector arguments |
+	selector := self nextSymbol.
+	arguments := self nextExpressionArray.
+	^ SCascadeMessage new
+		selector: selector;
+		arguments: arguments
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeDynamicVar
+	^ SDynamicBinding new name: self nextSymbol
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeIdentifier
+	| type binding |
+	type := self bindingTypeOf: self nextInteger.
+	binding := type decodeUsing: self.
+	^ SIdentifier new binding: binding
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeLiteral
+	| index value |
+	index := self nextInteger.
+	value := index = 0
+		ifTrue: [ self nextLiteralInteger ]
+		ifFalse: [ self literalAt: index ].
+	^ SLiteral new
+		index: index;
+		value: value
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeMessage
+	| inlined selector receiver arguments |
+	inlined := self nextBoolean.
+	selector := self nextSymbol.
+	receiver := self nextExpression.
+	arguments := self nextExpressionArray.
+	^ SMessage new
+		receiver: receiver;
+		selector: selector;
+		arguments: arguments;
+		inlined: inlined
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeMethod
+	| type node next pragma |
+	type := stream next.
+	type !!= MethodId
+		ifTrue: [ self error: 'method astcode expected' ].
+	node := SMethod new.
+	next := stream peek.
+	next = PragmaId
+		ifTrue: [ stream next.
+			pragma := SPragma new name: self nextSymbolOrNil.
+			node pragma: pragma ].
+	node
+		compiledCode: method;
+		statements: self nextExpressionArray.
+	^ node
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeNestedDynamicVar
+	^ SNestedDynamicBinding new
+		name:
+			self nextSymbol.
+
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeReturn
+	| expression local |
+	local := self nextBoolean.
+	expression := self nextExpression.
+	^ SReturn new
+		local: local;
+		expression: expression
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+decodeTemporary
+	^ STemporaryBinding new
+		index: self nextInteger;
+		environment: self nextEnvironment
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+nextArray
+	| count |
+	count := self nextInteger.
+	^ stream next: count
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+nextEnvironment
+	| value |
+	value := self nextInteger.
+	^ value !!= -2
+		ifTrue: [ value ]
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+nextExpression
+	| type |
+	type := self nodeTypeOf: stream next.
+	^type decodeUsing: self.
+
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+nextExpressionArray
+	| count |
+	count := self nextInteger.
+	^(1 to: count) collect: [ :arg | self nextExpression ]
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+nextSymbol
+	| index |
+	index := self nextInteger.
+	^ self literalAt: index
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+nextSymbolOrNil
+	| index |
+	index := self nextInteger.
+	^index !!= 0 ifTrue: [ self literalAt: index]
+! !
+
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 9/28/2022 13:22:49'!
+nodeTypeOf: id
+	^NodeTypes at: id
+! !
+
+!AstcodeDecoder methodsFor: 'unclassified' stamp: 'KenD 9/28/2022 13:22:49'!
+literalAt: anInteger
+	^ builder ifNil: [method at: anInteger] ifNotNil: [builder method: method literalAt: anInteger]
+! !
+
+!AstcodeDecoder methodsFor: 'unclassified' stamp: 'KenD 9/28/2022 13:22:49'!
+nextLiteralInteger
+	| value |
+	value := self nextInteger.
+	^ builder
+		ifNil: [ value ]
+		ifNotNil: [ builder newInteger: value ]
+! !
+
+!AstcodeDecoder class methodsFor: 'class initialization' stamp: 'KenD 9/28/2022 13:22:49'!
+initialize
+	NodeTypes := Dictionary new.
+	BindingTypes := Dictionary new.
+	NodeTypes
+		at: AssignmentId put: SAssignment;
+		at: BlockId put: SBlock;
+		at: CascadeId put: SCascade;
+		at: LiteralId put: SLiteral;
+		at: IdentifierId put: SIdentifier;
+		at: MessageId put: SMessage;
+		at: ReturnId put: SReturn.
+	BindingTypes
+		at: NilId put: SNilBinding;
+		at: TrueId put: STrueBinding;
+		at: FalseId put: SFalseBinding;
+		at: ArgumentId put: SArgumentBinding;
+		at: TemporaryId put: STemporaryBinding;
+		at: SelfId put: SSelfBinding;
+		at: SuperId put: SSuperBinding;
+		at: DynamicVarId put: SDynamicBinding;
+		at: NestedDynamicVarId put: SNestedDynamicBinding
+! !
+
+!AstcodeDecoder class methodsFor: 'instance creation' stamp: 'KenD 9/28/2022 13:22:49'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:04:54'!
+isAssignment 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:01'!
+isCascade 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:10'!
+isCascadeMessage 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:16'!
+isIdentifier 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:23'!
+isInstVar 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:32'!
+isLiteral 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:39'!
+isMessage 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:48'!
+isMethod 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:05:55'!
+isReturn 
+
+	^false! !
+
+!SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:06:02'!
+isSuper 
+
+	^false! !
+
+!SExpression methodsFor: 'printing' stamp: 'KenD 2/22/2021 13:06:29'!
+printOn: aStream 
+
+	self printOn: aStream indent: 0! !
+
+!SExpression methodsFor: 'printing' stamp: 'KenD 2/22/2021 13:06:44'!
+printOn: aStream indent: anInteger 
+
+	super printOn: aStream! !
+
+!SExpression methodsFor: 'visiting' stamp: 'KenD 2/22/2021 13:04:25'!
+acceptVisitor: visitor 
+
+	^self subclassResponsibility! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:24:13'!
+bytesOf: oid 
+	| size |
+	size := self sizeOf: oid.
+	^self bytesOf: oid count: size! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:24:30'!
+bytesOf: oid count: size 
+
+	^self subclassResponsibility! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:24:42'!
+runtime 
+
+	^ runtime! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:24:50'!
+runtime: aRuntime 
+
+	runtime := aRuntime! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:24:59'!
+sizeOf: oid 
+
+	^self subclassResponsibility! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:25:08'!
+storage 
+
+	^ storage! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:25:17'!
+storage: anObject 
+
+	storage := anObject! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:25:31'!
+stringOf: oid 
+	| size |
+	size := self sizeOf: oid.
+	^self stringOf: oid count: size - 1! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:25:42'!
+stringOf: oid count: size 
+
+	^self subclassResponsibility! !
+
+!ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:25:55'!
+symbolOf: oid 
+	| size |
+	size := self sizeOf: oid.
+	^self stringOf: oid count: size! !
+
+!ObjectFormat class methodsFor: 'instance creation' stamp: 'KenD 2/27/2021 09:23:44'!
+on: storage 
+
+	^self new storage: storage! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:35:01'!
+isArrayed: anObject 
+
+	^ (self flagsOf: anObject) anyMask: IsArrayed! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:35:16'!
+isBytes: anObject 
+
+	^ ((self flagsOf: anObject) anyMask: IsBytes)! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:35:25'!
+isInteger: oid 
+
+	^oid odd! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:35:34'!
+isLarge: anObject 
+
+	^(self isSmall: anObject) not! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:35:46'!
+isNamed: anObject 
+
+	^ (self flagsOf: anObject) anyMask: IsNamed! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:35:59'!
+isSmall: oid 
+
+	^ (self flagsOf: oid) anyMask: IsSmall! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:36:09'!
+labelFor: oid 
+
+	^oid hex! !
+
+!DmrObjectFormat methodsFor: 'testing' stamp: 'KenD 3/2/2021 13:36:19'!
+largeSizeOf: oid 
+
+	^ storage uint32of: oid atOffset: LargeSizeOffset! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:33:26'!
+behaviorOf: oid 
+
+	^ storage uint32of: oid atOffset: BehaviorOffset! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:33:48'!
+bytesOf: oid count: size 
+	
+	^ storage bytesAt: oid sized: size! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:34:01'!
+classOf: anObjectHandle 
+	| oid class behavior handle |
+	oid := anObjectHandle oid.
+	oid odd ifTrue: [ class := storage classNamed: 'SmallInteger'.
+			^ (anObjectHandle runtime handleOn: class) mirror asClassMirror ].
+	behavior := self behaviorOf: oid.
+	handle := anObjectHandle runtime handleOn: behavior.
+	^ handle mirror asBehaviorMirror instanceClass! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:34:16'!
+flagsOf: anObject 
+	^ storage uint8of: anObject atOffset: FlagsOffset! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:34:27'!
+integerOf: oid 
+	| shifted complement |
+	self assert: oid odd.
+	shifted := oid bitShift: -1. 
+	complement := 1 bitShift: storage wordSize * 8 - 1.
+	^ oid >= complement
+		ifTrue: [ shifted - complement ]
+		ifFalse: [ shifted ]! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:38:11'!
+sizeOf: oid 
+
+	^ (self isSmall: oid)
+		ifTrue: [ self smallSizeOf: oid ]
+		ifFalse: [ self largeSizeOf: oid ]! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:38:26'!
+slotOf: base at: index 
+
+	^ storage uint64atOffset: base + (8 * (index - 1))! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:38:42'!
+smallSizeOf: oid 
+
+	^ storage uint8of: oid atOffset: SizeOffset! !
+
+!DmrObjectFormat methodsFor: 'accessing' stamp: 'KenD 3/2/2021 13:38:54'!
+stringOf: oid count: anInteger 
+
+	^storage stringAt: oid sized: anInteger! !
+
+!DmrObjectFormat methodsFor: 'printing' stamp: 'KenD 3/2/2021 13:37:05'!
+print: oid on: aStream 
+	| size |
+	aStream
+		nextPut: $@;
+		nextPutAll: oid hex;
+		nextPutAll: '[flags: 0x';
+		nextPutAll: (self flagsOf: oid) printStringHex.
+	self printFlagsOf: oid on: aStream.
+	size := self sizeOf: oid.
+	aStream
+		nextPutAll: ', size: 0x';
+		nextPutAll: size printStringHex;
+		nextPut: $]
+! !
+
+!DmrObjectFormat methodsFor: 'printing' stamp: 'KenD 3/2/2021 13:37:40'!
+printFlagsOf: oid on: aStream 
+	| char |
+	aStream nextPut: $(.
+	char := (self isSmall: oid)
+		ifTrue: [ $S ]
+		ifFalse: [ $L ].
+	aStream
+		nextPut: char;
+		space.
+	char := (self isBytes: oid)
+		ifTrue: [ $B ]
+		ifFalse: [ $P ].
+	aStream
+		nextPut: char;
+		space.
+	char := (self isArrayed: oid)
+		ifTrue: [ $A ]
+		ifFalse: [ $F ].
+	aStream
+		nextPut: char;
+		nextPut: $)! !
+
+!ObjectShape methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:22:45'!
+indexOf: ivarName 
+	
+	^fields at: ivarName asString! !
+
+!ObjectShape methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:22:57'!
+indexOf: ivarName be: i 
+
+	fields at: ivarName put: i! !
+
+!ObjectShape methodsFor: 'accessing' stamp: 'KenD 2/22/2021 13:24:03'!
+name 
+
+	^name! !
+
+!ObjectShape methodsFor: 'initialization' stamp: 'KenD 2/22/2021 13:23:18'!
+initialize 
+
+	fields := Dictionary new! !
+
+!ObjectShape methodsFor: 'initialization' stamp: 'KenD 2/22/2021 13:23:52'!
+loadFrom: aClassDefinition 
+
+	name := aClassDefinition name asSymbol.
+	aClassDefinition allInstVarNames
+		withIndexDo: [:ivarName :i | self indexOf: ivarName be: i]! !
+
+!ObjectShape methodsFor: 'printing' stamp: 'KenD 2/22/2021 13:24:29'!
+printOn: aStream 
+
+	aStream nextPutAll: 'Shape of '; nextPutAll: name! !
+
+!ObjectShape class methodsFor: 'instance creation' stamp: 'KenD 2/22/2021 13:21:32'!
+new 
+
+	^self basicNew initialize! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:10:44'!
+isitReturn: anSReturn 
+
+	returnValue := anSReturn expression acceptVisitor: self.
+	returned := true.
+	^returnValue! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:08:17'!
+visitArgument: anSIdentifier 
+
+	^arguments at: anSIdentifier binding index! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:08:32'!
+visitAssignment: anSAssignment 
+	| result |
+	result := anSAssignment expression acceptVisitor: self.
+	anSAssignment assignees
+		do: [ :identifier | identifier binding assign: result within: self ].
+	^result! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:08:48'!
+visitBlock: anSBlock 
+	| closure handle |
+	closure := anSBlock isInlined
+		           ifTrue: [ SCompiledBlock new newClosure home: self ]
+		           ifFalse: [ self captureClosure: anSBlock ].
+	blockAstcodes at: closure block put: anSBlock.
+	self halt.
+	"	handle := LocalHandle on: closure within: localRuntime."
+	^ handle mirage! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:09:24'!
+visitIdentifier: anSIdentifier 
+
+	^anSIdentifier binding valueWithin: self! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:09:37'!
+visitMessage: anSMessage 
+	| msgReceiver msgArguments selector message |
+	msgReceiver := anSMessage receiver acceptVisitor: self.
+	msgArguments := anSMessage arguments
+		collect: [ :code | code acceptVisitor: self ].
+	selector := anSMessage selector.
+	message := MessageSend
+		receiver: msgReceiver
+		selector: selector
+		arguments: msgArguments.
+	 (self isSpecial: selector)
+		ifTrue: [ ^self dispatchSpecial: message ].
+	anSMessage receiver isSuper ifTrue: [^self dispatchSuper: message to: msgReceiver].
+	^self dispatch: message to: msgReceiver! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:10:10'!
+visitMethod: anSMethod 
+	| primitive value |
+	primitive := anSMethod primitive.
+	primitive ifNotNil: [ ^ self visitPrimitive: primitive ].
+	environment := Array new: method environmentCount.
+	value := self visitScript: anSMethod.
+	^returned ifTrue: [ value ] ifFalse: [ receiver ]! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:10:57'!
+visitScript: anSScript 
+	| result |
+	anSScript statements do: [:node | 
+		result := node acceptVisitor: self.
+		returned ifTrue: [^returnValue]
+	].
+	^result! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:11:12'!
+visitTemporary: anSIdentifier 
+
+	^temporaries at: anSIdentifier binding index! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:00:53'!
+instVarAt: anInteger 
+
+	^receiver _gate slotAt: anInteger! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:01:18'!
+instVarAt: index put: aValue 
+
+	^ receiver _gate handle slotAt: index put: aValue _gate handle oid! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:01:43'!
+method 
+
+	^method! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:02:03'!
+method: aCompiledMethod 
+
+	method := aCompiledMethod.
+	temporaries := Array new: aCompiledMethod tempCount! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:02:25'!
+mirageOnBoolean: aBoolean 
+	| runtime handle |
+	runtime := receiver _gate handle runtime.
+	handle := aBoolean ifTrue: [runtime true] ifFalse: [runtime false].
+	^ handle mirage
+! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:02:37'!
+mirageOnInteger: anInteger 
+	| runtime handle |
+	runtime := receiver _gate handle runtime.
+	handle := runtime integerHandle: anInteger.
+	^ handle mirage! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:02:52'!
+mirageOnObject: anObject 
+
+	anObject isSmallInteger ifTrue: [ ^ self mirageOnInteger: anObject ].
+	self assert: false! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:03:16'!
+parent 
+
+	^parent! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:03:26'!
+parent: anInterpreter 
+
+	parent := anInterpreter! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:04:16'!
+receiver 
+
+	^receiver! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:04:26'!
+receiver: anObject 
+
+	receiver := anObject.
+	returnValue := anObject! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:07:11'!
+temporaryAt: index in: anInteger 
+	| env |
+	anInteger ifNil: [ ^ temporaries at: index ].
+	env := self environmentFor: anInteger.
+	^ env at: index! !
+
+!SExpressionInterpreter methodsFor: 'accessing' stamp: 'KenD 2/27/2021 16:07:46'!
+temporaryAt: index in: anInteger put: aValue 
+	| env |
+	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
+	env := self environmentFor: anInteger.
+	^ env at: index put: aValue! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:56:58'!
+argumentAt: index in: anInteger 
+	| env |
+	anInteger ifNil: [ ^arguments at: index ].
+	env := self environmentFor: anInteger.
+	^env at: index.! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:57:13'!
+arguments: aCollection 
+
+	arguments := aCollection! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:57:30'!
+captureClosure: anSBlock 
+	| closure s i type env arg |
+	closure := anSBlock compiledCode newClosure home: self.
+	s := anSBlock capturedVariables readStream.
+	i := 1.
+	[ s atEnd ]
+		whileFalse: [ type := s next.
+			type = Self
+				ifTrue: [ closure at: i put: receiver ].
+			type = Environment
+				ifTrue: [ closure at: i put: environment].
+			type = EnvironmentValue
+				ifTrue: [ env := environment at: s next.
+					closure at: i put: env ].
+			type = LocalArgument
+				ifTrue: [ arg := arguments at: s next.
+					closure at: i put: arg ].
+			i := i + 1 ].
+	^ closure! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:58:12'!
+dispatch: message to: msgReceiver 
+
+	^ self subclassResponsibility! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:58:23'!
+dispatchSpecial: message 
+
+		^self subclassResponsibility ! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:58:36'!
+environmentFor: anInteger 
+	"
+	-1: inlined argument.
+	 0: current env.
+ 	>0: index of env in current env. "
+
+	anInteger = 0
+		ifTrue: [ ^ environment ].
+	anInteger = -1
+		ifTrue: [ ^ temporaries ].
+	^ environment at: anInteger! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:58:57'!
+evaluate: anSCompiledMethod 
+
+	method := anSCompiledMethod.
+	^ self visitMethod: anSCompiledMethod sexpressions! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:59:13'!
+evaluateClosure: aPClosure 
+
+	^self evaluateClosure: aPClosure withArgs: {}! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:59:25'!
+evaluateClosure: aPClosure with: anObject 
+
+	 ^self evaluateClosure: aPClosure withArgs: { anObject }! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:59:37'!
+evaluateClosure: aPClosure with: anObject with: anotherObject 
+
+	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 15:59:58'!
+evaluateClosure: aPClosure withArgs: anArray 
+	| oldArgs oldTemps oldEnv block sblock result |
+	block := aPClosure block.
+	sblock := blockAstcodes at: block.
+	sblock isInlined ifTrue: [
+			 anArray with: sblock inlinedArgs do: [:arg :i | temporaries at: i put: arg].
+			^ self visitScript: sblock ].
+	oldArgs := arguments.
+	oldTemps := temporaries.
+	oldEnv := environment.
+	arguments := anArray.
+	temporaries := Array new: block tempCount.
+	environment := aPClosure.
+	result := self visitScript: sblock.
+	environment := oldEnv.
+	temporaries := oldTemps.
+	arguments := oldArgs.
+	^ result! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 16:04:48'!
+subjectOn: anObjectHandle 
+
+	^ anObjectHandle maneuverer! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 16:06:19'!
+subjectOnBoolean: aBoolean in: aRuntime 
+	| t f |
+	^ aBoolean
+		ifTrue: [ t := aRuntime true. 
+			(t oid = true) ifTrue: [ t mirage] ifFalse: [ t maneuverer  ] 
+		]
+		ifFalse: [ f := aRuntime false. 
+			(f oid = false) ifTrue: [ f mirage ] ifFalse: [ f maneuverer]
+		] ! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 16:06:42'!
+subjectOnObject: anObjectHandle 
+
+	^ anObjectHandle maneuverer! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 16:06:54'!
+subjectOnObjectOk: anObjectHandle 
+
+	^ self maneuvererOn: anObjectHandle! !
+
+!SExpressionInterpreter methodsFor: 'evaluation' stamp: 'KenD 2/27/2021 16:06:32'!
+ubjectOnInteger: anInteger in: aRuntime 
+
+	^ (aRuntime integerHandle: anInteger) maneuverer! !
+
+!SExpressionInterpreter methodsFor: 'printing' stamp: 'KenD 7/7/2021 15:45:57'!
+printOn: aStream 
+	aStream
+		nextPutAll: self class name withArticle;
+		newLine;
+		print: method classBinding;
+		nextPutAll: '>>';
+		print: method selector;
+		newLine.
+	aStream
+		nextPutAll: 'rcvr -> ';
+		print: receiver _gate handle;
+		newLine.
+	arguments
+		withIndexDo: [ :a :i | 
+			aStream
+				nextPutAll: 'arg ';
+				print: i;
+				nextPutAll: ' -> ';
+				print: a _gate;
+				newLine ].
+	aStream nextPutAll: method source! !
+
+!SExpressionInterpreter methodsFor: 'initialization' stamp: 'KenD 2/27/2021 16:00:30'!
+initialize 
+
+	returned := false.
+	blockAstcodes := IdentityDictionary new! !
+
+!SExpressionInterpreter methodsFor: 'testing' stamp: 'KenD 2/27/2021 16:01:33'!
+isSpecial: aSelectorMirror 
+
+	^ self subclassResponsibility ! !
+
+!SExpressionInterpreter class methodsFor: 'instance creation' stamp: 'KenD 2/27/2021 15:56:13'!
+new 
+
+	^self basicNew initialize! !
+
+!SExpressionInterpreter class methodsFor: 'instance creation' stamp: 'KenD 2/27/2021 15:56:31'!
+on: receiverMirror with: arguments for: method 
+
+	^self new
+		receiver: receiverMirror;
+		arguments: arguments;
+		method: method! !
+
+!OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:33:46'!
+isImmediate1Operand: index 
+
+	^(self isImmediateOperand: index)
+		and: [(1 to: index - 1) noneSatisfy: [:i | self isImmediateOperand: i]]! !
+
+!OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:33:59'!
+isImmediate2Operand: index 
+
+	^(self isImmediateOperand: index)
+		and: [(1 to: index - 1) anySatisfy: [:i | self isImmediateOperand: i]]! !
+
+!OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:34:25'!
+isImmediateOperand: index 
+
+	| d |
+	d := descriptions at: index.
+	^(d includesString: 'IMM') or: [d includesString: 'OFFS'] or: [d = 'IW']! !
+
+!OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:34:41'!
+isVvvvOperand: index 
+
+	^(descriptions at: index) includesString: 'VVVV'! !
+
+!OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:36:36'!
+usesImmediate 
+
+	^immediate! !
+
+!OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:36:45'!
+usesImmediate2 
+
+	^immediate and: [selectors anySatisfy: [:s | s includesString: 'II']]! !
+
+!OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:36:59'!
+usesModRM 
+
+	^modrm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:12:55'!
+encodeAOperand1: operand 
+"
+	imm8
+"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:13:08'!
+encodeDOperand1: instruction 
+	"
+	offset
+	"
+	| op bytes |
+	op := instruction spec operands at: 1.
+	bytes := self bytesFor: instruction operand1 value length: op length // 8.
+	instruction immediate: bytes! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:13:38'!
+encodeFDOperand1: instruction 
+	"
+	AL/AX/EAX/RAX
+	Moffs
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:13:48'!
+encodeFDOperand2: operand 
+	"
+	AL/AX/EAX/RAX
+	Moffs
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:13:57'!
+encodeFVOperand1: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:14:06'!
+encodeFVOperand2: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:14:16'!
+encodeFVOperand3: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:14:24'!
+encodeFVRVMOperand1: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:14:34'!
+encodeFVRVMOperand2: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:14:43'!
+encodeFVRVMOperand3: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:14:52'!
+encodeIIOperand1: instruction 
+	"
+	iw
+	imm8
+	"
+	| op bytes |
+	op := instruction spec operands at: 1.
+	bytes := self bytesFor: instruction operand1 value length: op length // 8.
+	instruction immediate: bytes! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:15:04'!
+encodeIIOperand2: instruction 
+	"
+	iw
+	imm8
+	"
+	| op bytes |
+	op := instruction spec operands at: 2.
+	bytes := self bytesFor: instruction operand2 value length: op length // 8.
+	instruction immediate2: bytes
+! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:15:16'!
+encodeIOperand1: instruction 
+	"
+	AL/AX/EAX/RAX
+	imm8
+	"
+	"
+	do nothing
+	"
+	instruction arity = 1 ifTrue: [| op bytes |
+		op := instruction spec operands at: 1.
+		bytes := self bytesFor: instruction operand1 value length: op length // 8.
+		instruction immediate: bytes]! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:15:29'!
+encodeIOperand2: instruction 
+	"
+	AL/AX/EAX/RAX
+	imm8
+	"
+	| op bytes |
+	op := instruction spec operands at: 2.
+	bytes := self bytesFor: instruction operand2 value length: op length // 8.
+	instruction immediate: bytes
+! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:15:40'!
+encodeM1Operand1: instruction 
+	"
+	ModRM:r/m (w)
+	1
+	"
+	instruction rm: instruction operand1 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:15:50'!
+encodeM1Operand2: instruction 
+	"
+	ModRM:r/m (w)
+	1
+	"
+	"
+	do nothing
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:16:17'!
+encodeMCOperand1: instruction 
+	"
+	ModRM:r/m (w)
+	CL
+	"
+	instruction rm: instruction operand1 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:20:10'!
+encodeMCOperand2: operand 
+	"
+	ModRM:r/m (w)
+	CL
+	"
+	"
+	do nothing
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:21:24'!
+encodeMIOperand1: instruction 
+	"
+	ModRM:r/m (r, w)
+	imm8
+	"
+	instruction rm: instruction operand1 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:21:39'!
+encodeMIOperand2: instruction 
+	"
+	ModRM:r/m (r, w)
+	imm8
+	"
+	| op bytes |
+	op := instruction spec operands at: 2.
+	bytes := self bytesFor: instruction operand2 value length: op length // 8.
+	instruction immediate: bytes
+! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:21:50'!
+encodeMOperand1: instruction 
+
+	"
+	ModRM:r/m (r)
+	"
+	instruction rm: instruction operand1 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:22:03'!
+encodeMRCOperand1: instruction 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	CL
+	"
+	instruction rm: instruction operand1 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:22:14'!
+encodeMRCOperand2: instruction 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	CL
+	"
+	instruction reg: instruction operand2! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:22:24'!
+encodeMRCOperand3: instruction 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	CL
+	"
+	"
+	do nothing
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:22:35'!
+encodeMRIOperand1: instruction 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	imm8
+	"
+	instruction rm: instruction operand1 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:22:45'!
+encodeMRIOperand2: instruction 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	imm8
+	"
+	instruction reg: instruction operand2! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:22:58'!
+encodeMRIOperand3: instruction 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	imm8
+	"
+	| op bytes |
+	op := instruction spec operands at: 3.
+	bytes := self bytesFor: instruction operand3 value length: op length // 8.
+	instruction immediate: bytes! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:23:09'!
+encodeMROperand1: instruction 
+	"
+	ModRM:r/m (r, w)
+	ModRM:reg (r)
+	"
+	instruction rm: instruction operand1 rm
+! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:23:18'!
+encodeMROperand2: instruction 
+	"
+	ModRM:r/m (r, w)
+	ModRM:reg (r)
+	"
+	instruction reg: instruction operand2! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:23:27'!
+encodeMVROperand1: instruction 
+	"
+	ModRM:r/m (w)
+	VEX.vvvv (r)
+	ModRM:reg (r)
+	"
+	instruction vrm: instruction operand1 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:23:36'!
+encodeMVROperand2: instruction 
+	"
+	ModRM:r/m (w)
+	VEX.vvvv (r)
+	ModRM:reg (r)
+	"
+	instruction vvvv: instruction operand2 index! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:23:45'!
+encodeMVROperand3: instruction 
+	"
+	ModRM:r/m (w)
+	VEX.vvvv (r)
+	ModRM:reg (r)
+	"
+	instruction vreg: instruction operand3! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:23:54'!
+encodeNPOperand1: instruction 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	"
+	self assert: instruction operand1 isImmediate! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:24:07'!
+encodeNPOperand2: operand 
+	"
+	ModRM:r/m (w)
+	ModRM:reg (r)
+	"
+	self assert: false! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:24:19'!
+encodeOIOperand1: instruction 
+	"
+	opcode + rd (w)
+	imm8/16/32/64
+	"
+	self encodeOOperand1: instruction! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:24:32'!
+encodeOIOperand2: instruction 
+	"
+	opcode + rd (w)
+	imm8/16/32/64
+	"
+	instruction operand2 length: instruction operand1 length.
+	instruction immediate: instruction operand2 bytes! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:24:40'!
+encodeOOperand1: instruction 
+	"
+	opcode + rd (r, w)
+	"
+	| index i opcode |
+	index := instruction operand1 index.
+	i := index bitAnd: 2r111.
+	opcode := instruction spec primaryOpcode copy.
+	opcode at: opcode size put: opcode last + i.
+	index > 7
+		ifTrue: [instruction rexB: true opcode: opcode]
+		ifFalse: [instruction opcode: opcode]! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:26:10'!
+encodeRM0Operand1: instruction 
+	"
+	ModRM:reg (r, w)
+	ModRM:r/m (r)
+	"
+	instruction vreg: instruction operand1! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:26:21'!
+encodeRM0Operand2: instruction 
+	"
+	ModRM:reg (r, w)
+	ModRM:r/m (r)
+	"
+	instruction vrm: instruction operand2 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:26:58'!
+encodeRMIOperand1: instruction 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	imm8
+	"
+	instruction reg: instruction operand1! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:27:10'!
+encodeRMIOperand2: instruction 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	imm8
+	"
+	instruction rm: instruction operand2 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:27:22'!
+encodeRMIOperand3: instruction 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	imm8
+	"
+	| op bytes |
+	op := instruction spec operands at: 3.
+	bytes := self bytesFor: instruction operand3 value length: op length // 8.
+	instruction immediate: bytes
+! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:27:30'!
+encodeRMOperand1: instruction 
+	"
+	ModRM:reg (r, w)
+	ModRM:r/m (r)
+	"
+	instruction reg: instruction operand1! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:27:39'!
+encodeRMOperand2: instruction 
+	"
+	ModRM:reg (r, w)
+	ModRM:r/m (r)
+	"
+	instruction rm: instruction operand2 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:27:49'!
+encodeRMVOperand1: instruction 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	VEX.vvvv (r)
+	"
+	instruction vreg: instruction operand1! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:28:00'!
+encodeRMVOperand2: instruction 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	VEX.vvvv (r)
+	"
+	instruction vrm: instruction operand2 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:28:12'!
+encodeRMVOperand3: instruction 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	VEX.vvvv (r)
+	"
+	instruction vvvv: instruction operand3 index! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:28:22'!
+encodeRVMIOperand1: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[3:0]
+	"
+	instruction vreg: instruction operand1! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:28:30'!
+encodeRVMIOperand2: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[3:0]
+	"
+	instruction vvvv: instruction operand2 index! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:28:41'!
+encodeRVMIOperand3: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[3:0]
+	"
+	instruction vrm: instruction operand3 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:28:58'!
+encodeRVMIOperand4: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[3:0]
+	"
+	| op bytes |
+	op := instruction spec operands at: 4.
+	bytes := self bytesFor: instruction operand4 value length: op length // 8.
+	instruction immediate: bytes
+! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:29:09'!
+encodeRVMOperand1: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv
+	ModRM:r/m (r)
+	"
+	instruction vreg: instruction operand1! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:29:19'!
+encodeRVMOperand2: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv
+	ModRM:r/m (r)
+	"
+	instruction vvvv: instruction operand2 index! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:29:34'!
+encodeRVMOperand3: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv
+	ModRM:r/m (r)
+	"
+	instruction vrm: instruction operand3 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:29:43'!
+encodeRVMROperand1: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[7:4]
+	"
+	instruction vreg: instruction operand1! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:29:51'!
+encodeRVMROperand2: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[7:4]
+	"
+	instruction vvvv: instruction operand2 index! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:30:01'!
+encodeRVMROperand3: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[7:4]
+	"
+	instruction vrm: instruction operand3 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:30:10'!
+encodeRVMROperand4: instruction 
+	"
+	ModRM:reg (w)
+	VEX.vvvv (r)
+	ModRM:r/m (r)
+	imm8[7:4]
+	"
+	| imm |
+	imm := instruction operand4 index bitShift: 4.
+	instruction immediate: imm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:30:18'!
+encodeT1SOperand1: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:30:27'!
+encodeT1SOperand2: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:30:37'!
+encodeT1SOperand3: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:30:48'!
+encodeT1SRVMOperand1: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:30:57'!
+encodeT1SRVMOperand2: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:31:05'!
+encodeT1SRVMOperand3: instruction 
+	"
+	ModRM:reg (w)
+	EVEX.vvvv
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:31:17'!
+encodeTDOperand1: operand 
+	"
+	Moffs (w)
+	AL/AX/EAX/RAX
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:31:27'!
+encodeTDOperand2: operand 
+	"
+	Moffs (w)
+	AL/AX/EAX/RAX
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:31:38'!
+encodeTOOperand1: operand ! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:31:46'!
+encodeTOOperand2: operand ! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:31:58'!
+encodeVMIOperand1: instruction 
+	"
+	VEX.vvvv (w)
+	ModRM:r/m (r)
+	imm8
+	"
+	instruction vvvv: instruction operand1 index! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:32:07'!
+encodeVMIOperand2: instruction 
+	"
+	VEX.vvvv (w)
+	ModRM:r/m (r)
+	imm8
+	"
+	instruction vrm: instruction operand2 rm! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:32:16'!
+encodeVMIOperand3: instruction 
+	"
+	VEX.vvvv (w)
+	ModRM:r/m (r)
+	imm8
+	"
+	| op bytes |
+	op := instruction spec operands at: 3.
+	bytes := self bytesFor: instruction operand3 value length: op length // 8.
+	instruction immediate: bytes! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:32:28'!
+encodeVMOperand1: operand 
+	"
+	VEX.vvvv (w)
+	ModRM:r/m (r)
+	"
+	! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:32:37'!
+encodeVMOperand2: operand 
+	"
+	VEX.vvvv (w)
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:32:45'!
+encodeXMOperand1: operand 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'private' stamp: 'KenD 4/25/2021 11:32:59'!
+encodeXMOperand2: operand 
+	"
+	ModRM:reg (w)
+	ModRM:r/m (r)
+	"! !
+
+!OperandEncoding methodsFor: 'services' stamp: 'KenD 4/25/2021 11:11:50'!
+bytesFor: integer length: n 
+	| bytes v |
+	bytes := ByteArray new: n.
+	v := integer.
+	v < 0 ifTrue: [v := v + (1 bitShift: n * 8)].
+	1 to: n do: [:i | | b |
+		b := v bitAnd: 16rFF.
+		bytes at: i put: b.
+		v := v bitShift: -8].
+	^bytes! !
+
+!OperandEncoding methodsFor: 'services' stamp: 'KenD 4/25/2021 11:25:43'!
+encodeOperand: i of: instruction 
+	| selector |
+	selector := selectors at: i.
+	self perform: selector with: instruction
+! !
+
+!OperandEncoding methodsFor: 'services' stamp: 'KenD 4/25/2021 11:25:56'!
+encodeOperands: instruction 
+
+	1 to: instruction arity do: [:i | self encodeOperand: i of: instruction]! !
+
+!OperandEncoding methodsFor: 'services' stamp: 'KenD 4/25/2021 11:33:26'!
+immediateOperand 
+
+	^descriptions findFirst: [:d | d includesString: 'IMM']! !
+
+!OperandEncoding methodsFor: 'services' stamp: 'KenD 4/25/2021 11:35:17'!
+operand: index of: instruction 
+	| d |
+	d := descriptions at: index.
+	(d includesString: 'reg') ifTrue: [^instruction regOperand: index].
+	(d includesString: 'r/m') ifTrue: [^instruction rmOperand: index].
+	(d includesString: 'vvvv') ifTrue: [^instruction vvvvOperand: index].
+	(self isImmediate1Operand: index) ifTrue: [^instruction immediateOperand].
+	(self isImmediate2Operand: index) ifTrue: [^instruction immediateOperand2].
+	(instruction spec operands at: index) isImmediate
+		ifTrue: [^instruction immediateOperand].
+	((d beginsWith: 'opcode') and: [index = 1])
+		ifTrue: [^instruction opcodeOperand].
+	self assert: false! !
+
+!OperandEncoding methodsFor: 'accessing' stamp: 'KenD 4/25/2021 11:12:13'!
+descriptions 
+
+	^descriptions! !
+
+!OperandEncoding methodsFor: 'accessing' stamp: 'KenD 4/25/2021 11:12:25'!
+descriptions: aCollection 
+
+	descriptions := aCollection.
+	modrm := immediate := false.
+	(selectors conform: [:s | s beginsWith: 'encodeNP']) ifTrue: [^self].
+	descriptions do: [:d | 
+		(d includesString: 'ModRM') ifTrue: [modrm := true].
+		(d includesString: 'offs') ifTrue: [immediate := true].
+		(d includesString: 'imm') ifTrue: [immediate := true]]! !
+
+!OperandEncoding methodsFor: 'accessing' stamp: 'KenD 4/25/2021 11:34:55'!
+name 
+
+	^name! !
+
+!OperandEncoding methodsFor: 'accessing' stamp: 'KenD 4/25/2021 11:35:04'!
+name: aString 
+
+	name := aString! !
+
+!OperandEncoding methodsFor: 'accessing' stamp: 'KenD 4/25/2021 11:36:17'!
+selectors 
+
+	^selectors! !
+
+!OperandEncoding methodsFor: 'accessing' stamp: 'KenD 4/25/2021 11:36:25'!
+selectors: aCollection 
+
+	selectors := aCollection! !
+
+!OperandEncoding methodsFor: 'printing' stamp: 'KenD 4/25/2021 11:36:00'!
+printOn: aStream 
+
+	name isNil ifTrue: [^super printOn: aStream].
+	aStream nextPutAll: name! !
+
+!OperandEncoding class methodsFor: 'class initialization' stamp: 'KenD 4/25/2021 11:09:22'!
+commentEncodingMethods 
+"
+	StChangesetBrowser new
+		label: 'OperandEncoding comments';
+		setModel: (ChangesetBrowserModel on: OperandEncoding commentEncodingMethods);
+		openInWindow
+"
+	| changes |
+	changes := OrderedCollection new.
+	Encodings collect: [:oe | | comment |
+		comment := String streamContents: [:strm | 
+			strm crtab; nextPut: $"; crtab.
+			oe descriptions do: [:d | strm nextPutAll: d; crtab].
+			strm nextPut: $"; cr].
+		oe selectors do: [:s | | cm reader source change |
+			cm := self >> s.
+			reader := cm sourceCode readStream.
+			source := String streamContents: [:strm | 
+				strm
+					nextPutAll: reader nextLine;
+					nextPutAll: comment;
+					nextPutAll: reader upToEnd].
+			change := self project changes
+				methodDefinitionClass: self
+				sourceCode: source.
+			changes add: change]].
+	^changes
+! !
+
+!OperandEncoding class methodsFor: 'class initialization' stamp: 'KenD 4/25/2021 11:09:53'!
+defs 
+	^#(
+		#('A' 'imm8')
+		#('D' 'offset')
+		#('FD' 'AL/AX/EAX/RAX' 'Moffs')
+		#('FV' 'ModRM:reg (w)' 'EVEX.vvvv' 'ModRM:r/m (r)')
+		#('FV-RVM' 'ModRM:reg (w)' 'EVEX.vvvv' 'ModRM:r/m (r)')
+		#('I' 'AL/AX/EAX/RAX' 'imm8')
+		#('II' 'iw' 'imm8')
+		#('M' 'ModRM:r/m (r)')
+		#('M1' 'ModRM:r/m (w)' '1')
+		#('MC' 'ModRM:r/m (w)' 'CL')
+		#('MI' 'ModRM:r/m (r, w)' 'imm8')
+		#('MR' 'ModRM:r/m (r, w)' 'ModRM:reg (r)')
+		#('MRC' 'ModRM:r/m (w)' 'ModRM:reg (r)' 'CL')
+		#('MRI' 'ModRM:r/m (w)' 'ModRM:reg (r)' 'imm8')
+		#('MVR' 'ModRM:r/m (w)' 'VEX.vvvv (r)' 'ModRM:reg (r)')
+		#('NP' 'ModRM:r/m (w)' 'ModRM:reg (r)')
+		#('O' 'opcode + rd (r, w)')
+		#('OI' 'opcode + rd (w)' 'imm8/16/32/64')
+		#('RM' 'ModRM:reg (r, w)' 'ModRM:r/m (r)')
+		#('RM0' 'ModRM:reg (r, w)' 'ModRM:r/m (r)')
+		#('RMI' 'ModRM:reg (w)' 'ModRM:r/m (r)' 'imm8')
+		#('RMV' 'ModRM:reg (w)' 'ModRM:r/m (r)' 'VEX.vvvv (r)')
+		#('RVM' 'ModRM:reg (w)' 'VEX.vvvv' 'ModRM:r/m (r)')
+		#('RVMI' 'ModRM:reg (w)' 'VEX.vvvv (r)' 'ModRM:r/m (r)' 'imm8[3:0]')
+		#('RVMR' 'ModRM:reg (w)' 'VEX.vvvv (r)' 'ModRM:r/m (r)' 'imm8[7:4]')
+		#('T1S' 'ModRM:reg (w)' 'EVEX.vvvv' 'ModRM:r/m (r)')
+		#('T1S-RVM' 'ModRM:reg (w)' 'EVEX.vvvv' 'ModRM:r/m (r)')
+		#('TD' 'Moffs (w)' 'AL/AX/EAX/RAX')
+		#('VM' 'VEX.vvvv (w)' 'ModRM:r/m (r)')
+		#('VMI' 'VEX.vvvv (w)' 'ModRM:r/m (r)' 'imm8')
+		#('XM' 'ModRM:reg (w)' 'ModRM:r/m (r)'))! !
+
+!OperandEncoding class methodsFor: 'class initialization' stamp: 'KenD 4/25/2021 11:10:16'!
+initializeEncodings 
+	Encodings := OrderedCollection new.
+	self defs
+		do: [ :def | 
+			| oe n selectors |
+			n := def first replaceAllSubstrings: '-' with: ''.
+			oe := self new.
+			selectors := (2 to: def size)
+				collect: [ :i | ('encode' , n , 'Operand' , (i - 1) asString , ':') asSymbol ].
+			oe
+				name: n;
+				selectors: selectors;
+				descriptions: def allButFirst.
+			selectors
+				reject: [ :s | self includesSelector: s ]
+				thenDo: [ :s | self compile: s , ' instruction' ].
+			Encodings add: oe ].
+	Encodings := Encodings asArray! !
+
+!OperandEncoding class methodsFor: 'instance creation' stamp: 'KenD 4/25/2021 11:11:15'!
+named: aString 
+
+	^Encodings
+		detect: [:e | e name = aString asUppercase ]
+		ifNone: [(aString includes: $-) ifTrue: [self halt]]! !
+
+!WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:58:02'!
+nextBytePut: aCollection 
+
+	^ self nextPut: aCollection! !
+
+!WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:58:18'!
+nextBytesPut: aCollection 
+
+	^self nextBytesPutAll: aCollection! !
+
+!WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 13:00:35'!
+nextBytesPutAll: aCollection
+	"Append the bytes of aCollection to the sequence of bytes
+	 accessable to the receiver.  Answer aCollection"
+
+	| newEnd |
+	(collection class instSpec == aCollection class instSpec)
+		ifFalse: [ ^ super nextPutAll: aCollection ].
+
+	newEnd _ position + aCollection size.
+	newEnd > writeLimit ifTrue: [
+		self growTo: newEnd + 10].
+
+	collection replaceFrom: position+1 to: newEnd  with: aCollection startingAt: 1.
+	position _ newEnd.
+	
+	^aCollection! !
+
+!WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:59:00'!
+nextLongPut: anInteger
+	| unsigned |
+	unsigned _ anInteger < 0
+		ifTrue: [ anInteger + (1 << 32) ]
+		ifFalse: [ anInteger ].
+	self nextULongPut: unsigned.! !
+
+!WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:59:13'!
+nextULongPut: anInteger 
+
+	1 to: 4 do: [ :i | 
+		| bi |
+		bi := anInteger byteAt: i.
+		self nextPut: bi ]! !
 InlineMessageLinkerFlags initialize!
 SendSiteFlags initialize!
+SCompiledMethodFlags initialize!
+AstBindingTypes initialize!
+AstNodeTypes initialize!
+ClosureElementTypes initialize!
+SExpressionTypes initialize!
+ObjectHeaderMasks initialize!
+ObjectHeaderOffsets initialize!
+CharacterConstants initialize!
+OperandTypeFlags initialize!
 RegistersRISCV initialize!
 Assembler initialize!
+AstcodeDecoder initialize!
