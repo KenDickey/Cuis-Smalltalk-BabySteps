@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 29 September 2022 at 11:02:43 am'!
+'From Cuis 6.0 [latest update: #5492] on 29 September 2022 at 2:36:30 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 5!
+!provides: 'Powerlang' 1 6!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 SystemOrganization addCategory: #'Powerlang-Core-Nativization'!
@@ -13,6 +13,10 @@ SystemOrganization addCategory: 'Powerlang-Core-Metaphysics'!
 SystemOrganization addCategory: 'Powerlang-Core-Mirrors'!
 SystemOrganization addCategory: 'Powerlang-Core'!
 SystemOrganization addCategory: 'Powerlang-Core-Assembler-Intel'!
+SystemOrganization addCategory: 'Powerlang-Core-Execution'!
+SystemOrganization addCategory: 'Powerlang-Core-SCompiler-Smalltalk'!
+SystemOrganization addCategory: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SystemOrganization addCategory: 'Powerlang-Core-SCompiler-Bindings'!
 
 
 !classDefinition: #InlineMessageLinkerFlags category: #'Powerlang-Core-Nativization'!
@@ -135,6 +139,16 @@ PSharedPool subclass: #FrameOffsets
 FrameOffsets class
 	instanceVariableNames: ''!
 
+!classDefinition: #SpeciesFormatMasks category: 'Powerlang-Core-Mirrors'!
+PSharedPool subclass: #SpeciesFormatMasks
+	instanceVariableNames: ''
+	classVariableNames: 'InstSize IsPointers'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Mirrors'!
+!classDefinition: 'SpeciesFormatMasks class' category: 'Powerlang-Core-Mirrors'!
+SpeciesFormatMasks class
+	instanceVariableNames: 'InstSize IsPointers'!
+
 !classDefinition: #CharacterConstants category: 'Powerlang-Core'!
 PSharedPool subclass: #CharacterConstants
 	instanceVariableNames: ''
@@ -173,6 +187,56 @@ Array variableSubclass: #NativeCode
 	category: 'Powerlang-Core-Nativization'!
 !classDefinition: 'NativeCode class' category: #'Powerlang-Core-Nativization'!
 NativeCode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SClosure category: 'Powerlang-Core-Metaphysics'!
+Array variableSubclass: #SClosure
+	instanceVariableNames: 'block home'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'SClosure class' category: 'Powerlang-Core-Metaphysics'!
+SClosure class
+	instanceVariableNames: ''!
+
+!classDefinition: #SFFIDescriptor category: 'Powerlang-Core-SCompiler'!
+ByteArray variableByteSubclass: #SFFIDescriptor
+	instanceVariableNames: ''
+	classVariableNames: 'FFICallingConventions FFITypes'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SFFIDescriptor class' category: 'Powerlang-Core-SCompiler'!
+SFFIDescriptor class
+	instanceVariableNames: 'FFICallingConventions FFITypes'!
+
+!classDefinition: #SCompilationError category: 'Powerlang-Core-SCompiler'!
+Error subclass: #SCompilationError
+	instanceVariableNames: 'compiler resumable retryable stretch'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompilationError class' category: 'Powerlang-Core-SCompiler'!
+SCompilationError class
+	instanceVariableNames: ''!
+
+!classDefinition: #SInvalidPragmaError category: 'Powerlang-Core-SCompiler'!
+SCompilationError subclass: #SInvalidPragmaError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SInvalidPragmaError class' category: 'Powerlang-Core-SCompiler'!
+SInvalidPragmaError class
+	instanceVariableNames: ''!
+
+!classDefinition: #SUndeclaredIdentifierError category: 'Powerlang-Core-SCompiler'!
+SCompilationError subclass: #SUndeclaredIdentifierError
+	instanceVariableNames: 'identifier assigned'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SUndeclaredIdentifierError class' category: 'Powerlang-Core-SCompiler'!
+SUndeclaredIdentifierError class
 	instanceVariableNames: ''!
 
 !classDefinition: #BinaryMessageNativizer category: #'Powerlang-Core-Nativization'!
@@ -455,6 +519,66 @@ Object subclass: #RelocationFixup
 RelocationFixup class
 	instanceVariableNames: ''!
 
+!classDefinition: #IdentifierBinder category: 'Powerlang-Core-SCompiler'!
+Object subclass: #IdentifierBinder
+	instanceVariableNames: 'contents'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'IdentifierBinder class' category: 'Powerlang-Core-SCompiler'!
+IdentifierBinder class
+	instanceVariableNames: ''!
+
+!classDefinition: #StaticBinder category: 'Powerlang-Core-SCompiler'!
+IdentifierBinder subclass: #StaticBinder
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'StaticBinder class' category: 'Powerlang-Core-SCompiler'!
+StaticBinder class
+	instanceVariableNames: ''!
+
+!classDefinition: #LocalEnvironment category: 'Powerlang-Core-SCompiler'!
+Object subclass: #LocalEnvironment
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: 'ClosureElementTypes'
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'LocalEnvironment class' category: 'Powerlang-Core-SCompiler'!
+LocalEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #StackEnvironment category: 'Powerlang-Core-SCompiler'!
+LocalEnvironment subclass: #StackEnvironment
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'StackEnvironment class' category: 'Powerlang-Core-SCompiler'!
+StackEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #MessageInliner category: 'Powerlang-Core-SCompiler'!
+Object subclass: #MessageInliner
+	instanceVariableNames: 'message'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'MessageInliner class' category: 'Powerlang-Core-SCompiler'!
+MessageInliner class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCompilationResult category: 'Powerlang-Core-SCompiler'!
+Object subclass: #SCompilationResult
+	instanceVariableNames: 'compiler error ast method'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompilationResult class' category: 'Powerlang-Core-SCompiler'!
+SCompilationResult class
+	instanceVariableNames: ''!
+
 !classDefinition: #SParseTreeVisitor category: 'Powerlang-Core-SCompiler'!
 Object subclass: #SParseTreeVisitor
 	instanceVariableNames: ''
@@ -463,6 +587,16 @@ Object subclass: #SParseTreeVisitor
 	category: 'Powerlang-Core-SCompiler'!
 !classDefinition: 'SParseTreeVisitor class' category: 'Powerlang-Core-SCompiler'!
 SParseTreeVisitor class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSemanticVisitor category: 'Powerlang-Core-SCompiler'!
+SParseTreeVisitor subclass: #SSemanticVisitor
+	instanceVariableNames: 'inliner'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SSemanticVisitor class' category: 'Powerlang-Core-SCompiler'!
+SSemanticVisitor class
 	instanceVariableNames: ''!
 
 !classDefinition: #AstcodeEncoder category: 'Powerlang-Core-SExpressions'!
@@ -475,6 +609,16 @@ SParseTreeVisitor subclass: #AstcodeEncoder
 AstcodeEncoder class
 	instanceVariableNames: ''!
 
+!classDefinition: #ScriptScope category: 'Powerlang-Core-SCompiler'!
+Object subclass: #ScriptScope
+	instanceVariableNames: 'script arguments temporaries stackSize envSize captureSelf'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'ScriptScope class' category: 'Powerlang-Core-SCompiler'!
+ScriptScope class
+	instanceVariableNames: ''!
+
 !classDefinition: #AstcodeDecoder category: 'Powerlang-Core-SExpressions'!
 Object subclass: #AstcodeDecoder
 	instanceVariableNames: 'method stream builder'
@@ -485,6 +629,116 @@ Object subclass: #AstcodeDecoder
 AstcodeDecoder class
 	instanceVariableNames: 'BindingTypes NodeTypes'!
 
+!classDefinition: #SBinding category: 'Powerlang-Core-SExpressions'!
+Object subclass: #SBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SBinding class' category: 'Powerlang-Core-SExpressions'!
+SBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SDynamicBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SDynamicBinding
+	instanceVariableNames: 'name cache'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SDynamicBinding class' category: 'Powerlang-Core-SExpressions'!
+SDynamicBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SNestedDynamicBinding category: 'Powerlang-Core-SExpressions'!
+SDynamicBinding subclass: #SNestedDynamicBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SNestedDynamicBinding class' category: 'Powerlang-Core-SExpressions'!
+SNestedDynamicBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SInstVarBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SInstVarBinding
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SInstVarBinding class' category: 'Powerlang-Core-SExpressions'!
+SInstVarBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLiteralBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SLiteralBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLiteralBinding class' category: 'Powerlang-Core-SExpressions'!
+SLiteralBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SNilBinding category: 'Powerlang-Core-SExpressions'!
+SLiteralBinding subclass: #SNilBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SNilBinding class' category: 'Powerlang-Core-SExpressions'!
+SNilBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #STrueBinding category: 'Powerlang-Core-SExpressions'!
+SLiteralBinding subclass: #STrueBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'STrueBinding class' category: 'Powerlang-Core-SExpressions'!
+STrueBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLocalBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SLocalBinding
+	instanceVariableNames: 'position environment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLocalBinding class' category: 'Powerlang-Core-SExpressions'!
+SLocalBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #STemporaryBinding category: 'Powerlang-Core-SExpressions'!
+SLocalBinding subclass: #STemporaryBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'STemporaryBinding class' category: 'Powerlang-Core-SExpressions'!
+STemporaryBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSelfBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SSelfBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SSelfBinding class' category: 'Powerlang-Core-SExpressions'!
+SSelfBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSuperBinding category: 'Powerlang-Core-SExpressions'!
+SSelfBinding subclass: #SSuperBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SSuperBinding class' category: 'Powerlang-Core-SExpressions'!
+SSuperBinding class
+	instanceVariableNames: ''!
+
 !classDefinition: #SExpression category: 'Powerlang-Core-SExpressions'!
 Object subclass: #SExpression
 	instanceVariableNames: ''
@@ -493,6 +747,276 @@ Object subclass: #SExpression
 	category: 'Powerlang-Core-SExpressions'!
 !classDefinition: 'SExpression class' category: 'Powerlang-Core-SExpressions'!
 SExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #SIdentifier category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SIdentifier
+	instanceVariableNames: 'binding'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SIdentifier class' category: 'Powerlang-Core-SExpressions'!
+SIdentifier class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLiteralVar category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SLiteralVar
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLiteralVar class' category: 'Powerlang-Core-SExpressions'!
+SLiteralVar class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLiteral category: 'Powerlang-Core-SExpressions'!
+SLiteralVar subclass: #SLiteral
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLiteral class' category: 'Powerlang-Core-SExpressions'!
+SLiteral class
+	instanceVariableNames: ''!
+
+!classDefinition: #SMessage category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SMessage
+	instanceVariableNames: 'selector receiver arguments cache inlined'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SMessage class' category: 'Powerlang-Core-SExpressions'!
+SMessage class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOperation category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SOperation
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOperation class' category: 'Powerlang-Core-SExpressions'!
+SOperation class
+	instanceVariableNames: ''!
+
+!classDefinition: #SInlinerOperation category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SInlinerOperation
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SInlinerOperation class' category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpJump category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpJump
+	instanceVariableNames: 'target'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpJump class' category: 'Powerlang-Core-SExpressions'!
+SOpJump class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpJumpFalse category: 'Powerlang-Core-SExpressions'!
+SOpJump subclass: #SOpJumpFalse
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpJumpFalse class' category: 'Powerlang-Core-SExpressions'!
+SOpJumpFalse class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpJumpTrue category: 'Powerlang-Core-SExpressions'!
+SOpJump subclass: #SOpJumpTrue
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpJumpTrue class' category: 'Powerlang-Core-SExpressions'!
+SOpJumpTrue class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRfromFrame category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpLoadRfromFrame
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRfromFrame class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRfromFrame class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpPopR category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpPopR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpPopR class' category: 'Powerlang-Core-SExpressions'!
+SOpPopR class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpStoreRintoFrame category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpStoreRintoFrame
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpStoreRintoFrame class' category: 'Powerlang-Core-SExpressions'!
+SOpStoreRintoFrame class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpAssign category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpAssign
+	instanceVariableNames: 'assignees'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpAssign class' category: 'Powerlang-Core-SExpressions'!
+SOpAssign class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpDispatchMessage category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpDispatchMessage
+	instanceVariableNames: 'message'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpDispatchMessage class' category: 'Powerlang-Core-SExpressions'!
+SOpDispatchMessage class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpDropToS category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpDropToS
+	instanceVariableNames: 'count'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpDropToS class' category: 'Powerlang-Core-SExpressions'!
+SOpDropToS class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRfromStack category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpLoadRfromStack
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRfromStack class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRfromStack class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRwithNil category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpLoadRwithNil
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRwithNil class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRwithNil class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRwithSelf category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpLoadRwithSelf
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRwithSelf class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRwithSelf class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpPrimitive category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpPrimitive
+	instanceVariableNames: 'block'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpPrimitive class' category: 'Powerlang-Core-SExpressions'!
+SOpPrimitive class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpPushR category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpPushR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpPushR class' category: 'Powerlang-Core-SExpressions'!
+SOpPushR class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpRestart category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpRestart
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpRestart class' category: 'Powerlang-Core-SExpressions'!
+SOpRestart class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpReturn category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpReturn
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpReturn class' category: 'Powerlang-Core-SExpressions'!
+SOpReturn class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpNonLocalReturn category: 'Powerlang-Core-SExpressions'!
+SOpReturn subclass: #SOpNonLocalReturn
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpNonLocalReturn class' category: 'Powerlang-Core-SExpressions'!
+SOpNonLocalReturn class
+	instanceVariableNames: ''!
+
+!classDefinition: #SPragma category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SPragma
+	instanceVariableNames: 'name'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SPragma class' category: 'Powerlang-Core-SExpressions'!
+SPragma class
+	instanceVariableNames: ''!
+
+!classDefinition: #SReturn category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SReturn
+	instanceVariableNames: 'local expression'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SReturn class' category: 'Powerlang-Core-SExpressions'!
+SReturn class
+	instanceVariableNames: ''!
+
+!classDefinition: #SScript category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SScript
+	instanceVariableNames: 'statements compiledCode'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SScript class' category: 'Powerlang-Core-SExpressions'!
+SScript class
+	instanceVariableNames: ''!
+
+!classDefinition: #SMethod category: 'Powerlang-Core-SExpressions'!
+SScript subclass: #SMethod
+	instanceVariableNames: 'pragma'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SMethod class' category: 'Powerlang-Core-SExpressions'!
+SMethod class
 	instanceVariableNames: ''!
 
 !classDefinition: #ObjectFormat category: 'Powerlang-Core-Metaphysics'!
@@ -535,6 +1059,46 @@ Object subclass: #SExpressionInterpreter
 SExpressionInterpreter class
 	instanceVariableNames: ''!
 
+!classDefinition: #SmalltalkInterpreter category: 'Powerlang-Core-Metaphysics'!
+SExpressionInterpreter subclass: #SmalltalkInterpreter
+	instanceVariableNames: 'localRuntime'
+	classVariableNames: 'Underprimitives underprimitives'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'SmalltalkInterpreter class' category: 'Powerlang-Core-Metaphysics'!
+SmalltalkInterpreter class
+	instanceVariableNames: 'underprimitives'!
+
+!classDefinition: #ShapeMap category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #ShapeMap
+	instanceVariableNames: 'shapes'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ShapeMap class' category: 'Powerlang-Core-Metaphysics'!
+ShapeMap class
+	instanceVariableNames: ''!
+
+!classDefinition: #Storage category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #Storage
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'Storage class' category: 'Powerlang-Core-Metaphysics'!
+Storage class
+	instanceVariableNames: ''!
+
+!classDefinition: #StorageReadError category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #StorageReadError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'StorageReadError class' category: 'Powerlang-Core-Metaphysics'!
+StorageReadError class
+	instanceVariableNames: ''!
+
 !classDefinition: #OperandEncoding category: 'Powerlang-Core-Assembler-Intel'!
 Object subclass: #OperandEncoding
 	instanceVariableNames: 'name selectors descriptions immediate modrm'
@@ -543,6 +1107,186 @@ Object subclass: #OperandEncoding
 	category: 'Powerlang-Core-Assembler-Intel'!
 !classDefinition: 'OperandEncoding class' category: 'Powerlang-Core-Assembler-Intel'!
 OperandEncoding class
+	instanceVariableNames: ''!
+
+!classDefinition: #EvaluationContext category: 'Powerlang-Core-Execution'!
+Object subclass: #EvaluationContext
+	instanceVariableNames: 'system'
+	classVariableNames: ''
+	poolDictionaries: 'ClosureElementTypes'
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'EvaluationContext class' category: 'Powerlang-Core-Execution'!
+EvaluationContext class
+	instanceVariableNames: ''!
+
+!classDefinition: #StackedEvaluationContext category: 'Powerlang-Core-Execution'!
+EvaluationContext subclass: #StackedEvaluationContext
+	instanceVariableNames: 'stack regSP regBP regM regS regE pc'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'StackedEvaluationContext class' category: 'Powerlang-Core-Execution'!
+StackedEvaluationContext class
+	instanceVariableNames: ''!
+
+!classDefinition: #SExpressionLinearizer category: 'Powerlang-Core-Execution'!
+Object subclass: #SExpressionLinearizer
+	instanceVariableNames: 'operations primitives inBlock runtime greaterThan one plus stackTop dropsArguments not equalsEquals ifTrue ifFalse ifTrueIfFalse ifFalseIfTrue ifNil ifNotNil ifNilIfNotNil ifNotNilIfNil whileTrue whileFalse whileTrue_ whileFalse_ toDo toByDo repeat timesRepeat andNot orNot'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'SExpressionLinearizer class' category: 'Powerlang-Core-Execution'!
+SExpressionLinearizer class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSmalltalkCompiler category: 'Powerlang-Core-SCompiler-Smalltalk'!
+Object subclass: #SSmalltalkCompiler
+	instanceVariableNames: 'frontend source ast result headless blocks leaf activeScript'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk'!
+!classDefinition: 'SSmalltalkCompiler class' category: 'Powerlang-Core-SCompiler-Smalltalk'!
+SSmalltalkCompiler class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSmalltalkParser category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+Object subclass: #SSmalltalkParser
+	instanceVariableNames: 'compiler scanner token next'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SSmalltalkParser class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSmalltalkParser class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSmalltalkScanner category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+Object subclass: #SSmalltalkScanner
+	instanceVariableNames: 'compiler stream'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SSmalltalkScanner class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSmalltalkScanner class
+	instanceVariableNames: ''!
+
+!classDefinition: #SToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+Object subclass: #SToken
+	instanceVariableNames: 'compiler stretch comments'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSymbolicToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SToken subclass: #SSymbolicToken
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SSymbolicToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSymbolicToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #SStringToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSymbolicToken subclass: #SStringToken
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SStringToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SStringToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #Binding category: 'Powerlang-Core-SCompiler-Bindings'!
+Object subclass: #Binding
+	instanceVariableNames: 'name'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'Binding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding class
+	instanceVariableNames: ''!
+
+!classDefinition: #LiteralBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #LiteralBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'LiteralBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+LiteralBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #FalseBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LiteralBinding subclass: #FalseBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'FalseBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+FalseBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #TrueBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LiteralBinding subclass: #TrueBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'TrueBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+TrueBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #LocalBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #LocalBinding
+	instanceVariableNames: 'index environment declaration'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'LocalBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+LocalBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #ArgumentBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LocalBinding subclass: #ArgumentBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'ArgumentBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+ArgumentBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #TemporaryBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LocalBinding subclass: #TemporaryBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'TemporaryBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+TemporaryBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SelfBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #SelfBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'SelfBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+SelfBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SuperBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+SelfBinding subclass: #SuperBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'SuperBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+SuperBinding class
 	instanceVariableNames: ''!
 
 
@@ -589,6 +1333,12 @@ Copyright (c) 2020 Aucerna.
 
 !SExpression commentStamp: '<historical>' prior: 0!
 I am a Smalltalk expression, the minimal unit of Smalltalk semantics, expressed as a tree.
+!
+
+!ShapeMap commentStamp: '<historical>' prior: 0!
+I represent the shape of objects as used by mirrors. Mirrors
+access instance variables by name, asking the runtime the for
+the offsets of the instVars.
 !
 
 !InlineMessageLinkerFlags class methodsFor: 'class initialization' stamp: 'KenD 9/26/2022 12:31:19'!
@@ -812,6 +1562,241 @@ compiledCode: anObject
 !NativeCode methodsFor: 'as yet unclassified' stamp: 'KenD 9/26/2022 12:35:02'!
 disassembledAmd64
 	^machineCode disassembledAmd64
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+block
+	^block
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+block: aPCompiledMethod
+	block := aPCompiledMethod
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+evaluateWith: anObject
+	^self value: anObject
+	
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+evaluateWith: anObject with: anotherObject
+	block argumentCount = 2
+		ifFalse: [^super evaluateWith: anObject with: anotherObject].
+	^self value: anObject value: anotherObject
+	
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+home: anObject
+	home := anObject
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+isSelfEvaluating
+	^false
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+value
+	^ home evaluateClosure: self
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+value: anObject
+	^home evaluateClosure: self with: anObject
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+value: anObject1 value: anObject2
+	^ home evaluateClosure: self with: anObject1 with: anObject2
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+value: anObject1 value: anObject2 with: anObject3
+	^ home evaluateBlock: self with: anObject1 with: anObject2 with: anObject3
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+whileFalse: aBlockSubject
+	| result |
+	[ result := home evaluateClosure: self.
+	result _gate handle asLocalBoolean ] 
+		whileFalse: [ home evaluateClosure: aBlockSubject _gate handle oid ]
+! !
+
+!SClosure methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:22'!
+whileTrue: aBlockSubject
+	| result |
+	[ result := home evaluateClosure: self.
+	result _gate handle asLocalBoolean ]
+		whileTrue: [ home evaluateClosure: aBlockSubject _gate handle oid ]
+! !
+
+!SFFIDescriptor methodsFor: 'calls' stamp: 'KenD 9/29/2022 13:52:43'!
+arguments: aCollection
+	self replaceFrom: 3 to: 3 + aCollection size -1 with: aCollection
+! !
+
+!SFFIDescriptor methodsFor: 'calls' stamp: 'KenD 9/29/2022 13:52:43'!
+callingConvention: anInteger
+	self at: 1 put: anInteger
+! !
+
+!SFFIDescriptor methodsFor: 'calls' stamp: 'KenD 9/29/2022 13:52:43'!
+return: anInteger
+	self at: 2 put: anInteger
+! !
+
+!SFFIDescriptor class methodsFor: 'class initialization' stamp: 'KenD 9/29/2022 13:52:43'!
+initialize
+	self initializeFFITypes; initializeCallingConventions
+! !
+
+!SFFIDescriptor class methodsFor: 'class initialization' stamp: 'KenD 9/29/2022 13:52:43'!
+initializeCallingConventions
+	FFICallingConventions := Dictionary new.
+	FFICallingConventions
+		at: 'cdecl' put: 20;
+		at: 'com' put: 21;
+		at: 'callback' put: 22
+! !
+
+!SFFIDescriptor class methodsFor: 'class initialization' stamp: 'KenD 9/29/2022 13:52:43'!
+initializeFFITypes
+	FFITypes := Dictionary new.
+	FFITypes
+		at: 'char' put: 1;
+		at: 'uchar' put: 2;
+		at: 'short' put: 3;
+		at: 'ushort' put: 4;
+		at: 'long' put: 5;
+		at: 'ulong' put: 6;
+		at: 'large' put: 7;
+		at: 'ularge' put: 8;
+		at: 'intptr' put: 9;
+		at: 'uintptr' put: 10;
+		at: 'pointer' put: 11;
+		at: 'struct' put: 12;
+		at: 'float' put: 13;
+		at: 'double' put: 14
+! !
+
+!SFFIDescriptor class methodsFor: 'as yet unclassified' stamp: 'KenD 9/29/2022 13:52:43'!
+ret: aString args: aCollection cc: ccName
+	| args return cc result |
+	args := aCollection
+		collect: [ :argname | 
+			FFITypes
+				at: argname asString
+				ifAbsent: [ self error: 'undefined argument type ' , argname ] ].
+	return := FFITypes
+		at: aString
+		ifAbsent: [ self error: 'undefined result type ' , aString ].
+	cc := FFICallingConventions
+		at: ccName
+		ifAbsent: [ self error: 'unsupported calling convention ' , ccName ].
+	result := self new: args size + 2.
+	^ result
+		callingConvention: cc;
+		return: return;
+		arguments: args
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+beFatal
+	resumable := retryable := false
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+beResumable
+	resumable := true
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+beWarning
+	resumable := true
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+compiler
+	^compiler
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+compiler: aCompiler
+	compiler := aCompiler.
+	compiler result error: self
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+description: aString
+	messageText := aString
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+isResumable
+	^resumable
+
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+proceed
+	retryable := false.
+	compiler result beSuccessful.
+	self isResumable ifTrue: [ self resume ] ifFalse: [ self return ]
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+source
+	^compiler sourceCode copyFrom: stretch start to: stretch end
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+stretch
+	^stretch
+! !
+
+!SCompilationError methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:46'!
+stretch: aStretch
+	stretch := aStretch
+! !
+
+!SCompilationError methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:09:46'!
+isUndeclaredAccess
+	^false
+! !
+
+!SCompilationError methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:09:46'!
+isUndeclaredAssignment
+	^ false
+! !
+
+!SUndeclaredIdentifierError methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:58'!
+identifier
+	^ identifier
+! !
+
+!SUndeclaredIdentifierError methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:58'!
+isUndeclaredAccess
+	^assigned not
+! !
+
+!SUndeclaredIdentifierError methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:58'!
+isUndeclaredAssignment
+	^assigned
+! !
+
+!SUndeclaredIdentifierError methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:58'!
+stretch: aStretch
+	super stretch: aStretch.
+	identifier := self source
+! !
+
+!SUndeclaredIdentifierError methodsFor: 'accessing-token' stamp: 'KenD 9/29/2022 14:21:58'!
+assignment: aBoolean
+	assigned := aBoolean
 ! !
 
 !BinaryMessageNativizer methodsFor: 'private' stamp: 'KenD 9/26/2022 12:29:42'!
@@ -8399,6 +9384,337 @@ relativeFrom: source to: target
 	^self new beRelative; from: source to: target
 ! !
 
+!IdentifierBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:02:58'!
+contents
+	^contents
+! !
+
+!IdentifierBinder methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:02:58'!
+printOn: aStream
+	self printOn: aStream indent: 0
+! !
+
+!IdentifierBinder methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:02:58'!
+printOn: aStream indent: anInteger
+	self subclassResponsibility
+! !
+
+!IdentifierBinder methodsFor: 'private' stamp: 'KenD 9/29/2022 14:02:58'!
+keyFor: aString
+	^self subclassResponsibility
+! !
+
+!IdentifierBinder class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:02:58'!
+new
+	^super new initialize
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+at: aString
+	^contents at: aString ifAbsent: nil
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+at: aString ifAbsentPut: aBlock
+	^contents at: aString ifAbsentPut: aBlock
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+at: aString put: aBinding
+	contents at: aString put: aBinding
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+define: aString as: aBinding
+	contents at: aString put: aBinding
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+defines: identifier
+	^contents includesKey: identifier
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+do: aBlock
+	contents do: aBlock
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+select: aBlock
+	^contents select: aBlock
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+values
+	^contents values
+! !
+
+!StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
+withIndexDo: aBlock
+	contents withIndexDo: aBlock
+! !
+
+!StaticBinder methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:30:20'!
+initialize
+	super initialize.
+	contents := OrderedDictionary new
+! !
+
+!StaticBinder methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:30:20'!
+printOn: aStream indent: anInteger
+	aStream tab: anInteger; nextPut: $<.
+	contents keys
+		do: [:name | name printOn: aStream]
+		separatedBy: [aStream space].
+	aStream nextPut: $>
+! !
+
+!StaticBinder class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:30:20'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!LocalEnvironment methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:04:15'!
+isInlinedArgument
+	^false
+! !
+
+!StackEnvironment methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:34:15'!
+index
+	^nil
+! !
+
+!StackEnvironment methodsFor: 'private' stamp: 'KenD 9/29/2022 14:34:15'!
+isStack
+	^true
+! !
+
+!MessageInliner methodsFor: 'inlining' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineConditional
+	| arguments |
+	arguments := message arguments.
+	arguments size >= 1 ifFalse: [^self].
+	arguments do: [:arg | arg isEvaluable ifFalse: [^self]].
+	message beInlined.
+	arguments select: #isBlockNode thenDo: #beInlined
+! !
+
+!MessageInliner methodsFor: 'inlining' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineIfNilIfNotNil
+	| arguments arg |
+	arguments := message arguments.
+	arguments size = 2 ifFalse: [^self].
+	arguments first isEvaluable ifFalse: [^self].
+	arg := arguments second.
+	(arg isEvaluable or: [arg isBlockNode and: [arg arguments size = 1]])
+		ifFalse: [^self].
+	message beInlined.
+	arguments select: #isBlockNode thenDo: #beInlined
+	
+! !
+
+!MessageInliner methodsFor: 'inlining' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineIfNotNil
+	| arguments arg |
+	arguments := message arguments.
+	arguments size = 1 ifFalse: [^self].
+	arg := arguments first.
+	(arg isEvaluable or: [arg isBlockNode and: [arg arguments size = 1]])
+		ifFalse: [^self].
+	message beInlined.
+	arg isBlockNode ifTrue: [arg beInlined]
+! !
+
+!MessageInliner methodsFor: 'inlining' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineIfNotNilIfNil
+	| arguments arg |
+	arguments := message arguments.
+	arguments size = 2 ifFalse: [^self].
+	arguments second isEvaluable ifFalse: [^self].
+	arg := arguments first.
+	(arg isEvaluable or: [arg isBlockNode and: [arg arguments size = 1]])
+		ifFalse: [^self].
+	message beInlined.
+	arguments select: #isBlockNode thenDo: #beInlined
+! !
+
+!MessageInliner methodsFor: 'inlining' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineToByDo
+	| arguments arg step |
+	arguments := message arguments.
+	arguments size = 3 ifFalse: [^self].
+	arg := arguments at: 3.
+	arg isBlockNode ifFalse: [^self].
+	arg arguments size = 1 ifFalse: [^self].
+	step := arguments at: 2.
+	(step isNumberNode and: [step value isSmallInteger]) ifFalse: [^self].
+	message beInlined.
+	arg beInlined
+! !
+
+!MessageInliner methodsFor: 'inlining' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineToDo
+	| arguments last |
+	arguments := message arguments.
+	arguments size = 2 ifFalse: [^self].
+	last := arguments at: 2.
+	last isBlockNode ifFalse: [^self].
+	last arguments size = 1 ifFalse: [^self].
+	message beInlined.
+	last beInlined
+! !
+
+!MessageInliner methodsFor: 'inlining' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineWhile
+	| receiver arguments |
+	receiver := message receiver.
+	receiver isEvaluable
+		ifFalse: [ ^ self ].
+	arguments := message arguments.
+	arguments size = 1
+		ifFalse: [ ^ self ].
+	arguments last isNullary
+		ifFalse: [ ^ self ].
+	self inlineConditional.
+	receiver isBlockNode
+		ifTrue: [ receiver beInlined ]
+! !
+
+!MessageInliner methodsFor: 'transforming' stamp: 'KenD 9/29/2022 14:04:51'!
+inline: aMessageNode
+	| s keywords |
+	message := aMessageNode.
+	message receiver isSuper
+		ifTrue: [ ^ self ].
+	(message isCascadeMessage and: [ message receiver isBlockNode ])
+		ifTrue: [ ^ self ].
+	s := message selector value.
+	s == #ifTrue:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #ifFalse:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #or:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #and:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #timesRepeat:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #ifTrue:ifFalse:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #ifFalse:ifTrue:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #andNot:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #orNot:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #ifNil:
+		ifTrue: [ ^ self inlineConditional ].
+	s == #ifNotNil:
+		ifTrue: [ ^ self inlineIfNotNil ].
+	s == #ifNil:ifNotNil:
+		ifTrue: [ ^ self inlineIfNilIfNotNil ].
+	s == #ifNotNil:ifNil:
+		ifTrue: [ ^ self inlineIfNotNilIfNil ].
+	s == #whileTrue:
+		ifTrue: [ ^ self inlineWhile ].
+	s == #whileFalse:
+		ifTrue: [ ^ self inlineWhile ].
+	s == #whileTrue
+		ifTrue: [ ^ self inlineUnitaryWhile ].
+	s == #whileFalse
+		ifTrue: [ ^ self inlineUnitaryWhile ].
+	s == #repeat
+		ifTrue: [ ^ self inlineRepeat ].
+	s == #to:do:
+		ifTrue: [ ^ self inlineToDo ].
+	"s == #to:by:do:
+		ifTrue: [ ^ self inlineToByDo ]."
+	keywords := $: split: s.
+	keywords last = ''
+		ifTrue: [ keywords := keywords allButLast ].
+	(keywords conform: [ :k | k = 'and' ])
+		ifTrue: [ ^ self inlineConditional ].
+	(keywords conform: [ :k | k = 'or' ])
+		ifTrue: [ ^ self inlineConditional ].
+	((keywords allButLast conform: [ :k | k = 'and' ])
+		and: [ #('ifTrue' 'ifFalse') includes: keywords last ])
+		ifTrue: [ ^ self inlineConditional ].
+	((keywords allButLast conform: [ :k | k = 'or' ])
+		and: [ #('ifTrue' 'ifFalse') includes: keywords last ])
+		ifTrue: [ self inlineConditional ]
+! !
+
+!MessageInliner methodsFor: 'transforming' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineRepeat
+	| receiver arguments |
+	receiver := message receiver.
+	receiver isEvaluable
+		ifFalse: [ ^ self ].
+	arguments := message arguments.
+	arguments isEmpty
+		ifFalse: [ ^ self ].
+	receiver isBlockNode
+		ifFalse: [ ^ self ].
+	message beInlined.
+	receiver beInlined
+! !
+
+!MessageInliner methodsFor: 'transforming' stamp: 'KenD 9/29/2022 14:04:51'!
+inlineUnitaryWhile
+	| receiver arguments |
+	receiver := message receiver.
+	receiver isEvaluable ifFalse: [^self].
+	arguments := message arguments.
+	arguments size = 0 ifFalse: [^self].
+	self inlineConditional.
+	receiver isBlockNode ifTrue: [
+		message beInlined.
+		receiver beInlined]
+! !
+
+!SCompilationResult methodsFor: 'errors' stamp: 'KenD 9/29/2022 14:10:07'!
+beSuccessful
+	error := nil
+! !
+
+!SCompilationResult methodsFor: 'errors' stamp: 'KenD 9/29/2022 14:10:07'!
+error
+	^error
+! !
+
+!SCompilationResult methodsFor: 'errors' stamp: 'KenD 9/29/2022 14:10:07'!
+error: aCompilationError
+	error := aCompilationError
+! !
+
+!SCompilationResult methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:10:07'!
+ast
+	^ast
+! !
+
+!SCompilationResult methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:10:07'!
+ast: aParseNode
+	ast := aParseNode
+! !
+
+!SCompilationResult methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:10:07'!
+compiler: aSmalltalkCompiler
+	compiler := aSmalltalkCompiler
+! !
+
+!SCompilationResult methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:10:07'!
+method
+	^method
+! !
+
+!SCompilationResult methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:10:07'!
+method: aCompiledMethod
+	method := aCompiledMethod
+! !
+
 !SParseTreeVisitor methodsFor: 'visiting' stamp: 'KenD 9/26/2022 12:59:46'!
 visit: aParseNode
 	^aParseNode notNil ifTrue: [aParseNode acceptVisitor: self] 
@@ -8492,6 +9808,133 @@ visitSymbolicPragma: aPragmaNode
 !SParseTreeVisitor class methodsFor: 'instance creation' stamp: 'KenD 9/26/2022 12:59:46'!
 new
 	^super new initialize
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeAssignment: anAssignmentNode
+	anAssignmentNode assignees
+		do: [:v | self analyzeIdentifier: v assignee: true]
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeBlock: aBlockNode while: aBlock
+	aBlockNode isInlined
+		ifFalse: [aBlockNode index: aBlockNode compiler blockIndex].
+	self analyzeScript: aBlockNode while: aBlock
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeIdentifier: anIdentifierNode
+	self analyzeIdentifier: anIdentifierNode assignee: false
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeIdentifier: anIdentifierNode assignee: aBoolean
+	| script binding |
+	anIdentifierNode resolveAssigning: aBoolean.
+	aBoolean ifTrue: [anIdentifierNode beAssigned].
+	script := anIdentifierNode compiler activeScript.
+	binding := anIdentifierNode binding.
+	script reference: binding.
+	binding isLocal ifTrue: [binding := script scope captureLocal: binding].
+	anIdentifierNode binding: binding
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeMessage: aMessageNode
+	inliner inline: aMessageNode.
+	aMessageNode isInlined ifFalse: [aMessageNode compiler noticeSend]
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeMethod: aMethodNode while: aBlock
+	self analyzeScript: aMethodNode while: aBlock
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeReturn: aReturnNode
+	aReturnNode compiler activeScript realScript captureHome
+! !
+
+!SSemanticVisitor methodsFor: 'analizing' stamp: 'KenD 9/29/2022 13:54:50'!
+analyzeScript: aScriptNode while: aBlock
+	aScriptNode compiler activate: aScriptNode while: aBlock
+! !
+
+!SSemanticVisitor methodsFor: 'initialization' stamp: 'KenD 9/29/2022 13:54:50'!
+initialize
+	super initialize.
+	inliner := MessageInliner new
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitAssignment: anAssignmentNode
+	| c |
+	self analyzeAssignment: anAssignmentNode.
+	anAssignmentNode expression acceptVisitor: self.
+	c := anAssignmentNode compiler.
+
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitBlock: aBlockNode
+	self
+		analyzeBlock: aBlockNode
+		while: [aBlockNode statements do: [:node | node acceptVisitor: self]]
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitBraceNode: aBraceNode
+	aBraceNode isLiteral
+		ifFalse: [aBraceNode asMessageNode acceptVisitor: self]
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitCascade: aCascadeNode
+	aCascadeNode receiver acceptVisitor: self.
+	aCascadeNode messages do: [:msg | msg acceptVisitor: self]
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitIdentifier: anIdentifierNode
+	self analyzeIdentifier: anIdentifierNode
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitMessage: aMessageNode
+	self analyzeMessage: aMessageNode.
+	aMessageNode receiver acceptVisitor: self.
+	aMessageNode arguments do: [:arg | arg acceptVisitor: self]
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitMethod: aMethodNode
+	self analyzeMethod: aMethodNode while: [
+		aMethodNode bindLocals.
+		aMethodNode statements do: [:s | s acceptVisitor: self].
+		aMethodNode positionLocals]
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitParseNode: aParseNode
+	"
+	do nothing
+	"
+	
+! !
+
+!SSemanticVisitor methodsFor: 'visiting' stamp: 'KenD 9/29/2022 13:54:50'!
+visitReturn: aReturnNode
+	aReturnNode expression acceptVisitor: self.
+	self analyzeReturn: aReturnNode
+! !
+
+!SSemanticVisitor class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 13:54:50'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
 ! !
 
 !AstcodeEncoder methodsFor: 'codeGeneration' stamp: 'KenD 2/25/2021 13:30:00'!
@@ -8944,6 +10387,149 @@ new
 
 ! !
 
+!ScriptScope methodsFor: 'services' stamp: 'KenD 9/29/2022 14:22:10'!
+capturesSelf
+	^ captureSelf
+! !
+
+!ScriptScope methodsFor: 'services' stamp: 'KenD 9/29/2022 14:22:10'!
+describe: identifier
+	| binding type |
+	binding := self resolve: identifier.
+	type := self class name asLowercase allButLast: 'scope' size.
+	^binding description , ' of ' , type
+! !
+
+!ScriptScope methodsFor: 'services' stamp: 'KenD 9/29/2022 14:22:10'!
+environmentSize
+	^envSize
+! !
+
+!ScriptScope methodsFor: 'services' stamp: 'KenD 9/29/2022 14:22:10'!
+scopeOf: aString
+	| s |
+	s := self scriptDefining: aString.
+	^s notNil ifTrue: [s scope]
+! !
+
+!ScriptScope methodsFor: 'services' stamp: 'KenD 9/29/2022 14:22:10'!
+stackSize
+	^stackSize
+! !
+
+!ScriptScope methodsFor: 'binding' stamp: 'KenD 9/29/2022 14:22:10'!
+defineArgument: identifier
+	| binding |
+	(self resolves: identifier) ifTrue: [self redefinitionError: identifier].
+	binding := ArgumentBinding new name: identifier.
+	arguments define: identifier as: binding.
+	^binding
+! !
+
+!ScriptScope methodsFor: 'binding' stamp: 'KenD 9/29/2022 14:22:10'!
+defineTemporary: identifier
+	| binding |
+	(temporaries defines: identifier)
+		ifTrue: [self redefinitionError: identifier].
+	binding := TemporaryBinding new name: identifier.
+	temporaries define: identifier as: binding.
+	^binding
+! !
+
+!ScriptScope methodsFor: 'binding' stamp: 'KenD 9/29/2022 14:22:10'!
+defines: aString
+	^(temporaries defines: aString) or: [arguments defines: aString]
+! !
+
+!ScriptScope methodsFor: 'binding' stamp: 'KenD 9/29/2022 14:22:10'!
+localBindings
+	^arguments values , temporaries values
+! !
+
+!ScriptScope methodsFor: 'binding' stamp: 'KenD 9/29/2022 14:22:10'!
+resolveLocal: aString
+	(temporaries at: aString) ifNotNil: [:binding | ^binding].
+	^arguments at: aString
+! !
+
+!ScriptScope methodsFor: 'binding' stamp: 'KenD 9/29/2022 14:22:10'!
+resolves: aString
+	^(self resolve: aString) isDynamic not
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+growEnvironment
+	^envSize := envSize + 1
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+growStack
+	^stackSize := stackSize + 1
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+positionDefinedArguments
+	arguments withIndexDo: [:binding :index | binding index: index]
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+positionDefinedLocals
+	self positionDefinedTemporariesIn: self; positionDefinedArguments
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+positionDefinedTemporariesIn: aScriptScope
+	temporaries do: [:binding | | position |
+		position := binding isInStack
+			ifTrue: [aScriptScope growStack]
+			ifFalse: [aScriptScope growEnvironment].
+		binding index: position]
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+positionLocals
+	self positionDefinedLocals
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+realScope
+	^script realScript scope
+! !
+
+!ScriptScope methodsFor: 'private' stamp: 'KenD 9/29/2022 14:22:10'!
+redefinitionError: name
+	| scope description |
+	scope := self scopeOf: name.
+	description := scope describe: name.
+	script compiler
+		warning: name , ' already declared as ' , description
+		at: script stretch
+! !
+
+!ScriptScope methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:22:10'!
+initialize
+	super initialize.
+	arguments := StaticBinder new.
+	temporaries := StaticBinder new.
+	stackSize := envSize := 0.
+		captureSelf := false.
+! !
+
+!ScriptScope methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:22:10'!
+script: aScriptNode
+	script := aScriptNode
+! !
+
+!ScriptScope class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:22:10'!
+new
+	^super new initialize
+! !
+
+!ScriptScope class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:22:10'!
+on: aScriptNode
+	^self new script: aScriptNode
+! !
+
 !AstcodeDecoder methodsFor: 'decoding' stamp: 'KenD 2/24/2021 11:32:30'!
 decodeClassBinding 
 	| index assoc |
@@ -9369,6 +10955,305 @@ new
 
 ! !
 
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+assign: value within: aPowertalkRuntime
+	^ self subclassResponsibility
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isArgument
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isAssociation
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isClassBinding
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isClassVar
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isDynamic
+	^ false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isInstVar
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isLiteral
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isPoolVar
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isSelf
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isSuper
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+isTemporary
+	^false
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+name
+	^self printString
+! !
+
+!SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
+valueWithin: anEvaluationContext
+	^ self subclassResponsibility
+! !
+
+!SBinding class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 13:53:08'!
+decodeUsing: anAstcodeDecoder
+	^self subclassResponsibility
+! !
+
+!SDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:54'!
+assign: value within: anEvaluationContext
+	cache ifNil: [ self lookupWithin: anEvaluationContext ].
+	cache assign: value within: anEvaluationContext
+! !
+
+!SDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:54'!
+isDynamic
+	^true
+! !
+
+!SDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:54'!
+lookupWithin: anEvaluationContext
+	cache := anEvaluationContext staticBindingFor: name
+! !
+
+!SDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:54'!
+name
+	name
+! !
+
+!SDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:54'!
+name: aSymbol
+	name := aSymbol
+! !
+
+!SDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:54'!
+printOn: aStream
+	aStream
+		nextPutAll: 'DinamicVarId. ';
+		nextPutAll: name printString
+! !
+
+!SDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:06:54'!
+valueWithin: anEvaluationContext
+	cache ifNil: [ self lookupWithin: anEvaluationContext ].
+	^ cache valueWithin: anEvaluationContext
+! !
+
+!SDynamicBinding class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:06:54'!
+decodeUsing: anAstcodeDecoder
+	^ anAstcodeDecoder decodeDynamicVar
+! !
+
+!SNestedDynamicBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:32:34'!
+lookupWithin: anEvaluationContext
+	cache := anEvaluationContext staticBindingForNested: name
+! !
+
+!SNestedDynamicBinding class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:32:34'!
+decodeUsing: anAstcodeDecoder
+	^ anAstcodeDecoder decodeNestedDynamicVar
+! !
+
+!SInstVarBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:06'!
+index
+	^index
+! !
+
+!SInstVarBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:06'!
+index: anInteger
+	index := anInteger
+! !
+
+!SInstVarBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:09:06'!
+valueWithin: anEvaluationContext
+	^ anEvaluationContext instanceVarAt: index
+! !
+
+!SInstVarBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:09:06'!
+assign: value within: anEvaluationContext
+	anEvaluationContext instanceVarAt: index put: value
+! !
+
+!SInstVarBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:09:06'!
+isInstVar
+	^true
+! !
+
+!SInstVarBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:09:06'!
+printOn: aStream
+	aStream nextPutAll: 'InstVarId. '; nextPutAll: index printString
+! !
+
+!SInstVarBinding class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:09:06'!
+decodeUsing: anAstcodeDecoder
+	^anAstcodeDecoder decodeInstVar
+! !
+
+!SLiteralBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:11:31'!
+isLiteral
+	^true
+! !
+
+!SLiteralBinding class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:11:31'!
+decodeUsing: anAstcodeDecoder
+	^self new
+! !
+
+!SNilBinding methodsFor: 'evaluating' stamp: 'KenD 9/29/2022 14:13:12'!
+printOn: aStream
+	aStream nextPutAll: 'NilId'
+! !
+
+!SNilBinding methodsFor: 'evaluating' stamp: 'KenD 9/29/2022 14:13:12'!
+value
+	^nil
+! !
+
+!SNilBinding methodsFor: 'evaluating' stamp: 'KenD 9/29/2022 14:13:12'!
+valueWithin: anEvaluationContext
+	^ anEvaluationContext nil
+! !
+
+!STrueBinding methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:21:45'!
+printOn: aStream
+	aStream nextPutAll: 'TrueId'
+! !
+
+!STrueBinding methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:21:45'!
+value
+	^true
+! !
+
+!STrueBinding methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:21:45'!
+valueWithin: anEvaluationContext
+	^ anEvaluationContext true
+! !
+
+!SLocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:24'!
+environment
+	^environment
+! !
+
+!SLocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:24'!
+environment: anInteger
+	environment := anInteger
+! !
+
+!SLocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:24'!
+index
+	^position
+! !
+
+!SLocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:24'!
+index: anInteger
+	position := anInteger
+! !
+
+!SLocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:24'!
+isInStack
+	self ASSERT: false.
+	^ environment = 0
+! !
+
+!STemporaryBinding methodsFor: 'as yet unclassified' stamp: 'KenD 9/29/2022 14:20:53'!
+assign: value within: anEvaluationContext
+	anEvaluationContext temporaryAt: position in: environment put: value
+! !
+
+!STemporaryBinding methodsFor: 'as yet unclassified' stamp: 'KenD 9/29/2022 14:20:53'!
+printOn: aStream
+	aStream
+		nextPutAll: 'STemporary ';
+		print: position;
+		nextPutAll: ' @ env ';
+		print: environment
+! !
+
+!STemporaryBinding methodsFor: 'as yet unclassified' stamp: 'KenD 9/29/2022 14:20:53'!
+valueWithin: anEvaluationContext
+	^ anEvaluationContext temporaryAt: position in: environment
+! !
+
+!STemporaryBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:53'!
+isInCurrentEnvironment
+	^environment = 1
+! !
+
+!STemporaryBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:53'!
+isTemporary
+	^true
+! !
+
+!STemporaryBinding class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:20:53'!
+decodeUsing: anAstcodeDecoder
+	^anAstcodeDecoder decodeTemporary
+! !
+
+!SSelfBinding methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:54:15'!
+printOn: aStream
+	aStream nextPutAll: 'SelfId'
+! !
+
+!SSelfBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:54:15'!
+isSelf
+	^true
+! !
+
+!SSelfBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:54:15'!
+valueWithin: anEvaluationContext
+	^ anEvaluationContext receiver
+! !
+
+!SSelfBinding class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 13:54:15'!
+decodeUsing: anAstcodeDecoder
+	^self new
+! !
+
+!SSuperBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:56:33'!
+isSelf
+	^false
+! !
+
+!SSuperBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:56:33'!
+isSuper
+	^true
+! !
+
+!SSuperBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:56:33'!
+printOn: aStream
+	aStream nextPutAll: 'SuperId'
+! !
+
 !SExpression methodsFor: 'testing' stamp: 'KenD 2/22/2021 13:04:54'!
 isAssignment 
 
@@ -9433,6 +11318,577 @@ printOn: aStream indent: anInteger
 acceptVisitor: visitor 
 
 	^self subclassResponsibility! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+acceptVisitor: visitor
+	^visitor visitIdentifier: self
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+binding: aBinding
+	binding := aBinding
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isArgument
+	^binding isArgument
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isAssociation
+	^binding isAssociation
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isIdentifier
+	^true
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isInstVar
+	^binding isInstVar
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isLiteral
+	^binding isLiteral
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isSelf
+	^binding isSelf
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isSelfOrSuper
+	^binding isSelf or: [binding isSuper]
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isSuper
+	^binding isSuper
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isTemporary
+	^binding isTemporary
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+isVariable
+	^true
+! !
+
+!SIdentifier methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:08:33'!
+printOn: aStream indent: anInteger
+	aStream
+		tab: anInteger;
+		nextPutAll: '{IdentifierId. ';
+		print: binding;
+		nextPutAll: '}'
+! !
+
+!SIdentifier methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:08:33'!
+binding
+	^binding
+! !
+
+!SIdentifier class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:08:33'!
+decodeUsing: anAstcodeDecoder
+	^anAstcodeDecoder decodeIdentifier
+! !
+
+!SLiteralVar methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:10:53'!
+index
+	^index
+! !
+
+!SLiteralVar methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:10:53'!
+index: anInteger
+	index := anInteger
+! !
+
+!SLiteral methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:11:06'!
+acceptVisitor: visitor
+	^ visitor visitLiteral: self
+! !
+
+!SLiteral methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:11:06'!
+isLiteral
+	^true
+! !
+
+!SLiteral methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:11:06'!
+value
+	^value
+! !
+
+!SLiteral methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:11:06'!
+value: anObject
+	value := anObject
+! !
+
+!SLiteral methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:11:06'!
+printOn: aStream indent: anInteger
+	aStream
+		tab: anInteger;
+		nextPutAll: '{LiteralId. ';
+		print: value;
+		nextPutAll: '}'
+! !
+
+!SLiteral class methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:11:06'!
+decodeUsing: anAstcodeDecoder
+	^anAstcodeDecoder decodeLiteral
+! !
+
+!SMessage methodsFor: 'private' stamp: 'KenD 9/29/2022 14:12:37'!
+inlined: aBoolean
+	inlined := aBoolean
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+acceptVisitor: visitor
+	^visitor visitMessage: self
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+arguments
+	^arguments
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+arguments: aCollection
+	arguments := aCollection
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+cache: anSCompiledMethod when: type
+	cache
+		ifNil: [ ^ cache := Array with: type with:
+			anSCompiledMethod].
+	cache := cache
+		,
+			(Array with: type with: 
+			anSCompiledMethod)
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+cacheUndermessage: aBlockClosure
+	cache := aBlockClosure
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+cachedUndermessage
+	^cache class == BlockClosure ifTrue: [ cache ]
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+flushCache
+	cache := nil
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+initialize
+	super initialize.
+	arguments := #().
+	inlined := false
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+isInlined
+	^ inlined
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+isMessage
+	^true
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+methodFor: requiredType
+	| type |
+	cache ifNil: [ ^ nil ].
+	1 to: cache size by: 2 do: [ :i | 
+		type := cache at: i.
+		type == requiredType
+			ifTrue: [ ^ cache at: i + 1 ] ].
+	^ nil
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+printOn: aStream indent: anInteger
+	aStream tab: anInteger; nextPutAll: '{MessageId. '; print: selector; nextPutAll: '. '; cr.
+	receiver printOn: aStream indent: anInteger + 1.
+	aStream nextPutAll: '.'; cr.
+	arguments
+		do: [:statement | statement printOn: aStream indent: anInteger + 1]
+		separatedBy: [aStream nextPutAll: '. '; cr].
+	aStream nextPutAll: '}'
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+receiver
+	^receiver
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+receiver: anSExpression
+	receiver := anSExpression
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+registerCacheWith: runtime
+	cache ifNil: [ runtime registerCache: self for: selector ]
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+selector
+	^selector
+! !
+
+!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+selector: aSelector
+	selector := aSelector
+! !
+
+!SMessage methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:12:37'!
+argumentCount
+	^arguments size
+! !
+
+!SMessage class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:12:37'!
+decodeUsing: anAstcodeDecoder
+	^anAstcodeDecoder decodeMessage
+! !
+
+!SMessage class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:12:37'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!SOpJump methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:36'!
+acceptVisitor: visitor
+	^ visitor visitOpJump: self
+! !
+
+!SOpJump methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:36'!
+printOn: aStream
+	aStream nextPutAll: self class name withArticle; nextPutAll: ' after '; print: target
+! !
+
+!SOpJump methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:36'!
+target
+	^target
+! !
+
+!SOpJump methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:36'!
+target: anInteger
+	 target := anInteger
+! !
+
+!SOpJumpFalse methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:15:54'!
+acceptVisitor: visitor
+	^ visitor visitOpJumpFalse: self
+! !
+
+!SOpJumpTrue methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:16:06'!
+acceptVisitor: visitor
+	^ visitor visitOpJumpTrue: self
+! !
+
+!SOpLoadRfromFrame methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:16:17'!
+acceptVisitor: visitor
+	^ visitor visitOpLoadRfromFrame: self
+! !
+
+!SOpLoadRfromFrame methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:16:17'!
+index
+^	index
+! !
+
+!SOpLoadRfromFrame methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:16:17'!
+index: anInteger
+	index := anInteger
+! !
+
+!SOpPopR methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:17:55'!
+acceptVisitor: visitor
+	^ visitor visitOpPopR: self
+! !
+
+!SOpStoreRintoFrame methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:18:51'!
+acceptVisitor: visitor
+	^ visitor visitOpStoreRintoFrame: self
+! !
+
+!SOpStoreRintoFrame methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:18:51'!
+index
+	^ index
+! !
+
+!SOpStoreRintoFrame methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:18:51'!
+index: anInteger
+	index := anInteger
+! !
+
+!SOpAssign methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:05'!
+acceptVisitor: visitor
+	^ visitor visitOpAssign: self
+! !
+
+!SOpAssign methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:05'!
+assignees
+	^assignees
+! !
+
+!SOpAssign methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:05'!
+assignees: aCollection
+	assignees := aCollection
+! !
+
+!SOpDispatchMessage methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:16'!
+acceptVisitor: visitor
+	^ visitor visitOpDispatchMessage: self
+! !
+
+!SOpDispatchMessage methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:16'!
+message
+	^ message
+! !
+
+!SOpDispatchMessage methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:14:16'!
+message: anSMessage
+	message := anSMessage
+! !
+
+!SOpDropToS methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:14:26'!
+acceptVisitor: visitor
+	^ visitor visitOpDropToS: self
+! !
+
+!SOpDropToS methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:14:26'!
+count
+	^count
+! !
+
+!SOpDropToS methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:14:26'!
+count: anInteger
+	count := anInteger 
+! !
+
+!SOpLoadRfromStack methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:16:28'!
+acceptVisitor: visitor
+	^ visitor visitOpLoadRfromStack: self
+! !
+
+!SOpLoadRfromStack methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:16:28'!
+index
+	^index
+! !
+
+!SOpLoadRfromStack methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:16:28'!
+index: anInteger
+	index := anInteger
+! !
+
+!SOpLoadRwithNil methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:16:38'!
+acceptVisitor: visitor
+	^ visitor visitOpLoadRwithNil: self
+! !
+
+!SOpLoadRwithSelf methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:16:48'!
+acceptVisitor: visitor
+	^ visitor visitOpLoadRwithSelf: self
+! !
+
+!SOpPrimitive methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:18:05'!
+acceptVisitor: visitor
+	^ visitor visitOpPrimitive: self
+! !
+
+!SOpPrimitive methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:18:05'!
+block
+	^block
+! !
+
+!SOpPrimitive methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:18:05'!
+block: aBlockClosure
+	block := aBlockClosure
+! !
+
+!SOpPushR methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:18:17'!
+acceptVisitor: visitor
+	^ visitor visitOpPushR: self
+! !
+
+!SOpRestart methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:17:19'!
+acceptVisitor: visitor
+	^ visitor visitOpRestart: self
+! !
+
+!SOpReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:17:33'!
+acceptVisitor: visitor
+	^ visitor visitOpReturn: self
+! !
+
+!SOpNonLocalReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:17:01'!
+acceptVisitor: visitor
+	^ visitor visitOpNonLocalReturn: self
+! !
+
+!SPragma methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:19:08'!
+name
+	^ name
+! !
+
+!SPragma methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:19:08'!
+name: aString
+	name := aString
+! !
+
+!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+acceptVisitor: visitor
+	^visitor visitReturn: self
+! !
+
+!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+expression
+	^expression
+! !
+
+!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+expression: anSExpression
+	expression := anSExpression
+! !
+
+!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+isReturn
+	^true
+! !
+
+!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+local
+	^local
+! !
+
+!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+local: aBoolean
+	local := aBoolean
+! !
+
+!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+printOn: aStream indent: anInteger
+	aStream tab: anInteger; nextPutAll: '{ReturnId.'; cr.
+	expression printOn: aStream indent: anInteger + 1.
+	aStream nextPutAll: '}'
+! !
+
+!SReturn class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:19:31'!
+decodeUsing: anAstcodeDecoder
+	^anAstcodeDecoder decodeReturn
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+argumentCount
+	^compiledCode argumentCount
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+compiledCode
+	^compiledCode
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+compiledCode: anObject
+	compiledCode := anObject
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+initialize
+	statements := #()
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+printOn: aStream indent: anInteger
+	statements
+		do: [:statement | statement printOn: aStream indent: anInteger + 1]
+		separatedBy: [aStream nextPutAll: '.'; cr]
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+statements
+	^statements
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+statements: aCollection
+	statements := aCollection
+! !
+
+!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+tempCount
+	^compiledCode tempCount
+! !
+
+!SScript methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:53:47'!
+optimizedCode: anObject
+	^ self compiledCode optimizedCode: anObject
+! !
+
+!SScript class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 13:53:47'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!SMethod methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:50'!
+offsetOfCurrentEnvironment
+	^ 0
+! !
+
+!SMethod methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:50'!
+offsetOfEnvironment: anInteger
+	^0
+! !
+
+!SMethod methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:50'!
+pragma
+	^pragma
+! !
+
+!SMethod methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:50'!
+pragma: anSPragma
+	pragma := anSPragma
+! !
+
+!SMethod methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:50'!
+primitive
+	^pragma ifNotNil: [ pragma name ]
+! !
+
+!SMethod methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:50'!
+printOn: aStream indent: anInteger
+	aStream nextPutAll: '{MethodId. '; cr.
+	pragma ifNotNil: [ (pragma isKindOf: SExpression) ifTrue: [ pragma printOn: aStream indent: anInteger + 1] ifFalse: [ aStream tab: anInteger + 1; print: pragma ] ].
+	super printOn: aStream indent: anInteger.
+	aStream nextPutAll: '}'
+! !
+
+!SMethod methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:50'!
+isMethod
+	^true
+! !
+
+!SMethod methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:12:50'!
+acceptVisitor: visitor
+	^visitor visitMethod: self
+! !
 
 !ObjectFormat methodsFor: 'accessing' stamp: 'KenD 2/27/2021 09:24:13'!
 bytesOf: oid 
@@ -9671,6 +12127,11 @@ isitReturn: anSReturn
 	returned := true.
 	^returnValue! !
 
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:07:19'!
+subjectOnInteger: anInteger in: aRuntime
+	^ (aRuntime integerHandle: anInteger) maneuverer
+! !
+
 !SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:08:17'!
 visitArgument: anSIdentifier 
 
@@ -9724,6 +12185,13 @@ visitMethod: anSMethod
 	environment := Array new: method environmentCount.
 	value := self visitScript: anSMethod.
 	^returned ifTrue: [ value ] ifFalse: [ receiver ]! !
+
+!SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:07:19'!
+visitReturn: anSReturn
+	returnValue := anSReturn expression acceptVisitor: self.
+	returned := true.
+	^returnValue
+! !
 
 !SExpressionInterpreter methodsFor: 'visiting' stamp: 'KenD 2/27/2021 16:10:57'!
 visitScript: anSScript 
@@ -9990,6 +12458,354 @@ on: receiverMirror with: arguments for: method
 		receiver: receiverMirror;
 		arguments: arguments;
 		method: method! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+dispatch: message to: msgReceiver
+	^ msgReceiver _gate dispatch: message from: self
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+dispatchSpecial: message
+	| selector mirror gate |
+	selector := message selector.
+	gate := message receiver _gate.
+	mirror := gate mirror.
+	selector == #_isSmallInteger
+		ifTrue: [ ^ self subjectOnBoolean: gate handle isInteger in: gate handle runtime].
+	selector == #_isLarge
+		ifTrue: [ ^ self subjectOnBoolean: mirror reflectsLargeObject in: gate handle runtime].
+	selector == #_smallSize
+		ifTrue: [ ^ self subjectOnInteger: mirror smallSize in: gate handle runtime ].
+	selector == #_largeSize
+		ifTrue: [ ^ self subjectOnInteger: mirror largeSize in: gate handle runtime ].
+	selector == #_basicFlags
+		ifTrue: [ ^ self subjectOnInteger: mirror basicFlags in: gate handle runtime ].
+	selector == #_basicHash
+		ifTrue: [ ^ self subjectOnInteger: 0 in: gate handle runtime ].
+	selector == #_basicHash:
+		ifTrue: [ ^ message receiver ].
+	self ASSERT: false
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+dispatchSuper: message to: msgReceiver
+	^ msgReceiver _gate dispatchSuper: message from: self
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+falseLiteral
+	^receiver _gate handle runtime false maneuverer.
+
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+gateOnBlock: aPCompiledBlock
+	| runtime closure handle |
+	runtime := receiver _gate handle runtime.
+	closure := aPCompiledBlock newClosure home: self.
+	handle := LocalHandle on: closure within: localRuntime.
+	^ closure mirage
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+initialize
+	super initialize.
+	localRuntime := Runtime forLocalPharo.
+
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:26:10'!
+isSpecial: selector
+	^Underprimitives includes: selector
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+literal: anObject
+	| handle |
+	handle := receiver _gate handleOn: anObject.
+	^ self subjectOn: handle
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+mirageOnBlock: aPCompiledBlock
+	| runtime handle |
+	runtime := receiver _gate handle runtime.
+	handle := runtime newClosureHandle: aPCompiledBlock.
+	^ handle mirage
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+nilLiteral
+	^receiver _gate handle runtime nil maneuverer.
+
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+primitiveClosureValue
+	| closure block sblock prev result interpreter next |
+	closure := receiver _gate handle.
+	block := closure mirror asClosureMirror block handle oid.
+	interpreter := self.
+	[ next := interpreter blocks. next includesKey: block] whileFalse: [ interpreter := interpreter parent ].
+	sblock := next at: block.
+	prev := environment.
+	environment := closure.
+	result := interpreter visitScript: sblock.
+	environment := prev.
+	^result
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+primitivePrimeFor
+	| num result  |
+	num := arguments first _gate handle asLocalInteger.
+	result := #(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 269 359 479 641 857 1151 1549 2069 2237 2423 2617 2797 2999 3167 3359 3539 3727 3911 4441 4787 5119 5471 5801 6143 6521 6827 7177 7517 7853 8783 9601 10243 10867 11549 12239 12919 13679 14293 15013 15731 17569 19051 20443 21767 23159 24611 25847 27397 28571 30047 31397 35771 38201 40841 43973 46633 48989 51631 54371 57349 60139 62969)
+		detect: [ :i | i >= num ].
+	^ self subjectOnInteger: result in: receiver _gate handle runtime
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+trueLiteral
+	^receiver _gate handle runtime true maneuverer.
+
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+visitLiteral: anSLiteral
+	| handle |
+	anSLiteral value isInteger ifTrue: [ 
+		^self subjectOnInteger: anSLiteral value in: receiver _gate handle runtime ].
+	handle := localRuntime handleOn: anSLiteral value.
+	^ handle mirage
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+visitPrimitive: primitive
+	| gate new left right args rcvr runtime value class |
+	returned := true.
+	gate := receiver _gate.
+	runtime := gate handle runtime.
+	primitive = #Behavior
+		ifTrue: [ class := runtime bridge objectNamed: gate handle oid spec name.
+			^ returnValue := self
+				subjectOn: (gate handleOn: class instanceBehavior) ].
+	primitive = #UnderSize
+		ifTrue:
+			[ ^ returnValue := self subjectOnInteger: gate handle size in: runtime ].
+	primitive = #Size
+		ifTrue: [ ^ returnValue := self
+				subjectOnInteger: gate handle arrayedSize
+				in: runtime ].
+	primitive = #At
+		ifTrue:
+			[ value := gate handle at: arguments first _gate handle asLocalInteger.
+			^ returnValue := self subjectOn: value ].
+	primitive = #AtPut
+		ifTrue: [ value := arguments second.
+			gate handle
+				at: arguments first _gate handle asLocalInteger
+				put: value _gate handle oid.
+			^ returnValue := value ].
+	primitive = #New
+		ifTrue: [ new := gate handle runtime new: gate handle oid.
+			^ returnValue := self subjectOn: new ].
+	primitive = #NewSized
+		ifTrue: [ new := gate handle runtime
+				new: gate handle oid
+				sized: arguments first _gate handle asLocalInteger.
+			^ returnValue := self subjectOn: new ].
+	primitive = #Equal
+		ifTrue: [ left := receiver _gate handle oid.
+			right := arguments first _gate handle oid.
+			^ returnValue := self
+				subjectOnBoolean: left == right
+				in: localRuntime ].
+	primitive = #SMIPlus
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self subjectOnInteger: left + right in: runtime ].
+	primitive = #SMIMinus
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self subjectOnInteger: left - right in: runtime ].
+	primitive = #SMITimes
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self subjectOnInteger: left * right in: runtime ].
+	primitive = #SMIIntDiv
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self subjectOnInteger: left // right in: runtime ].
+	primitive = #SMIIntQuot
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self subjectOnInteger: left \\ right in: runtime ].
+	primitive = #SMIGreaterThan
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self
+				subjectOnBoolean: left > right
+				in: localRuntime ].
+	primitive = #SmallIntegerBitAnd
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self
+				subjectOnInteger: (left bitAnd: right)
+				in: runtime ].
+	primitive = #SMIGreaterEqualThan
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self
+				subjectOnBoolean: left >= right
+				in: localRuntime ].
+	primitive = #SMIEqual
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self
+				subjectOnBoolean: left = right
+				in: localRuntime ].
+	primitive = #SMINotEqual
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self
+				subjectOnBoolean: left !!= right
+				in: localRuntime ].
+	primitive = #ClosureValue
+		ifTrue: [ ^ self primitiveClosureValue ].
+	primitive = #ReplaceFromTo
+		ifTrue: [ rcvr := receiver _gate handle target.
+			args := arguments collect: [ :arg | arg _gate asLocalCollection ].
+			rcvr
+				perform: #replaceFrom:to:with:startingAt:
+				withArguments: args asArray.
+			^ returnValue := receiver ].
+	primitive = #PrimeFor
+		ifTrue: [ ^ self primitivePrimeFor ].
+	self ASSERT: false
+! !
+
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+visitPrimitiveOld: primitive
+	| gate new left right args rcvr |
+	returned := true.
+	gate := receiver _gate.
+	primitive = #Size
+		ifTrue: [ ^ returnValue := self mirageOnInteger: gate mirror size ].
+	primitive = #New
+		ifTrue: [ new := gate handle runtime new: gate handle oid.
+			^ returnValue := self mirageOnObject: new ].
+	primitive = #NewSized
+		ifTrue: [ new := gate handle target new: arguments first _gate handle target.
+			^ returnValue := self mirageOnObject: new ].
+	primitive = #SmallIntegerMinus
+		ifTrue: [ left := receiver _gate handle target.
+			right := arguments first _gate handle target.
+			^ returnValue := self mirageOnInteger: left - right ].
+	primitive = #SmallIntegerPlus
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self mirageOnInteger: left + right ].
+	primitive = #SmallIntegerBitAnd
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self mirageOnInteger: (left bitAnd: right) ].
+	primitive = #SmallIntegerLessOrEqual
+		ifTrue: [ left := receiver _gate handle target.
+			right := arguments first _gate handle target.
+			^ returnValue := self mirageOnBoolean: left <= right ].
+	primitive = #SmallIntegerEqual
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self mirageOnBoolean: left = right ].
+	primitive = #SmallIntegerNotEqual
+		ifTrue: [ left := receiver _gate handle asLocalInteger.
+			right := arguments first _gate handle asLocalInteger.
+			^ returnValue := self mirageOnBoolean: left !!= right ].
+	primitive = #ClosureValue
+		ifTrue: [ ^ self primitiveClosureValue ].
+	primitive = #ReplaceFromTo
+		ifTrue: [ rcvr := receiver _gate handle target.
+			args := arguments collect: [ :arg | arg _gate asLocalCollection ].
+			rcvr
+				perform: #replaceFrom:to:with:startingAt:
+				withArguments: args asArray.
+			^ returnValue := receiver ].
+	self ASSERT: false
+! !
+
+!SmalltalkInterpreter class methodsFor: 'class initialization' stamp: 'KenD 9/29/2022 14:25:25'!
+initialize
+	"
+	self initialize
+	"
+
+	Underprimitives := #(_basicAt: #_basicAt:put: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash:)
+! !
+
+!ShapeMap methodsFor: 'adding' stamp: 'KenD 9/29/2022 14:22:32'!
+add: structure
+	shapes at: structure name put: structure
+! !
+
+!ShapeMap methodsFor: 'adding' stamp: 'KenD 9/29/2022 14:22:32'!
+at: type
+	^shapes at: type
+! !
+
+!ShapeMap methodsFor: 'adding' stamp: 'KenD 9/29/2022 14:22:32'!
+indexInCurrentOf: varname at: type
+	| species slot |
+	species := Smalltalk at: type asSymbol.
+	slot := species slotNamed: varname.
+	slot isNil
+		ifTrue: [ self error: 'inst var ' , varname , ' not found' ].
+	^ slot index
+! !
+
+!ShapeMap methodsFor: 'adding' stamp: 'KenD 9/29/2022 14:22:32'!
+indexOf: varname at: type
+	| shape |
+	shape := shapes at: type ifAbsent: [
+		^self indexInCurrentOf: varname at: type].
+	^shape indexOf: varname
+! !
+
+!ShapeMap methodsFor: 'adding' stamp: 'KenD 9/29/2022 14:22:32'!
+initialize
+	shapes := Dictionary new
+! !
+
+!ShapeMap methodsFor: 'adding' stamp: 'KenD 9/29/2022 14:22:32'!
+load: aClassDefinition
+	| shape |
+	shape := ObjectShape new loadFrom: aClassDefinition.
+	self add: shape
+! !
+
+!ShapeMap class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:22:32'!
+new
+	^self basicNew initialize
+! !
+
+!Storage methodsFor: 'storage' stamp: 'KenD 9/29/2022 14:30:01'!
+arrayedSlotOf: base at: index put: value
+	^ self subclassResponsibility
+! !
+
+!Storage methodsFor: 'storage' stamp: 'KenD 9/29/2022 14:30:01'!
+new: oid
+	^self subclassResponsibility
+! !
+
+!Storage methodsFor: 'storage' stamp: 'KenD 9/29/2022 14:30:01'!
+slotOf: base at: index
+	^ self subclassResponsibility
+! !
+
+!Storage methodsFor: 'storage' stamp: 'KenD 9/29/2022 14:30:01'!
+slotOf: base at: index put: value
+	^self subclassResponsibility
+! !
 
 !OperandEncoding methodsFor: 'testing' stamp: 'KenD 4/25/2021 11:33:46'!
 isImmediate1Operand: index 
@@ -10879,6 +13695,2493 @@ named: aString
 		detect: [:e | e name = aString asUppercase ]
 		ifNone: [(aString includes: $-) ifTrue: [self halt]]! !
 
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+argumentAt: anInteger
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+argumentAt: anInteger in: environmentIndex
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+arguments
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+captureClosure: anSBlock
+	| closure s i type env arg |
+	closure := system newClosureFor: anSBlock compiledCode.
+	s := anSBlock capturedVariables readStream.
+	i := 1.
+	[ s atEnd ]
+		whileFalse: [ type := s next.
+			type = Self
+				ifTrue: [ closure at: i put: self self ].
+			type = Environment
+				ifTrue: [ closure at: i put: self environment ].
+			type = EnvironmentValue
+				ifTrue: [ env := self environment at: s next.
+					closure at: i put: env ].
+			type = LocalArgument
+				ifTrue: [ arg := self argumentAt: s next.
+					closure at: i put: arg ].
+			i := i + 1 ].
+	^ closure
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+environment
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+false
+	^ system false
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+firstArgument
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+fourthArgument
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+instanceVarAt: index
+	^ system instanceVarOf: self self at: index
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+instanceVarAt: index put: value
+	^ system instanceVarOf: self self at: index put: value
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+method
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+method: anSCompiledMethod
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+methodArguments
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+nil
+	^ system nil
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+receiver
+	^self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+secondArgument
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+self
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+stackTemporaryAt: index
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+stackTemporaryAt: index put: value
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+staticBindingFor: aSymbol
+	| symbol |
+	symbol := system symbolFrom: aSymbol.
+	(self staticBindingForIvar: symbol) ifNotNil: [ :b | ^ b ].
+	(self staticBindingForCvar: symbol) ifNotNil: [ :b | ^ b ].
+	^ self staticBindingForMvar: symbol
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+system: aPowertalkRuntime
+	system := aPowertalkRuntime
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+temporaryAt: index in: environmentIndex
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+temporaryAt: index in: environmentIndex put: value
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+thirdArgument
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:34:52'!
+true
+	^ system true
+! !
+
+!EvaluationContext methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:34:52'!
+staticBindingFor: symbol inModule: module
+	|  namespace assoc |
+	namespace := system moduleNamespace: module.
+	assoc := system lookupAssociationFor: symbol in: namespace.
+	assoc ifNil: [ self error: 'unbound variable: ' , symbol asString ].
+	^ SAssociationBinding new association: assoc
+! !
+
+!EvaluationContext methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:34:52'!
+staticBindingForCvar: aSymbol
+	| species namespaces namespace nilObj |
+	species := system methodClassBinding: self method.
+	nilObj := system nil.
+	[ namespaces := system speciesNamespaces: species.
+	1 to: namespaces size do: [ :i | 
+		namespace := namespaces at: i. 
+		(system lookupAssociationFor: aSymbol in: namespace)
+			ifNotNil: [ :assoc | ^ SAssociationBinding new association: assoc ] ].
+	species := system speciesSuperclass: species.
+	species = nilObj ] whileFalse.
+	^ nil
+! !
+
+!EvaluationContext methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:34:52'!
+staticBindingForIvar: aSymbol
+	| ivar |
+	ivar := system staticBindingForIvar: aSymbol in: self self.
+	^ ivar > 0
+		ifTrue: [ SInstVarBinding new index: ivar ]
+! !
+
+!EvaluationContext methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:34:52'!
+staticBindingForMvar: symbol
+	| species module |
+	species := system methodClassBinding: self method.
+	module := system speciesModule: species.
+	^ self staticBindingFor: symbol inModule: module
+! !
+
+!EvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:34:52'!
+backtrace
+	^ self subclassResponsibility
+! !
+
+!EvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:34:52'!
+classBinding
+	^system methodClassBinding: self method
+! !
+
+!EvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:34:52'!
+loadAssociationValue: anObject
+	^system loadAssociationValue: anObject
+! !
+
+!EvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:34:52'!
+staticBindingForNested: name
+	| binding module |
+	binding := self staticBindingFor: (name at: 1).
+	module := binding valueWithin: self.
+	^self staticBindingFor: (name at: 2) inModule: module
+! !
+
+!EvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:34:52'!
+storeAssociation: association value: anObject
+	system storeAssociation: association value: anObject 
+! !
+
+!EvaluationContext methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:34:52'!
+printOn: aStream
+ self backtrace
+				do: [ :frame | 
+					frame
+						do: [ :elem | elem printOn: aStream ]
+						separatedBy: [ aStream nextPutAll: '. ' ].
+					aStream cr ]
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+argumentAt: anInteger
+	| args |
+	args := self isBlock ifTrue: [ system blockArgumentCount: regM ] ifFalse: [ system methodArgumentCount: regM ].
+	^stack at: regBP + 1 + (args - anInteger + 1)
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+argumentAt: index in: environmentIndex
+	environmentIndex ifNil: [ ^ self argumentAt: index ].
+	^self environment: environmentIndex at: index.
+
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+arguments
+	| count |
+	self halt.
+	count := system argumentCountOf: regM.
+	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+buildClosureFrameFor: receiver code: code environment: environment
+	| temps |
+	temps := system blockTempCount: code.
+	self buildFrameFor: receiver code: code environment: environment temps: temps
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+buildFrameFor: receiver code: code environment: environment temps: temps
+	regS := receiver.
+	regM := code.
+	self
+		push: pc;
+		push: regBP.
+	regBP := regSP.
+	regBP < 100 ifTrue: [ self error: 'stack overflow' ].
+	self
+		push: receiver;
+		push: code;
+		push: regE;
+		push: environment.
+	regE := environment.
+	pc := 0.
+	temps timesRepeat: [ self push: self nil ]
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+buildLaunchFrame
+	| launcher code |
+	launcher := system newCompiledMethod.
+	code := system newArraySized: 0.
+	system methodOptimizedCode: launcher put: code.
+	self
+		buildMethodFrameFor: system nil
+		code: launcher
+		environment: system nil
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+buildMethodFrameFor: receiver code: code environment: environment
+	| temps |
+	temps := system methodTempCount: code.
+	self
+		buildFrameFor: receiver
+		code: code
+		environment: environment
+		temps: temps
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+environment
+	^regE
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+environment: environmentIndex at: index
+	"
+	-1: inlined argument.
+	 0: current env.
+ 	>0: index of env in current env. "
+
+	| env |
+	environmentIndex = -1
+		ifTrue: [ ^ self stackTemporaryAt: index ].
+	env := environmentIndex = 0
+		ifTrue: [ regE ]
+		ifFalse: [ regE at: environmentIndex ].
+	^ env at: index
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+environment: environmentIndex at: index put: value
+	"
+	-1: inlined argument.
+	 0: current env.
+ 	>0: index of env in current env. "
+
+	| env |
+	environmentIndex = -1
+		ifTrue: [ ^ self stackTemporaryAt: index put: value ].
+	env := environmentIndex = 0
+		ifTrue: [ regE ]
+		ifFalse: [ regE at: environmentIndex ].
+	^ env at: index put: value
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+firstArgument
+	^ self argumentAt: 1
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+fourthArgument
+	^ self argumentAt: 4
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+hasFinished
+	^ regBP = 0 and: [ regSP = (stack size + 1) ]
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+incRegPC
+	^pc := pc + 1
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+initialize
+	super initialize.
+	stack := Array new: 64 * 1024.
+	regSP := stack size + 1.
+	regBP := 0.
+	pc := 0
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+isBlock
+	^ system isBlock: regM
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+method
+	^ self isBlock
+		ifTrue: [ system blockMethod: regM ]
+		ifFalse: [ regM ]
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+method: anSCompiledMethod
+	regM := anSCompiledMethod
+
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+methodArguments
+	| count |
+	count := system methodArgumentCount: regM.
+	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+operandAt: anInteger
+	^ stack at: regSP + anInteger
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+pop
+	| result |
+	result := stack at: regSP.
+	regSP := regSP + 1.
+	^result
+
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+popFrame
+	regSP := regBP.
+	regE := stack at: regBP - 3.
+	regBP := self pop.
+	pc := self pop.
+		regM := stack at: regBP - 2.
+	regS := stack at: regBP - 1.
+
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+popLaunchFrame
+	regSP := regBP.
+	regE := stack at: regBP - 3.
+	regBP := self pop.
+	pc := self pop.
+	regBP = 0
+		ifTrue: [ ^ self ].
+	regM := stack at: regBP - 2.
+	regS := stack at: regBP - 1.
+
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+popOperand
+	^self pop
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+popOperands: anInteger
+	| result |
+	anInteger = 0
+		ifTrue: [ ^ #() ].
+	result := Array new: anInteger.
+	anInteger to: 1 by: -1 do: [ :i | result at: i put: self pop ].
+	^ result
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+printOn: aStream
+	| slot |
+	regSP to: regBP + 3 do: [ :i | slot := stack at: i. aStream nextPutAll: i hex; nextPutAll: ' -> '; print: slot;cr ].
+	aStream nextPutAll: '...'; cr.
+
+super printOn: aStream
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+printStack
+	^String
+		streamContents: [ :stream | 
+			| slot |
+			regSP to: stack size do: [ :i | 
+				slot := stack at: i.
+				stream
+					nextPutAll: i hex;
+					nextPutAll: ' -> ';
+					print: slot;
+					cr ] ]
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+push: anObject
+	anObject ifNil: [ self halt ].
+	regSP := regSP - 1.
+	stack at: regSP put: anObject
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+pushOperand: anObject
+	anObject ifNil: [ self halt ].
+	regSP := regSP - 1.
+	stack at: regSP put: anObject
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+receiver
+	^ regS
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+regBP
+	^ regBP
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+restart
+	| nilObj |
+	nilObj := system nil.
+	regBP - self tempOffset to: regSP by: -1 do: [ :i | stack at: i put: nilObj ].
+	pc := 1
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+secondArgument
+	^ self argumentAt: 2
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+self
+	^ regS
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+stackTemporaryAt: index
+	^ stack at: regBP - self tempOffset - index
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+stackTemporaryAt: index put: value
+	^ stack at: regBP - self tempOffset - index put: value
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+system: aPowertalkRuntime
+	super system: aPowertalkRuntime.
+	regE := regS := system nil
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+tempOffset
+"should be 2 or 4 if we had methods without environment"
+	^4
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+temporaryAt: index in: environmentIndex
+	environmentIndex ifNil: [ ^ self stackTemporaryAt: index].
+	^ self environment: environmentIndex at: index
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+temporaryAt: index in: environmentIndex put: value
+	environmentIndex ifNil: [ ^ self stackTemporaryAt: index put: value ].
+	^ self environment: environmentIndex at: index put: value
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+thirdArgument
+	^ self argumentAt: 3
+! !
+
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+unwind
+	| home bp environment |
+	home := system closureHome: self environment.
+	home == system nil ifTrue: [ self error: 'cannot return because closure has no home' ].
+	bp := regBP.
+	[ bp !!= 0 ]
+		whileTrue: [ environment := stack at: bp - 4.
+			environment == home
+				ifTrue: [ regBP := bp.
+					^ self popFrame ].
+			bp := stack at: bp ].
+	self error: 'cannot return from this closure'
+! !
+
+!StackedEvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:36:01'!
+backtrace
+	| result bp code receiver |
+	result := OrderedCollection new.
+	bp := regBP.
+	[ bp !!= 0 ]
+		whileTrue: [ code := stack at: bp - 2.
+			receiver := stack at: bp - 1.
+			result add: {code. receiver}.
+			bp := stack at: bp ].
+	^ result
+! !
+
+!StackedEvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:36:01'!
+dropOperands: anInteger
+	regSP := regSP + anInteger
+! !
+
+!StackedEvaluationContext methodsFor: 'services' stamp: 'KenD 9/29/2022 14:36:01'!
+reserveStackSlots: anInteger
+	regSP := regSP - anInteger
+! !
+
+!StackedEvaluationContext methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:36:01'!
+regM
+	^ regM
+! !
+
+!StackedEvaluationContext methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:36:01'!
+regPC
+	^pc
+! !
+
+!StackedEvaluationContext methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:36:01'!
+regPC: anInteger
+	pc := anInteger
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+assign: aCollection
+	| op |
+	op := SOpAssign new assignees: aCollection.
+	operations add: op
+
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+branchIf: aBoolean
+	| class op |
+	class := aBoolean
+		ifTrue: [ SOpJumpTrue ]
+		ifFalse: [ SOpJumpFalse ].
+		op := class new.
+	operations add: op.
+	^op
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+branchTargetOf: branch
+	branch target: self currentPC
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+currentPC
+	^ operations size
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+dispatch: message
+	| op count |
+	op := SOpDispatchMessage new message: message.
+	operations add: op.
+	dropsArguments ifTrue: [ ^self ].
+	
+	count := message arguments size.
+	count > 0 ifTrue: [ count := count + 1 ].
+	stackTop := stackTop - count 
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+dropCascadeMessageArgs: argsize
+	(argsize = 0 orNot: [ dropsArguments ])
+		ifTrue: [ ^ self ].
+	self dropToS: argsize
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+dropMessageArgs: argsize
+	(argsize = 0 orNot: [ dropsArguments ])
+		ifTrue: [ ^ self ].
+	self dropToS: argsize + 1
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+dropToS
+	^self dropToS: 1
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+dropToS: anInteger
+	| op |
+	op := SOpDropToS new count: anInteger.
+	operations add: op.
+	stackTop := stackTop - anInteger
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+dropsArguments
+	dropsArguments := true
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+initialize
+	dropsArguments := false
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inline: anSMessage binaryWhile: aBoolean
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| start end |
+	start := self currentPC.
+	self visitStatements: anSMessage receiver statements.
+	end := self branchIf: aBoolean not.
+	self
+		visitStatements: anSMessage arguments first statements;
+		jumpTo: start;
+		branchTargetOf: end
+		
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inline: anSMessage if: aBoolean
+	| branch end |
+	anSMessage receiver acceptVisitor: self.
+	branch := self branchIf: aBoolean not.
+	end := self
+		visitStatements: anSMessage arguments first statements;
+		jump.
+	self
+		branchTargetOf: branch;
+		loadRwithNil;
+		branchTargetOf: end 
+		
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inline: anSMessage ifNil: aBoolean
+	| nilObj message branch end arg index |
+	anSMessage receiver acceptVisitor: self.
+	arg := anSMessage arguments first.
+	(arg isBlock and: [ arg inlinedArgs size = 1]) ifTrue: [ 
+		index := arg inlinedArgs first.
+		self storeRintoFrameAt: index
+		 ].
+	self pushR.
+	nilObj := SLiteral new value: runtime nil.
+	message := SMessage new
+		receiver: (SOpLoadRfromStack new index: 0);
+		arguments: {nilObj};
+		selector: equalsEquals.
+	self visitMessage: message.
+	branch := self branchIf: aBoolean not.
+
+	arg isBlock
+		ifTrue: [ self visitStatements: arg statements ]
+		ifFalse: [ arg acceptVisitor: self ].
+	end := self
+		dropToS;
+		jump.
+	self
+		branchTargetOf: branch;
+		popR;
+		branchTargetOf: end
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inline: anSMessage ifNilIfNotNil: aBoolean
+	| arguments nilObj message branch end arg index |
+	anSMessage receiver acceptVisitor: self.
+	arguments := anSMessage arguments.
+	arg := aBoolean ifTrue: [arguments second] ifFalse: [arguments first].
+	(arg isBlock and: [ arg inlinedArgs size = 1 ])
+		ifTrue: [ index := arg inlinedArgs first.
+			self storeRintoFrameAt: index ].
+	self pushR.
+	nilObj := SLiteral new value: runtime nil.
+	message := SMessage new
+		receiver: (SOpLoadRfromStack new index: 0);
+		arguments: {nilObj};
+		selector: equalsEquals.
+	self visitMessage: message.
+	branch := self branchIf: aBoolean not.
+	end := self
+		visitStatements: arguments first statements;
+		jump.
+	self
+		branchTargetOf: branch;
+		visitStatements: arguments second statements;
+		branchTargetOf: end;
+		dropToS
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inline: anSMessage ifTrueIfFalse: aBoolean
+	| branch end |
+	anSMessage receiver acceptVisitor: self.
+	branch := self branchIf: aBoolean not.
+	end := self
+		visitStatements: anSMessage arguments first statements;
+		jump.
+	self
+		branchTargetOf: branch;
+		visitStatements: anSMessage arguments second statements;
+		branchTargetOf: end
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inline: anSMessage unitaryWhile: aBoolean
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| start branch |
+	start := self currentPC.
+	self visitStatements: anSMessage receiver statements.
+	branch :=  self branchIf: aBoolean.
+	branch target: start.
+
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inlineAnd: anSMessage
+	| branches |
+	anSMessage receiver acceptVisitor: self.
+	branches := OrderedCollection new.
+	anSMessage arguments
+		do: [ :block | 
+			branches add: (self branchIf: false).
+	
+	self
+		visitStatements: block statements].
+	branches do: [ :branch | self branchTargetOf: branch ]
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inlineAndNot: anSMessage
+	| branch message |
+	anSMessage receiver acceptVisitor: self.
+	branch := self branchIf: false.
+	message := SMessage new
+		selector: not;
+		arguments: #().
+	self
+		visitStatements: anSMessage arguments first statements;
+		dispatch: message;
+		branchTargetOf: branch
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inlineOr: anSMessage
+	|  branches |
+	anSMessage receiver acceptVisitor: self.
+	branches := OrderedCollection new.
+	 anSMessage arguments do: [ :block | 
+		branches add: (self branchIf: true).
+		self visitStatements: block statements].
+	branches do: [:branch | self branchTargetOf: branch]
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inlineOrNot: anSMessage
+	| branch message |
+	anSMessage receiver acceptVisitor: self.
+		branch := self branchIf: true.
+	message := SMessage new
+		selector: not;
+		arguments: #().
+	self
+		visitStatements: anSMessage arguments first statements;
+		dispatch: message;
+		branchTargetOf: branch
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inlineRepeat: anSMessage
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| start |
+	start := self currentPC.
+	self
+		visitStatements: anSMessage receiver statements;
+		jumpTo: start
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inlineTimesRepeat: anSMessage
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| current limit start end compare increment |
+	operations add: one.
+	self pushR.
+	current := SOpLoadRfromFrame new index: stackTop.
+	anSMessage receiver acceptVisitor: self.
+	self pushR.
+	limit := SOpLoadRfromFrame new index: stackTop.
+	start := self currentPC.
+	compare := SMessage new
+		receiver: current;
+		selector: greaterThan;
+		arguments: {limit}.
+	self visitMessage: compare.
+	end := self branchIf: true.
+	self visitStatements: anSMessage arguments first statements.
+	increment := SMessage new
+		receiver: current;
+		selector: plus;
+		arguments: {one}.
+	self
+		visitMessage: increment;
+		storeRintoFrameAt: current index;
+		jumpTo: start;
+		branchTargetOf: end;
+		dropToS: 2
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+inlineToDo: anSMessage
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| index current limit start end compare increment |
+	anSMessage receiver acceptVisitor: self.
+	index := anSMessage arguments second inlinedArgs first.
+	current := SOpLoadRfromFrame new index: index.
+	self storeRintoFrameAt: index.
+	anSMessage arguments first acceptVisitor: self.
+	self pushR.
+	limit := SOpLoadRfromFrame new index: stackTop.
+	start := self currentPC.
+	compare := SMessage new
+		receiver: current;
+		selector: greaterThan;
+		arguments: {limit}.
+	self visitMessage: compare.
+	end := self branchIf: true.
+	self visitStatements: anSMessage arguments second statements.
+	increment := SMessage new
+		receiver: current;
+		selector: plus;
+		arguments: {one}.
+	self
+		visitMessage: increment;
+		storeRintoFrameAt: index;
+		jumpTo: start;
+		branchTargetOf: end;
+		dropToS: 1
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+jump
+	| op |
+	op := SOpJump new.
+	operations add: op.
+	^op
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+jumpTo: anInteger
+| op |
+op := SOpJump new target: anInteger.
+	operations add: op
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+loadRfromStack: anInteger
+	| op |
+	op := SOpLoadRfromStack new index: anInteger.
+	operations add: op
+
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+loadRwithNil
+	operations add: SOpLoadRwithNil new
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+loadRwithSelf
+	operations add: SOpLoadRwithSelf new
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+operations
+^operations
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+popR
+	operations add: SOpPopR new.
+	stackTop := stackTop - 1
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+primitive: aClosure
+	operations add: (SOpPrimitive new block: aClosure)
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+pushR
+	operations add: SOpPushR new.
+	stackTop := stackTop + 1
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+reset
+	operations := OrderedCollection new.
+	inBlock := false.
+
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+return
+	operations add: SOpReturn new
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+return: isLocal
+	|  class |
+	class := (isLocal andNot: [ inBlock ])
+		ifTrue: [ SOpReturn ]
+		ifFalse: [ SOpNonLocalReturn ].
+	operations add: class new
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+runtime: aPowertalkRuntime
+	| literal |
+	runtime := aPowertalkRuntime.
+	literal := runtime newInteger: 1.
+	one := SLiteral new value: literal.
+	plus := runtime symbolFromLocal: #+.
+	greaterThan := runtime symbolFromLocal: #>.
+	equalsEquals := runtime symbolFromLocal: #==.
+	not := runtime symbolFromLocal: #not.
+	ifTrue := runtime symbolFromLocal: #ifTrue:.
+	ifFalse := runtime symbolFromLocal: #ifFalse:.
+	ifTrueIfFalse := runtime symbolFromLocal: #ifTrue:ifFalse:.
+	ifFalseIfTrue := runtime symbolFromLocal: #ifFalse:ifTrue:.
+	ifNil := runtime symbolFromLocal: #ifNil:.
+	ifNotNil := runtime symbolFromLocal: #ifNotNil:.
+	ifNilIfNotNil := runtime symbolFromLocal: #ifNil:ifNotNil:.
+	ifNotNilIfNil := runtime symbolFromLocal: #ifNotNil:ifNil:.
+	repeat := runtime symbolFromLocal: #repeat.
+	whileTrue := runtime symbolFromLocal: #whileTrue.
+	whileFalse := runtime symbolFromLocal: #whileFalse.
+	whileTrue_ := runtime symbolFromLocal: #whileTrue:.
+	whileFalse_ := runtime symbolFromLocal: #whileFalse:.
+	timesRepeat := runtime symbolFromLocal: #timesRepeat:.
+	toDo := runtime symbolFromLocal: #to:do:.
+	toByDo := runtime symbolFromLocal: #to:by:do:.
+	andNot := runtime symbolFromLocal: #andNot:.
+	orNot := runtime symbolFromLocal: #orNot:
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+storeRintoFrameAt: anInteger
+	| op |
+	op := SOpStoreRintoFrame new index: anInteger.
+	operations add: op
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitAssignment: anSAssignment
+	anSAssignment expression acceptVisitor: self.
+	self
+		assign: anSAssignment assignees
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitBlock: anSBlock
+	| prevInBlock prevOperations statements |
+	operations add: anSBlock.
+	prevInBlock := inBlock.
+	prevOperations := operations.
+	inBlock := true.
+	operations := OrderedCollection new.
+	statements := anSBlock statements.
+	statements do: [ :node | node acceptVisitor: self ].
+	statements isEmpty
+		ifTrue: [ self loadRwithNil ]
+		ifFalse: [ statements last isReturn
+				ifFalse: [ self return ] ].
+	anSBlock isInlined ifFalse: [ 
+	runtime
+		blockOptimizedCode: anSBlock compiledCode
+		put: operations asArray].
+	operations := prevOperations.
+	inBlock := prevInBlock
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitCascade: anSCascade
+	| args argsize |
+	anSCascade receiver acceptVisitor: self.
+	self pushR.
+	anSCascade messages
+		do: [ :msg | 
+			args := msg arguments.
+			argsize := args size.
+			args
+				do: [ :arg | 
+					arg acceptVisitor: self.
+					self pushR ].
+			self
+				loadRfromStack: argsize;
+				dispatch: msg;
+				dropCascadeMessageArgs: argsize ].
+	self dropToS
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitIdentifier: anSIdentifier
+	operations add: anSIdentifier
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitInlinedMessage: anSMessage
+	| selector |
+	selector := anSMessage selector.
+	selector == ifTrue
+		ifTrue: [ ^ self inline: anSMessage if: true ].
+	selector == ifFalse
+		ifTrue: [ ^ self inline: anSMessage if: false ].
+	selector == ifNil
+		ifTrue: [ ^ self inline: anSMessage ifNil: true ].
+	selector == ifNotNil
+		ifTrue: [ ^ self inline: anSMessage ifNil: false ].
+	selector == ifNilIfNotNil
+		ifTrue: [ ^ self inline: anSMessage ifNilIfNotNil: true ].
+	selector == ifNotNilIfNil
+		ifTrue: [ ^ self inline: anSMessage ifNilIfNotNil: false ].
+	selector == ifTrueIfFalse
+		ifTrue: [ ^ self inline: anSMessage ifTrueIfFalse: true ].
+	selector == ifFalseIfTrue
+		ifTrue: [ ^ self inline: anSMessage ifTrueIfFalse: false ].
+	selector == whileTrue
+		ifTrue: [ ^ self inline: anSMessage unitaryWhile: true ].
+	selector == whileFalse
+		ifTrue: [ ^ self inline: anSMessage unitaryWhile: false ].
+	selector == whileTrue_
+		ifTrue: [ ^ self inline: anSMessage binaryWhile: true ].
+	selector == whileFalse_
+		ifTrue: [ ^ self inline: anSMessage binaryWhile: false ].
+	selector == repeat
+		ifTrue: [ ^ self inlineRepeat: anSMessage ].
+	selector == toDo
+		ifTrue: [ ^ self inlineToDo: anSMessage ].
+	selector == toByDo
+		ifTrue: [ ^ self inlineToByDo: anSMessage ].
+	selector == timesRepeat
+		ifTrue: [ ^ self inlineTimesRepeat: anSMessage ].
+	selector == andNot
+		ifTrue: [ ^ self inlineAndNot: anSMessage ].
+	selector == orNot
+		ifTrue: [ ^ self inlineOrNot: anSMessage ].
+	selector := runtime localSymbolFrom: selector.
+	(selector beginsWith: #or:)
+		ifTrue: [ ^ self inlineOr: anSMessage ].
+	(selector beginsWith: #and:)
+		ifTrue: [ ^ self inlineAnd: anSMessage ].
+
+	self ASSERT: false
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitLiteral: anSLiteral
+	operations add: anSLiteral
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitMessage: anSMessage
+	| args argsize |
+	anSMessage isInlined
+		ifTrue: [ ^ self visitInlinedMessage: anSMessage ].
+	anSMessage receiver acceptVisitor: self.
+	args := anSMessage arguments.
+	argsize := args size.
+	argsize > 0
+		ifTrue: [ self pushR ].
+	args
+		do: [ :arg | 
+			arg acceptVisitor: self.
+			self pushR ].
+	argsize > 0
+		ifTrue: [ self loadRfromStack: argsize ].
+	self dispatch: anSMessage; dropMessageArgs: argsize.
+	
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitMethod: anSMethod
+	| primitive statements symbol |
+	self reset.
+	primitive := anSMethod pragma.
+	primitive
+		ifNotNil: [ symbol := runtime localSymbolFrom: anSMethod primitive.
+			primitive := primitives at: symbol.
+			^ self
+				primitive: primitive;
+				return ].
+	stackTop := runtime methodTempCount: anSMethod compiledCode.
+	statements := anSMethod statements.
+	statements do: [ :node | node acceptVisitor: self ].
+	(statements isEmpty orNot: [ statements last isReturn ])
+		ifTrue: [ self
+				loadRwithSelf;
+				return ]
+! !
+
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+visitReturn: anSReturn
+	anSReturn expression acceptVisitor: self.
+	self
+		return: anSReturn local
+! !
+
+!SExpressionLinearizer methodsFor: 'visiting' stamp: 'KenD 9/29/2022 12:33:20'!
+visitOpLoadRfromFrame: anSOpLoadRfromFrame
+	operations add: anSOpLoadRfromFrame
+! !
+
+!SExpressionLinearizer methodsFor: 'visiting' stamp: 'KenD 9/29/2022 12:33:20'!
+visitOpLoadRfromStack: anSOpLoadRfromStack
+self loadRfromStack: anSOpLoadRfromStack index
+! !
+
+!SExpressionLinearizer methodsFor: 'private' stamp: 'KenD 9/29/2022 12:33:20'!
+visitStatements: aCollection
+	aCollection do: [:sexpression | sexpression acceptVisitor: self]
+	
+! !
+
+!SExpressionLinearizer methodsFor: 'accessing' stamp: 'KenD 9/29/2022 12:33:20'!
+primitives: aCollection
+	primitives := aCollection
+! !
+
+!SSmalltalkCompiler methodsFor: 'services' stamp: 'KenD 9/29/2022 13:55:07'!
+parseFragment
+	headless := false.
+	self reset.
+	ast := self parser methodFragment.
+	result ast: ast
+! !
+
+!SSmalltalkCompiler methodsFor: 'services' stamp: 'KenD 9/29/2022 13:55:07'!
+parseFragment: aString
+	source := aString.
+	[self parseFragment; resolveSemantics] on: SCompilationError do: [].
+	^ast
+! !
+
+!SSmalltalkCompiler methodsFor: 'services' stamp: 'KenD 9/29/2022 13:55:07'!
+parseMethod
+	headless := false.
+	self reset.
+	ast := self parser method.
+	result ast: ast
+! !
+
+!SSmalltalkCompiler methodsFor: 'services' stamp: 'KenD 9/29/2022 13:55:07'!
+parseMethod: aString
+	source := aString.
+	frontend protect: [self parseMethod; resolveSemantics].
+	^result
+! !
+
+!SSmalltalkCompiler methodsFor: 'services' stamp: 'KenD 9/29/2022 13:55:07'!
+resolveSemantics
+	ast acceptVisitor: SSemanticVisitor new
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+assignmentNode
+	^SAssignmentNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+blockNode
+	^SBlockNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+braceNode
+	^SBraceNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+buildMethod
+	result method: ast buildMethod
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+cascadeMessageNode
+	^SCascadeMessageNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+cascadeNode
+	^SCascadeNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+commentNode
+	^SCommentNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+compileMethod: aString
+	source := aString.
+	frontend protect: [
+		self
+			parseMethod;
+			resolveSemantics;
+			buildMethod].
+	^result
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+delimiterToken
+	^SDelimiterToken new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+endToken
+	^SEndToken new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+hasBlocks
+	^ blocks > 0
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+hasSends
+^ leaf not
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+identifierNode
+	^SIdentifierNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+initialize
+	self reset
+
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+literalNode
+	^SLiteralNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+messageNode
+	^SMessageNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+methodNode
+	^SMethodNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+noticeSend
+	leaf := false
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+numericLiteralNode
+	^SNumberNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+pragmaNode
+	^SPragmaNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+reset
+	self resetResult.
+	leaf := true.
+	blocks := 0.
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+returnNode
+	^SReturnNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+selectorNode
+	^SSelectorNode new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'nodes' stamp: 'KenD 9/29/2022 13:55:07'!
+stringToken
+	^SStringToken new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+activate: aScriptNode while: aBlock
+	| current |
+	current := activeScript.
+	activeScript := aScriptNode.
+	aBlock value.
+	activeScript := current
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+activeScope
+	^activeScript scope
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+activeScript
+	^activeScript
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+activeScript: aParseNode
+	activeScript := aParseNode
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+ast
+	^ast
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+frontend
+	^frontend
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+frontend: aCompiler
+	frontend := aCompiler
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+parser
+	^SSmalltalkParser new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+result
+	^result
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+scanner
+	^SSmalltalkScanner new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+sourceCode
+	^source
+! !
+
+!SSmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:55:07'!
+sourceCode: aString
+	source := aString
+! !
+
+!SSmalltalkCompiler methodsFor: 'emitting' stamp: 'KenD 9/29/2022 13:55:07'!
+blockCount
+	^blocks
+! !
+
+!SSmalltalkCompiler methodsFor: 'emitting' stamp: 'KenD 9/29/2022 13:55:07'!
+blockIndex
+	blocks := blocks + 1.
+	^blocks - 1
+! !
+
+!SSmalltalkCompiler methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:07'!
+resetResult
+	result := SCompilationResult new compiler: self
+! !
+
+!SSmalltalkCompiler methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:55:07'!
+supportsBraceNodes
+	^true
+! !
+
+!SSmalltalkCompiler methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:55:07'!
+compilationError: aString stretch: aStretch
+	^SCompilationError new
+		compiler: self;
+		stretch: aStretch;
+		description: aString
+! !
+
+!SSmalltalkCompiler methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:55:07'!
+error: aString at: anInteger
+	| stretch |
+	stretch := anInteger thru: anInteger.
+	^self error: aString stretch: stretch
+! !
+
+!SSmalltalkCompiler methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:55:07'!
+error: aString stretch: aStretch
+	| error |
+	error := self compilationError: aString stretch: aStretch.
+	^error beFatal; signal
+! !
+
+!SSmalltalkCompiler methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:55:07'!
+warning: aString at: aStretch
+	| error |
+	error := self compilationError: aString stretch: aStretch.
+	error beWarning; signal
+! !
+
+!SSmalltalkCompiler class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 13:55:07'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!SSmalltalkParser methodsFor: 'arrays' stamp: 'KenD 9/29/2022 13:55:27'!
+arrayElement
+	token isLiteral ifTrue: [^token value].
+	token isNameToken ifTrue: [^self pseudoLiteralValue].
+	token isKeyword ifTrue: [^self literalKeyword].
+	(token is: #'-') ifTrue: [^self negativeNumberOrBinary].
+	token hasSymbol ifTrue: [^token value].
+	(token is: $() ifTrue: [^self arrayBody value].
+	(token is: #'#(') ifTrue: [^self arrayBody value].
+	(token is: #'#[') ifTrue: [^self byteArrayBody value].
+	self invalidArrayToken
+! !
+
+!SSmalltalkParser methodsFor: 'arrays' stamp: 'KenD 9/29/2022 13:55:27'!
+byteArrayBody
+	| bytes save start array node |
+	bytes := OrderedCollection new.
+	save := token.
+	start := token position.
+	[
+		self step.
+		token isLiteral or: [token isPoolLiteral]]
+		whileTrue: [self addByteTo: bytes].
+	(token is: $]) ifFalse: [
+		token isNameToken
+			ifTrue: [self missingLiteral]
+			ifFalse: [self missingToken: ']']].
+	array := ByteArray new: bytes size.
+	bytes withIndexDo: [:b :i | array at: i put: b].
+	node := self buildNode: compiler literalNode at: start with: array.
+	^node moveCommentsFrom: save
+! !
+
+!SSmalltalkParser methodsFor: 'arrays' stamp: 'KenD 9/29/2022 13:55:27'!
+negativeNumberOrBinary
+	self peek isNumberNode
+		ifTrue: [token := self next negate position: token position - 1].
+	^token value
+! !
+
+!SSmalltalkParser methodsFor: 'ffi support' stamp: 'KenD 9/29/2022 13:55:27'!
+symbolicPragma
+	| position symbol pragma |
+	position := token position.
+	symbol := self step value.
+	pragma := self buildNode: compiler pragmaNode at: position.
+	^pragma symbol: symbol
+! !
+
+!SSmalltalkParser methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:27'!
+buildMessageNode: receiver
+	| node |
+	node := self buildNode: compiler messageNode at: receiver position.
+	^node receiver: receiver
+! !
+
+!SSmalltalkParser methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:27'!
+buildNode: aParseNode at: anInteger with: anObject
+	| node |
+	node := scanner buildToken: aParseNode at: anInteger with: anObject.
+	^node end: token position
+! !
+
+!SSmalltalkParser methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:27'!
+ffiArguments
+	| args type |
+	args := OrderedCollection new.
+	self step.
+	token value !!= $(
+		ifTrue: [ self error: 'expected "("' ].
+	self peek value = $)
+		ifTrue: [ self step.
+			^ args ].
+	[ type := self ffiType.
+	args add: type.
+	self step.
+	token value = #, ] whileTrue.
+	token value !!= $)
+		ifTrue: [ self error: 'expected ")"' ].
+	^ args
+! !
+
+!SSmalltalkParser methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:27'!
+hasKeywordSelector
+	^token isKeyword
+! !
+
+!SSmalltalkParser methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:27'!
+keywordMessage: aMessageNode
+	| selector arguments node |
+	node := self buildNode: compiler selectorNode at: token position.
+	selector := '' writeStream.
+	arguments := OrderedCollection new.
+	[token isKeyword] whileTrue: [
+		selector nextPutAll: token value.
+		node addKeyword: self step.
+		arguments add: self keywordArgument].
+	node symbol: selector contents; end: token prevPosition.
+	aMessageNode
+		arguments: arguments;
+		end: token prevPosition;
+		selector: node
+! !
+
+!SSmalltalkParser methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:27'!
+keywordSequence: aParseNode
+	| expression |
+	self hasKeywordSelector ifFalse: [^aParseNode].
+	expression := self buildMessageNode: aParseNode.
+	self keywordMessage: expression.
+	^expression
+! !
+
+!SSmalltalkParser methodsFor: 'private' stamp: 'KenD 9/29/2022 13:55:27'!
+skipDots
+	[token is: $.] whileTrue: [self step]
+! !
+
+!SSmalltalkParser methodsFor: 'productions' stamp: 'KenD 9/29/2022 13:55:27'!
+method
+	| method |
+	self step.
+	method := self methodSignature.
+	method isNil ifTrue: [^nil].
+	self addBodyTo: method.
+	^method
+! !
+
+!SSmalltalkParser methodsFor: 'productions' stamp: 'KenD 9/29/2022 13:55:27'!
+methodFragment
+	| method |
+	self step.
+	method := self methodSignature.
+	method isNil ifTrue: [^nil].
+	[self addBodyTo: method] on: SCompilationError do: [].
+	^method
+! !
+
+!SSmalltalkParser methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:55:27'!
+error: aString
+	self error: aString at: token position
+! !
+
+!SSmalltalkParser methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:55:27'!
+missingArgument
+	self error: 'argument missing'
+! !
+
+!SSmalltalkParser methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:55:27'!
+warning: aString
+	compiler warning: aString at: token position
+! !
+
+!SSmalltalkParser methodsFor: 'parsing' stamp: 'KenD 9/29/2022 13:55:27'!
+methodPragma
+	self step.
+	^[| method |
+		method := self methodSignature.
+		self addTemporariesTo: method; attachPragmaTo: method.
+		method pragma]
+		on: SCompilationError
+		do: [:ex | ex return: compiler pragmaNode]
+! !
+
+!SSmalltalkParser methodsFor: 'parsing' stamp: 'KenD 9/29/2022 13:55:27'!
+unaryMessage: aMessageNode
+	| selector |
+	selector := self unarySelector.
+	aMessageNode
+		selector: selector;
+		end: selector end;
+		arguments: #();
+		moveCommentsFrom: selector
+! !
+
+!SSmalltalkParser methodsFor: 'api support' stamp: 'KenD 9/29/2022 13:55:27'!
+addPragmaTo: aMethodNode
+	(self attachPragmaTo: aMethodNode) ifTrue: [self step]
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+end
+	^self buildToken: compiler endToken at: stream position + 1
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+next
+	^self nextToken
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextArrayPrefix
+	| string |
+	string := stream copyFrom: stream position - 1 to: stream position.
+	^self
+		buildToken: compiler delimiterToken
+		at: stream position - 1
+		with: string
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextAssignment
+	^self buildToken: compiler delimiterToken at: stream position with: #':='
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextBinarySelector
+	stream back.
+	^self
+		buildToken: compiler stringToken
+		at: stream position + 1
+		with: self scanBinarySymbol
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextColon
+	| start char |
+	start := stream position.
+	char := stream peek.
+	((char = Character space or: [char = Character tab]) and: [(stream peek: 2) second = $=]) ifTrue: [
+		stream skip: 1.
+		char := $=].
+	char = $= ifTrue: [
+		stream skip.
+		^self nextAssignment position: start].
+	^(self isBinary: stream peek)
+		ifTrue: [self nextBinarySelector]
+		ifFalse: [self nextSpecialCharacter]
+
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextIdentifierOrKeyword
+	| start |
+	start := stream position.
+	self skipIdentifier.
+	((stream peekFor: $:) and: [stream peekFor: $=]) ifTrue: [stream skip: -2].
+	^self buildToken: compiler stringToken at: start
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextKeyword
+	| start string |
+	start := stream position + 1.
+	self skipKeyword.
+	string := stream copyFrom: start to: stream position.
+	^self buildToken: compiler literalNode at: start - 1 with: string asSymbol
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextLiteralCharacter
+	stream atEnd ifTrue: [^self error: 'character expected'].
+	^self
+		buildToken: compiler literalNode
+		at: stream position
+		with: stream next
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextLiteralString
+	^self
+		buildToken: compiler literalNode
+		at: stream position
+		with: self scanString reduced
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextNumber
+	| parser assoc |
+	stream skip: -1.
+	parser := NumberParser2 new on: stream.
+	assoc := parser next.
+	parser error ifNotNil: [:e | ^self error: e key at: e value].
+	^self
+		buildToken: compiler numericLiteralNode
+		at: assoc value start
+		with: assoc key
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextQuotedSymbol
+	| node |
+	node := self nextLiteralString.
+	^node beSymbol; position: node position - 1
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextSpecialCharacter
+	| token |
+	token := self buildToken: compiler delimiterToken.
+	^token beCharacter
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+nextSymbolOrArrayPrefix
+	| char |
+	stream atEnd ifTrue: [self error: 'character expected'].
+	char := stream peek.
+	(self canBeInIdentifier: char) ifTrue: [^self nextKeyword].
+	(self isBinary: char) ifTrue: [^self nextBinarySymbol].
+	stream next.
+	(char = $[ or: [char = $(]) ifTrue: [^self nextArrayPrefix].
+	char = $' ifTrue: [^self nextQuotedSymbol].
+	self error: 'character expected'
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+scanBinarySymbol
+	| start symbol |
+	start := stream position.
+	self skipBinary.
+	symbol := stream copyFrom: start + 1 to: stream position.
+	^symbol asSymbol
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+scanChar
+	^(stream skipSeparators; atEnd) ifFalse: [stream next]
+
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+scanString
+	| current start |
+	start := current := stream position.
+	^String streamContents: [:writer | 
+		[| fragment |
+			fragment := stream upTo: $'.
+			writer nextPutAll: fragment.
+			(current < stream position and: [(stream back; next) = $'])
+				ifFalse: [self error: 'string end expected' at: start].
+			stream peekFor: $']
+			whileTrue: [
+				writer nextPut: $'.
+				current := stream position]]
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+skipBinary
+	[self isBinary: stream peek] whileTrue: [stream next]
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+skipIdentifier
+	| frontend |
+	frontend := compiler frontend.
+	[stream atEnd]
+		whileFalse: [(frontend peekForIdentifier: stream) ifFalse: [^self]]
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+skipKeyword
+	| frontend continue pos |
+	frontend := compiler frontend.
+	[
+		self skipIdentifier.
+		continue := false.
+		(stream peekFor: $:) ifTrue: [
+			pos := stream position.
+			stream atEnd
+				ifFalse: [continue := frontend canStartIdentifier: stream peek]].
+		continue] whileTrue.
+	pos isNil ifFalse: [stream position: pos]
+! !
+
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+compiler
+	^compiler
+! !
+
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+compiler: aSmalltalkCompiler
+	compiler := aSmalltalkCompiler.
+	compiler sourceCode ifNotNil: [:s | self sourceCode: s]
+! !
+
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+on: aString
+	stream := aString readStream.
+	compiler notNil ifTrue: [compiler sourceCode: aString]
+! !
+
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+sourceCode: aString
+	stream := aString readStream
+! !
+
+!SSmalltalkScanner methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:56:06'!
+canStartIdentifier: aCharacter
+	(compiler frontend canStartIdentifier: aCharacter) ifFalse: [^false].
+	aCharacter = $_
+		ifTrue: [^stream peek ifNil: [false] ifNotNil: [:ch | ch asInteger >= 33]].
+	^true
+! !
+
+!SSmalltalkScanner methodsFor: 'private' stamp: 'KenD 9/29/2022 13:56:06'!
+buildToken: aSmalltalkToken at: anInteger
+	| string |
+	string := stream copyFrom: anInteger to: stream position.
+	^self buildToken: aSmalltalkToken at: anInteger with: string
+! !
+
+!SSmalltalkScanner methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:56:06'!
+error: aString
+	^self error: aString at: stream position
+! !
+
+!SSmalltalkScanner methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:56:06'!
+error: aString at: anInteger
+	^compiler error: aString at: anInteger
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+compileWarning: aString
+	compiler notify: aString at: self stretch
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+compiler
+	^compiler
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+compiler: aSmalltalkCompiler
+	compiler := aSmalltalkCompiler
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+end
+	^stretch end
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+end: aNumber
+	stretch end: aNumber
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+position
+	^stretch start
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+position: aNumber
+	stretch start: aNumber
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+prevPosition
+	^stretch start - 1
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+source
+	^compiler sourceCode copyFrom: stretch start to: stretch end
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+stretch
+	^stretch
+! !
+
+!SToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:20:36'!
+stretch: aStretch
+	stretch := aStretch
+! !
+
+!SToken methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:20:36'!
+isDelimitedIdentifier
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+endsExpression
+	^self isEnd
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+hasSymbol
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+is: anObject
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isAssignment
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isBar
+	^(self is: #'|') or: [self is: #'/']
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isBlockNode
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isComment
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isDelimiter
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isEnd
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isIdentifier
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isKeyword
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isLiteral
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isNameToken
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isNumberNode
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isPoolLiteral
+	^false
+! !
+
+!SToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:20:36'!
+isStringToken
+	^false
+! !
+
+!SToken methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:20:36'!
+comment
+	^comments notNil ifTrue: [comments anyOne]
+! !
+
+!SToken methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:20:36'!
+comments
+	^comments
+! !
+
+!SToken methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:20:36'!
+comments: aCollection
+	aCollection isNil ifTrue: [^self].
+	comments isNil
+		ifTrue: [comments := aCollection]
+		ifFalse: [comments addAll: aCollection]
+! !
+
+!SToken methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:20:36'!
+moveCommentsTo: aParseNode
+	aParseNode comments: comments.
+	comments := nil
+! !
+
+!SToken methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:20:36'!
+initialize
+	super initialize.
+	stretch := 1 thru: 0
+! !
+
+!SToken class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:20:36'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!SSymbolicToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:21:04'!
+value
+	^value
+! !
+
+!SSymbolicToken methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:21:04'!
+value: anObject
+	value := anObject
+! !
+
+!SSymbolicToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:04'!
+is: anObject
+	^value == anObject
+! !
+
+!SStringToken methodsFor: 'converting' stamp: 'KenD 9/29/2022 14:21:26'!
+asIdentifierNode
+	^compiler identifierNode
+		name: value;
+		stretch: stretch;
+		comments: comments
+! !
+
+!SStringToken methodsFor: 'converting' stamp: 'KenD 9/29/2022 14:21:26'!
+asSelectorNode
+	^compiler selectorNode symbol: value; stretch: stretch
+! !
+
+!SStringToken methodsFor: 'converting' stamp: 'KenD 9/29/2022 14:21:26'!
+isStringToken
+	^true
+! !
+
+!SStringToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:26'!
+hasSymbol
+	^value isSymbol
+! !
+
+!SStringToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:26'!
+isBinary
+	^value isSymbol
+! !
+
+!SStringToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:26'!
+isDelimitedIdentifier
+	^value first = ${
+! !
+
+!SStringToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:26'!
+isKeyword
+	^value last = $:
+! !
+
+!SStringToken methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:21:26'!
+isNameToken
+	^(self isKeyword or: [self isBinary]) not
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+canBeAssigned
+	^true
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+declaration
+	^self
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+encodeUsing: anAstcodeEncoder
+	self ASSERT: false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isArgument
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isClassBinding
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isClassVariable
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isConstantBinding
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isDynamic
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isGlobal
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isInStack
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isInstVar
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isLiteral
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isLocal
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isPoolVariableBinding
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isSelf
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isSelfOrSuper
+	^self isSelf or: [self isSuper]
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isSuper
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+isTemporary
+	^false
+! !
+
+!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+literal
+	^nil
+! !
+
+!Binding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:59:00'!
+name
+	^name
+! !
+
+!Binding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:59:00'!
+name: aString
+	name := aString
+! !
+
+!Binding methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:59:00'!
+printNameOn: aStream
+		aStream
+		print: name
+
+! !
+
+!Binding methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:59:00'!
+printOn: aStream
+	self printNameOn: aStream.
+	aStream
+		nextPutAll: ' ('.
+	super printOn: aStream.
+	aStream nextPutAll: ')'
+! !
+
+!Binding methodsFor: 'actions' stamp: 'KenD 9/29/2022 13:59:00'!
+beReferencedFrom: aScriptNode
+	
+! !
+
+!LiteralBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:58:47'!
+isLiteral
+	^true
+! !
+
+!FalseBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:02:17'!
+encodeUsing: anAstcodeEmitter
+	anAstcodeEmitter encodeFalse
+! !
+
+!FalseBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:02:17'!
+name
+	^'false'
+! !
+
+!FalseBinding methodsFor: 'evaluating' stamp: 'KenD 9/29/2022 14:02:17'!
+value
+	^false
+! !
+
+!TrueBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:28:12'!
+encodeUsing: anAstcodeEmitter
+	anAstcodeEmitter encodeTrue
+! !
+
+!TrueBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:28:12'!
+name
+	^'true'
+! !
+
+!TrueBinding methodsFor: 'evaluating' stamp: 'KenD 9/29/2022 14:28:12'!
+value
+	^true
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+declaration
+	^declaration
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+declaration: anIdentifierNode
+	declaration := anIdentifierNode
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+environment
+	^environment index
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+environmentIndex
+	^environment index
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+environmentIndex: anInteger
+	environment index: anInteger
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+environmentObject
+	^environment
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+environmentType
+	^environment environmentType
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+index
+	^index
+! !
+
+!LocalBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:58:17'!
+index: aNumber
+	index := aNumber
+! !
+
+!LocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:58:17'!
+isInArray
+	^self isInStack not
+! !
+
+!LocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:58:17'!
+isInStack
+	^environment isStack
+! !
+
+!LocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:58:17'!
+isLocal
+	^true
+! !
+
+!LocalBinding methodsFor: 'actions' stamp: 'KenD 9/29/2022 13:58:17'!
+beInArray
+	environment := ArrayEnvironment new
+! !
+
+!ArgumentBinding methodsFor: 'actions' stamp: 'KenD 9/29/2022 14:01:42'!
+beInlined
+	environment := InlinedArgEnvironment new
+! !
+
+!ArgumentBinding methodsFor: 'actions' stamp: 'KenD 9/29/2022 14:01:42'!
+description
+	^'argument ' , name
+! !
+
+!ArgumentBinding methodsFor: 'actions' stamp: 'KenD 9/29/2022 14:01:42'!
+encodeUsing: anAstcodeEncoder
+	anAstcodeEncoder encodeArgument: index env: environment
+! !
+
+!ArgumentBinding methodsFor: 'actions' stamp: 'KenD 9/29/2022 14:01:42'!
+isInlined
+	^environment isInlinedArgument
+! !
+
+!ArgumentBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:01:42'!
+canBeAssigned
+	^false
+! !
+
+!ArgumentBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:01:42'!
+index: aNumber
+	index := aNumber.
+
+! !
+
+!ArgumentBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:01:42'!
+isArgument
+	^true
+! !
+
+!ArgumentBinding methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:01:42'!
+initialize
+	super initialize.
+	environment := ArgumentEnvironment new
+! !
+
+!ArgumentBinding class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:01:42'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!TemporaryBinding methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:28:31'!
+description
+	^'temporary ' , name
+! !
+
+!TemporaryBinding methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:28:31'!
+encodeUsing: anAstcodeEncoder
+	anAstcodeEncoder encodeTemporary: index env: environment
+! !
+
+!TemporaryBinding methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:28:31'!
+initialize
+	super initialize.
+	environment := StackEnvironment new
+! !
+
+!TemporaryBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:28:31'!
+isTemporary
+	^true
+! !
+
+!TemporaryBinding class methodsFor: 'instance creation' stamp: 'KenD 9/29/2022 14:28:31'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+! !
+
+!SelfBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:57:35'!
+canBeAssigned
+	^false
+! !
+
+!SelfBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:57:35'!
+encodeUsing: anAstcodeEmitter
+	anAstcodeEmitter encodeSelf
+! !
+
+!SelfBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:57:35'!
+isSelf
+	^true
+! !
+
+!SelfBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:57:35'!
+name
+	^'self'
+! !
+
+!SelfBinding methodsFor: 'actions' stamp: 'KenD 9/29/2022 13:57:35'!
+beReferencedFrom: aScriptNode
+	aScriptNode useSelf
+! !
+
+!SuperBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:28:51'!
+encodeUsing: anAstcodeEmitter
+	anAstcodeEmitter encodeSuper
+! !
+
+!SuperBinding methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:28:51'!
+name
+	^'super'
+! !
+
+!SuperBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:28:51'!
+isSelf
+	^false
+! !
+
+!SuperBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:28:51'!
+isSuper
+	^true
+! !
+
 !WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:58:02'!
 nextBytePut: aCollection 
 
@@ -10922,6 +16225,11 @@ nextULongPut: anInteger
 		| bi |
 		bi := anInteger byteAt: i.
 		self nextPut: bi ]! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/29/2022 14:03:31'!
+thru: anInteger
+	^Stretch from: self thru: anInteger
+! !
 InlineMessageLinkerFlags initialize!
 SendSiteFlags initialize!
 SCompiledMethodFlags initialize!
@@ -10934,5 +16242,7 @@ ObjectHeaderOffsets initialize!
 CharacterConstants initialize!
 OperandTypeFlags initialize!
 RegistersRISCV initialize!
+SFFIDescriptor initialize!
 Assembler initialize!
 AstcodeDecoder initialize!
+SmalltalkInterpreter initialize!
