@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 30 September 2022 at 12:38:59 pm'!
+'From Cuis 6.0 [latest update: #5492] on 30 September 2022 at 3:39:03 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 9!
+!provides: 'Powerlang' 1 11!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 SystemOrganization addCategory: #'Powerlang-Core-Nativization'!
@@ -11743,9 +11743,9 @@ resolvePseudo: aString
 
 ! !
 
-!MethodScope methodsFor: 'private' stamp: 'KenD 9/30/2022 12:19:08'!
+!MethodScope methodsFor: 'private' stamp: 'KenD 9/30/2022 15:09:19'!
 captureEnvironment: aScriptNode
-	self ASSERT: aScriptNode == script
+	self assert: aScriptNode == script
 ! !
 
 !MethodScope methodsFor: 'private' stamp: 'KenD 9/30/2022 12:19:08'!
@@ -20545,17 +20545,28 @@ parseTemporaries: aString
 	^self methodSignature notNil ifTrue: [self temporaries]
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 15:09:04'!
 end
-	^self buildToken: compiler endToken at: stream position + 1
+	^self buildToken: compiler endToken at: stream position "+ 1"
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
+isBinary: aCharacter
+	| code |
+	aCharacter isNil ifTrue: [^false].
+	code := aCharacter asInteger.
+	code < 128 ifTrue: [
+		^#($+ $- $< $> $= $* $/ $\ $| $& $~ $, $@ $% $? $!! $: $^)
+			includes: aCharacter].
+	^code > 255
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 next
 	^self nextToken
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextArrayPrefix
 	| string |
 	string := stream copyFrom: stream position - 1 to: stream position.
@@ -20565,12 +20576,12 @@ nextArrayPrefix
 		with: string
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextAssignment
 	^self buildToken: compiler delimiterToken at: stream position with: #':='
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextBinarySelector
 	stream back.
 	^self
@@ -20579,7 +20590,15 @@ nextBinarySelector
 		with: self scanBinarySymbol
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
+nextBinarySymbol
+	^self
+		buildToken: compiler literalNode
+		at: stream position
+		with: self scanBinarySymbol
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextColon
 	| start char |
 	start := stream position.
@@ -20596,7 +20615,19 @@ nextColon
 
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
+nextComment
+	| start comment |
+	start := stream position.
+	[ stream atEnd not and:[stream peek !!== $"] ] whileTrue: [stream next].
+	stream atEnd ifTrue: [self error: 'unfinished comment' at: start].
+	stream position: start.
+	comment := stream upTo: $".
+	^self buildToken: compiler commentNode at: start with: comment
+
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextIdentifierOrKeyword
 	| start |
 	start := stream position.
@@ -20605,7 +20636,7 @@ nextIdentifierOrKeyword
 	^self buildToken: compiler stringToken at: start
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextKeyword
 	| start string |
 	start := stream position + 1.
@@ -20614,7 +20645,7 @@ nextKeyword
 	^self buildToken: compiler literalNode at: start - 1 with: string asSymbol
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextLiteralCharacter
 	stream atEnd ifTrue: [^self error: 'character expected'].
 	^self
@@ -20623,7 +20654,7 @@ nextLiteralCharacter
 		with: stream next
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextLiteralString
 	^self
 		buildToken: compiler literalNode
@@ -20631,7 +20662,7 @@ nextLiteralString
 		with: self scanString reduced
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextNumber
 	| parser assoc |
 	stream skip: -1.
@@ -20644,21 +20675,21 @@ nextNumber
 		with: assoc key
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextQuotedSymbol
 	| node |
 	node := self nextLiteralString.
 	^node beSymbol; position: node position - 1
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextSpecialCharacter
 	| token |
 	token := self buildToken: compiler delimiterToken.
 	^token beCharacter
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 nextSymbolOrArrayPrefix
 	| char |
 	stream atEnd ifTrue: [self error: 'character expected'].
@@ -20671,7 +20702,25 @@ nextSymbolOrArrayPrefix
 	self error: 'character expected'
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
+nextToken
+	| first |
+	first := self scanChar.
+	first isNil ifTrue: [^self end].
+	(self canStartIdentifier: first) ifTrue: [^self nextIdentifierOrKeyword].
+	(first = $_) ifTrue: [^self nextAssignment].
+	first = $: ifTrue: [^self nextColon].
+	first = $' ifTrue: [^self nextLiteralString].
+	first = $$ ifTrue: [^self nextLiteralCharacter].
+	first = $# ifTrue: [^self nextSymbolOrArrayPrefix].
+	first = $" ifTrue: [^self nextComment].
+	first isDigit ifTrue: [^self nextNumber].
+	(first !!= $^ and: [first !!= $_ and: [self isBinary: first]])
+		ifTrue: [^self nextBinarySelector].
+	^self nextSpecialCharacter
+! !
+
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 scanBinarySymbol
 	| start symbol |
 	start := stream position.
@@ -20680,13 +20729,13 @@ scanBinarySymbol
 	^symbol asSymbol
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 scanChar
 	^(stream skipSeparators; atEnd) ifFalse: [stream next]
 
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 scanString
 	| current start |
 	start := current := stream position.
@@ -20702,12 +20751,12 @@ scanString
 				current := stream position]]
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 skipBinary
 	[self isBinary: stream peek] whileTrue: [stream next]
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 skipIdentifier
 	| frontend |
 	frontend := compiler frontend.
@@ -20715,7 +20764,7 @@ skipIdentifier
 		whileFalse: [(frontend peekForIdentifier: stream) ifFalse: [^self]]
 ! !
 
-!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'scanning' stamp: 'KenD 9/30/2022 12:57:47'!
 skipKeyword
 	| frontend continue pos |
 	frontend := compiler frontend.
@@ -20730,29 +20779,34 @@ skipKeyword
 	pos isNil ifFalse: [stream position: pos]
 ! !
 
-!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/30/2022 12:57:47'!
 compiler
 	^compiler
 ! !
 
-!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/30/2022 12:57:47'!
 compiler: aSmalltalkCompiler
 	compiler := aSmalltalkCompiler.
 	compiler sourceCode ifNotNil: [:s | self sourceCode: s]
 ! !
 
-!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/30/2022 12:57:47'!
 on: aString
 	stream := aString readStream.
 	compiler notNil ifTrue: [compiler sourceCode: aString]
 ! !
 
-!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'accessing' stamp: 'KenD 9/30/2022 12:57:47'!
 sourceCode: aString
 	stream := aString readStream
 ! !
 
-!SSmalltalkScanner methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'testing' stamp: 'KenD 9/30/2022 12:57:47'!
+canBeInIdentifier: aCharacter
+	^compiler frontend canBeInIdentifier: aCharacter
+! !
+
+!SSmalltalkScanner methodsFor: 'testing' stamp: 'KenD 9/30/2022 12:57:47'!
 canStartIdentifier: aCharacter
 	(compiler frontend canStartIdentifier: aCharacter) ifFalse: [^false].
 	aCharacter = $_
@@ -20760,19 +20814,32 @@ canStartIdentifier: aCharacter
 	^true
 ! !
 
-!SSmalltalkScanner methodsFor: 'private' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'private' stamp: 'KenD 9/30/2022 12:57:47'!
+buildToken: aSmalltalkToken
+	^self buildToken: aSmalltalkToken at: stream position
+! !
+
+!SSmalltalkScanner methodsFor: 'private' stamp: 'KenD 9/30/2022 12:57:47'!
 buildToken: aSmalltalkToken at: anInteger
 	| string |
 	string := stream copyFrom: anInteger to: stream position.
 	^self buildToken: aSmalltalkToken at: anInteger with: string
 ! !
 
-!SSmalltalkScanner methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'private' stamp: 'KenD 9/30/2022 12:57:47'!
+buildToken: aSmalltalkToken at: anInteger with: anObject
+	^aSmalltalkToken
+		position: anInteger;
+		value: anObject;
+		end: stream position
+! !
+
+!SSmalltalkScanner methodsFor: 'errors' stamp: 'KenD 9/30/2022 12:57:47'!
 error: aString
 	^self error: aString at: stream position
 ! !
 
-!SSmalltalkScanner methodsFor: 'errors' stamp: 'KenD 9/29/2022 13:56:06'!
+!SSmalltalkScanner methodsFor: 'errors' stamp: 'KenD 9/30/2022 12:57:47'!
 error: aString at: anInteger
 	^compiler error: aString at: anInteger
 ! !
@@ -22844,6 +22911,13 @@ nextBytesPutAll: aCollection
 	
 	^aCollection! !
 
+!WriteStream methodsFor: '*Powerlang-Compatibility-Pharo' stamp: 'KenD 9/30/2022 12:46:35'!
+nextLargePut: anInteger
+	| unsigned |
+	unsigned := anInteger < 0 ifTrue: [ anInteger + (1 << 64) ] ifFalse: [ anInteger  ]
+.self nextULargePut: unsigned.
+! !
+
 !WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:59:00'!
 nextLongPut: anInteger
 	| unsigned |
@@ -22852,6 +22926,15 @@ nextLongPut: anInteger
 		ifFalse: [ anInteger ].
 	self nextULongPut: unsigned.! !
 
+!WriteStream methodsFor: '*Powerlang-Compatibility-Pharo' stamp: 'KenD 9/30/2022 12:46:35'!
+nextULargePut: anInteger
+	1 to: 8 do: [ :i | 
+		| bi |
+		bi := anInteger byteAt: i.
+		self nextPut: bi ]
+
+! !
+
 !WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:59:13'!
 nextULongPut: anInteger 
 
@@ -22859,6 +22942,61 @@ nextULongPut: anInteger
 		| bi |
 		bi := anInteger byteAt: i.
 		self nextPut: bi ]! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:43'!
+bin 
+	"
+	255 bin
+	"
+	^self printStringBase: 2! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:24'!
+bin: bits 
+	"
+	(2 bin: 7) size = 7
+	"
+	| pad bin |
+	pad := String new: bits withAll: $0.
+	bin := pad , self bin.
+	^ bin copyFrom: bin size - bits + 1 to: bin size! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:30:23'!
+bitsAt: aStretch 
+	"
+	(2r001101010 bitField: (3 thru: 6)) bin = '1010'
+	(-16r40000000 bitField: (29 thru: 31)) bin = '100'
+	"
+	| shifted mask |
+	shifted := self bitShiftRight: aStretch start - 1.
+	mask := 1 bitShift: aStretch length.
+	^shifted bitAnd: mask - 1! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:29:27'!
+bitsAt: aStretch put: anInteger 
+	"
+	((2r001101100 bitsAt: (3 thru: 6) put: 2r1101) bitField: (3 thru: 6)) bin = '1101'
+	((2r100 bitsAt: (29 thru: 31) put: 2r101) bitField: (29 thru: 31)) bin = '101'
+	((2r100 bitsAt: (29 thru: 31) put: 2r101) bitField: (1 thru: 3)) bin = '100'
+	"
+	| shifted max |
+	shifted := anInteger bitShift: aStretch start - 1.
+	max := 1 bitShift: aStretch length.
+	anInteger < max ifFalse: [self error: 'invalid argument'].
+	^(self bitsClear: aStretch) bitOr: shifted! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:29:57'!
+bitsClear: aStretch 
+	"
+	(2r111100110 bitsClear: (3 thru: 6)) = 2r111000010
+	"
+	| mask |
+	mask := (1 bitShift: aStretch end) - (1 bitShift: aStretch start - 1).
+	^self bitAnd: mask bitInvert! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:30:51'!
+isOnBit: n
+
+	^(self bitAnd: n) = n! !
 
 !Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/29/2022 14:03:31'!
 thru: anInteger
