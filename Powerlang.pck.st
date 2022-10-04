@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 2 October 2022 at 3:50:24 pm'!
+'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 1:32:52 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 15!
+!provides: 'Powerlang' 1 17!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -47,7 +47,7 @@ OperandTypeFlags class
 !classDefinition: #RegistersRISCV category: #'Powerlang-Core-Assembly-RISCV'!
 SharedPool subclass: #RegistersRISCV
 	instanceVariableNames: ''
-	classVariableNames: 'RegA RegE RegFP RegFalse RegG RegIP RegM RegNextIP RegNil RegR RegS RegSP RegT RegTrue RegV RegX0 RegX1'
+	classVariableNames: 'RegA RegE RegFP RegFalse RegFlags RegG RegLink RegM RegNil RegR RegS RegSP RegT RegTmp1 RegTrue RegV RegX0 RegX1 RegZero'
 	poolDictionaries: 'RISC5Regs'
 	category: 'Powerlang-Core-Assembly-RISCV'!
 !classDefinition: 'RegistersRISCV class' category: #'Powerlang-Core-Assembly-RISCV'!
@@ -324,14 +324,14 @@ Object subclass: #ABI
 ABI class
 	instanceVariableNames: ''!
 
-!classDefinition: #RiscV64ABI category: #'Powerlang-Core-Assembly-RISCV'!
-ABI subclass: #RiscV64ABI
+!classDefinition: #RV64GABI category: #'Powerlang-Core-Assembly-RISCV'!
+ABI subclass: #RV64GABI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: 'RegistersRISCV'
 	category: 'Powerlang-Core-Assembly-RISCV'!
-!classDefinition: 'RiscV64ABI class' category: #'Powerlang-Core-Assembly-RISCV'!
-RiscV64ABI class
+!classDefinition: 'RV64GABI class' category: #'Powerlang-Core-Assembly-RISCV'!
+RV64GABI class
 	instanceVariableNames: ''!
 
 !classDefinition: #Assembler category: #'Powerlang-Core-Assembly'!
@@ -364,14 +364,14 @@ CodeGenerator subclass: #RISCCodeGenerator
 RISCCodeGenerator class
 	instanceVariableNames: ''!
 
-!classDefinition: #RV64CodeGenerator category: #'Powerlang-Core-Assembly-RISCV'!
-RISCCodeGenerator subclass: #RV64CodeGenerator
-	instanceVariableNames: ''
+!classDefinition: #RV64GCodeGenerator category: #'Powerlang-Core-Assembly-RISCV'!
+RISCCodeGenerator subclass: #RV64GCodeGenerator
+	instanceVariableNames: 'generate zeroReg flagsReg tmp1Reg linkReg'
 	classVariableNames: ''
 	poolDictionaries: 'RegistersRISCV'
 	category: 'Powerlang-Core-Assembly-RISCV'!
-!classDefinition: 'RV64CodeGenerator class' category: #'Powerlang-Core-Assembly-RISCV'!
-RV64CodeGenerator class
+!classDefinition: 'RV64GCodeGenerator class' category: #'Powerlang-Core-Assembly-RISCV'!
+RV64GCodeGenerator class
 	instanceVariableNames: ''!
 
 !classDefinition: #NativeCodeReference category: #'Powerlang-Core-Assembly'!
@@ -402,6 +402,16 @@ Object subclass: #RelocationFixup
 	category: 'Powerlang-Core-Assembly'!
 !classDefinition: 'RelocationFixup class' category: #'Powerlang-Core-Assembly'!
 RelocationFixup class
+	instanceVariableNames: ''!
+
+!classDefinition: #RVMemoryReference category: #'Powerlang-Core-Assembly-RISCV'!
+Object subclass: #RVMemoryReference
+	instanceVariableNames: 'length base index scale displacement'
+	classVariableNames: ''
+	poolDictionaries: 'Registers'
+	category: 'Powerlang-Core-Assembly-RISCV'!
+!classDefinition: 'RVMemoryReference class' category: #'Powerlang-Core-Assembly-RISCV'!
+RVMemoryReference class
 	instanceVariableNames: ''!
 
 !classDefinition: #LookupNativizer category: #'Powerlang-Core-Building'!
@@ -2021,7 +2031,7 @@ I am the JIT assembler frontend. I provide a high-level assembler interface (if 
 and delegate writing of the actual bytes to my backends.
 !
 
-!RV64CodeGenerator commentStamp: '<historical>' prior: 0!
+!RV64GCodeGenerator commentStamp: '<historical>' prior: 0!
 RISC-V RV64G
 See specs at:
   https://riscv.org/technical/specifications/!
@@ -2077,25 +2087,32 @@ initialize
 	RegisterSegment _ 512.
 	RegisterSpecific _ 768.! !
 
-!RegistersRISCV class methodsFor: 'class initialization' stamp: 'KenD 9/29/2022 11:01:30'!
+!RegistersRISCV class methodsFor: 'class initialization' stamp: 'KenD 10/4/2022 10:42:07'!
 initialize
 
-	RegA       := X11. "Arg  [Arg1]"
-	RegE       := X21. "Environment"
-	RegFP     := FramePtr. "X8"
-	RegFalse := X26.
-	RegG      := X23.
-	RegNextIP := X7. "Next Code Address to Jump to" 
-	RegM  := X19.
-	RegNil := X24.
-	RegR   := X10. "Receiver/Result [Arg0]"
-	RegS   := X20. "Selector"
-	RegSP := StackPtr. "X2"
-	RegT   := X28.
-	RegTrue := X25.
-	RegV   := X22.
-	RegX0 := X14.
-	RegX1 := X15.
+	RegR        := Tmp0. "X5 Receiver/Result"
+	RegA        := Tmp1. "X6 Arg"
+	RegT        := Tmp2. "X7 Temp"
+	RegV        := Tmp3. "X28"
+	RegFlags := Tmp5.  "X30 Condition Flags"
+	RegTmp1 := Tmp6. "X31"
+
+	RegM       := Sav1.   "X9"
+	RegS        := Sav2.  "X18 Selector"
+	RegE        := Sav3.  "X19 Environment"
+	RegNil      := Sav4. "X20"
+	RegTrue  := Sav5. "X21"
+	RegFalse := Sav6. "X22"
+	RegG       := Sav7. "X23 Globals"
+	
+	RegZero := Zero.          "X0"
+	RegLink := ReturnAddr. "X1"
+	RegSP   := StackPtr.      "X2"
+	RegFP   := FramePtr.     "X8"
+
+	RegX0 := FTmp0. "F0"
+	RegX1 := FTmp1. "F1"
+	
 ! !
 
 !ObjectHeaderMasks class methodsFor: 'class initialization' stamp: 'KenD 2/27/2021 09:22:14'!
@@ -4080,102 +4097,117 @@ is64bits
 	^self bits = 64
 ! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:26'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:26'!
 regA
 
 	^RegA! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:41'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:41'!
 regE
 
 	^RegE! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:51'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:51'!
 regFP
 
 	^RegFP! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:45:04'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:45:04'!
 regFalse
 
 	^RegFalse! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:45:23'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:45:23'!
 regG
 
 	^RegG! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:11:47'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 10/4/2022 10:44:26'!
 regIP
 
-	self shouldNotImplement ! !
+	^ self error: 'RISC-V: PC is not a visible register. Use auipc instruction!!' ! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:09'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:09'!
 regM
 
 	^RegM! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:12:33'!
-regNextIP
-	"This is used to synthesize a code jump target address"
-	^ RegNextIP! !
-
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:22'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:22'!
 regNil
 
 	^RegNil! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:34'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:34'!
 regR
 
 	^RegR! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:54'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:46:54'!
 regS
 
 	^RegS! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:47:09'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:47:09'!
 regSP
 
 	^RegSP! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:47:25'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:47:25'!
 regT
 
 	^RegT! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:07:47'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:07:47'!
 regTrue
 
 	^RegTrue! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:07:59'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:07:59'!
 regV
 
 	^RegV! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:08:17'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:08:17'!
 regX0
 
 	^RegX0! !
 
-!RiscV64ABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:08:27'!
+!RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 13:08:27'!
 regX1
 
 	^RegX1! !
 
-!RiscV64ABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:41:42'!
+!RV64GABI methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 10:47:37'!
+regFlags
+
+	^ RegFlags! !
+
+!RV64GABI methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 10:45:20'!
+regLink
+
+	^ RegLink! !
+
+!RV64GABI methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 10:45:28'!
+regTmp1
+
+	^ RegTmp1! !
+
+!RV64GABI methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 10:46:06'!
+regZero
+
+	^RegZero! !
+
+!RV64GABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:41:42'!
 bits
 	"Pointers are 8 bytes"
 	^ 64! !
 
-!RiscV64ABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:42:07'!
+!RV64GABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:42:07'!
 wordSize
 	"Pointers are 8 bytes"
 	^ 8! !
 
-!RiscV64ABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:42:51'!
+!RV64GABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:42:51'!
 wordSizeShift
 
 	^ 3
@@ -7017,19 +7049,19 @@ pop: srcReg
 		addImm: wordSize to: self regSP 
 ! !
 
-!RISCCodeGenerator methodsFor: 'jumps' stamp: 'KenD 9/26/2022 12:39:12'!
+!RISCCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/4/2022 13:09:19'!
 push: srcReg
 	| memref |
-	memref := self memRef base: self regSP; displacement: -8.
+	memref := self memRef base: self regSP; displacement: -8. "Stack grows down"
 	self
 		store: srcReg intoMem: memref;
 		subImm: wordSize from: self regSP 
 ! !
 
-!RISCCodeGenerator methodsFor: 'jumps' stamp: 'KenD 9/26/2022 12:39:12'!
+!RISCCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/4/2022 13:09:41'!
 pushImm: imm
 	| memref |
-	memref := self memRef base: self regSP; displacement: -8.
+	memref := self memRef base: self regSP; displacement: -8. "Stack grows down"
 	self moveImm: imm to: self regV;
 		store: self regV intoMem: memref;
 		subImm: wordSize from: self regSP 
@@ -7041,7 +7073,16 @@ subImm: anInteger from: srcAndDstReg
 
 ! !
 
-!RV64CodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
+!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 13:02:59'!
+initialize
+
+	super initialize. "sets memory"
+	self platform: NativizationPlatform default. "sets abi & wordsize"
+	
+	
+	! !
+
+!RV64GCodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
 new
 	^ self basicNew initialize.
 
@@ -7366,6 +7407,82 @@ absoluteFrom: source to: target
 !RelocationFixup class methodsFor: 'instance creation' stamp: 'KenD 9/26/2022 12:39:39'!
 relativeFrom: source to: target
 	^self new beRelative; from: source to: target
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+base
+	^ base
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+base:register
+	base := register.
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+displacement
+	^ displacement
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+displacement:something
+	displacement := something.
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+index
+	^ index
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+index:register
+	index := register.
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+length
+	^ length
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+length:anInteger
+	length := anInteger.
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+scale
+	^ scale
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:07:01'!
+scale:integer
+	self assert: (#(1 2 4 8) includes: integer).
+	scale := integer.
+! !
+
+!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/4/2022 11:04:49'!
+initialize
+	"Invoked when a new instance is created."
+
+	"  please change as required (and remove this comment)"
+	"length := nil."
+	"base := nil."
+	index := 0.
+	scale := 1.
+	displacement := 0.
+
+	"  super initialize.   -- commented since inherited method does nothing"
+! !
+
+!RVMemoryReference methodsFor: 'printing & storing' stamp: 'KenD 10/4/2022 11:04:49'!
+printOn:aStream
+! !
+
+!RVMemoryReference class methodsFor: 'instance creation' stamp: 'KenD 10/4/2022 11:04:49'!
+new
+	"return an initialized instance"
+
+	^ self basicNew initialize.
 ! !
 
 !LookupNativizer methodsFor: 'as yet unclassified' stamp: 'KenD 9/26/2022 12:34:38'!
@@ -15962,31 +16079,26 @@ abi: anABI
 	abi := anABI.
 ! !
 
-!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 10/4/2022 12:56:19'!
 codeGeneratorClass: aClass
-	self ASSERT: codeGeneratorClass isNil.
-	self ASSERT: aClass notNil.
+	self assert: codeGeneratorClass isNil.
+	self assert: aClass notNil.
 
 	codeGeneratorClass := aClass.
 ! !
 
-!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:35:44'!
-initialize
-	"super initialize.   -- commented since inherited method does nothing"
-! !
-
-!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 10/4/2022 12:56:30'!
 name: aString
-	self ASSERT: name isNil.
-	self ASSERT: aString notNil.
+	self assert: name isNil.
+	self assert: aString notNil.
 
 	name := aString.
 ! !
 
-!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 10/4/2022 12:56:44'!
 wordSize: anInteger
-	self ASSERT: wordSize isNil.
-	self ASSERT:(anInteger == 8 or:[ anInteger == 4]).
+	self assert: wordSize isNil.
+	self assert: (anInteger == 8 or:[ anInteger == 4]).
 
 	wordSize := anInteger.
 ! !
@@ -16003,21 +16115,21 @@ newCodeGenerator
 	^ codeGeneratorClass new platform: self.
 ! !
 
-!NativizationPlatform methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'accessing' stamp: 'KenD 10/4/2022 12:45:09'!
 abi
-	self ASSERT: abi notNil.  
+	self assert: abi notNil.  
 	^ abi
 ! !
 
-!NativizationPlatform methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'accessing' stamp: 'KenD 10/4/2022 12:45:17'!
 name
-	self ASSERT: name notNil.
+	self assert: name notNil.
 	^ name
 ! !
 
-!NativizationPlatform methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform methodsFor: 'accessing' stamp: 'KenD 10/4/2022 12:45:29'!
 wordSize
-	self ASSERT: wordSize notNil.
+	self assert: wordSize notNil.
 	^ wordSize
 ! !
 
@@ -16050,21 +16162,36 @@ default: aNativizationPlatform
 	Default := aNativizationPlatform.
 ! !
 
-!NativizationPlatform class methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:35:44'!
+!NativizationPlatform class methodsFor: 'accessing' stamp: 'KenD 10/4/2022 12:53:21'!
 host
 	"Return platform for the machine this code is running on."
 
-	| host |
+"	| host |
 
 	host := Smalltalk host.
 	host = 'x86_64-linux-gnu' ifTrue:[ ^ self x86_64_linux_gnu ].
 	host = 'x86_64-darwin' ifTrue:[ ^ self x86_64_darwin ].
 	host = 'x86_64-win32' ifTrue:[ ^self x86_64_win32 ].
-
+          "" aarch64-linux-gnu  ""
 	host = 'riscv64-linux-gnu' ifTrue:[ ^ self riscv64_linux_gnu ].
 
-	self error:'Unssuported host: ', host.
+	self error:'Unssuported host: ', host.	
+"
+	self signal: #FixME.
+	
+	^ self riscv64_linux_gnu
+
 ! !
+
+!NativizationPlatform class methodsFor: 'accessing' stamp: 'KenD 10/4/2022 12:51:12'!
+riscv64_linux_gnu
+
+		^ self new
+		name: 'riscv64_linux_gnu';
+		wordSize: 8;
+		abi: RV64GABI new;
+		codeGeneratorClass: RV64GCodeGenerator ;
+		yourself! !
 
 !NativizationPlatform class methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:35:44'!
 x86_64_darwin
