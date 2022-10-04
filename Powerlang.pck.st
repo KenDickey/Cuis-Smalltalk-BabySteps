@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 1:32:52 pm'!
+'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 4:45:12 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 17!
+!provides: 'Powerlang' 1 19!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -366,7 +366,7 @@ RISCCodeGenerator class
 
 !classDefinition: #RV64GCodeGenerator category: #'Powerlang-Core-Assembly-RISCV'!
 RISCCodeGenerator subclass: #RV64GCodeGenerator
-	instanceVariableNames: 'generate zeroReg flagsReg tmp1Reg linkReg'
+	instanceVariableNames: 'zeroReg flagsReg tmp1Reg linkReg'
 	classVariableNames: ''
 	poolDictionaries: 'RegistersRISCV'
 	category: 'Powerlang-Core-Assembly-RISCV'!
@@ -2027,7 +2027,8 @@ ii) provide fixed mapping from 'IR' registers (such as A, R, M and so on)
 !
 
 !Assembler commentStamp: '<historical>' prior: 0!
-I am the JIT assembler frontend. I provide a high-level assembler interface (if that really exists)
+I am the JIT assembler frontend. 
+I provide a high-level assembler interface (if that really exists)
 and delegate writing of the actual bytes to my backends.
 !
 
@@ -7073,11 +7074,32 @@ subImm: anInteger from: srcAndDstReg
 
 ! !
 
-!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 13:02:59'!
+!RV64GCodeGenerator methodsFor: 'basic' stamp: 'KenD 10/4/2022 16:40:35'!
+add: src1Reg to: src2andDstReg
+	"Here we have to emulate X86 behavior and in addition to addition
+	 we have to set artificial flags register to indicate overflow
+	"
+
+	 "set tmp1Reg to 1 if src2andDstReg (operand 2) is negative"
+	memory nextInstructionPut: (RV64SLTI destReg: tmp1Reg regSource: src2andDstReg imm12: 0).
+	 "perform the addition that may overflow"
+	memory nextInstructionPut: (RV64ADD regDest: src2andDstReg regA: src1Reg regB: src2andDstReg).
+	"set flagsReg to 1 if result is smaller than src1Ref (operand 1)"
+	memory nextInstructionPut: (RV64SLT regDest: flagsReg regA: src2andDstReg regB: src1Reg).
+	 "set flagsReg to 0 if both operand 2 is negative and result is smaller than operand 2."
+	memory nextInstructionPut: (RV64SUB regDest: flagsReg regA: tmp1Reg regB: flagsReg).
+
+! !
+
+!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 15:56:52'!
 initialize
 
-	super initialize. "sets memory"
+	super initialize. "sets memory, a RelocatableBuffer"
 	self platform: NativizationPlatform default. "sets abi & wordsize"
+	zeroReg  := abi regZero.
+	flagsReg := abi regFlags.
+	tmp1Reg := abi regTmp1.
+	linkReg    := abi regLink.
 	
 	
 	! !
@@ -7168,14 +7190,22 @@ nextBytesPut: aByteArray
 	stream nextBytesPut: aByteArray
 ! !
 
-!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 9/26/2022 12:39:25'!
-nextLargePut: large
-	stream nextLargePut: large
+!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 10/4/2022 16:13:08'!
+nextDoublePut: large
+	stream nextDoublePut: large
 
 ! !
 
-!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 9/26/2022 12:39:25'!
+!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 10/4/2022 16:31:43'!
+nextInstructionPut: rv64gInstruction
+	"Assemble instruction into 4 byte unsigned integer and add to stream"
+	self signal: #NoCompressedInstructionsUsed.
+	stream nextULongPut: rv64gInstruction instruction
+! !
+
+!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 10/4/2022 16:14:02'!
 nextLongPut: long
+	"Place 4 byte signed integer into stream"
 	stream nextLongPut: long
 
 ! !
@@ -7190,15 +7220,17 @@ nextPutAll: aByteArray
 	stream nextPutAll: aByteArray
 ! !
 
-!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 9/26/2022 12:39:25'!
-nextULargePut: large
-	stream nextULargePut: large
+!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 10/4/2022 16:21:08'!
+nextUDoublePut: udouble
+	"Place 8 byte unsigned integer into stream"
+	stream nextUDoublePut: udouble
 
 ! !
 
-!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 9/26/2022 12:39:25'!
-nextULongPut: long
-	stream nextULongPut: long
+!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 10/4/2022 16:20:53'!
+nextULongPut: ulong
+	"Place 4 byte unsigned integer into stream"
+	stream nextULongPut: ulong
 ! !
 
 !RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 9/26/2022 12:39:25'!
@@ -25819,11 +25851,12 @@ nextBytesPutAll: aCollection
 	
 	^aCollection! !
 
-!WriteStream methodsFor: '*Powerlang-Compatibility-Pharo' stamp: 'KenD 9/30/2022 12:46:35'!
-nextLargePut: anInteger
+!WriteStream methodsFor: '*Powerlang-Compatibility-Pharo' stamp: 'KenD 10/4/2022 16:11:59'!
+nextDoublePut: anInteger
+	"Write out an 8 byte signed integer"
 	| unsigned |
 	unsigned := anInteger < 0 ifTrue: [ anInteger + (1 << 64) ] ifFalse: [ anInteger  ]
-.self nextULargePut: unsigned.
+.self nextUDoublePut: unsigned.
 ! !
 
 !WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:59:00'!
@@ -25834,8 +25867,9 @@ nextLongPut: anInteger
 		ifFalse: [ anInteger ].
 	self nextULongPut: unsigned.! !
 
-!WriteStream methodsFor: '*Powerlang-Compatibility-Pharo' stamp: 'KenD 9/30/2022 12:46:35'!
-nextULargePut: anInteger
+!WriteStream methodsFor: '*Powerlang-Compatibility-Pharo' stamp: 'KenD 10/4/2022 16:10:19'!
+nextUDoublePut: anInteger
+	"Place 8 byte unsigned integer into stream"
 	1 to: 8 do: [ :i | 
 		| bi |
 		bi := anInteger byteAt: i.
@@ -25843,9 +25877,9 @@ nextULargePut: anInteger
 
 ! !
 
-!WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 16:59:13'!
+!WriteStream methodsFor: '*powerlang-core' stamp: 'KenD 10/4/2022 16:07:23'!
 nextULongPut: anInteger 
-
+	"Place 4 byte unsigned integer into stream"
 	1 to: 4 do: [ :i | 
 		| bi |
 		bi := anInteger byteAt: i.

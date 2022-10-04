@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 10:50:19 am'!
+'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 4:22:12 pm'!
 'Description RISC-V Instruction opcodes for RV64G'!
-!provides: 'RISC5-Instructions' 1 29!
+!provides: 'RISC5-Instructions' 1 30!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -770,6 +770,11 @@ initialize
 destReg: regDest
 
 	destReg := regDest ! !
+
+!RISC5Instructions methodsFor: 'accessing' stamp: 'KenD 10/4/2022 16:00:39'!
+instruction
+	"Answer an assembled 32 bit instruction"
+	self subclassResponsibility ! !
 
 !RISC5Instructions class methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:03:50'!
 floatRegName: regIntEncoding
