@@ -1,12 +1,11 @@
-'From Cuis 5.0 [latest update: #4587] on 7 May 2021 at 7:26:14 am'!
+'From Cuis 6.0 [latest update: #5202] on 29 May 2022 at 7:26:47 am'!
 'Description MorphMorphs change/add state/behavior of other morphs.'!
-!provides: 'MorphIt' 1 28!
-!requires: 'Cuis-Base' 50 4578 nil!
-!requires: 'Morphic-Misc1' 1 175 nil!
+!provides: 'MorphIt' 1 29!
+!requires: 'Cuis-Base' 60 5202 nil!
+!requires: 'UI-Components' 1 4 nil!
 !requires: 'Value-Constraints' 1 5 nil!
 !requires: 'ValueHolder' 1 20 nil!
-!requires: 'Morphic-ColorEditor' 1 16 nil!
-!requires: 'Animator' 1 19 nil!
+!requires: 'Animator' 1 25 nil!
 SystemOrganization addCategory: 'MorphIt'!
 
 
@@ -130,34 +129,6 @@ This is a documentation class -- see my class side
 Note:  
 		MorphIt samplePallet.!
 
-!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 10:00'!
-name
-
-	^ super name 
-		ifNotNil: [ :myName |  myName ]
-		ifNil: [ self defaultName ]
-! !
-
-!MorphMorph methodsFor: 'copying' stamp: 'KenD 5/3/2021 19:11:58'!
-postCopy
-	"After a clone or shallow copy, one needs an unshared location"
- 	 owner := nil.
-  	location := MorphicTranslation new.
-    	id := 0.! !
-
-!MorphTheColor class methodsFor: 'new-morph participation' stamp: 'KenD 5/8/2015 16:24'!
-initializedInstance
-"
-	self initializedInstance openInWorld.
-"
-
-	^ self forColor: Color blue! !
-
-!MorphModifierPallet class methodsFor: 'instance creation' stamp: 'KenD 7/5/2015 15:29'!
-initializedInstance
-
-	^ ImagePallet morphModifierPallet morphExtent:  (690 @ 84).! !
-
 !MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 09:58'!
 balloonText: aString
 
@@ -174,10 +145,25 @@ icon
 
 	self subclassResponsibility ! !
 
+!MorphMorph methodsFor: 'accessing' stamp: 'KenD 5/10/2015 10:00'!
+name
+
+	^ super name 
+		ifNotNil: [ :myName |  myName ]
+		ifNil: [ self defaultName ]
+! !
+
 !MorphMorph methodsFor: 'copying' stamp: 'KenD 5/3/2021 19:09:54'!
 copy
 
 	^self shallowCopy postCopy! !
+
+!MorphMorph methodsFor: 'copying' stamp: 'KenD 5/3/2021 19:11:58'!
+postCopy
+	"After a clone or shallow copy, one needs an unshared location"
+ 	 owner := nil.
+  	location := MorphicTranslation new.
+    	id := 0.! !
 
 !MorphMorph methodsFor: 'morph interactions' stamp: 'KenD 5/8/2015 22:02'!
 addToModifiersOf: aMorph
@@ -592,6 +578,14 @@ forColor: aColor
 	myColor := aColor.
 	self image: (myColor icon magnifyTo: 32@32).
 ! !
+
+!MorphTheColor class methodsFor: 'new-morph participation' stamp: 'KenD 5/8/2015 16:24'!
+initializedInstance
+"
+	self initializedInstance openInWorld.
+"
+
+	^ self forColor: Color blue! !
 
 !MorphTheColor class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 16:32'!
 forColor: aColor
@@ -1181,6 +1175,11 @@ initialize
 
 	! !
 
+!MorphModifierPallet class methodsFor: 'instance creation' stamp: 'KenD 7/5/2015 15:29'!
+initializedInstance
+
+	^ ImagePallet morphModifierPallet morphExtent:  (690 @ 84).! !
+
 !MorphModifierPallet class methodsFor: 'new-morph participation' stamp: 'KenD 7/5/2015 15:30'!
 includeInNewMorphMenu 
 
@@ -1275,13 +1274,7 @@ Drop 'Follow a Path' icon onto the DropTarget.  When clicked, the target morph w
 	MorphModifierPallet initializedInstance openInWorld morphExtent: (690 @ 84).
  ! !
 
-!Form methodsFor: '*morphit' stamp: 'KenD 10/12/2013 16:39'!
-icon32
-	"Answer a 32 x 32 icon of myself"
-	
-	^self magnifyTo: 32 @ 32! !
-
-!ImagePallet class methodsFor: '*morphit' stamp: 'KenD 7/5/2015 15:08'!
+!UndefinedObject methodsFor: '*morphit' stamp: 'KenD 7/5/2015 15:08'!
 morphModifierPallet
 	"Answer a morphModifier pallet for testing"
 "
@@ -1326,6 +1319,12 @@ morphModifierPallet
 		
 
 ! !
+
+!Form methodsFor: '*morphit' stamp: 'KenD 10/12/2013 16:39'!
+icon32
+	"Answer a 32 x 32 icon of myself"
+	
+	^self magnifyTo: 32 @ 32! !
 
 !Theme methodsFor: '*morphIt' stamp: 'KenD 5/10/2015 16:47'!
 showHaloIcon

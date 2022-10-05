@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 5:00:54 pm'!
+'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 1:06:46 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 20!
+!provides: 'Powerlang' 1 21!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7074,7 +7074,28 @@ subImm: anInteger from: srcAndDstReg
 
 ! !
 
-!RV64GCodeGenerator methodsFor: 'basic' stamp: 'KenD 10/4/2022 17:00:45'!
+!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 15:56:52'!
+initialize
+
+	super initialize. "sets memory, a RelocatableBuffer"
+	self platform: NativizationPlatform default. "sets abi & wordsize"
+	zeroReg  := abi regZero.
+	flagsReg := abi regFlags.
+	tmp1Reg := abi regTmp1.
+	linkReg    := abi regLink.
+	
+	
+	! !
+
+!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/5/2022 13:00:31'!
+return
+	"Return from subroutine"
+
+	memory nextInstructionPut: 
+		(RV64JALR regDest: zeroReg regBase: linkReg offset: 0).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/4/2022 17:00:45'!
 add: src1Reg to: src2andDstReg
 	"Here we have to emulate X86 behavior and in addition to addition
 	 we have to set artificial flags register to indicate overflow.
@@ -7092,18 +7113,100 @@ add: src1Reg to: src2andDstReg
 
 ! !
 
-!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 15:56:52'!
-initialize
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:40:43'!
+addDouble: source1 to: source2andDest
+	"RV64G registers are already doubles"
+	self add: source1 to: source2andDest! !
 
-	super initialize. "sets memory, a RelocatableBuffer"
-	self platform: NativizationPlatform default. "sets abi & wordsize"
-	zeroReg  := abi regZero.
-	flagsReg := abi regFlags.
-	tmp1Reg := abi regTmp1.
-	linkReg    := abi regLink.
-	
-	
-	! !
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:16:40'!
+addImm: imm to: srcAndDst
+
+	self flag: #UncheckedForOverflow.
+	memory nextInstructionPut: (RV64ADD regDest: srcAndDst regSource: srcAndDst imm12: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:52:35'!
+sub: src1 from: src2AndDest
+
+	"NB:  destReg := regA - regB"
+	memory nextInstructionPut: 
+		(RV64AND regDest: src2AndDest regA: src2AndDest regB: src1).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:54:37'!
+subDouble: src1 from: src2AndDest
+	"RV64G registers are already doubles"
+	self sub: src1 from: src2AndDest 
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:43:06'!
+and: srcAndDstReg with: source2
+
+	memory nextInstructionPut: 
+		(RV64AND regDest: srcAndDstReg regA: srcAndDstReg regB: source2).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:44:53'!
+and: srcAndDstReg withImm: imm
+
+	memory nextInstructionPut: 
+		(RV64ANDI destReg: srcAndDstReg regSource: srcAndDstReg imm12: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:30:08'!
+shiftLeft: srcAndDstReg by: countReg
+
+	"logical shiift left"
+	memory nextInstructionPut: 
+		(RV64SLL regDest: srcAndDstReg regA: srcAndDstReg  regB: countReg).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:27:41'!
+shiftLeft: srcAndDstReg byImm: imm
+
+	"logical shiift left"
+	memory nextInstructionPut: 
+		(RV64SLLI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:34:44'!
+shiftRight: srcAndDstReg by: countReg
+
+	"logical shiift right"
+	memory nextInstructionPut: 
+		(RV64SRL regDest: srcAndDstReg regA: srcAndDstReg regB: countReg ).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:26:16'!
+shiftRight: srcAndDstReg byImm: imm
+
+	"logical shiift right"
+	memory nextInstructionPut: 
+		(RV64SRLI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:32:59'!
+shiftRightArithmetic: srcAndDstReg by: countReg
+
+	"arithmetic shiift right; most significant bit duplicated"
+	memory nextInstructionPut: 
+		(RV64SRA regDest: srcAndDstReg regA: srcAndDstReg  regB: countReg ).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:26:52'!
+shiftRightArithmetic: srcAndDstReg byImm: imm
+
+	"arithmetic shiift right"
+	memory nextInstructionPut: 
+		(RV64SRAI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:04:50'!
+move: srcReg to: dstReg
+
+	memory nextInstructionPut:
+		(RV64ADDI regDest: dstReg regSource: srcReg imm12: 0).
+! !
 
 !RV64GCodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
 new

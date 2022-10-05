@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 11:59:29 am'!
+'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 1:06:54 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 NB: 
 - No Compressed Instruction Format
 - No binary disassembly (but instructions can print themselves)'!
-!provides: 'RISC5-Instructions' 1 33!
+!provides: 'RISC5-Instructions' 1 34!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -654,6 +654,9 @@ Shift Right Arithmatic -- destReg := regA >> regB; most significant bit duplicat
 
 !RV64SRL commentStamp: '<historical>' prior: 0!
 Shift Right Arithmatic -- destReg := regA >> regB!
+
+!RV64SUB commentStamp: '<historical>' prior: 0!
+result <= src2 - src1!
 
 !RV64XOR commentStamp: '<historical>' prior: 0!
 eXclusive OR {distinguish OR)!

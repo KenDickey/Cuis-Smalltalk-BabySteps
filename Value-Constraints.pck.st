@@ -1,53 +1,57 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1823] on 14 September 2013 at 8:26:12.340605 pm'!
+'From Cuis 6.0 [latest update: #5202] on 29 May 2022 at 7:55:00 am'!
 'Description Value-Constraints are used by UI to select proper editors and for drag-n-drop'!
-!provides: 'Value-Constraints' 1 5!
-!classDefinition: #ValueConstraintTests category: #'Value-Constraints'!
+!provides: 'Value-Constraints' 1 8!
+!requires: 'Morphic-Widgets-Extras' 1 39 nil!
+SystemOrganization addCategory: 'Value-Constraints'!
+
+
+!classDefinition: #ValueConstraintTests category: 'Value-Constraints'!
 TestCase subclass: #ValueConstraintTests
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Value-Constraints'!
-!classDefinition: 'ValueConstraintTests class' category: #'Value-Constraints'!
+!classDefinition: 'ValueConstraintTests class' category: 'Value-Constraints'!
 ValueConstraintTests class
 	instanceVariableNames: ''!
 
-!classDefinition: #ValueConstraint category: #'Value-Constraints'!
+!classDefinition: #ValueConstraint category: 'Value-Constraints'!
 Object subclass: #ValueConstraint
 	instanceVariableNames: 'theClass'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Value-Constraints'!
-!classDefinition: 'ValueConstraint class' category: #'Value-Constraints'!
+!classDefinition: 'ValueConstraint class' category: 'Value-Constraints'!
 ValueConstraint class
 	instanceVariableNames: ''!
 
-!classDefinition: #OneOfValueConstraint category: #'Value-Constraints'!
+!classDefinition: #OneOfValueConstraint category: 'Value-Constraints'!
 ValueConstraint subclass: #OneOfValueConstraint
 	instanceVariableNames: 'itemList'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Value-Constraints'!
-!classDefinition: 'OneOfValueConstraint class' category: #'Value-Constraints'!
+!classDefinition: 'OneOfValueConstraint class' category: 'Value-Constraints'!
 OneOfValueConstraint class
 	instanceVariableNames: ''!
 
-!classDefinition: #RangeValueConstraint category: #'Value-Constraints'!
+!classDefinition: #RangeValueConstraint category: 'Value-Constraints'!
 ValueConstraint subclass: #RangeValueConstraint
 	instanceVariableNames: 'min max'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Value-Constraints'!
-!classDefinition: 'RangeValueConstraint class' category: #'Value-Constraints'!
+!classDefinition: 'RangeValueConstraint class' category: 'Value-Constraints'!
 RangeValueConstraint class
 	instanceVariableNames: ''!
 
-!classDefinition: #ValueInCategoryConstraint category: #'Value-Constraints'!
+!classDefinition: #ValueInCategoryConstraint category: 'Value-Constraints'!
 ValueConstraint subclass: #ValueInCategoryConstraint
 	instanceVariableNames: 'theCategoryName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Value-Constraints'!
-!classDefinition: 'ValueInCategoryConstraint class' category: #'Value-Constraints'!
+!classDefinition: 'ValueInCategoryConstraint class' category: 'Value-Constraints'!
 ValueInCategoryConstraint class
 	instanceVariableNames: ''!
 
@@ -93,16 +97,16 @@ Some classes of values used by the UI are more general than instances, e.g. Widg
 Example:
 	ValueInCategoryConstraint ofCategory: 'Morphic-Widgets'.!
 
-!ValueConstraintTests methodsFor: 'testing' stamp: 'KenD 9/11/2013 13:40'!
+!ValueConstraintTests methodsFor: 'testing' stamp: 'KenD 5/29/2022 07:54:25'!
 testCategoryValueConstraints
 
 	| categoryValue |
-	categoryValue := ValueInCategoryConstraint ofCategory: 'Morphic-Widgets'.
+	categoryValue := ValueInCategoryConstraint ofCategory: 'Morphic-Widgets-Extras'.
 	
 	self assert: (categoryValue acceptsValue: PartsBinMorph new).
 	self deny:  (categoryValue acceptsValue: 3 @ 9).
 	self assert: (categoryValue acceptsValue: DragAndDropAreaMorph new).
-	self deny: (categoryValue acceptsValue: EllipseMorph new).
+	self deny: (categoryValue acceptsValue: BoxedMorph new).
 	self deny: (categoryValue acceptsValue: #sillyTest).! !
 
 !ValueConstraintTests methodsFor: 'testing' stamp: 'KenD 9/11/2013 13:55'!
@@ -216,16 +220,16 @@ maximumValue
 
 	^ max! !
 
+!RangeValueConstraint methodsFor: 'accessing' stamp: 'KenD 9/11/2013 10:14'!
+minimumValue
+
+	^ min! !
+
 !RangeValueConstraint methodsFor: 'initialize-release' stamp: 'KenD 9/11/2013 10:15'!
 min: minmumValue max: maximumValue
 
 	min := minmumValue.
 	max := maximumValue.! !
-
-!RangeValueConstraint methodsFor: 'accessing' stamp: 'KenD 9/11/2013 10:14'!
-minimumValue
-
-	^ min! !
 
 !RangeValueConstraint class methodsFor: 'instance creation' stamp: 'KenD 9/11/2013 10:31'!
 minValue: aMin maxValue: aMax

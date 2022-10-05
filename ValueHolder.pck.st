@@ -1,61 +1,49 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #1850] on 12 October 2013 at 9:37:33.582000187 pm'!
+'From Cuis 6.0 [latest update: #5202] on 29 May 2022 at 7:39:09 am'!
 'Description Holders for constrained values.'!
-!provides: 'ValueHolder' 1 20!
-!classDefinition: #ValueHolder category: #ValueHolder!
-Object subclass: #ValueHolder
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'ValueHolder'!
-!classDefinition: 'ValueHolder class' category: #ValueHolder!
-ValueHolder class
-	instanceVariableNames: ''!
+!provides: 'ValueHolder' 1 21!
+SystemOrganization addCategory: 'ValueHolder'!
 
-!classDefinition: #ValueOfClass category: #ValueHolder!
+
+!classDefinition: #ValueOfClass category: 'ValueHolder'!
 ValueHolder subclass: #ValueOfClass
 	instanceVariableNames: 'theClass'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ValueHolder'!
-!classDefinition: 'ValueOfClass class' category: #ValueHolder!
+!classDefinition: 'ValueOfClass class' category: 'ValueHolder'!
 ValueOfClass class
 	instanceVariableNames: ''!
 
-!classDefinition: #ValueOfKind category: #ValueHolder!
+!classDefinition: #ValueOfKind category: 'ValueHolder'!
 ValueHolder subclass: #ValueOfKind
 	instanceVariableNames: 'theKind'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ValueHolder'!
-!classDefinition: 'ValueOfKind class' category: #ValueHolder!
+!classDefinition: 'ValueOfKind class' category: 'ValueHolder'!
 ValueOfKind class
 	instanceVariableNames: ''!
 
-!classDefinition: #ValueOfRange category: #ValueHolder!
+!classDefinition: #ValueOfRange category: 'ValueHolder'!
 ValueOfKind subclass: #ValueOfRange
 	instanceVariableNames: 'minValue maxValue'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ValueHolder'!
-!classDefinition: 'ValueOfRange class' category: #ValueHolder!
+!classDefinition: 'ValueOfRange class' category: 'ValueHolder'!
 ValueOfRange class
 	instanceVariableNames: ''!
 
-!classDefinition: #ValueOneOf category: #ValueHolder!
+!classDefinition: #ValueOneOf category: 'ValueHolder'!
 ValueOfKind subclass: #ValueOneOf
 	instanceVariableNames: 'selectionList'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ValueHolder'!
-!classDefinition: 'ValueOneOf class' category: #ValueHolder!
+!classDefinition: 'ValueOneOf class' category: 'ValueHolder'!
 ValueOneOf class
 	instanceVariableNames: ''!
 
-
-!ValueHolder commentStamp: '<historical>' prior: 0!
-My instances hold various values -- usually constrained by type/kind/range.
-
-See my subclasses.!
 
 !ValueOfClass commentStamp: '<historical>' prior: 0!
 My values are constrained to be DIRECT INSTANCES of theClass.!
@@ -84,61 +72,6 @@ ValueOneOf mustBeOneOf: #( Red Green Blue ) ofKind: Symbol.
 ValueOneOf mustBeOneOf: {'this'. 'that'. 'theOther'.} ofKind: String.
 !
 
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:33'!
-checkValue: aValue
-	"I accept any value"
-
-	 "True => OK; False => Invalid"
-
-	^ true! !
-
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:31'!
-contents
-		"Squeak compatability"
-
-		^ self value! !
-
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:30'!
-contents: newValue
-		"Squeak compatability"
-
-		self value: newValue ! !
-
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/12/2013 17:23'!
-defaultName
-
-	^ 'ValueHolder'! !
-
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:28'!
-errorStringFor: aValue
-	"My subclasses do this"
-
-	^ ''			"an empty string"! !
-
-!ValueHolder methodsFor: 'private' stamp: 'KenD 10/2/2013 17:24'!
-privateSetValue: newValue
-
-	value := newValue.! !
-
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:24'!
-value
-
-	^ value! !
-
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:29'!
-value: newValue
-	"Nota Bene: I hold an UNCHECKED, UNCONSTRAINED value"
-
-	self value: newValue
-		  ifInvalid: [ :ignoredValue | DomainError signal: (self errorStringFor: newValue) ] ! !
-
-!ValueHolder methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:24'!
-value: newValue ifInvalid: aBlock
-
-	(self checkValue: newValue)
-		ifTrue:  [ self privateSetValue: newValue ]
-		ifFalse:  [ aBlock value: newValue ]! !
-
 !ValueOfClass methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:35'!
 checkValue: aValue
 	"I accept only DIRECT INSTANCES of a Class "
@@ -155,16 +88,16 @@ errorStringFor: aValue
 
 	^ aValue printString, ' class MUST be ', theClass name! !
 
+!ValueOfClass methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:34'!
+theClass
+
+	^ theClass! !
+
 !ValueOfClass methodsFor: 'private' stamp: 'KenD 10/2/2013 16:24'!
 forClass: aClass
 	"This is an initialization method.  My instances are considered immutable"
 
 	theClass := aClass! !
-
-!ValueOfClass methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:34'!
-theClass
-
-	^ theClass! !
 
 !ValueOfClass class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 16:35'!
 mustBeInstanceOfClass: aClass
@@ -185,26 +118,26 @@ checkValue: aValue
 
 	^ (aValue isKindOf: theKind)! !
 
-!ValueOfKind methodsFor: 'as yet unclassified' stamp: 'KenD 10/12/2013 17:26'!
-defaultName
-
-	^ 'ValueOfKind' , theKind name! !
-
 !ValueOfKind methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:46'!
 errorStringFor: aValue
 
 	^ aValue printString, ' class MUST be a kind of', theKind name! !
+
+!ValueOfKind methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:45'!
+theKind
+
+	^ theKind! !
+
+!ValueOfKind methodsFor: 'as yet unclassified' stamp: 'KenD 10/12/2013 17:26'!
+defaultName
+
+	^ 'ValueOfKind' , theKind name! !
 
 !ValueOfKind methodsFor: 'private' stamp: 'KenD 10/2/2013 16:48'!
 forKind: aClass
 	"This is an initialization method.  My instances are considered immutable"
 
 	theKind := aClass! !
-
-!ValueOfKind methodsFor: 'accessing' stamp: 'KenD 10/2/2013 16:45'!
-theKind
-
-	^ theKind! !
 
 !ValueOfKind class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 16:47'!
 mustBeKindOf: aClass
@@ -291,18 +224,18 @@ errorStringFor: aValue
 
 	^ aValue printString, '  MUST be one of ', selectionList printString! !
 
+!ValueOneOf methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:27'!
+mySelectionList
+	"Answer my collection"
+
+	^ selectionList ! !
+
 !ValueOneOf methodsFor: 'private' stamp: 'KenD 10/2/2013 16:54'!
 mustBeOneOf: aCollection
 
 	selectionList := aCollection.
 	"Default selection to 1st element"
 	self privateSetValue: (aCollection first).! !
-
-!ValueOneOf methodsFor: 'accessing' stamp: 'KenD 10/2/2013 17:27'!
-mySelectionList
-	"Answer my collection"
-
-	^ selectionList ! !
 
 !ValueOneOf class methodsFor: 'instance creation' stamp: 'KenD 10/2/2013 17:30'!
 mustBeOneOf: aCollection
