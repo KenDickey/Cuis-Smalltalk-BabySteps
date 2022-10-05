@@ -1,7 +1,9 @@
-'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 11:44:34 am'!
+'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 11:59:29 am'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
-NB: No Compressed Instruction Format'!
-!provides: 'RISC5-Instructions' 1 32!
+NB: 
+- No Compressed Instruction Format
+- No binary disassembly (but instructions can print themselves)'!
+!provides: 'RISC5-Instructions' 1 33!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -777,20 +779,25 @@ instruction
 	"Answer an assembled 32 bit instruction"
 	self subclassResponsibility ! !
 
-!RISC5Instructions class methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:03:50'!
+!RISC5Instructions class methodsFor: 'accessing' stamp: 'KenD 10/5/2022 11:57:42'!
 floatRegName: regIntEncoding
 	"Float register name from 5 bit integer encoding"
-	^FRegs at: regIntEncoding + 1! !
+	^ FRegs at: regIntEncoding + 1! !
+
+!RISC5Instructions class methodsFor: 'accessing' stamp: 'KenD 10/5/2022 11:57:37'!
+intRegName: regIntEncoding
+	"Integer register name from 5 bit integer encoding"
+	^ IRegs at: regIntEncoding + 1! !
 
 !RISC5Instructions class methodsFor: 'accessing' stamp: 'KenD 5/1/2021 08:46:37'!
 opcode
 
 	self subclassResponsibility ! !
 
-!RISC5Instructions class methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:03:17'!
+!RISC5Instructions class methodsFor: 'accessing' stamp: 'KenD 10/5/2022 11:58:20'!
 regName: regIntEncoding
-	"Integer register name from 5 bit integer encoding"
-	^IRegs at: regIntEncoding + 1! !
+	"Assume integer register"
+	^ self intRegName: regIntEncoding! !
 
 !RISC5Instructions class methodsFor: 'class initialization' stamp: 'KenD 5/3/2021 12:06:56'!
 initialize
