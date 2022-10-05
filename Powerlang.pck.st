@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 1:06:46 pm'!
+'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 1:57:10 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 21!
+!provides: 'Powerlang' 1 22!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -2035,7 +2035,14 @@ and delegate writing of the actual bytes to my backends.
 !RV64GCodeGenerator commentStamp: '<historical>' prior: 0!
 RISC-V RV64G
 See specs at:
-  https://riscv.org/technical/specifications/!
+  https://riscv.org/technical/specifications/
+
+Linux System Call Convention (RV64G)
+    syscall number is passed in a7
+    syscall arguments are passed in a0 to a5
+    unused arguments are set to 0
+    return value is returned in a0
+!
 
 !RelocatableBuffer commentStamp: '<historical>' prior: 0!
 Copyright (c) 2020 Aucerna.
@@ -7118,11 +7125,11 @@ addDouble: source1 to: source2andDest
 	"RV64G registers are already doubles"
 	self add: source1 to: source2andDest! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:16:40'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 13:47:42'!
 addImm: imm to: srcAndDst
 
 	self flag: #UncheckedForOverflow.
-	memory nextInstructionPut: (RV64ADD regDest: srcAndDst regSource: srcAndDst imm12: imm).
+	memory nextInstructionPut: (RV64ADDI regDest: srcAndDst regSource: srcAndDst imm12: imm).
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:52:35'!
@@ -7201,11 +7208,134 @@ shiftRightArithmetic: srcAndDstReg byImm: imm
 		(RV64SRAI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
 ! !
 
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:52:32'!
+breakpoint
+	"System Breakpoint - transfer control to debugger (e.g. gdb)"
+	memory nextInstructionPut: (RV64EBREAK new).
+! !
+
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:54:41'!
+syscall: callNumber 
+	"Low level Linux Syscall.  Args in a0..a5; call# in a7; result in a0"
+	self clearReg: 10. "arg0"
+	self clearReg: 11.
+	self clearReg: 12.
+	self clearReg: 13. "zero unused regs"
+	self clearReg: 14.
+	self clearReg: 15.
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: 17 regSource: RegZero imm12: callNumber).
+	memory nextInstructionPut: (RV64ECALL new).
+	self move: 10 to: RegR.  "Result from A0 into RegR"
+	 ! !
+
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:54:16'!
+syscall: callNumber arg: reg0 
+	"Low level Linux Syscall.  Args in a0..a5; call# in a7; result in a0"
+	self move: reg0 to: 10. "arg0"
+	self clearReg: 11.
+	self clearReg: 12.
+	self clearReg: 13. "zero unused regs"
+	self clearReg: 14.
+	self clearReg: 15.
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: 17 regSource: RegZero imm12: callNumber).
+	memory nextInstructionPut: (RV64ECALL new).
+	self move: 10 to: RegR.  "Result from A0 into RegR"
+	 ! !
+
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:54:01'!
+syscall: callNumber arg: reg0 arg: reg1 
+	"Low level Linux Syscall.  Args in a0..a5; call# in a7; result in a0"
+	self move: reg0 to: 10. "arg0"
+	self move: reg1 to: 11.
+	self clearReg: 12.
+	self clearReg: 13. "zero unused regs"
+	self clearReg: 14.
+	self clearReg: 15.
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: 17 regSource: RegZero imm12: callNumber).
+	memory nextInstructionPut: (RV64ECALL new).
+	self move: 10 to: RegR.  "Result from A0 into RegR"
+	 ! !
+
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:53:30'!
+syscall: callNumber arg: reg0 arg: reg1 arg: reg2
+	"Low level Linux Syscall.  Args in a0..a5; call# in a7; result in a0"
+	self move: reg0 to: 10. "arg0"
+	self move: reg1 to: 11.
+	self move: reg2 to: 12.
+	self clearReg: 13. "zero unused regs"
+	self clearReg: 14.
+	self clearReg: 15.
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: 17 regSource: RegZero imm12: callNumber).
+	memory nextInstructionPut: (RV64ECALL new).
+	self move: 10 to: RegR.  "Result from A0 into RegR"
+	 ! !
+
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:55:33'!
+syscall: callNumber arg: reg0 arg: reg1 arg: reg2 arg: reg3
+	"Low level Linux Syscall.  Args in a0..a5; call# in a7; result in a0"
+	self move: reg0 to: 10. "arg0"
+	self move: reg1 to: 11.
+	self move: reg2 to: 12.
+	self move: reg3 to: 13.
+	self clearReg: 14.
+	self clearReg: 15.
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: 17 regSource: RegZero imm12: callNumber).
+	memory nextInstructionPut: (RV64ECALL new).
+	self move: 10 to: RegR.  "Result from A0 into RegR"
+	 ! !
+
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:56:00'!
+syscall: callNumber arg: reg0 arg: reg1 arg: reg2 arg: reg3 arg: reg4
+	"Low level Linux Syscall.  Args in a0..a5; call# in a7; result in a0"
+	self move: reg0 to: 10. "arg0"
+	self move: reg1 to: 11.
+	self move: reg2 to: 12.
+	self move: reg3 to: 13.
+	self move: reg4 to: 14.
+	self clearReg: 15.
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: 17 regSource: RegZero imm12: callNumber).
+	memory nextInstructionPut: (RV64ECALL new).
+	self move: 10 to: RegR.  "Result from A0 into RegR"
+	 ! !
+
+!RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:56:25'!
+syscall: callNumber arg: reg0 arg: reg1 arg: reg2 arg: reg3 arg: reg4 arg: reg5
+	"Low level Linux Syscall.  Args in a0..a5; call# in a7; result in a0"
+	self move: reg0 to: 10. "arg0"
+	self move: reg1 to: 11.
+	self move: reg2 to: 12.
+	self move: reg3 to: 13.
+	self move: reg4 to: 14.
+	self move: reg5 to: 15.
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: 17 regSource: RegZero imm12: callNumber).
+	memory nextInstructionPut: (RV64ECALL new).
+	self move: 10 to: RegR.  "Result from A0 into RegR"
+	 ! !
+
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:49:17'!
+clearReg: reg
+
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: reg regSource: RegZero imm12: 0).
+	! !
+
 !RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:04:50'!
 move: srcReg to: dstReg
 
 	memory nextInstructionPut:
 		(RV64ADDI regDest: dstReg regSource: srcReg imm12: 0).
+! !
+
+!RV64GCodeGenerator methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 11:00:12'!
+regFlags
+	^ flagsReg
 ! !
 
 !RV64GCodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
