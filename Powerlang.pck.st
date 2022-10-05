@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 1:57:10 pm'!
+'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 4:28:59 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 22!
+!provides: 'Powerlang' 1 24!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7081,6 +7081,21 @@ subImm: anInteger from: srcAndDstReg
 
 ! !
 
+!RV64GCodeGenerator methodsFor: 'alignment' stamp: 'KenD 10/5/2022 15:29:24'!
+noOp
+
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: RegZero regSource: RegZero imm12: 0).! !
+
+!RV64GCodeGenerator methodsFor: 'alignment' stamp: 'KenD 10/5/2022 15:30:38'!
+noOp: count
+
+	"assemble #count noOps"
+	1 to count do: [
+		memory nextInstructionPut: 
+			(RV64ADDI regDest: RegZero regSource: RegZero imm12: 0)
+	]! !
+
 !RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 15:56:52'!
 initialize
 
@@ -7094,10 +7109,24 @@ initialize
 	
 	! !
 
-!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/5/2022 13:00:31'!
+!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/5/2022 15:38:44'!
+call: srcReg
+	"Goto address #srcReg, placing return address in #linkReg"
+	memory nextInstructionPut: 
+		(RV64JALR destReg: linkReg baseReg: srcReg immedOffset: 0).
+! !
+
+!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/5/2022 15:35:26'!
+call: srcReg withOffset: imm
+
+	memory nextInstructionPut: 
+		(RV64JALR destReg: linkReg baseReg: srcReg immedOffset: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/5/2022 15:39:50'!
 return
 	"Return from subroutine"
-
+	"Goto address in #linkReg, remembering nothing"
 	memory nextInstructionPut: 
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: 0).
 ! !
@@ -7132,10 +7161,11 @@ addImm: imm to: srcAndDst
 	memory nextInstructionPut: (RV64ADDI regDest: srcAndDst regSource: srcAndDst imm12: imm).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:52:35'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 15:42:52'!
 sub: src1 from: src2AndDest
 
 	"NB:  destReg := regA - regB"
+	self flag: #UnderflowUntested.
 	memory nextInstructionPut: 
 		(RV64AND regDest: src2AndDest regA: src2AndDest regB: src1).
 ! !
