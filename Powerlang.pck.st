@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 4:45:12 pm'!
+'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 5:00:54 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 19!
+!provides: 'Powerlang' 1 20!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7074,10 +7074,11 @@ subImm: anInteger from: srcAndDstReg
 
 ! !
 
-!RV64GCodeGenerator methodsFor: 'basic' stamp: 'KenD 10/4/2022 16:40:35'!
+!RV64GCodeGenerator methodsFor: 'basic' stamp: 'KenD 10/4/2022 17:00:45'!
 add: src1Reg to: src2andDstReg
 	"Here we have to emulate X86 behavior and in addition to addition
-	 we have to set artificial flags register to indicate overflow
+	 we have to set artificial flags register to indicate overflow.
+	Note overflow check notes in RISCV-SPEC section 2.4: Integer Computational Instructions
 	"
 
 	 "set tmp1Reg to 1 if src2andDstReg (operand 2) is negative"
