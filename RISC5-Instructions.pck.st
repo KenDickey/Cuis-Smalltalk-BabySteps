@@ -1,6 +1,7 @@
-'From Cuis 6.0 [latest update: #5492] on 4 October 2022 at 4:22:12 pm'!
-'Description RISC-V Instruction opcodes for RV64G'!
-!provides: 'RISC5-Instructions' 1 30!
+'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 11:44:34 am'!
+'Description RISC-V 32 bit Instruction opcodes for RV64G
+NB: No Compressed Instruction Format'!
+!provides: 'RISC5-Instructions' 1 32!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -24,18 +25,18 @@ Object subclass: #RISC5Instructions
 RISC5Instructions class
 	instanceVariableNames: ''!
 
-!classDefinition: #RV64B category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64B
+!classDefinition: #RV64Branch category: #'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Branch
 	instanceVariableNames: 'regA regB immHi immLo'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64B class' category: #'RISC5-Instructions'!
-RV64B class
+!classDefinition: 'RV64Branch class' category: #'RISC5-Instructions'!
+RV64Branch class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64BEQ category: #'RISC5-Instructions'!
-RV64B subclass: #RV64BEQ
+RV64Branch subclass: #RV64BEQ
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -45,7 +46,7 @@ RV64BEQ class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64BGE category: #'RISC5-Instructions'!
-RV64B subclass: #RV64BGE
+RV64Branch subclass: #RV64BGE
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -55,7 +56,7 @@ RV64BGE class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64BGEU category: #'RISC5-Instructions'!
-RV64B subclass: #RV64BGEU
+RV64Branch subclass: #RV64BGEU
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -65,7 +66,7 @@ RV64BGEU class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64BLT category: #'RISC5-Instructions'!
-RV64B subclass: #RV64BLT
+RV64Branch subclass: #RV64BLT
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -75,7 +76,7 @@ RV64BLT class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64BLTU category: #'RISC5-Instructions'!
-RV64B subclass: #RV64BLTU
+RV64Branch subclass: #RV64BLTU
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -85,7 +86,7 @@ RV64BLTU class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64BNE category: #'RISC5-Instructions'!
-RV64B subclass: #RV64BNE
+RV64Branch subclass: #RV64BNE
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -94,18 +95,18 @@ RV64B subclass: #RV64BNE
 RV64BNE class
 	instanceVariableNames: ''!
 
-!classDefinition: #RV64I category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64I
+!classDefinition: #RV64Immediate category: #'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Immediate
 	instanceVariableNames: 'sourceReg immediate12'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64I class' category: #'RISC5-Instructions'!
-RV64I class
+!classDefinition: 'RV64Immediate class' category: #'RISC5-Instructions'!
+RV64Immediate class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64ADDI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64ADDI
+RV64Immediate subclass: #RV64ADDI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -115,7 +116,7 @@ RV64ADDI class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64ANDI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64ANDI
+RV64Immediate subclass: #RV64ANDI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -125,7 +126,7 @@ RV64ANDI class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64EBREAK category: #'RISC5-Instructions'!
-RV64I subclass: #RV64EBREAK
+RV64Immediate subclass: #RV64EBREAK
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -135,7 +136,7 @@ RV64EBREAK class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64ECALL category: #'RISC5-Instructions'!
-RV64I subclass: #RV64ECALL
+RV64Immediate subclass: #RV64ECALL
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -145,7 +146,7 @@ RV64ECALL class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64ORI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64ORI
+RV64Immediate subclass: #RV64ORI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -155,7 +156,7 @@ RV64ORI class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SLLI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64SLLI
+RV64Immediate subclass: #RV64SLLI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -165,7 +166,7 @@ RV64SLLI class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SLTI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64SLTI
+RV64Immediate subclass: #RV64SLTI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -175,7 +176,7 @@ RV64SLTI class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SLTIU category: #'RISC5-Instructions'!
-RV64I subclass: #RV64SLTIU
+RV64Immediate subclass: #RV64SLTIU
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -185,7 +186,7 @@ RV64SLTIU class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SRAI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64SRAI
+RV64Immediate subclass: #RV64SRAI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -195,7 +196,7 @@ RV64SRAI class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SRLI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64SRLI
+RV64Immediate subclass: #RV64SRLI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -205,7 +206,7 @@ RV64SRLI class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64XORI category: #'RISC5-Instructions'!
-RV64I subclass: #RV64XORI
+RV64Immediate subclass: #RV64XORI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -234,18 +235,18 @@ RISC5Instructions subclass: #RV64JALR
 RV64JALR class
 	instanceVariableNames: ''!
 
-!classDefinition: #RV64L category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64L
+!classDefinition: #RV64Load category: #'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Load
 	instanceVariableNames: 'immedOffset baseReg'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64L class' category: #'RISC5-Instructions'!
-RV64L class
+!classDefinition: 'RV64Load class' category: #'RISC5-Instructions'!
+RV64Load class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LB category: #'RISC5-Instructions'!
-RV64L subclass: #RV64LB
+RV64Load subclass: #RV64LB
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -255,7 +256,7 @@ RV64LB class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LBU category: #'RISC5-Instructions'!
-RV64L subclass: #RV64LBU
+RV64Load subclass: #RV64LBU
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -265,7 +266,7 @@ RV64LBU class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LD category: #'RISC5-Instructions'!
-RV64L subclass: #RV64LD
+RV64Load subclass: #RV64LD
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -275,7 +276,7 @@ RV64LD class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LH category: #'RISC5-Instructions'!
-RV64L subclass: #RV64LH
+RV64Load subclass: #RV64LH
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -285,7 +286,7 @@ RV64LH class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LHU category: #'RISC5-Instructions'!
-RV64L subclass: #RV64LHU
+RV64Load subclass: #RV64LHU
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -295,7 +296,7 @@ RV64LHU class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LW category: #'RISC5-Instructions'!
-RV64L subclass: #RV64LW
+RV64Load subclass: #RV64LW
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -305,7 +306,7 @@ RV64LW class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LWU category: #'RISC5-Instructions'!
-RV64L subclass: #RV64LWU
+RV64Load subclass: #RV64LWU
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -314,18 +315,18 @@ RV64L subclass: #RV64LWU
 RV64LWU class
 	instanceVariableNames: ''!
 
-!classDefinition: #RV64R category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64R
+!classDefinition: #RV64Reg3Reg category: #'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Reg3Reg
 	instanceVariableNames: 'regA regB'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64R class' category: #'RISC5-Instructions'!
-RV64R class
+!classDefinition: 'RV64Reg3Reg class' category: #'RISC5-Instructions'!
+RV64Reg3Reg class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64ADD category: #'RISC5-Instructions'!
-RV64R subclass: #RV64ADD
+RV64Reg3Reg subclass: #RV64ADD
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -345,7 +346,7 @@ RV64NOOP class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64AND category: #'RISC5-Instructions'!
-RV64R subclass: #RV64AND
+RV64Reg3Reg subclass: #RV64AND
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -355,7 +356,7 @@ RV64AND class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64OR category: #'RISC5-Instructions'!
-RV64R subclass: #RV64OR
+RV64Reg3Reg subclass: #RV64OR
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -365,7 +366,7 @@ RV64OR class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SLL category: #'RISC5-Instructions'!
-RV64R subclass: #RV64SLL
+RV64Reg3Reg subclass: #RV64SLL
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -375,7 +376,7 @@ RV64SLL class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SLT category: #'RISC5-Instructions'!
-RV64R subclass: #RV64SLT
+RV64Reg3Reg subclass: #RV64SLT
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -385,7 +386,7 @@ RV64SLT class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SLTU category: #'RISC5-Instructions'!
-RV64R subclass: #RV64SLTU
+RV64Reg3Reg subclass: #RV64SLTU
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -395,7 +396,7 @@ RV64SLTU class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SRA category: #'RISC5-Instructions'!
-RV64R subclass: #RV64SRA
+RV64Reg3Reg subclass: #RV64SRA
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -405,7 +406,7 @@ RV64SRA class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SRL category: #'RISC5-Instructions'!
-RV64R subclass: #RV64SRL
+RV64Reg3Reg subclass: #RV64SRL
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -415,7 +416,7 @@ RV64SRL class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SUB category: #'RISC5-Instructions'!
-RV64R subclass: #RV64SUB
+RV64Reg3Reg subclass: #RV64SUB
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -425,7 +426,7 @@ RV64SUB class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64XOR category: #'RISC5-Instructions'!
-RV64R subclass: #RV64XOR
+RV64Reg3Reg subclass: #RV64XOR
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -434,18 +435,18 @@ RV64R subclass: #RV64XOR
 RV64XOR class
 	instanceVariableNames: ''!
 
-!classDefinition: #RV64S category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64S
+!classDefinition: #RV64Store category: #'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Store
 	instanceVariableNames: 'baseReg immLo immHi'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64S class' category: #'RISC5-Instructions'!
-RV64S class
+!classDefinition: 'RV64Store class' category: #'RISC5-Instructions'!
+RV64Store class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SB category: #'RISC5-Instructions'!
-RV64S subclass: #RV64SB
+RV64Store subclass: #RV64SB
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -455,7 +456,7 @@ RV64SB class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SD category: #'RISC5-Instructions'!
-RV64S subclass: #RV64SD
+RV64Store subclass: #RV64SD
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -465,7 +466,7 @@ RV64SD class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SH category: #'RISC5-Instructions'!
-RV64S subclass: #RV64SH
+RV64Store subclass: #RV64SH
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -475,7 +476,7 @@ RV64SH class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SW category: #'RISC5-Instructions'!
-RV64S subclass: #RV64SW
+RV64Store subclass: #RV64SW
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -484,18 +485,18 @@ RV64S subclass: #RV64SW
 RV64SW class
 	instanceVariableNames: ''!
 
-!classDefinition: #RV64U category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64U
+!classDefinition: #RV64UpperAddr category: #'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64UpperAddr
 	instanceVariableNames: 'immediate20'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64U class' category: #'RISC5-Instructions'!
-RV64U class
+!classDefinition: 'RV64UpperAddr class' category: #'RISC5-Instructions'!
+RV64UpperAddr class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64AUIPC category: #'RISC5-Instructions'!
-RV64U subclass: #RV64AUIPC
+RV64UpperAddr subclass: #RV64AUIPC
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -505,7 +506,7 @@ RV64AUIPC class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64LUI category: #'RISC5-Instructions'!
-RV64U subclass: #RV64LUI
+RV64UpperAddr subclass: #RV64LUI
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -525,7 +526,7 @@ RISC5InstructionsTests class
 	instanceVariableNames: ''!
 
 
-!RV64B commentStamp: '<historical>' prior: 0!
+!RV64Branch commentStamp: '<historical>' prior: 0!
 Branch 
 
 if (regA OP regB) branch to (PC+(immed12 << 1))
@@ -551,7 +552,7 @@ Branch if Less Than -- UNSIGNED!
 !RV64BNE commentStamp: '<historical>' prior: 0!
 Branch if Not Equal!
 
-!RV64I commentStamp: '<historical>' prior: 0!
+!RV64Immediate commentStamp: '<historical>' prior: 0!
 Immediate instructions
 
 	destReg := regA OP immed12
@@ -591,7 +592,7 @@ Jump and Link; Register
 Instruction Pattern:
   [immed12][baseReg][destReg][opcode]!
 
-!RV64L commentStamp: '<historical>' prior: 0!
+!RV64Load commentStamp: '<historical>' prior: 0!
 Load
 
  regDest := mem(size)At: [baseReg + immedOffset]
@@ -623,7 +624,7 @@ load (4 byte) signed Word into register!
 !RV64LWU commentStamp: '<historical>' prior: 0!
 load (4 byte) UNsigned Word into register!
 
-!RV64R commentStamp: '<historical>' prior: 0!
+!RV64Reg3Reg commentStamp: '<historical>' prior: 0!
 R => 3 Register opcode; Register to Register
 
   destReg := regA OP regB
@@ -655,7 +656,7 @@ Shift Right Arithmatic -- destReg := regA >> regB!
 !RV64XOR commentStamp: '<historical>' prior: 0!
 eXclusive OR {distinguish OR)!
 
-!RV64S commentStamp: '<historical>' prior: 0!
+!RV64Store commentStamp: '<historical>' prior: 0!
 Store  -- "NB: 'destReg' used for 'sourceReg"
 
  mem(size)At: [baseReg + immedOffset] := regSource(size) 
@@ -766,9 +767,9 @@ initialize
 	F31 := FTmp11 := 31.
 ! !
 
-!RISC5Instructions methodsFor: 'initialization' stamp: 'KenD 5/1/2021 08:48:23'!
+!RISC5Instructions methodsFor: 'initialization' stamp: 'KenD 10/5/2022 11:37:08'!
 destReg: regDest
-
+	"Common to all instruction variants"
 	destReg := regDest ! !
 
 !RISC5Instructions methodsFor: 'accessing' stamp: 'KenD 10/4/2022 16:00:39'!
@@ -902,17 +903,17 @@ strm contents asString.
 "
 	'Hello RISCV World!!\n' asByteString do: [ :byte | byteStream nextPut: byte ].! !
 
-!RV64B methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:11:01'!
+!RV64Branch methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:11:01'!
 func3
 
 	self subclassResponsibility ! !
 
-!RV64B methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:10:55'!
+!RV64Branch methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:10:55'!
 func7
 
 	self shouldNotImplement ! !
 
-!RV64B methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:12:58'!
+!RV64Branch methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:12:58'!
 instruction
 " [immHi 25:31][baseReg 20:24][destReg 15:19][func3 12:14][immLo 7:11][opcode 6:0]"
 	^(immHi << 25) 
@@ -922,24 +923,24 @@ instruction
 	 + (immLo << 7) 
 	 + self opcode! !
 
-!RV64B methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:30:47'!
+!RV64Branch methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:30:47'!
 offset
 
 	"Answer assembled immediate
 	  Nota Bene: immed12 multiplied by 2"
 	^ ((immHi << 5) + immLo) << 1 ! !
 
-!RV64B methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:10:48'!
+!RV64Branch methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:10:48'!
 opName
 
 	self subclassResponsibility ! !
 
-!RV64B methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:11:47'!
+!RV64Branch methodsFor: 'accessing' stamp: 'KenD 5/8/2021 07:11:47'!
 opcode
 	"Opcode for all S-type instructions"
 	^2r1100011! !
 
-!RV64B methodsFor: 'initialization' stamp: 'KenD 5/8/2021 07:08:15'!
+!RV64Branch methodsFor: 'initialization' stamp: 'KenD 5/8/2021 07:08:15'!
 regA: reg1 regB: reg2 immLo: lo mmHi: hi
 
 	regA := reg1.
@@ -948,7 +949,7 @@ regA: reg1 regB: reg2 immLo: lo mmHi: hi
 	immHi := hi
 ! !
 
-!RV64B methodsFor: 'printing' stamp: 'KenD 5/8/2021 07:10:02'!
+!RV64Branch methodsFor: 'printing' stamp: 'KenD 5/8/2021 07:10:02'!
 printString
 	"E.g.: 'beq  r1,r2,offset' "
 	^ self opName, '  ',
@@ -956,7 +957,7 @@ printString
 		(self class regName: regB ), ', 16r', 
 		(self offset printStringBase: 16)! !
 
-!RV64B class methodsFor: 'instance creation' stamp: 'KenD 5/8/2021 07:32:18'!
+!RV64Branch class methodsFor: 'instance creation' stamp: 'KenD 5/8/2021 07:32:18'!
 regA: reg1 regB: reg2 immediateOffset: immediate12
 
 	"NB: immediate12 will be multiplied by 2 (<< 1)
@@ -1032,24 +1033,24 @@ opName
 
 	^'bne'! !
 
-!RV64I methodsFor: 'initialization' stamp: 'KenD 5/3/2021 15:16:54'!
+!RV64Immediate methodsFor: 'initialization' stamp: 'KenD 5/3/2021 15:16:54'!
 destReg: regDest regSource: reg1 imm12: immediateInt12
 
 	super destReg: regDest .
 	sourceReg := reg1.
 	immediate12 := immediateInt12 ! !
 
-!RV64I methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:38:20'!
+!RV64Immediate methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:38:20'!
 func3
 
 	self subclassResponsibility ! !
 
-!RV64I methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:38:44'!
+!RV64Immediate methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:38:44'!
 func7
 
 	self subclassResponsibility ! !
 
-!RV64I methodsFor: 'accessing' stamp: 'KenD 5/11/2021 14:15:19'!
+!RV64Immediate methodsFor: 'accessing' stamp: 'KenD 5/11/2021 14:15:19'!
 instruction
 	"[immed12 31:20][rSource1 19:15][func3 14:12][rd 11:7][opcode 6:0]"
 	^(immediate12 << 20) 
@@ -1058,12 +1059,12 @@ instruction
 	 + (destReg << 7) 
 	 + self opcode! !
 
-!RV64I methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:30:49'!
+!RV64Immediate methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:30:49'!
 opcode
 	"Opcode for all I-type instructions"
 	^2r0010011! !
 
-!RV64I methodsFor: 'printing' stamp: 'KenD 5/3/2021 15:18:24'!
+!RV64Immediate methodsFor: 'printing' stamp: 'KenD 5/3/2021 15:18:24'!
 printString
 	"E.g.: 'addi  rd,r1s,36' "
 	^ self opName, '  ',
@@ -1071,7 +1072,7 @@ printString
 		(self class regName: sourceReg), ', ', 
 		'16r', (immediate12 printStringBase: 16).  "FIXME: 0x??"! !
 
-!RV64I class methodsFor: 'instance creation' stamp: 'KenD 5/3/2021 15:25:13'!
+!RV64Immediate class methodsFor: 'instance creation' stamp: 'KenD 5/3/2021 15:25:13'!
 regDest: destReg regSource: reg1 imm12: immediate12
 
 	(immediate12 bitAnd: 16rFFF) = immediate12 
@@ -1371,17 +1372,17 @@ regDest: rd regBase: rb offset: immediate12
 			baseReg: rb 
 			immedOffset: immediate12 	! !
 
-!RV64L methodsFor: 'accessing' stamp: 'KenD 5/4/2021 08:06:50'!
+!RV64Load methodsFor: 'accessing' stamp: 'KenD 5/4/2021 08:06:50'!
 func3
 
 	self subclassResponsibility ! !
 
-!RV64L methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:54:28'!
+!RV64Load methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:54:28'!
 func7
 
 	self shouldNotImplement ! !
 
-!RV64L methodsFor: 'accessing' stamp: 'KenD 5/7/2021 16:11:51'!
+!RV64Load methodsFor: 'accessing' stamp: 'KenD 5/7/2021 16:11:51'!
 instruction
 " [immOffset 20:31][baseReg 15:19][func3 12:14][destReg 7:11][opcode 6:0]"
 	^ (immedOffset << 20) 
@@ -1390,30 +1391,30 @@ instruction
 	 + (destReg << 7) 
 	 + self opcode! !
 
-!RV64L methodsFor: 'accessing' stamp: 'KenD 5/7/2021 16:09:37'!
+!RV64Load methodsFor: 'accessing' stamp: 'KenD 5/7/2021 16:09:37'!
 offset
 
 	"Answer assembled immediate"
 	^immedOffset ! !
 
-!RV64L methodsFor: 'accessing' stamp: 'KenD 5/4/2021 08:07:03'!
+!RV64Load methodsFor: 'accessing' stamp: 'KenD 5/4/2021 08:07:03'!
 opName
 
 	self subclassResponsibility ! !
 
-!RV64L methodsFor: 'accessing' stamp: 'KenD 5/4/2021 12:34:51'!
+!RV64Load methodsFor: 'accessing' stamp: 'KenD 5/4/2021 12:34:51'!
 opcode
 	"Opcode for all L-type instructions"
 	^2r0000011! !
 
-!RV64L methodsFor: 'initialization' stamp: 'KenD 5/7/2021 16:07:32'!
+!RV64Load methodsFor: 'initialization' stamp: 'KenD 5/7/2021 16:07:32'!
 destReg: regDest baseReg: reg1 immedOffset: immed12
 
 	super destReg: regDest .
 	baseReg := reg1.
 	immedOffset := immed12 ! !
 
-!RV64L methodsFor: 'printing' stamp: 'KenD 5/9/2021 16:04:53'!
+!RV64Load methodsFor: 'printing' stamp: 'KenD 5/9/2021 16:04:53'!
 printString
 	"E.g.: 'lb  rDest,rBase,offset' "
 	^ self opName, '  ',
@@ -1421,7 +1422,7 @@ printString
 		(self class regName: baseReg ), ', 16r', 
 		(self offset printStringBase: 16)! !
 
-!RV64L class methodsFor: 'instance creation' stamp: 'KenD 5/7/2021 16:05:43'!
+!RV64Load class methodsFor: 'instance creation' stamp: 'KenD 5/7/2021 16:05:43'!
 regDest: rd regBase: rb immediateOffset: immediate12
 	
 	(immediate12 bitAnd: 16rFFF) = immediate12 
@@ -1502,7 +1503,7 @@ opName
 
 	^'lwU'! !
 
-!RV64R methodsFor: 'printing' stamp: 'KenD 5/3/2021 12:00:09'!
+!RV64Reg3Reg methodsFor: 'printing' stamp: 'KenD 5/3/2021 12:00:09'!
 printString
 	"E.g.: 'add  rd,r1,r2' "
 	^ self opName, '  ',
@@ -1510,17 +1511,17 @@ printString
 		(self class regName: regA), ',', 
 		(self class regName: regB)! !
 
-!RV64R methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:14:26'!
+!RV64Reg3Reg methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:14:26'!
 func3
 
 	self subclassResponsibility ! !
 
-!RV64R methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:14:30'!
+!RV64Reg3Reg methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:14:30'!
 func7
 
 	self subclassResponsibility ! !
 
-!RV64R methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:12:43'!
+!RV64Reg3Reg methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:12:43'!
 instruction
 	
 	^self class
@@ -1531,29 +1532,29 @@ instruction
 		rd: destReg 
 		op: self class opcode! !
 
-!RV64R methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:01:13'!
+!RV64Reg3Reg methodsFor: 'accessing' stamp: 'KenD 5/3/2021 12:01:13'!
 opName
 
 	self subclassResponsibility ! !
 
-!RV64R methodsFor: 'initialization' stamp: 'KenD 5/1/2021 08:48:48'!
+!RV64Reg3Reg methodsFor: 'initialization' stamp: 'KenD 5/1/2021 08:48:48'!
 destReg: regDest regA: reg1 regB: reg2
 
 	super destReg: regDest .
 	regA := reg1.
 	regB := reg2! !
 
-!RV64R class methodsFor: 'accessing' stamp: 'KenD 5/1/2021 16:10:11'!
+!RV64Reg3Reg class methodsFor: 'accessing' stamp: 'KenD 5/1/2021 16:10:11'!
 opcode
 	"Opcode for all R-type instructions"
 	^2r0110011! !
 
-!RV64R class methodsFor: 'instance creation' stamp: 'KenD 5/1/2021 16:07:42'!
+!RV64Reg3Reg class methodsFor: 'instance creation' stamp: 'KenD 5/1/2021 16:07:42'!
 regDest: destReg regA: reg1 regB: reg2
 
 	^self new destReg: destReg regA: reg1 regB: reg2! !
 
-!RV64R class methodsFor: 'instruction assembly' stamp: 'KenD 5/1/2021 09:21:51'!
+!RV64Reg3Reg class methodsFor: 'instruction assembly' stamp: 'KenD 5/1/2021 09:21:51'!
 assembleFunc7: f7 r2: reg2 r1: reg1 func3: f3 rd: destReg op: opcode
 	"[func7 31:25][rs2 24:20][rs1 19:15][func3 14:12][rd 11:7][opcode 6:0]"
 	^(f7 << 25) + (reg2 << 20) + (reg1 << 15) + (f3 << 12) + (destReg << 7) + opcode! !
@@ -1729,17 +1730,17 @@ opName
 
 	^'Xor'! !
 
-!RV64S methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:40:20'!
+!RV64Store methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:40:20'!
 func3
 
 	self subclassResponsibility ! !
 
-!RV64S methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:40:12'!
+!RV64Store methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:40:12'!
 func7
 
 	self shouldNotImplement ! !
 
-!RV64S methodsFor: 'accessing' stamp: 'KenD 5/7/2021 16:04:11'!
+!RV64Store methodsFor: 'accessing' stamp: 'KenD 5/7/2021 16:04:11'!
 instruction
 " [immHi 25:31][baseReg 20:24][destReg 15:19][func3 12:14][immLo 7:11][opcode 6:0]"
 	^(immHi << 25) 
@@ -1749,23 +1750,23 @@ instruction
 	 + (immLo << 7) 
 	 + self opcode! !
 
-!RV64S methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:40:54'!
+!RV64Store methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:40:54'!
 offset
 
 	"Answer assembled immediate"
 	^ (immHi << 5) + immLo ! !
 
-!RV64S methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:41:02'!
+!RV64Store methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:41:02'!
 opName
 
 	self subclassResponsibility ! !
 
-!RV64S methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:41:26'!
+!RV64Store methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:41:26'!
 opcode
 	"Opcode for all S-type instructions"
 	^2r0100011! !
 
-!RV64S methodsFor: 'initialization' stamp: 'KenD 5/7/2021 15:58:53'!
+!RV64Store methodsFor: 'initialization' stamp: 'KenD 5/7/2021 15:58:53'!
 srcReg: rs baseReg: rb  immLo: lo mmHi: hi
 
 	super destReg: rs.
@@ -1773,7 +1774,7 @@ srcReg: rs baseReg: rb  immLo: lo mmHi: hi
 	immLo := lo.
 	immHi := hi! !
 
-!RV64S methodsFor: 'printing' stamp: 'KenD 5/7/2021 15:42:32'!
+!RV64Store methodsFor: 'printing' stamp: 'KenD 5/7/2021 15:42:32'!
 printString
 	"E.g.: 'lb  rd,rBase,offset' "
 	^ self opName, '  ',
@@ -1781,7 +1782,7 @@ printString
 		(self class regName: baseReg ), ', 16r', 
 		(self offset printStringBase: 16)! !
 
-!RV64S class methodsFor: 'instance creation' stamp: 'KenD 5/7/2021 15:38:48'!
+!RV64Store class methodsFor: 'instance creation' stamp: 'KenD 5/7/2021 15:38:48'!
 regSource: rs regBase: rb immediateOffset: immediate12
 	
 	(immediate12 bitAnd: 16rFFF) = immediate12 
@@ -1833,37 +1834,37 @@ opName
 	"StoreWord"
 	^'sw'! !
 
-!RV64U methodsFor: 'initialization' stamp: 'KenD 5/11/2021 09:03:52'!
+!RV64UpperAddr methodsFor: 'initialization' stamp: 'KenD 5/11/2021 09:03:52'!
 destReg: rd immediate: imm20
 
 	super destReg: rd.
 	immediate20 := imm20 ! !
 
-!RV64U methodsFor: 'accessing' stamp: 'KenD 9/5/2022 12:57:19'!
+!RV64UpperAddr methodsFor: 'accessing' stamp: 'KenD 9/5/2022 12:57:19'!
 instruction
 " [imm20 12:31][destReg 7:11][opcode 6:0]"
 	^ (immediate20 << 12) 
 	 + (destReg << 7) 
 	 + self opcode! !
 
-!RV64U methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:07:40'!
+!RV64UpperAddr methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:07:40'!
 opCode
 
 	self subclassResponsibility ! !
 
-!RV64U methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:06:19'!
+!RV64UpperAddr methodsFor: 'accessing' stamp: 'KenD 5/11/2021 09:06:19'!
 upperBits
 " [imm20 12:31][destReg 7:11][opcode 6:0]"
 	^ (immediate20 << 12) ! !
 
-!RV64U methodsFor: 'printing' stamp: 'KenD 9/5/2022 13:03:37'!
+!RV64UpperAddr methodsFor: 'printing' stamp: 'KenD 9/5/2022 13:03:37'!
 printString
 	"E.g.: 'lui  rDest,immediate "
 	^ self opName, '  ',
 		(self class regName: destReg), ', 16r', 
 		(immediate20 printStringBase: 16)! !
 
-!RV64U class methodsFor: 'instance creation' stamp: 'KenD 5/11/2021 09:04:20'!
+!RV64UpperAddr class methodsFor: 'instance creation' stamp: 'KenD 5/11/2021 09:04:20'!
 regDest: rd immediate: imm20
 
  	(imm20 bitAnd: 16rFFFFF) = imm20 
