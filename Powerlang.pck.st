@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 4:28:59 pm'!
+'From Cuis 6.0 [latest update: #5492] on 6 October 2022 at 7:27:42 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 24!
+!provides: 'Powerlang' 1 25!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7131,21 +7131,32 @@ return
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: 0).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/4/2022 17:00:45'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:27:08'!
 add: src1Reg to: src2andDstReg
-	"Here we have to emulate X86 behavior and in addition to addition
-	 we have to set artificial flags register to indicate overflow.
+	"Signed Addition with flagsReg nonZero on overflow
+
 	Note overflow check notes in RISCV-SPEC section 2.4: Integer Computational Instructions
+	Also https://riscv-programming.org/book/riskbook.html 6.9: Detecting Overflow
 	"
 
-	 "set tmp1Reg to 1 if src2andDstReg (operand 2) is negative"
-	memory nextInstructionPut: (RV64SLTI destReg: tmp1Reg regSource: src2andDstReg imm12: 0).
+	 "tmp1Reg to 1 if (regB < 0)"
+	memory nextInstructionPut: 
+		(RV64SLTI destReg: tmp1Reg regSource: src2andDstReg imm12: 0).
 	 "perform the addition that may overflow"
-	memory nextInstructionPut: (RV64ADD regDest: src2andDstReg regA: src1Reg regB: src2andDstReg).
-	"set flagsReg to 1 if result is smaller than src1Ref (operand 1)"
-	memory nextInstructionPut: (RV64SLT regDest: flagsReg regA: src2andDstReg regB: src1Reg).
-	 "set flagsReg to 0 if both operand 2 is negative and result is smaller than operand 2."
-	memory nextInstructionPut: (RV64SUB regDest: flagsReg regA: tmp1Reg regB: flagsReg).
+	memory nextInstructionPut: 
+		(RV64ADD regDest: src2andDstReg regA: src1Reg regB: src2andDstReg).
+	"set flagsReg to 1 if (regA+regB < regA)"
+	memory nextInstructionPut: 
+		(RV64SLT regDest: flagsReg regA: src2andDstReg regB: src1Reg).
+"
+	tmp1   flags   overflow?
+	 0           0             0
+	 1           1             0
+	 0           1             1
+	 1            0            1
+"	"if (tmp1=flags), flagsReg gets zero, else non-zero (1 or -1, but who cares?)"
+	memory nextInstructionPut: 
+		(RV64SUB regDest: flagsReg regA: tmp1Reg regB: flagsReg).
 
 ! !
 
@@ -7154,11 +7165,13 @@ addDouble: source1 to: source2andDest
 	"RV64G registers are already doubles"
 	self add: source1 to: source2andDest! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 13:47:42'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:19:16'!
 addImm: imm to: srcAndDst
-
-	self flag: #UncheckedForOverflow.
-	memory nextInstructionPut: (RV64ADDI regDest: srcAndDst regSource: srcAndDst imm12: imm).
+	"Signed Addition with flagsReg nonZero on overflow"
+	"Just put signed immediate value into a register and use #add:to:"
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: tmp1Reg regSource: zeroReg imm12: imm).
+	self add: tmp1Reg to: srcAndDst.
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 15:42:52'!
