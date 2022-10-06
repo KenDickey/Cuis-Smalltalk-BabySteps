@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 6 October 2022 at 7:27:42 am'!
+'From Cuis 6.0 [latest update: #5492] on 6 October 2022 at 7:37:01 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 25!
+!provides: 'Powerlang' 1 26!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7131,20 +7131,23 @@ return
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: 0).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:27:08'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:36:52'!
 add: src1Reg to: src2andDstReg
 	"Signed Addition with flagsReg nonZero on overflow
 
-	Note overflow check notes in RISCV-SPEC section 2.4: Integer Computational Instructions
-	Also https://riscv-programming.org/book/riskbook.html 6.9: Detecting Overflow
+	Note overflow check notes in 
+	-- https://riscv-programming.org/book/riskbook.html 6.9: Detecting Overflow
+	-- RISCV-SPEC section 2.4: Integer Computational Instructions
 	"
 
 	 "tmp1Reg to 1 if (regB < 0)"
 	memory nextInstructionPut: 
 		(RV64SLTI destReg: tmp1Reg regSource: src2andDstReg imm12: 0).
-	 "perform the addition that may overflow"
+		
+	 "Do the addition that may overflow"
 	memory nextInstructionPut: 
 		(RV64ADD regDest: src2andDstReg regA: src1Reg regB: src2andDstReg).
+		
 	"set flagsReg to 1 if (regA+regB < regA)"
 	memory nextInstructionPut: 
 		(RV64SLT regDest: flagsReg regA: src2andDstReg regB: src1Reg).
@@ -7153,8 +7156,9 @@ add: src1Reg to: src2andDstReg
 	 0           0             0
 	 1           1             0
 	 0           1             1
-	 1            0            1
-"	"if (tmp1=flags), flagsReg gets zero, else non-zero (1 or -1, but who cares?)"
+	 1            0           -1
+	If (tmp1=flags), flagsReg gets zero, else non-zero 
+	(1 or -1, but who cares? Avoid test+jump)"
 	memory nextInstructionPut: 
 		(RV64SUB regDest: flagsReg regA: tmp1Reg regB: flagsReg).
 
