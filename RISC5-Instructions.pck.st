@@ -1,16 +1,16 @@
-'From Cuis 6.0 [latest update: #5492] on 5 October 2022 at 1:06:54 pm'!
+'From Cuis 6.0 [latest update: #5492] on 7 October 2022 at 2:50:51 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 NB: 
 - No Compressed Instruction Format
 - No binary disassembly (but instructions can print themselves)'!
-!provides: 'RISC5-Instructions' 1 34!
+!provides: 'RISC5-Instructions' 1 37!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
 !classDefinition: #RISC5Regs category: #'RISC5-Instructions'!
 SharedPool subclass: #RISC5Regs
 	instanceVariableNames: ''
-	classVariableNames: 'Arg0 Arg1 Arg2 Arg3 Arg4 Arg5 Arg6 Arg7 F0 F1 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F2 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F3 F30 F31 F4 F5 F6 F7 F8 F9 FArg0 FArg1 FArg2 FArg3 FArg4 FArg5 FArg6 FArg7 FSav0 FSav1 FSav10 FSav11 FSav2 FSav3 FSav4 FSav5 FSav6 FSav7 FSav8 FSav9 FTmp0 FTmp1 FTmp10 FTmp11 FTmp2 FTmp3 FTmp4 FTmp5 FTmp6 FTmp7 FTmp8 FTmp9 FramePtr GlobalPtr ReturnAddr Sav0 Sav1 Sav10 Sav11 Sav2 Sav3 Sav4 Sav5 Sav6 Sav7 Sav8 Sav9 StackPtr ThreadPtr Tmp0 Tmp1 Tmp2 Tmp3 Tmp4 Tmp5 Tmp6 X0 X1 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X2 X20 X21 X22 X23 X24 X25 X26 X27 X28 X29 X3 X30 X31 X4 X5 X6 X7 X8 X9 Zero'
+	classVariableNames: 'Arg0 Arg1 Arg2 Arg3 Arg4 Arg5 Arg6 Arg7 DYNamic F0 F1 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F2 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F3 F30 F31 F4 F5 F6 F7 F8 F9 FArg0 FArg1 FArg2 FArg3 FArg4 FArg5 FArg6 FArg7 FSav0 FSav1 FSav10 FSav11 FSav2 FSav3 FSav4 FSav5 FSav6 FSav7 FSav8 FSav9 FTmp0 FTmp1 FTmp10 FTmp11 FTmp2 FTmp3 FTmp4 FTmp5 FTmp6 FTmp7 FTmp8 FTmp9 FramePtr GlobalPtr ReturnAddr RoundDown RoundNearestToEven RoundNearestToMax RoundTwordZero RoundUp Sav0 Sav1 Sav10 Sav11 Sav2 Sav3 Sav4 Sav5 Sav6 Sav7 Sav8 Sav9 SizeDouble SizeHalf SizeQuad SizeSingle StackPtr ThreadPtr Tmp0 Tmp1 Tmp2 Tmp3 Tmp4 Tmp5 Tmp6 X0 X1 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X2 X20 X21 X22 X23 X24 X25 X26 X27 X28 X29 X3 X30 X31 X4 X5 X6 X7 X8 X9 Zero'
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
 !classDefinition: 'RISC5Regs class' category: #'RISC5-Instructions'!
@@ -247,6 +247,16 @@ RISC5Instructions subclass: #RV64Load
 RV64Load class
 	instanceVariableNames: ''!
 
+!classDefinition: #RV64FLD category: #'RISC5-Instructions'!
+RV64Load subclass: #RV64FLD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FLD class' category: #'RISC5-Instructions'!
+RV64FLD class
+	instanceVariableNames: ''!
+
 !classDefinition: #RV64LB category: #'RISC5-Instructions'!
 RV64Load subclass: #RV64LB
 	instanceVariableNames: ''
@@ -357,6 +367,56 @@ RV64Reg3Reg subclass: #RV64AND
 RV64AND class
 	instanceVariableNames: ''!
 
+!classDefinition: #RV64DFloatReg3Reg category: #'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DFloatReg3Reg
+	instanceVariableNames: 'roundingMode'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DFloatReg3Reg class' category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FADD category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FADD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FADD class' category: #'RISC5-Instructions'!
+RV64FADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FDIV category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FDIV
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FDIV class' category: #'RISC5-Instructions'!
+RV64FDIV class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMUL category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FMUL
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMUL class' category: #'RISC5-Instructions'!
+RV64FMUL class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FSUB category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FSUB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FSUB class' category: #'RISC5-Instructions'!
+RV64FSUB class
+	instanceVariableNames: ''!
+
 !classDefinition: #RV64OR category: #'RISC5-Instructions'!
 RV64Reg3Reg subclass: #RV64OR
 	instanceVariableNames: ''
@@ -437,6 +497,56 @@ RV64Reg3Reg subclass: #RV64XOR
 RV64XOR class
 	instanceVariableNames: ''!
 
+!classDefinition: #RV64Reg4Reg category: #'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Reg4Reg
+	instanceVariableNames: 'regA regB regC roundMode precision'
+	classVariableNames: 'DYN Dfmt Hfmt Qfmr RDN RME RMM RTZ RUP Sfmt'
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64Reg4Reg class' category: #'RISC5-Instructions'!
+RV64Reg4Reg class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMADD category: #'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FMADD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMADD class' category: #'RISC5-Instructions'!
+RV64FMADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMSUB category: #'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FMSUB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMSUB class' category: #'RISC5-Instructions'!
+RV64FMSUB class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FNMADD category: #'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FNMADD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FNMADD class' category: #'RISC5-Instructions'!
+RV64FNMADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FNMSUB category: #'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FNMSUB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FNMSUB class' category: #'RISC5-Instructions'!
+RV64FNMSUB class
+	instanceVariableNames: ''!
+
 !classDefinition: #RV64Store category: #'RISC5-Instructions'!
 RISC5Instructions subclass: #RV64Store
 	instanceVariableNames: 'baseReg immLo immHi'
@@ -445,6 +555,16 @@ RISC5Instructions subclass: #RV64Store
 	category: 'RISC5-Instructions'!
 !classDefinition: 'RV64Store class' category: #'RISC5-Instructions'!
 RV64Store class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FSD category: #'RISC5-Instructions'!
+RV64Store subclass: #RV64FSD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FSD class' category: #'RISC5-Instructions'!
+RV64FSD class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SB category: #'RISC5-Instructions'!
@@ -605,6 +725,9 @@ Instruction Pattern:
 Nota Bene: immediate12 value is split:
   immHi is upper 7 bits; immLo is lower 5 bits!
 
+!RV64FLD commentStamp: '<historical>' prior: 0!
+load (8 byte) Floatingpoint Double into register!
+
 !RV64LB commentStamp: '<historical>' prior: 0!
 load signed Byte into register!
 
@@ -612,7 +735,7 @@ load signed Byte into register!
 load UNsigned Byte into register!
 
 !RV64LD commentStamp: '<historical>' prior: 0!
-load (8 byte) signed DoubleWord into register!
+load (8 byte) Floatingpoint Double into register!
 
 !RV64LH commentStamp: '<historical>' prior: 0!
 load (2 byte) signed HalfWord into register!
@@ -627,12 +750,26 @@ load (4 byte) signed Word into register!
 load (4 byte) UNsigned Word into register!
 
 !RV64Reg3Reg commentStamp: '<historical>' prior: 0!
-R => 3 Register opcode; Register to Register
+R => 4 Register opcode; Register to Register
 
   destReg := regA OP regB
 
+
+
 Instruction Pattern:
-  [func7][regB][regA][func3][destReg][opcode]!
+  [regC][fomat][regB][regA][roundMode][destReg][opcode]!
+
+!RV64FADD commentStamp: '<historical>' prior: 0!
+add FloatingPoint Numbers!
+
+!RV64FDIV commentStamp: '<historical>' prior: 0!
+Divide FloatingPoint Numbers!
+
+!RV64FMUL commentStamp: '<historical>' prior: 0!
+Multiply FloatingPoint Numbers!
+
+!RV64FSUB commentStamp: '<historical>' prior: 0!
+subtract FloatingPoint Numbers!
 
 !RV64OR commentStamp: '<historical>' prior: 0!
 Inclusive OR {distinguish XOR)!
@@ -661,6 +798,28 @@ result <= src2 - src1!
 !RV64XOR commentStamp: '<historical>' prior: 0!
 eXclusive OR {distinguish OR)!
 
+!RV64Reg4Reg commentStamp: '<historical>' prior: 0!
+R => 4 Register opcode; Register to Register
+
+  destReg := regA MulOP regB ArithOp regC
+
+E.g. for "fused multiply-add"
+
+Instruction Pattern:
+  [regC][fomat][regB][regA][roundMode][destReg][opcode]!
+
+!RV64FMADD commentStamp: '<historical>' prior: 0!
+Fused Multiply-Add!
+
+!RV64FMSUB commentStamp: '<historical>' prior: 0!
+Fused Multiply-Subtract!
+
+!RV64FNMADD commentStamp: '<historical>' prior: 0!
+Fused Negative-Multiply-Add!
+
+!RV64FNMSUB commentStamp: '<historical>' prior: 0!
+Fused Negative-Multiply-Subtract!
+
 !RV64Store commentStamp: '<historical>' prior: 0!
 Store  -- "NB: 'destReg' used for 'sourceReg"
 
@@ -668,6 +827,9 @@ Store  -- "NB: 'destReg' used for 'sourceReg"
 
 Instruction Pattern:
   [immedHi][regSource][regBase][func3][immLo][opcode]!
+
+!RV64FSD commentStamp: '<historical>' prior: 0!
+Store 8 byte DoubleFloat into memory!
 
 !RV64SB commentStamp: '<historical>' prior: 0!
 Store Byte!
@@ -697,7 +859,7 @@ Load Upper Immediate
 Instruction Pattern:
   [immed20][regDest][opcode]!
 
-!RISC5Regs class methodsFor: 'class initialization' stamp: 'KenD 10/4/2022 10:17:50'!
+!RISC5Regs class methodsFor: 'class initialization' stamp: 'KenD 10/7/2022 14:18:25'!
 initialize
 "
 	self initialize
@@ -770,6 +932,21 @@ initialize
 	F29 := FTmp9 := 29.
 	F30 := FTmp10 := 30.
 	F31 := FTmp11 := 31.
+	
+	"Float Rounding Modes"
+	RoundNearestToEven := 2r000. "RME Round to Nearest, ties to Even"
+	RoundTwordZero := 2r001. "RTZ Round Towards Zero"
+	RoundDown := 2r010. "RDN Round DowN (toward -infinity)"
+	RoundUp := 2r011. "RUP Round UP (towards +infinity)"
+	RoundNearestToMax := 2r100. "RMM Round to nearest, ties to Max Magnitude"
+	DYNamic := 2r111. "DYN In instruction's #rm field, select dynamic; else illegal"
+	"2r101 & 2r110 reserved for future use"
+	
+	"Float Data Formats"
+	SizeSingle  := 2r00. "Single Precision"
+	SizeDouble := 2r01. "Double Precision"
+	SizeHalf := 2r10. "Half Precision"
+	SizeQuad := 2r11. "Quad Precision"
 ! !
 
 !RISC5Instructions methodsFor: 'initialization' stamp: 'KenD 10/5/2022 11:37:08'!
@@ -1443,6 +1620,21 @@ regDest: rd regBase: rb immediateOffset: immediate12
 			baseReg: rb 
 			immedOffset: immediate12 ! !
 
+!RV64FLD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:50:55'!
+func3
+
+	^ 2r010! !
+
+!RV64FLD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:48:31'!
+opName
+
+	^'Fld'! !
+
+!RV64FLD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:49:25'!
+opcode
+
+	^ 2r0000111! !
+
 !RV64LB methodsFor: 'accessing' stamp: 'KenD 5/4/2021 11:59:59'!
 func3
 
@@ -1620,6 +1812,72 @@ opName
 
 	^'and'! !
 
+!RV64DFloatReg3Reg methodsFor: 'initialization' stamp: 'KenD 10/7/2022 14:27:32'!
+destReg: destR regA: reg1 regB: reg2 roundingMode: rm
+
+	super destReg: destR regA: reg1 regB: reg2.
+	roundingMode := rm.! !
+
+!RV64DFloatReg3Reg methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:44:05'!
+func3
+
+	^ roundingMode! !
+
+!RV64DFloatReg3Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:38:52'!
+regDest: destReg regA: reg1 regB: reg2
+
+	^self regDest: destReg regA: reg1 regB: reg2 roundingMode: RoundNearestToEven! !
+
+!RV64DFloatReg3Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:38:12'!
+regDest: destReg regA: reg1 regB: reg2 roundingMode: rm
+
+	^self new destReg: destReg regA: reg1 regB: reg2 roundingMode: rm! !
+
+!RV64DFloatReg3Reg class methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:50:44'!
+opcode
+	"Opcode for all floating point R-format instructions"
+	^ 2r1010011! !
+
+!RV64FADD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:46:32'!
+func7
+
+	^ 2r0000001! !
+
+!RV64FADD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:28:40'!
+opName
+
+	^'Fadd'! !
+
+!RV64FDIV methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:47:50'!
+func7
+
+	^ 2r0001101! !
+
+!RV64FDIV methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:42:50'!
+opName
+
+	^'Fdiv'! !
+
+!RV64FMUL methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:47:28'!
+func7
+
+	^ 2r0001001! !
+
+!RV64FMUL methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:34:37'!
+opName
+
+	^'Fmul'! !
+
+!RV64FSUB methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:46:52'!
+func7
+
+	^ 2r0000101! !
+
+!RV64FSUB methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:32:27'!
+opName
+
+	^'Fsub'! !
+
 !RV64OR methodsFor: 'accessing' stamp: 'KenD 5/3/2021 14:13:29'!
 func3
 
@@ -1740,6 +1998,90 @@ opName
 
 	^'Xor'! !
 
+!RV64Reg4Reg methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:19:54'!
+instruction
+" [regC31:27][fomat26:25][regB24:20][regA19:15][roundMode14:12][destReg11:7][opcode6:0]"
+	^  (regC << 27)
+	 + (precision << 25) 
+	 + (regB << 20)
+	 + (regA << 15) 
+	 + (roundMode << 12) 
+	 + (destReg << 7) 
+	 + self opcode! !
+
+!RV64Reg4Reg methodsFor: 'initialization' stamp: 'KenD 10/7/2022 12:10:24'!
+destReg: destR regA: reg1 regB: reg2 regC: reg3 roundMode: rm format: fmt
+
+	destReg := destR.
+	regA := reg1.
+	regB := reg2.
+	regC := reg3.
+	roundMode := rm.
+	precision := fmt.! !
+
+!RV64Reg4Reg class methodsFor: 'accessing' stamp: 'KenD 10/7/2022 11:43:29'!
+opcode
+
+	self subclassResponsibility ! !
+
+!RV64Reg4Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:19:52'!
+regDest: destReg regA: reg1 regB: reg2 regC: reg3
+
+	^self new regDest: destReg regA: reg1 regB: reg2 regC: reg3 
+		roundMode: RoundNearestToEven format: SizeDouble! !
+
+!RV64Reg4Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:20:05'!
+regDest: destReg regA: reg1 regB: reg2 regC: reg3 roundMode: rm
+
+	^self new regDest: destReg regA: reg1 regB: reg2 regC: reg3 
+		roundMode: rm format: SizeDouble! !
+
+!RV64Reg4Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:20:15'!
+regDest: destReg regA: reg1 regB: reg2 regC: reg3 roundMode: rm format: fmt
+
+	^self new destReg: destReg regA: reg1 regB: reg2 regC: reg3 
+		roundMode: rm format: fmt! !
+
+!RV64FMADD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:23:04'!
+opName
+
+	^'FMulAdd'! !
+
+!RV64FMADD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:23:57'!
+opcode
+
+	^ 2r100011! !
+
+!RV64FMSUB methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:29:22'!
+opName
+
+	^ 'FMulSub'! !
+
+!RV64FMSUB methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:29:07'!
+opcode
+
+	^ 2r1001011! !
+
+!RV64FNMADD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:31:06'!
+opName
+
+	^'FNegMulAdd'! !
+
+!RV64FNMADD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:31:56'!
+opcode
+
+	^ 2r100111! !
+
+!RV64FNMSUB methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:33:07'!
+opName
+
+	^'FNegMulSub'! !
+
+!RV64FNMSUB methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:33:38'!
+opcode
+
+	^ 2r1001011! !
+
 !RV64Store methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:40:20'!
 func3
 
@@ -1803,6 +2145,21 @@ regSource: rs regBase: rb immediateOffset: immediate12
 			baseReg: rb 
 			immLo: (immediate12 bitAnd: 2r000000011111) 
 			immHi: ((immediate12 bitAnd: 2r111111100000) >> 5)! !
+
+!RV64FSD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:53:32'!
+func3
+
+	^ 2r010! !
+
+!RV64FSD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:52:22'!
+opName
+
+	^ 'Fsd'! !
+
+!RV64FSD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:53:05'!
+opcode
+
+	^ 2r0100111! !
 
 !RV64SB methodsFor: 'accessing' stamp: 'KenD 5/7/2021 15:50:00'!
 func3
