@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 6 October 2022 at 7:37:01 am'!
+'From Cuis 6.0 [latest update: #5492] on 6 October 2022 at 4:49:55 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 26!
+!provides: 'Powerlang' 1 27!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7096,6 +7096,24 @@ noOp: count
 			(RV64ADDI regDest: RegZero regSource: RegZero imm12: 0)
 	]! !
 
+!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/6/2022 16:47:25'!
+addDouble: floatSource1 to: source2andDest
+	self flag: #FMADD.
+	self shouldBeImplemented! !
+
+!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/6/2022 16:46:54'!
+convert: intReg toDouble: floatReg
+
+	self flag: #FMV.
+	self shouldBeImplemented ! !
+
+!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/6/2022 16:47:09'!
+moveDouble: floatRegSrc to: intRegDest
+	"move from float register floatRegSrc into general purpose intRegDest"
+	self flag: #FMV.
+	self shouldBeImplemented .
+! !
+
 !RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 15:56:52'!
 initialize
 
@@ -7164,11 +7182,6 @@ add: src1Reg to: src2andDstReg
 
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:40:43'!
-addDouble: source1 to: source2andDest
-	"RV64G registers are already doubles"
-	self add: source1 to: source2andDest! !
-
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:19:16'!
 addImm: imm to: srcAndDst
 	"Signed Addition with flagsReg nonZero on overflow"
@@ -7205,6 +7218,21 @@ and: srcAndDstReg withImm: imm
 
 	memory nextInstructionPut: 
 		(RV64ANDI destReg: srcAndDstReg regSource: srcAndDstReg imm12: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/6/2022 16:40:03'!
+compare: regA with: regB
+	self flag: #CheckSemantics.
+	memory nextInstructionPut: 
+		(RV64SUB regDest: flagsReg regA: regA regB: regB).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/6/2022 16:42:08'!
+compare: reg1 withImm: imm
+	"Just use a register"
+	memory nextInstructionPut: 
+		(RV64ANDI destReg: tmp1Reg regSource: zeroReg imm12: imm).
+	self compare: reg1 with: tmp1Reg 
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:30:08'!
@@ -7253,6 +7281,25 @@ shiftRightArithmetic: srcAndDstReg byImm: imm
 	"arithmetic shiift right"
 	memory nextInstructionPut: 
 		(RV64SRAI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+! !
+
+!RV64GCodeGenerator methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 11:00:12'!
+regFlags
+	^ flagsReg
+! !
+
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:49:17'!
+clearReg: reg
+
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: reg regSource: RegZero imm12: 0).
+	! !
+
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:04:50'!
+move: srcReg to: dstReg
+
+	memory nextInstructionPut:
+		(RV64ADDI regDest: dstReg regSource: srcReg imm12: 0).
 ! !
 
 !RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:52:32'!
@@ -7365,25 +7412,6 @@ syscall: callNumber arg: reg0 arg: reg1 arg: reg2 arg: reg3 arg: reg4 arg: reg5
 	memory nextInstructionPut: (RV64ECALL new).
 	self move: 10 to: RegR.  "Result from A0 into RegR"
 	 ! !
-
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:49:17'!
-clearReg: reg
-
-	memory nextInstructionPut: 
-		(RV64ADDI regDest: reg regSource: RegZero imm12: 0).
-	! !
-
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:04:50'!
-move: srcReg to: dstReg
-
-	memory nextInstructionPut:
-		(RV64ADDI regDest: dstReg regSource: srcReg imm12: 0).
-! !
-
-!RV64GCodeGenerator methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 11:00:12'!
-regFlags
-	^ flagsReg
-! !
 
 !RV64GCodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
 new
