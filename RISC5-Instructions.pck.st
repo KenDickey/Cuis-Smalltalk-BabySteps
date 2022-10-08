@@ -1,9 +1,9 @@
-'From Cuis 6.0 [latest update: #5492] on 7 October 2022 at 2:50:51 pm'!
+'From Cuis 6.0 [latest update: #5492] on 8 October 2022 at 2:59:38 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 NB: 
 - No Compressed Instruction Format
 - No binary disassembly (but instructions can print themselves)'!
-!provides: 'RISC5-Instructions' 1 37!
+!provides: 'RISC5-Instructions' 1 39!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -367,6 +367,86 @@ RV64Reg3Reg subclass: #RV64AND
 RV64AND class
 	instanceVariableNames: ''!
 
+!classDefinition: #RV64DFloatReg2Reg category: #'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DFloatReg2Reg
+	instanceVariableNames: 'roundingMode'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DFloatReg2Reg class' category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTD2I category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTD2I
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTD2I class' category: #'RISC5-Instructions'!
+RV64FCVTD2I class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTD2UI category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTD2UI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTD2UI class' category: #'RISC5-Instructions'!
+RV64FCVTD2UI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTI2D category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTI2D
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTI2D class' category: #'RISC5-Instructions'!
+RV64FCVTI2D class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTUI2D category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTUI2D
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTUI2D class' category: #'RISC5-Instructions'!
+RV64FCVTUI2D class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMVD2IR category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FMVD2IR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMVD2IR class' category: #'RISC5-Instructions'!
+RV64FMVD2IR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMVI2DR category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FMVI2DR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMVI2DR class' category: #'RISC5-Instructions'!
+RV64FMVI2DR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FSQRT category: #'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FSQRT
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FSQRT class' category: #'RISC5-Instructions'!
+RV64FSQRT class
+	instanceVariableNames: ''!
+
 !classDefinition: #RV64DFloatReg3Reg category: #'RISC5-Instructions'!
 RV64Reg3Reg subclass: #RV64DFloatReg3Reg
 	instanceVariableNames: 'roundingMode'
@@ -395,6 +475,56 @@ RV64DFloatReg3Reg subclass: #RV64FDIV
 	category: 'RISC5-Instructions'!
 !classDefinition: 'RV64FDIV class' category: #'RISC5-Instructions'!
 RV64FDIV class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FEQ category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FEQ
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FEQ class' category: #'RISC5-Instructions'!
+RV64FEQ class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FLE category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FLE
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FLE class' category: #'RISC5-Instructions'!
+RV64FLE class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FLT category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FLT
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FLT class' category: #'RISC5-Instructions'!
+RV64FLT class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMAX category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FMAX
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMAX class' category: #'RISC5-Instructions'!
+RV64FMAX class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMIN category: #'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FMIN
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMIN class' category: #'RISC5-Instructions'!
+RV64FMIN class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64FMUL category: #'RISC5-Instructions'!
@@ -759,11 +889,87 @@ R => 4 Register opcode; Register to Register
 Instruction Pattern:
   [regC][fomat][regB][regA][roundMode][destReg][opcode]!
 
+!RV64DFloatReg2Reg commentStamp: '<historical>' prior: 0!
+dest := Operation( regA )!
+
+!RV64FCVTD2I commentStamp: '<historical>' prior: 0!
+Convert a DoubleFloat to a signed Integer
+
+Official opcode is FCVT.D.L which is confusing
+
+Nota Bene: Does NOT copy bits into register (See FMV)!
+
+!RV64FCVTD2UI commentStamp: '<historical>' prior: 0!
+Convert a DoubleFloat to an UNsigned Integer
+
+Official opcode is FCVT.D.LU which is confusing
+
+Nota Bene: Does NOT copy bits into register (See FMV)!
+
+!RV64FCVTI2D commentStamp: '<historical>' prior: 0!
+Convert a signed Integer into a DoubleFloat
+
+Official opcode is FCVT.D.L which is confusing
+
+Nota Bene: Does NOT copy bits into register (See FMV)!
+
+!RV64FCVTUI2D commentStamp: '<historical>' prior: 0!
+Convert an Long UNsigned Integer into a DoubleFloat
+
+Official opcode is FCVT.D.LU which is confusing
+
+Nota Bene: Does NOT copy bits into register (See FMV)!
+
+!RV64FMVD2IR commentStamp: '<historical>' prior: 0!
+MoVe an UNCHANGED bit value 
+  from DoubleFloat register regA 
+  into Integer register regDest
+
+Official opcode is FMV.X.D which is confusing.
+
+Nota Bene: NOT A CONVERSION (See FCVT*)!
+
+!RV64FMVI2DR commentStamp: '<historical>' prior: 0!
+MoVe an UNCHANGED bit value 
+  from Integer register regA 
+  into DoubleFloat register regDest
+
+Official opcode is FMV.D.X which is confusing
+
+Nota Bene: NOT A CONVERSION (See FCVT*)!
+
+!RV64FSQRT commentStamp: '<historical>' prior: 0!
+Floating point square root!
+
 !RV64FADD commentStamp: '<historical>' prior: 0!
 add FloatingPoint Numbers!
 
 !RV64FDIV commentStamp: '<historical>' prior: 0!
 Divide FloatingPoint Numbers!
+
+!RV64FEQ commentStamp: '<historical>' prior: 0!
+If Floatings in RegA and RegB compare EQual
+  write 1 into integer destReg,
+  else 0.
+Result is 0 is either regA or regB contains a NAN!
+
+!RV64FLE commentStamp: '<historical>' prior: 0!
+If float in RegA is Less than or Equal to float in RegB
+  write 1 into integer destReg,
+  else 0.
+Result is 0 is either regA or regB contains a NAN!
+
+!RV64FLT commentStamp: '<historical>' prior: 0!
+If float in RegA is Less Than to float in RegB
+  write 1 into integer destReg,
+  else 0.
+Result is 0 is either regA or regB contains a NAN!
+
+!RV64FMAX commentStamp: '<historical>' prior: 0!
+Floats: Result is max( regA,  regB )!
+
+!RV64FMIN commentStamp: '<historical>' prior: 0!
+Floats: Result is min( regA,  regB )!
 
 !RV64FMUL commentStamp: '<historical>' prior: 0!
 Multiply FloatingPoint Numbers!
@@ -1812,6 +2018,204 @@ opName
 
 	^'and'! !
 
+!RV64DFloatReg2Reg class methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:38:57'!
+defaultRoundingMode
+
+	^ RoundNearestToEven "IEEE spec default"! !
+
+!RV64FCVTD2I methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:35:42'!
+func3
+
+	^ roundingMode ! !
+
+!RV64FCVTD2I methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:36:41'!
+func7
+
+	^ 2r1100001! !
+
+!RV64FCVTD2I methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:35:26'!
+opName
+
+	^ 'FcvtD2I'! !
+
+!RV64FCVTD2I class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 14:39:55'!
+regDest: destReg regA: reg1 roundingMode: rm
+
+	^self new destReg: destReg regA: reg1 
+		regB: 2r00010 
+		roundingMode: rm! !
+
+!RV64FCVTD2UI methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:38:24'!
+func3
+
+	^ roundingMode ! !
+
+!RV64FCVTD2UI methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:38:17'!
+func7
+
+	^ 2r1100001! !
+
+!RV64FCVTD2UI methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:38:07'!
+opName
+
+	^ 'FcvtD2UI'! !
+
+!RV64FCVTD2UI class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 14:40:26'!
+regDest: destReg regA: reg1 roundingMode: rm
+
+	^self new destReg: destReg regA: reg1 
+		regB: 2r00011 
+		roundingMode: rm! !
+
+!RV64FCVTI2D methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:04:08'!
+func3
+
+	^ roundingMode ! !
+
+!RV64FCVTI2D methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:30:35'!
+func7
+
+	^ 2r1101001! !
+
+!RV64FCVTI2D methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:33:38'!
+opName
+
+	^ 'FcvtI2D' "Integer 2 DoubleFloat"! !
+
+!RV64FCVTI2D class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 14:09:28'!
+regDest: destReg regA: reg1 roundingMode: rm
+
+	^self new destReg: destReg regA: reg1 
+		regB: 2r00010 
+		roundingMode: rm! !
+
+!RV64FCVTUI2D methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:03:59'!
+func3
+
+	^ roundingMode ! !
+
+!RV64FCVTUI2D methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:30:28'!
+func7
+
+	^ 2r1101001! !
+
+!RV64FCVTUI2D methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:33:30'!
+opName
+
+	^ 'FcvtUI2D' "Unsigned Integer 2 DoubleFloat"! !
+
+!RV64FCVTUI2D class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 14:09:10'!
+regDest: destReg regA: reg1 roundingMode: rm
+
+	^self new destReg: destReg regA: reg1 
+		regB: 2r00011 
+		roundingMode: rm! !
+
+!RV64FMVD2IR methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:21:08'!
+func3
+
+	^ 2r000! !
+
+!RV64FMVD2IR methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:22:15'!
+func7
+
+	^ 2r1110001! !
+
+!RV64FMVD2IR methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:53:39'!
+opName
+
+	^ 'FmvD2I' "Copy bits from DoubleFloat src to Integer dest register"! !
+
+!RV64FMVD2IR class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 14:58:48'!
+regDest: destReg regA: reg1
+
+	^self new destReg: destReg regA: reg1 
+		regB: Zero
+		roundingMode: 2r000! !
+
+!RV64FMVI2DR methodsFor: 'initialization' stamp: 'KenD 10/8/2022 13:32:17'!
+destReg: destR regA: reg1
+
+	"Nota Bene: reg2 specifier MUST BE ZERO"
+	super destReg: destR regA: reg1 regB: Zero.
+	roundingMode := 0.! !
+
+!RV64FMVI2DR methodsFor: 'initialization' stamp: 'KenD 10/8/2022 14:56:50'!
+destReg: destR regA: reg1 regB: reg2
+
+	"Nota Bene: reg2 specifier MUST BE ZERO"
+	super destReg: destR regA: reg1 regB: Zero.
+	roundingMode := 0.! !
+
+!RV64FMVI2DR methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:29:16'!
+func3
+
+	^ 2r000! !
+
+!RV64FMVI2DR methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:21:42'!
+func7
+
+	^ 2r1111001! !
+
+!RV64FMVI2DR methodsFor: 'accessing' stamp: 'KenD 10/8/2022 14:52:19'!
+opName
+
+	^ 'FmvI2D' "Copy Integer Reg bits into DoubleFloat destination register"! !
+
+!RV64FMVI2DR class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 14:59:24'!
+regDest: destReg regA: reg1
+
+	^self new destReg: destReg regA: reg1 
+		regB: Zero
+		roundingMode: 2r000! !
+
+!RV64FSQRT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:45:45'!
+func3
+
+	^ roundingMode ! !
+
+!RV64FSQRT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:45:20'!
+func7
+
+	^ 2r0101100! !
+
+!RV64FSQRT methodsFor: 'initialization' stamp: 'KenD 10/8/2022 13:37:53'!
+destReg: destR regA: reg1
+
+	"Nota Bene: reg2 specifier MUST BE ZERO"
+	super destReg: destR regA: reg1 regB: Zero.
+	roundingMode := self class defaultRoundingMode.! !
+
+!RV64FSQRT methodsFor: 'initialization' stamp: 'KenD 10/8/2022 08:51:13'!
+destReg: destR regA: reg1 regB: reg2 roundingMode: rm
+
+	"Nota Bene: reg2 specifier MUST BE ZERO"
+	super destReg: destR regA: reg1 regB: reg2.
+	roundingMode := rm.! !
+
+!RV64FSQRT class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 14:07:36'!
+regDest: destReg regA: reg1
+
+	^self regDest: destReg regA: reg1 
+		regB: Zero 
+		roundingMode: self class defaultRoundingMode ! !
+
+!RV64FSQRT class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 08:49:37'!
+regDest: destReg regA: reg1 regB: reg2 roundingMode: rm
+
+	(reg2 isZero) ifFalse: [self error: 'FSQRT has only source and dest registers'].
+	^self new destReg: destReg regA: reg1 regB: reg2 roundingMode: rm! !
+
+!RV64FSQRT class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 08:48:05'!
+regDest: destReg regA: reg1 roundingMode: rm
+
+	^self new destReg: destReg regA: reg1 regB: Zero roundingMode: rm! !
+
+!RV64FSQRT class methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:47:09'!
+opcode
+	"Opcode for all floating point R-format instructions"
+	^ 2r1010011! !
+
 !RV64DFloatReg3Reg methodsFor: 'initialization' stamp: 'KenD 10/7/2022 14:27:32'!
 destReg: destR regA: reg1 regB: reg2 roundingMode: rm
 
@@ -1823,10 +2227,10 @@ func3
 
 	^ roundingMode! !
 
-!RV64DFloatReg3Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:38:52'!
+!RV64DFloatReg3Reg class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 13:42:49'!
 regDest: destReg regA: reg1 regB: reg2
 
-	^self regDest: destReg regA: reg1 regB: reg2 roundingMode: RoundNearestToEven! !
+	^self regDest: destReg regA: reg1 regB: reg2 roundingMode: self class defaultRoundingMode! !
 
 !RV64DFloatReg3Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:38:12'!
 regDest: destReg regA: reg1 regB: reg2 roundingMode: rm
@@ -1857,6 +2261,81 @@ func7
 opName
 
 	^'Fdiv'! !
+
+!RV64FEQ methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:37:30'!
+func3
+
+	^ 2r010! !
+
+!RV64FEQ methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:37:06'!
+func7
+
+	^ 2r1010000! !
+
+!RV64FEQ methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:36:13'!
+opName
+
+	^ 'Feq'! !
+
+!RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:22'!
+func3
+
+	^ 2r001! !
+
+!RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:39'!
+func7
+
+	^ 2r1010000! !
+
+!RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:06'!
+opName
+
+	^ 'Flt'! !
+
+!RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:39:17'!
+func3
+
+	^ 2r000! !
+
+!RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:49'!
+func7
+
+	^ 2r1010000! !
+
+!RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:39:38'!
+opName
+
+	^ 'Flt'! !
+
+!RV64FMAX methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:51:40'!
+func3
+
+	^ 2r001! !
+
+!RV64FMAX methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:52:24'!
+func7
+
+	^ 2r0010101! !
+
+!RV64FMAX methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:50:24'!
+opName
+	
+	^ 'Fmax'! !
+
+!RV64FMIN methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:51:19'!
+func3
+
+	^ 2r000! !
+
+!RV64FMIN methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:52:33'!
+func7
+
+	^ 2r0010101! !
+
+!RV64FMIN methodsFor: 'accessing' stamp: 'KenD 10/8/2022 13:50:42'!
+opName
+	
+	^ 'Fmin'! !
 
 !RV64FMUL methodsFor: 'accessing' stamp: 'KenD 10/7/2022 14:47:28'!
 func7
@@ -2024,11 +2503,11 @@ opcode
 
 	self subclassResponsibility ! !
 
-!RV64Reg4Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:19:52'!
+!RV64Reg4Reg class methodsFor: 'instance creation' stamp: 'KenD 10/8/2022 13:40:35'!
 regDest: destReg regA: reg1 regB: reg2 regC: reg3
 
 	^self new regDest: destReg regA: reg1 regB: reg2 regC: reg3 
-		roundMode: RoundNearestToEven format: SizeDouble! !
+		roundMode: self class defaultRoundingMode format: SizeDouble! !
 
 !RV64Reg4Reg class methodsFor: 'instance creation' stamp: 'KenD 10/7/2022 14:20:05'!
 regDest: destReg regA: reg1 regB: reg2 regC: reg3 roundMode: rm
