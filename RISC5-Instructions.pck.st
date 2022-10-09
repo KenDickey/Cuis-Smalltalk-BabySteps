@@ -1,9 +1,14 @@
-'From Cuis 6.0 [latest update: #5492] on 8 October 2022 at 2:59:38 pm'!
+'From Cuis 6.0 [latest update: #5492] on 9 October 2022 at 8:52:02 am'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
-NB: 
-- No Compressed Instruction Format
-- No binary disassembly (but instructions can print themselves)'!
-!provides: 'RISC5-Instructions' 1 39!
+
+NB: Not all instructions supported
+ - No Compressed Instruction Format (all instructions 32 bits wide)
+ - No binary disassembly (but instructions can print themselves)
+ - Assumption of 8 byte Integers and DoubleFloats 
+ - Some mnemonics changed for clarification
+     E.g. Move value from DoubleFloat register into Integer register
+	is ''FmvD2I'' not ''FMV.X.D'''!
+!provides: 'RISC5-Instructions' 1 41!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
