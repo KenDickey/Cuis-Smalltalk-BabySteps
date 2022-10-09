@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 6 October 2022 at 4:49:55 pm'!
+'From Cuis 6.0 [latest update: #5492] on 9 October 2022 at 11:14:38 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 27!
+!provides: 'Powerlang' 1 28!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7096,22 +7096,33 @@ noOp: count
 			(RV64ADDI regDest: RegZero regSource: RegZero imm12: 0)
 	]! !
 
-!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/6/2022 16:47:25'!
+!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/9/2022 10:53:32'!
 addDouble: floatSource1 to: source2andDest
-	self flag: #FMADD.
-	self shouldBeImplemented! !
 
-!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/6/2022 16:46:54'!
+	memory nextInstructionPut: 
+		(RV64FADD regDest: source2andDest regA: floatSource1 regB: source2andDest 
+					roundingMode: self class defaultRoundingMode).! !
+
+!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/9/2022 11:00:27'!
 convert: intReg toDouble: floatReg
+	"Convert signed integer from int register intReg into DoubleFLoat floatReg"
+	"NB: does do coercion; NOT a bit copy"
+	memory nextInstructionPut: 
+		(RV64FCVTI2D regDest: floatReg regA: intReg roundingMode: self class defaultRoundingMode).! !
 
-	self flag: #FMV.
-	self shouldBeImplemented ! !
+!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/9/2022 11:04:01'!
+divDouble: src1andDstReg by: src2reg
 
-!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/6/2022 16:47:09'!
+	memory nextInstructionPut: 
+		(RV64FDIV regDest: src1andDstReg regA: src1andDstReg regB: src2reg 
+					roundingMode: self class defaultRoundingMode).! !
+
+!RV64GCodeGenerator methodsFor: 'floating point' stamp: 'KenD 10/9/2022 10:56:21'!
 moveDouble: floatRegSrc to: intRegDest
 	"move from float register floatRegSrc into general purpose intRegDest"
-	self flag: #FMV.
-	self shouldBeImplemented .
+	"NB: no coercion; just copy the bits"
+	memory nextInstructionPut: 
+		(RV64FMVD2IR regDest: intRegDest regA: floatRegSrc).
 ! !
 
 !RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 15:56:52'!
@@ -7190,6 +7201,20 @@ addImm: imm to: srcAndDst
 		(RV64ADDI regDest: tmp1Reg regSource: zeroReg imm12: imm).
 	self add: tmp1Reg to: srcAndDst.
 ! !
+
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/9/2022 11:09:47'!
+dec: srcAndDstReg
+	"Decriment register value"
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: srcAndDstReg regSource: srcAndDstReg imm12: -1).
+	! !
+
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/9/2022 11:09:59'!
+inc: srcAndDstReg
+	"Incriment register value"
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: srcAndDstReg regSource: srcAndDstReg imm12: 1).
+	! !
 
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 15:42:52'!
 sub: src1 from: src2AndDest

@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 9 October 2022 at 8:52:02 am'!
+'From Cuis 6.0 [latest update: #5492] on 9 October 2022 at 11:14:23 am'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 41!
+!provides: 'RISC5-Instructions' 1 42!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -945,6 +945,9 @@ Nota Bene: NOT A CONVERSION (See FCVT*)!
 
 !RV64FSQRT commentStamp: '<historical>' prior: 0!
 Floating point square root!
+
+!RV64DFloatReg3Reg commentStamp: '<historical>' prior: 0!
+destReg := regA OP regB!
 
 !RV64FADD commentStamp: '<historical>' prior: 0!
 add FloatingPoint Numbers!
@@ -2220,6 +2223,12 @@ regDest: destReg regA: reg1 roundingMode: rm
 opcode
 	"Opcode for all floating point R-format instructions"
 	^ 2r1010011! !
+
+!RV64DFloatReg3Reg methodsFor: 'initialization' stamp: 'KenD 10/9/2022 10:52:50'!
+destReg: destR regA: reg1 regB: reg2
+
+	super destReg: destR regA: reg1 regB: reg2.
+	roundingMode := self class defaultRoundingMode.! !
 
 !RV64DFloatReg3Reg methodsFor: 'initialization' stamp: 'KenD 10/7/2022 14:27:32'!
 destReg: destR regA: reg1 regB: reg2 roundingMode: rm
