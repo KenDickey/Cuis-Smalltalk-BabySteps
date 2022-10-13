@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 9 October 2022 at 11:14:23 am'!
+'From Cuis 6.0 [latest update: #5492] on 13 October 2022 at 9:58:02 am'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 42!
+!provides: 'RISC5-Instructions' 1 44!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -900,14 +900,14 @@ dest := Operation( regA )!
 !RV64FCVTD2I commentStamp: '<historical>' prior: 0!
 Convert a DoubleFloat to a signed Integer
 
-Official opcode is FCVT.D.L which is confusing
+Official opcode is FCVT.L.D which is confusing
 
 Nota Bene: Does NOT copy bits into register (See FMV)!
 
 !RV64FCVTD2UI commentStamp: '<historical>' prior: 0!
 Convert a DoubleFloat to an UNsigned Integer
 
-Official opcode is FCVT.D.LU which is confusing
+Official opcode is FCVT.LU.D which is confusing
 
 Nota Bene: Does NOT copy bits into register (See FMV)!
 
@@ -1834,10 +1834,10 @@ regDest: rd regBase: rb immediateOffset: immediate12
 			baseReg: rb 
 			immedOffset: immediate12 ! !
 
-!RV64FLD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:50:55'!
+!RV64FLD methodsFor: 'accessing' stamp: 'KenD 10/13/2022 09:55:40'!
 func3
 
-	^ 2r010! !
+	^ 2r011! !
 
 !RV64FLD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:48:31'!
 opName
@@ -2182,10 +2182,10 @@ func3
 
 	^ roundingMode ! !
 
-!RV64FSQRT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:45:20'!
+!RV64FSQRT methodsFor: 'accessing' stamp: 'KenD 10/13/2022 07:33:42'!
 func7
 
-	^ 2r0101100! !
+	^ 2r0101101! !
 
 !RV64FSQRT methodsFor: 'initialization' stamp: 'KenD 10/8/2022 13:37:53'!
 destReg: destR regA: reg1
@@ -2281,40 +2281,40 @@ func3
 
 	^ 2r010! !
 
-!RV64FEQ methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:37:06'!
+!RV64FEQ methodsFor: 'accessing' stamp: 'KenD 10/13/2022 07:37:25'!
 func7
 
-	^ 2r1010000! !
+	^ 2r1010001! !
 
 !RV64FEQ methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:36:13'!
 opName
 
 	^ 'Feq'! !
 
-!RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:22'!
+!RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/13/2022 07:36:47'!
 func3
 
-	^ 2r001! !
+	^ 2r000! !
 
-!RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:39'!
+!RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/13/2022 07:37:31'!
 func7
 
-	^ 2r1010000! !
+	^ 2r1010001! !
 
 !RV64FLE methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:06'!
 opName
 
 	^ 'Flt'! !
 
-!RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:39:17'!
+!RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/13/2022 07:36:36'!
 func3
 
-	^ 2r000! !
+	^ 2r001! !
 
-!RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:38:49'!
+!RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/13/2022 07:37:39'!
 func7
 
-	^ 2r1010000! !
+	^ 2r1010001! !
 
 !RV64FLT methodsFor: 'accessing' stamp: 'KenD 10/8/2022 08:39:38'!
 opName
@@ -2639,10 +2639,10 @@ regSource: rs regBase: rb immediateOffset: immediate12
 			immLo: (immediate12 bitAnd: 2r000000011111) 
 			immHi: ((immediate12 bitAnd: 2r111111100000) >> 5)! !
 
-!RV64FSD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:53:32'!
+!RV64FSD methodsFor: 'accessing' stamp: 'KenD 10/13/2022 09:54:51'!
 func3
 
-	^ 2r010! !
+	^ 2r011! !
 
 !RV64FSD methodsFor: 'accessing' stamp: 'KenD 10/7/2022 13:52:22'!
 opName

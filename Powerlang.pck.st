@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 9 October 2022 at 11:14:38 am'!
+'From Cuis 6.0 [latest update: #5492] on 13 October 2022 at 9:58:16 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 28!
+!provides: 'Powerlang' 1 30!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7158,6 +7158,16 @@ return
 	"Goto address in #linkReg, remembering nothing"
 	memory nextInstructionPut: 
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: 0).
+! !
+
+!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/13/2022 07:48:59'!
+return: imm12offset
+	"Return from subroutine"
+	"Goto address in #linkReg + offset, remembering nothing"
+	
+	"Nota Bene: unshifted imm12offset is sign extended and the lowest bit set to zero"
+	memory nextInstructionPut: 
+		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:36:52'!
