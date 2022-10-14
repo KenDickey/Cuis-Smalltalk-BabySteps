@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 13 October 2022 at 9:58:02 am'!
+'From Cuis 6.0 [latest update: #5492] on 14 October 2022 at 1:31:20 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 44!
+!provides: 'RISC5-Instructions' 1 45!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -829,6 +829,9 @@ Environment Break -- Transfer control to debugger!
 
 !RV64ECALL commentStamp: '<historical>' prior: 0!
 Environment Call -- transfer control to OS!
+
+!RV64SLLI commentStamp: '<historical>' prior: 0!
+Shift Left Immediate!
 
 !RV64SRAI commentStamp: '<historical>' prior: 0!
 Shift Right Arithmatic Immediate!
