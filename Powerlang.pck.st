@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 13 October 2022 at 9:58:16 am'!
+'From Cuis 6.0 [latest update: #5492] on 14 October 2022 at 1:31:02 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 30!
+!provides: 'Powerlang' 1 31!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -47,7 +47,7 @@ OperandTypeFlags class
 !classDefinition: #RegistersRISCV category: #'Powerlang-Core-Assembly-RISCV'!
 SharedPool subclass: #RegistersRISCV
 	instanceVariableNames: ''
-	classVariableNames: 'RegA RegE RegFP RegFalse RegFlags RegG RegLink RegM RegNil RegR RegS RegSP RegT RegTmp1 RegTrue RegV RegX0 RegX1 RegZero'
+	classVariableNames: 'RegA RegE RegFP RegFalse RegFlags RegG RegLink RegM RegNil RegR RegS RegSP RegT RegTmp0 RegTmp1 RegTrue RegV RegX0 RegX1 RegZero'
 	poolDictionaries: 'RISC5Regs'
 	category: 'Powerlang-Core-Assembly-RISCV'!
 !classDefinition: 'RegistersRISCV class' category: #'Powerlang-Core-Assembly-RISCV'!
@@ -366,7 +366,7 @@ RISCCodeGenerator class
 
 !classDefinition: #RV64GCodeGenerator category: #'Powerlang-Core-Assembly-RISCV'!
 RISCCodeGenerator subclass: #RV64GCodeGenerator
-	instanceVariableNames: 'zeroReg flagsReg tmp1Reg linkReg'
+	instanceVariableNames: 'zeroReg flagsReg tmp0Reg tmp1Reg linkReg'
 	classVariableNames: ''
 	poolDictionaries: 'RegistersRISCV'
 	category: 'Powerlang-Core-Assembly-RISCV'!
@@ -2095,13 +2095,14 @@ initialize
 	RegisterSegment _ 512.
 	RegisterSpecific _ 768.! !
 
-!RegistersRISCV class methodsFor: 'class initialization' stamp: 'KenD 10/4/2022 10:42:07'!
+!RegistersRISCV class methodsFor: 'class initialization' stamp: 'KenD 10/14/2022 13:18:08'!
 initialize
 
 	RegR        := Tmp0. "X5 Receiver/Result"
 	RegA        := Tmp1. "X6 Arg"
 	RegT        := Tmp2. "X7 Temp"
 	RegV        := Tmp3. "X28"
+	RegTmp0 := Tmp4. "X29"
 	RegFlags := Tmp5.  "X30 Condition Flags"
 	RegTmp1 := Tmp6. "X31"
 
@@ -4194,6 +4195,11 @@ regFlags
 regLink
 
 	^ RegLink! !
+
+!RV64GABI methodsFor: 'registers - internal use only' stamp: 'KenD 10/14/2022 13:22:28'!
+regTmp0
+
+	^ RegTmp0! !
 
 !RV64GABI methodsFor: 'registers - internal use only' stamp: 'KenD 10/4/2022 10:45:28'!
 regTmp1
@@ -7125,13 +7131,14 @@ moveDouble: floatRegSrc to: intRegDest
 		(RV64FMVD2IR regDest: intRegDest regA: floatRegSrc).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 15:56:52'!
+!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/14/2022 13:23:03'!
 initialize
 
 	super initialize. "sets memory, a RelocatableBuffer"
 	self platform: NativizationPlatform default. "sets abi & wordsize"
 	zeroReg  := abi regZero.
 	flagsReg := abi regFlags.
+	tmp0Reg := abi regTmp0.
 	tmp1Reg := abi regTmp1.
 	linkReg    := abi regLink.
 	
@@ -7203,12 +7210,11 @@ add: src1Reg to: src2andDstReg
 
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:19:16'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/14/2022 13:30:39'!
 addImm: imm to: srcAndDst
 	"Signed Addition with flagsReg nonZero on overflow"
-	"Just put signed immediate value into a register and use #add:to:"
-	memory nextInstructionPut: 
-		(RV64ADDI regDest: tmp1Reg regSource: zeroReg imm12: imm).
+	"Place immediate value into a register and use #add:to:"
+	self moveImm: imm to: tmp1Reg. "NB: uses `tmp0Reg` internally, so `tmp1Reg` OK"
 	self add: tmp1Reg to: srcAndDst.
 ! !
 
@@ -7335,6 +7341,42 @@ move: srcReg to: dstReg
 
 	memory nextInstructionPut:
 		(RV64ADDI regDest: dstReg regSource: srcReg imm12: 0).
+! !
+
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/14/2022 13:29:13'!
+moveImm: imm to: dstReg
+	"Load Integer constant to register `dstReg`"
+
+	"Nota Bene: `dstReg` may be `tmp1Reg`"
+	
+	(imm bitClear: 16rFFF) isZero  "Fit in 11 bits?"
+	ifTrue: [ 
+		memory nextInstructionPut: 
+			(RV64ORI regDest: dstReg regSource: zeroReg imm12: imm).
+	]
+	ifFalse: [ "Fits in 32 bits?"
+		(imm bitClear: 16rFFFF) isZero
+		ifTrue: [
+			memory nextInstructionPut: "upper 20 bits"
+				(RV64LUI regDest: dstReg immediate: imm >> 12).
+			memory nextInstructionPut: "lower 12 bits"
+				(RV64ORI regDest: dstReg regSource: zeroReg imm12: (imm bitAnd: 16rFFF)).
+		]
+		ifFalse: [ 	"Fits in 64 bits?"
+			(imm bitClear: 16rFFFFFFFF) isZero
+			ifTrue: [
+				" upper 32 bits into RegTmp0"
+				self moveImm: ((imm bitAnd: 16rFFFF0000) >> 32) to: tmp0Reg.
+				memory nextInstructionPut:  "shift back into top"
+					(RV64SLLI regDest: RegTmp0 regSource: tmp0Reg imm12: 32).
+				"lower 32 bits to regDest"
+				self moveImm: (imm bitAnd: 16rFFFF0000) to: dstReg.
+				memory nextInstructionPut: "put 'em together"
+					(RV64OR regDest: dstReg regA: dstReg regB: tmp0Reg).
+			]
+			ifFalse: [ self error: 'Immediate too large for 64 bits' ] 
+		]
+	]
 ! !
 
 !RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:52:32'!
