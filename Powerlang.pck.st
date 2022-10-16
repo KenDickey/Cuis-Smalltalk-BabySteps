@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 9:16:20 am'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 2:05:25 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 37!
+!provides: 'Powerlang' 1 38!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -2053,6 +2053,9 @@ Copyright (c) 2020 Aucerna.
 Copyright (c) 2020 Aucerna.
 	See (MIT) license in root directory.
 !
+
+!RVMemoryReference commentStamp: '<historical>' prior: 0!
+I am an abstract description of a location in memory.!
 
 !DmrObjectFormat commentStamp: '<historical>' prior: 0!
 I represent the format of objects in the DMR. Ask me questions about
@@ -5302,7 +5305,7 @@ loadAwithR
 	codegen move: codegen regR to: codegen regA
 ! !
 
-!Assembler methodsFor: 'loading' stamp: 'KenD 9/26/2022 12:38:17'!
+!Assembler methodsFor: 'loading' stamp: 'KenD 10/16/2022 13:44:09'!
 loadAwithRoffsetAtA
 	| memref |
 	memref := codegen memRef
@@ -5517,7 +5520,7 @@ loadRwithNil
 	codegen move: codegen regNil to: codegen regR
 ! !
 
-!Assembler methodsFor: 'loading' stamp: 'KenD 9/26/2022 12:38:17'!
+!Assembler methodsFor: 'loading' stamp: 'KenD 10/16/2022 13:44:27'!
 loadRwithRatOffsetA
 	| memref |
 	memref := codegen memRef
@@ -6702,7 +6705,7 @@ memRef16
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:33'!
 memRef16: baseReg offset: offsetReg
 	^ self memRef16
 		base: baseReg;
@@ -6727,7 +6730,7 @@ memRef32
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:38'!
 memRef32: baseReg index: indexReg
 	^ self memRef32 
 		base: baseReg; 
@@ -6747,7 +6750,7 @@ memRef32: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:42'!
 memRef32: baseReg offset: offsetReg
 	^ self memRef32
 		base: baseReg;
@@ -6780,7 +6783,7 @@ memRef8
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:47'!
 memRef8: baseReg index: indexReg
 	^ self memRef8 
 		base: baseReg; 
@@ -6800,7 +6803,7 @@ memRef8: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:51'!
 memRef: baseReg index: indexRef
 	^ self memRef 
 		base: baseReg; 
@@ -6811,7 +6814,7 @@ memRef: baseReg index: indexRef
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:55'!
 memRef: baseReg index: indexRef offsetImm: anInteger
 	^ self memRef 
 		base: baseReg; 
@@ -6831,7 +6834,7 @@ memRef: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:59'!
 memRef: baseReg offset: indexReg
 	^ self memRef
 		base: baseReg;
@@ -7148,6 +7151,15 @@ initialize
 	
 	! !
 
+!RV64GCodeGenerator methodsFor: 'initialization' stamp: 'KenD 10/4/2022 11:00:12'!
+target: aNativizationTarget
+	super target: aNativizationTarget.
+	zeroReg := abi regZero.
+	flagsReg := abi regFlags.
+	tmp1Reg := abi regTmp1.
+	linkReg := abi regLink.
+! !
+
 !RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/5/2022 15:38:44'!
 call: srcReg
 	"Goto address #srcReg, placing return address in #linkReg"
@@ -7258,11 +7270,19 @@ and: srcAndDstReg with: source2
 		(RV64AND regDest: srcAndDstReg regA: srcAndDstReg regB: source2).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:44:53'!
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/16/2022 13:51:46'!
 and: srcAndDstReg withImm: imm
 
-	memory nextInstructionPut: 
-		(RV64ANDI destReg: srcAndDstReg regSource: srcAndDstReg imm12: imm).
+	(self fitsIn12bits: imm)
+	ifTrue: [
+		memory nextInstructionPut: 
+			(RV64ANDI destReg: srcAndDstReg regSource: srcAndDstReg imm12: imm).
+	]
+	ifFalse: [
+		self moveImm: imm to: tmp0Reg.
+		memory nextInstructionPut: 
+				(RV64AND regDest: srcAndDstReg regA: srcAndDstReg regB: tmp0Reg).
+	].
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/6/2022 16:40:03'!
@@ -7272,12 +7292,26 @@ compare: regA with: regB
 		(RV64SUB regDest: flagsReg regA: regA regB: regB).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/6/2022 16:42:08'!
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/16/2022 14:04:39'!
 compare: reg1 withImm: imm
-	"Just use a register"
-	memory nextInstructionPut: 
-		(RV64ANDI destReg: tmp1Reg regSource: zeroReg imm12: imm).
-	self compare: reg1 with: tmp1Reg 
+	"Just use a register" 
+	self moveImm: imm to: tmp0Reg.
+	self compare: reg1 with: tmp0Reg 
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/16/2022 13:52:49'!
+or: srcAndDstReg withImm: imm
+
+	(self fitsIn12bits: imm)
+	ifTrue: [
+		memory nextInstructionPut: 
+			(RV64ORI destReg: srcAndDstReg regSource: srcAndDstReg imm12: imm).
+	]
+	ifFalse: [
+		self moveImm: imm to: tmp0Reg.
+		memory nextInstructionPut: 
+				(RV64OR regDest: srcAndDstReg regA: srcAndDstReg regB: tmp0Reg).
+	].
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:30:08'!
@@ -7288,12 +7322,20 @@ shiftLeft: srcAndDstReg by: countReg
 		(RV64SLL regDest: srcAndDstReg regA: srcAndDstReg  regB: countReg).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:27:41'!
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/16/2022 13:56:25'!
 shiftLeft: srcAndDstReg byImm: imm
 
 	"logical shiift left"
-	memory nextInstructionPut: 
-		(RV64SLLI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+	(self fitsIn12bits: imm)
+	ifTrue: [
+		memory nextInstructionPut: 
+			(RV64SLLI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+	]
+	ifFalse: [
+		self moveImm: imm to: tmp0Reg.
+		memory nextInstructionPut: 
+				(RV64SLL regDest: srcAndDstReg regA: srcAndDstReg regB: tmp0Reg).		
+	]
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:34:44'!
@@ -7304,12 +7346,20 @@ shiftRight: srcAndDstReg by: countReg
 		(RV64SRL regDest: srcAndDstReg regA: srcAndDstReg regB: countReg ).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:26:16'!
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/16/2022 13:58:38'!
 shiftRight: srcAndDstReg byImm: imm
 
 	"logical shiift right"
-	memory nextInstructionPut: 
-		(RV64SRLI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+	(self fitsIn12bits: imm)
+	ifTrue: [
+		memory nextInstructionPut: 
+			(RV64SRLI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+	]
+	ifFalse: [
+		self moveImm: imm to: tmp0Reg.
+		memory nextInstructionPut: 
+				(RV64SRL regDest: srcAndDstReg regA: srcAndDstReg regB: tmp0Reg).
+	].
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:32:59'!
@@ -7320,19 +7370,27 @@ shiftRightArithmetic: srcAndDstReg by: countReg
 		(RV64SRA regDest: srcAndDstReg regA: srcAndDstReg  regB: countReg ).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:26:52'!
+!RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/16/2022 13:59:18'!
 shiftRightArithmetic: srcAndDstReg byImm: imm
 
 	"arithmetic shiift right"
-	memory nextInstructionPut: 
-		(RV64SRAI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+	(self fitsIn12bits: imm)
+	ifTrue: [
+		memory nextInstructionPut: 
+			(RV64SRAI regDest: srcAndDstReg regSource: srcAndDstReg  imm12: imm).
+	]
+	ifFalse: [
+		self moveImm: imm to: tmp0Reg.
+		memory nextInstructionPut: 
+				(RV64SRA regDest: srcAndDstReg regA: srcAndDstReg regB: tmp0Reg).
+	].
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/5/2022 13:49:17'!
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/16/2022 13:03:38'!
 clearReg: reg
 
 	memory nextInstructionPut: 
-		(RV64ADDI regDest: reg regSource: RegZero imm12: 0).
+		(RV64ADDI regDest: reg regSource: zeroReg imm12: 0).
 	! !
 
 !RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/5/2022 13:04:50'!
@@ -7514,6 +7572,14 @@ syscall: callNumber arg: reg0 arg: reg1 arg: reg2 arg: reg3 arg: reg4 arg: reg5
 	memory nextInstructionPut: (RV64ECALL new).
 	self move: 10 to: RegR.  "Result from A0 into RegR"
 	 ! !
+
+!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 10/4/2022 11:00:12'!
+memRef
+	"superclass CodeGenerator says that I am responsible to implement this method"
+
+	^ RVMemoryReference new
+		length: self wordSize * 8
+! !
 
 !RV64GCodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
 new
@@ -7892,29 +7958,26 @@ length:anInteger
 	length := anInteger.
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/16/2022 13:43:14'!
 scale
+
 	^ scale
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:07:01'!
-scale:integer
-	self assert: (#(1 2 4 8) includes: integer).
-	scale := integer.
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/16/2022 13:43:38'!
+scale: numBytes
+	self assert: (#(1 2 4 8) includes: numBytes).
+	scale := numBytes.
 ! !
 
-!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/4/2022 11:04:49'!
+!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/16/2022 13:43:04'!
 initialize
 	"Invoked when a new instance is created."
 
-	"  please change as required (and remove this comment)"
-	"length := nil."
-	"base := nil."
+	super initialize.
 	index := 0.
 	scale := 1.
 	displacement := 0.
-
-	"  super initialize.   -- commented since inherited method does nothing"
 ! !
 
 !RVMemoryReference methodsFor: 'printing & storing' stamp: 'KenD 10/4/2022 11:04:49'!
