@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 12:31:04 pm'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 3:01:47 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 49!
+!provides: 'RISC5-Instructions' 1 50!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -941,7 +941,7 @@ load signed Byte into register!
 load UNsigned Byte into register!
 
 !RV64LD commentStamp: '<historical>' prior: 0!
-load (8 byte) Floatingpoint Double into register!
+load double-width (8 byte) Integer into register!
 
 !RV64LH commentStamp: '<historical>' prior: 0!
 load (2 byte) signed HalfWord into register!
@@ -1975,9 +1975,9 @@ func3
 
 	^16r3! !
 
-!RV64LD methodsFor: 'accessing' stamp: 'KenD 5/4/2021 12:23:41'!
+!RV64LD methodsFor: 'accessing' stamp: 'KenD 10/16/2022 14:26:09'!
 opName
-	"loadDouble"
+	"load double-width Integer -> 8 bytes"
 	^'ld'! !
 
 !RV64LH methodsFor: 'accessing' stamp: 'KenD 5/4/2021 12:19:25'!
