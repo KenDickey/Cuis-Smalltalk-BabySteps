@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 8:52:18 am'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 12:31:04 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 48!
+!provides: 'RISC5-Instructions' 1 49!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -552,6 +552,36 @@ RV64DFloatReg3Reg subclass: #RV64FSUB
 RV64FSUB class
 	instanceVariableNames: ''!
 
+!classDefinition: #RV64DIV category: #'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DIV
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DIV class' category: #'RISC5-Instructions'!
+RV64DIV class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64DIVU category: #'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DIVU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DIVU class' category: #'RISC5-Instructions'!
+RV64DIVU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64MUL category: #'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64MUL
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64MUL class' category: #'RISC5-Instructions'!
+RV64MUL class
+	instanceVariableNames: ''!
+
 !classDefinition: #RV64OR category: #'RISC5-Instructions'!
 RV64Reg3Reg subclass: #RV64OR
 	instanceVariableNames: ''
@@ -560,6 +590,26 @@ RV64Reg3Reg subclass: #RV64OR
 	category: 'RISC5-Instructions'!
 !classDefinition: 'RV64OR class' category: #'RISC5-Instructions'!
 RV64OR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64REM category: #'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64REM
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64REM class' category: #'RISC5-Instructions'!
+RV64REM class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64REMU category: #'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64REMU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64REMU class' category: #'RISC5-Instructions'!
+RV64REMU class
 	instanceVariableNames: ''!
 
 !classDefinition: #RV64SLL category: #'RISC5-Instructions'!
@@ -1015,8 +1065,27 @@ Multiply FloatingPoint Numbers!
 !RV64FSUB commentStamp: '<historical>' prior: 0!
 subtract FloatingPoint Numbers!
 
+!RV64DIV commentStamp: '<historical>' prior: 0!
+Divide registers
+
+  dstReg := regA / regB!
+
+!RV64DIVU commentStamp: '<historical>' prior: 0!
+Register UNSIGNED DIVide, rounds toward zero!
+
+!RV64MUL commentStamp: '<historical>' prior: 0!
+MULtiply registers!
+
 !RV64OR commentStamp: '<historical>' prior: 0!
 Inclusive OR registers {distinguish XOR)!
+
+!RV64REM commentStamp: '<historical>' prior: 0!
+REMainder
+
+	destReg := regA % regB!
+
+!RV64REMU commentStamp: '<historical>' prior: 0!
+UNSIGNED REMainder!
 
 !RV64SLL commentStamp: '<historical>' prior: 0!
 Shift Left Logical -- destReg := regA << regB
@@ -2403,6 +2472,51 @@ opName
 
 	^'Fsub'! !
 
+!RV64DIV methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:24:53'!
+func3
+
+	^ 2r100! !
+
+!RV64DIV methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:25:08'!
+func7
+
+	^ 2r0000001! !
+
+!RV64DIV methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:23:51'!
+opName
+
+	^ 'Div'! !
+
+!RV64DIVU methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:26:36'!
+func3
+
+	^ 2r101! !
+
+!RV64DIVU methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:26:51'!
+func7
+
+	^ 2r0000001! !
+
+!RV64DIVU methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:26:19'!
+opName
+
+	^ 'DivU'! !
+
+!RV64MUL methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:21:23'!
+func3
+
+	^ 2r000! !
+
+!RV64MUL methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:21:11'!
+func7
+
+	^ 2r0000001! !
+
+!RV64MUL methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:19:38'!
+opName
+
+	^ 'Mul'! !
+
 !RV64OR methodsFor: 'accessing' stamp: 'KenD 5/3/2021 14:13:29'!
 func3
 
@@ -2417,6 +2531,36 @@ func7
 opName
 	" 'ior' ?"
 	^'or'! !
+
+!RV64REM methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:28:28'!
+func3
+
+	^ 2r110! !
+
+!RV64REM methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:28:50'!
+func7
+
+	^ 2r0000001! !
+
+!RV64REM methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:28:10'!
+opName
+
+	^ 'Rem'! !
+
+!RV64REMU methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:29:35'!
+func3
+
+	^ 2r111! !
+
+!RV64REMU methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:29:24'!
+func7
+
+	^ 2r0000001! !
+
+!RV64REMU methodsFor: 'accessing' stamp: 'KenD 10/16/2022 12:29:46'!
+opName
+
+	^ 'RemU'! !
 
 !RV64SLL methodsFor: 'accessing' stamp: 'KenD 5/3/2021 14:20:55'!
 func3
