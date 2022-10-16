@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 8:17:27 am'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 8:52:18 am'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 47!
+!provides: 'RISC5-Instructions' 1 48!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -917,6 +917,9 @@ Instruction Pattern:
 
 !RV64ADD commentStamp: '<historical>' prior: 0!
 Add registers!
+
+!RV64NOOP commentStamp: '<historical>' prior: 0!
+No Operation [a 32 bit instruction useful in padding code for 64bit alignment]!
 
 !RV64AND commentStamp: '<historical>' prior: 0!
 AND registers!

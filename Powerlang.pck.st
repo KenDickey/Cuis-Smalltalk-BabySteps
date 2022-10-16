@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 8:17:19 am'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 9:16:20 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 34!
+!provides: 'Powerlang' 1 37!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7087,16 +7087,19 @@ subImm: anInteger from: srcAndDstReg
 
 ! !
 
-!RV64GCodeGenerator methodsFor: 'alignment' stamp: 'KenD 10/5/2022 15:29:24'!
+!RV64GCodeGenerator methodsFor: 'alignment' stamp: 'KenD 10/16/2022 08:52:02'!
 noOp
-
+	"Add 32 bits of space to the instruction stream.
+	This is required in some cases to keep 64 bit (8 byte) memory address alignment."
 	memory nextInstructionPut: 
 		(RV64ADDI regDest: RegZero regSource: RegZero imm12: 0).! !
 
-!RV64GCodeGenerator methodsFor: 'alignment' stamp: 'KenD 10/5/2022 15:30:38'!
+!RV64GCodeGenerator methodsFor: 'alignment' stamp: 'KenD 10/16/2022 08:50:05'!
 noOp: count
 
-	"assemble #count noOps"
+	"assemble `count` noOps
+	 With some CPUs, need NoOps at end of code sequence 
+	 to avoid prefetch signalling an illegal instruction (which would never be executed)"
 	1 to count do: [
 		memory nextInstructionPut: 
 			(RV64ADDI regDest: RegZero regSource: RegZero imm12: 0)
@@ -7382,10 +7385,24 @@ regFlags
 	^ flagsReg
 ! !
 
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 09:15:36'!
+alignTo: aNumber
+	| current count |
+	current := memory position.
+	count := (current alignedTo: aNumber) - current.
+	"NoOps are 1 byte in x86 but 4 bytes in RV64G"
+	self noOp: count / 4! !
+
 !RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 08:06:45'!
 fitsIn12bits: anInteger
 	"Signed integer `anInteger` fits in immediate12 ?"
 	^ (anInteger between: -16r800 and: 16r7FF) ! !
+
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 08:44:02'!
+is8byteAligned: integerAddress
+
+	"Does address have lower 3 bits all zero ?"
+	^ (integerAddress bitAnd: 02r0111) isZero! !
 
 !RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:52:32'!
 breakpoint
