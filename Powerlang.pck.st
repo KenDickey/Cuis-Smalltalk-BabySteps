@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 2:14:11 pm'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 3:01:26 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 39!
+!provides: 'Powerlang' 1 40!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -2055,7 +2055,12 @@ Copyright (c) 2020 Aucerna.
 !
 
 !RVMemoryReference commentStamp: '<historical>' prior: 0!
-I am an abstract description of a location in memory.!
+I am an abstract description of a location in memory.
+
+  `length` is my width in bits.
+  I live at reg(`base`)+`index`, but may be displaced.
+  `scale` seems to be width in bytes, but perhaps ???
+!
 
 !DmrObjectFormat commentStamp: '<historical>' prior: 0!
 I represent the format of objects in the DMR. Ask me questions about
@@ -7192,6 +7197,71 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/16/2022 15:00:31'!
+load: dstReg fromMem: srcMemRef
+
+	"Load `dstReg` from memory location `srcMemRef`.
+	 The size of data loaded is specified in `srcMemRef`.
+	 
+	 When loading 32bits into 64bit register, high 32bits must be
+	 cleared (in other words, 32bit value is *zero* extended to
+	 64bits and stored in `dstReg`.
+	 
+	 However, when loading 16bits or 8bits, high 48 or 56 bits
+	 are *left intact*.
+	 
+	 This somewhat weird behavior is heritage of x86."
+	
+	| bitWidth |
+	bitWidth := srcMemRef length.
+	bitWidth isNil ifTrue: [ self error: 'Unknown memory bitWidth' ].
+	(bitWidth = 64)
+	ifTrue: [ "load 64 bit Double-wide Integer"
+		memory nextInstructionPut: 
+			(RV64LD destReg: dstReg baseReg: srcMemRef base immedOffset: srcMemRef offset)
+	]
+	ifFalse: [
+		(bitWidth = 32)
+		ifTrue: [
+			memory nextInstructionPut: 
+				(RV64LWU "zero extended Load Word Unsigned"
+					destReg: dstReg 
+					baseReg: srcMemRef base 
+					immedOffset: srcMemRef offset)
+		] 
+		ifFalse: [
+			(bitWidth = 16)
+			ifTrue: [
+				memory nextInstructionPut: "load 16 bit HalfWord"
+					(RV64LHU 
+						destReg: tmp0Reg 
+						baseReg: srcMemRef base 
+						immedOffset: srcMemRef offset).
+				memory nextInstructionPut: "shift out lower 16 bits"
+					(RV64SRLI  destReg: dstReg  regSource: dstReg imm12: 16).
+				memory nextInstructionPut: "upper bits back where they started"
+					(RV64SLLI  destReg: dstReg  regSource: dstReg imm12: 16).
+				memory nextInstructionPut: "glue the pieces together"
+					(RV64AND regDest: dstReg regA: dstReg regB: tmp0Reg)
+			] 
+			ifFalse: [
+				self assert: (bitWidth = 8).
+				memory nextInstructionPut: "load 8 bit Byte"
+					(RV64LB 
+						destReg: tmp0Reg 
+						baseReg: srcMemRef base 
+						immedOffset: srcMemRef offset).
+				memory nextInstructionPut: "shift out lower 8 bits"
+					(RV64SRLI  destReg: dstReg  regSource: dstReg imm12: 8).
+				memory nextInstructionPut: "upper bits back where they started"
+					(RV64SLLI  destReg: dstReg  regSource: dstReg imm12: 8).
+				memory nextInstructionPut: "glue the pieces together"
+					(RV64AND regDest: dstReg regA: dstReg regB: tmp0Reg)
+			] 
+		]
+	]
+		! !
+
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/15/2022 17:13:23'!
 add: src1Reg to: src2andDstReg
 	"Signed Addition with flagsReg nonZero on overflow
@@ -7971,11 +8041,12 @@ scale: numBytes
 	scale := numBytes.
 ! !
 
-!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/16/2022 13:43:04'!
+!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/16/2022 14:22:25'!
 initialize
 	"Invoked when a new instance is created."
 
 	super initialize.
+	self length: 64. "default is pointer size (8 bytes)"
 	index := 0.
 	scale := 1.
 	displacement := 0.
