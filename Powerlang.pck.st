@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 2:05:25 pm'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 2:14:11 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 38!
+!provides: 'Powerlang' 1 39!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7257,10 +7257,11 @@ sub: src1 from: src2AndDest
 		(RV64SUB regDest: src2AndDest regA: src2AndDest regB: src1).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/16/2022 07:35:58'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/16/2022 14:08:17'!
 subDouble: src1 from: src2AndDest
 	"Assume RV64G DoubleFloat registers "
-	self sub: src1 from: src2AndDest 
+	memory nextInstructionPut: 
+		(RV64FSUB regDest: src2AndDest regA: src2AndDest regB: src1). 
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:43:06'!
