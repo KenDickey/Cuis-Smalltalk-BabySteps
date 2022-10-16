@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 14 October 2022 at 1:31:02 pm'!
+'From Cuis 6.0 [latest update: #5492] on 15 October 2022 at 5:13:52 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 31!
+!provides: 'Powerlang' 1 32!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7177,7 +7177,7 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/6/2022 07:36:52'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/15/2022 17:13:23'!
 add: src1Reg to: src2andDstReg
 	"Signed Addition with flagsReg nonZero on overflow
 
@@ -7198,13 +7198,14 @@ add: src1Reg to: src2andDstReg
 	memory nextInstructionPut: 
 		(RV64SLT regDest: flagsReg regA: src2andDstReg regB: src1Reg).
 "
-	tmp1   flags   overflow?
-	 0           0             0
-	 1           1             0
-	 0           1             1
-	 1            0           -1
+	tmp1   flags   overflow? condition
+	 0           0             0         NO-overflow
+	 1           1             0         NO-overflow
+	 0           1           -1         (regA+regB < regA)
+	 1            0            1        (regB < 0)
+	
 	If (tmp1=flags), flagsReg gets zero, else non-zero 
-	(1 or -1, but who cares? Avoid test+jump)"
+	(1 or -1, but who cares? Can test if salient. Avoid test+jump to flag Overflow)"
 	memory nextInstructionPut: 
 		(RV64SUB regDest: flagsReg regA: tmp1Reg regB: flagsReg).
 
@@ -7232,13 +7233,13 @@ inc: srcAndDstReg
 		(RV64ADDI regDest: srcAndDstReg regSource: srcAndDstReg imm12: 1).
 	! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 15:42:52'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/15/2022 17:01:11'!
 sub: src1 from: src2AndDest
 
 	"NB:  destReg := regA - regB"
 	self flag: #UnderflowUntested.
 	memory nextInstructionPut: 
-		(RV64AND regDest: src2AndDest regA: src2AndDest regB: src1).
+		(RV64SUB regDest: src2AndDest regA: src2AndDest regB: src1).
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:54:37'!

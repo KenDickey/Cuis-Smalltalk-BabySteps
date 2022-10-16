@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 14 October 2022 at 1:31:20 pm'!
+'From Cuis 6.0 [latest update: #5492] on 15 October 2022 at 5:13:47 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 45!
+!provides: 'RISC5-Instructions' 1 46!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -1010,7 +1010,7 @@ Shift Right Arithmatic -- destReg := regA >> regB; most significant bit duplicat
 Shift Right Arithmatic -- destReg := regA >> regB!
 
 !RV64SUB commentStamp: '<historical>' prior: 0!
-result <= src2 - src1!
+destReg := regA - regB!
 
 !RV64XOR commentStamp: '<historical>' prior: 0!
 eXclusive OR {distinguish OR)!
