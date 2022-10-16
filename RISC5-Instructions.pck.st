@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 15 October 2022 at 5:13:47 pm'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 8:17:27 am'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,7 +8,7 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 46!
+!provides: 'RISC5-Instructions' 1 47!
 SystemOrganization addCategory: #'RISC5-Instructions'!
 
 
@@ -792,7 +792,7 @@ Instruction Pattern:
   [immedHi][regB][regA][func3][immLo][opcode] "regDest unused"!
 
 !RV64BEQ commentStamp: '<historical>' prior: 0!
-Branch on equal!
+Branch if Equal!
 
 !RV64BGE commentStamp: '<historical>' prior: 0!
 Branch if Greater or Equal (i.e. not LT)  Signed!
@@ -824,17 +824,35 @@ Add Immediate
 Instruction Pattern:
   [immed12][sourceReg][func3][destReg][opcode]!
 
+!RV64ANDI commentStamp: '<historical>' prior: 0!
+And, Immediate!
+
 !RV64EBREAK commentStamp: '<historical>' prior: 0!
 Environment Break -- Transfer control to debugger!
 
 !RV64ECALL commentStamp: '<historical>' prior: 0!
 Environment Call -- transfer control to OS!
 
+!RV64ORI commentStamp: '<historical>' prior: 0!
+Or, Immediate!
+
 !RV64SLLI commentStamp: '<historical>' prior: 0!
-Shift Left Immediate!
+Shift Left Logical Immediate!
+
+!RV64SLTI commentStamp: '<historical>' prior: 0!
+Set if Less Than, Immediate!
+
+!RV64SLTIU commentStamp: '<historical>' prior: 0!
+Set if Less Than, Unsigned Immediate!
 
 !RV64SRAI commentStamp: '<historical>' prior: 0!
-Shift Right Arithmatic Immediate!
+Shift Right Arithmatic, Immediate!
+
+!RV64SRLI commentStamp: '<historical>' prior: 0!
+Shift Right Logical, Immediate!
+
+!RV64XORI commentStamp: '<historical>' prior: 0!
+XOr Immediate!
 
 !RV64JAL commentStamp: '<historical>' prior: 0!
 Jump and Link; immediate
@@ -896,6 +914,12 @@ R => 4 Register opcode; Register to Register
 
 Instruction Pattern:
   [regC][fomat][regB][regA][roundMode][destReg][opcode]!
+
+!RV64ADD commentStamp: '<historical>' prior: 0!
+Add registers!
+
+!RV64AND commentStamp: '<historical>' prior: 0!
+AND registers!
 
 !RV64DFloatReg2Reg commentStamp: '<historical>' prior: 0!
 dest := Operation( regA )!
@@ -989,7 +1013,7 @@ Multiply FloatingPoint Numbers!
 subtract FloatingPoint Numbers!
 
 !RV64OR commentStamp: '<historical>' prior: 0!
-Inclusive OR {distinguish XOR)!
+Inclusive OR registers {distinguish XOR)!
 
 !RV64SLL commentStamp: '<historical>' prior: 0!
 Shift Left Logical -- destReg := regA << regB
@@ -1004,16 +1028,18 @@ Set if Less Than (Unsigned):
   if regA < regB then destReg := 1 else destReg := 0!
 
 !RV64SRA commentStamp: '<historical>' prior: 0!
-Shift Right Arithmatic -- destReg := regA >> regB; most significant bit duplicated!
+Shift Right, Arithmatic -- destReg := regA >> regB; most significant bit duplicated!
 
 !RV64SRL commentStamp: '<historical>' prior: 0!
-Shift Right Arithmatic -- destReg := regA >> regB!
+Shift Right, Logical -- destReg := regA >> regB!
 
 !RV64SUB commentStamp: '<historical>' prior: 0!
+SUBtract registers
+
 destReg := regA - regB!
 
 !RV64XOR commentStamp: '<historical>' prior: 0!
-eXclusive OR {distinguish OR)!
+eXclusive OR registers {distinguish OR)!
 
 !RV64Reg4Reg commentStamp: '<historical>' prior: 0!
 R => 4 Register opcode; Register to Register
