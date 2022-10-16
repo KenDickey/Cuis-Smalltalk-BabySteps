@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 15 October 2022 at 5:13:52 pm'!
+'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 7:59:18 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 32!
+!provides: 'Powerlang' 1 33!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7242,10 +7242,62 @@ sub: src1 from: src2AndDest
 		(RV64SUB regDest: src2AndDest regA: src2AndDest regB: src1).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/5/2022 12:54:37'!
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/16/2022 07:35:58'!
 subDouble: src1 from: src2AndDest
-	"RV64G registers are already doubles"
+	"Assume RV64G DoubleFloat registers "
 	self sub: src1 from: src2AndDest 
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/5/2022 13:49:17'!
+clearReg: reg
+
+	memory nextInstructionPut: 
+		(RV64ADDI regDest: reg regSource: RegZero imm12: 0).
+	! !
+
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/5/2022 13:04:50'!
+move: srcReg to: dstReg
+
+	memory nextInstructionPut:
+		(RV64ADDI regDest: dstReg regSource: srcReg imm12: 0).
+! !
+
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/16/2022 07:59:06'!
+moveImm: imm to: dstReg
+	"Load Integer constant to register `dstReg`"
+
+	"Nota Bene: `dstReg` may be `tmp1Reg` so use `tmp0Reg`"
+	
+	(self fitsIn12bits: imm)
+	ifTrue: [ 
+		memory nextInstructionPut: 
+			(RV64ORI regDest: dstReg regSource: zeroReg imm12: imm).
+	]
+	ifFalse: [ | bitWidth |
+		bitWidth := self bitLengthOf: imm.
+		(bitWidth isNil) ifTrue: [self error: 'immediate value does not fit in a register'].
+		(bitWidth <= 32) "Fits in 32 bits"
+		ifTrue: [
+			memory nextInstructionPut: "Upper 20 bits"
+				(RV64LUI regDest: dstReg immediate: imm >> 12).
+			memory nextInstructionPut: "Lower 12 bits"
+				(RV64ORI regDest: dstReg regSource: zeroReg imm12: (imm bitAnd: 16rFFF)).
+		]
+		ifFalse: [ 	"Fits in 64 bits"
+			self assert: (bitWidth <= 64).
+			" Upper 32 bits into `tmp0Reg`.
+			We know by construction that immediate fits in 32 bits, 
+			so following recursive call never tries to use `tmp0Reg` recursively."
+			self moveImm: ((imm bitAnd: 16rFFFF0000) >> 32) to: tmp0Reg.
+			memory nextInstructionPut:  "shift back into top"
+				(RV64SLLI regDest: tmp0Reg regSource: tmp0Reg imm12: 32).
+			"Lower 32 bits to `dstReg`"
+			self moveImm: (imm bitAnd: 16r0000FFFF) to: dstReg.
+			"Or upper and lower bits back together into `dstReg`"
+			memory nextInstructionPut: 
+				(RV64OR regDest: dstReg regA: dstReg regB: tmp0Reg).
+		]
+	]
 ! !
 
 !RV64GCodeGenerator methodsFor: 'operations - logical' stamp: 'KenD 10/5/2022 12:43:06'!
@@ -7330,55 +7382,10 @@ regFlags
 	^ flagsReg
 ! !
 
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:49:17'!
-clearReg: reg
-
-	memory nextInstructionPut: 
-		(RV64ADDI regDest: reg regSource: RegZero imm12: 0).
-	! !
-
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/5/2022 13:04:50'!
-move: srcReg to: dstReg
-
-	memory nextInstructionPut:
-		(RV64ADDI regDest: dstReg regSource: srcReg imm12: 0).
-! !
-
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/14/2022 13:29:13'!
-moveImm: imm to: dstReg
-	"Load Integer constant to register `dstReg`"
-
-	"Nota Bene: `dstReg` may be `tmp1Reg`"
-	
-	(imm bitClear: 16rFFF) isZero  "Fit in 11 bits?"
-	ifTrue: [ 
-		memory nextInstructionPut: 
-			(RV64ORI regDest: dstReg regSource: zeroReg imm12: imm).
-	]
-	ifFalse: [ "Fits in 32 bits?"
-		(imm bitClear: 16rFFFF) isZero
-		ifTrue: [
-			memory nextInstructionPut: "upper 20 bits"
-				(RV64LUI regDest: dstReg immediate: imm >> 12).
-			memory nextInstructionPut: "lower 12 bits"
-				(RV64ORI regDest: dstReg regSource: zeroReg imm12: (imm bitAnd: 16rFFF)).
-		]
-		ifFalse: [ 	"Fits in 64 bits?"
-			(imm bitClear: 16rFFFFFFFF) isZero
-			ifTrue: [
-				" upper 32 bits into RegTmp0"
-				self moveImm: ((imm bitAnd: 16rFFFF0000) >> 32) to: tmp0Reg.
-				memory nextInstructionPut:  "shift back into top"
-					(RV64SLLI regDest: RegTmp0 regSource: tmp0Reg imm12: 32).
-				"lower 32 bits to regDest"
-				self moveImm: (imm bitAnd: 16rFFFF0000) to: dstReg.
-				memory nextInstructionPut: "put 'em together"
-					(RV64OR regDest: dstReg regA: dstReg regB: tmp0Reg).
-			]
-			ifFalse: [ self error: 'Immediate too large for 64 bits' ] 
-		]
-	]
-! !
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 07:41:26'!
+fitsIn12bits: anInteger
+	" `anInteger` fits in immediate12 ?"
+	^ (anInteger between: -16r800 and: 16r7FF) ! !
 
 !RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:52:32'!
 breakpoint
