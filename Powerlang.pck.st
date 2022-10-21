@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 3:01:26 pm'!
+'From Cuis 6.0 [latest update: #5492] on 21 October 2022 at 9:40:00 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 40!
+!provides: 'Powerlang' 1 42!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -6755,12 +6755,12 @@ memRef32: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:42'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/21/2022 09:37:46'!
 memRef32: baseReg offset: offsetReg
 	^ self memRef32
 		base: baseReg;
 		index: offsetReg;
-		scale: 1;
+		scale: 1; "byte"
 		yourself
 ! !
 
@@ -7262,6 +7262,15 @@ load: dstReg fromMem: srcMemRef
 	]
 		! !
 
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/21/2022 09:24:41'!
+loadDouble: dstReg fromMem: srcMemRef
+	"Load 64-bit floating point `dstReg` from memory location `srcMemRef`"
+	memory nextInstructionPut: 
+			(RV64FLD 
+				destReg: dstReg 
+				baseReg: srcMemRef base 
+				immedOffset: srcMemRef offset)! !
+
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/15/2022 17:13:23'!
 add: src1Reg to: src2andDstReg
 	"Signed Addition with flagsReg nonZero on overflow
@@ -7464,6 +7473,21 @@ clearReg: reg
 		(RV64ADDI regDest: reg regSource: zeroReg imm12: 0).
 	! !
 
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/21/2022 09:36:16'!
+loadLongMwithIPoffset: anInteger
+
+	(self fitsIn12bits: anInteger) 
+	ifTrue:  [
+		memory nextInstructionPut: 
+			(RV64AUIPC regDest: RegM immediate: anInteger)
+	]
+	ifFalse: [
+		memory nextInstructionPut: 
+			(RV64AUIPC regDest: RegM immediate: 0).
+		self moveImm: anInteger to: tmp1Reg. "NB: uses `tmp0Reg` internally, but `tmp1Reg` OK"
+		self add: tmp1Reg to: RegM.
+	]! !
+
 !RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/5/2022 13:04:50'!
 move: srcReg to: dstReg
 
@@ -7514,13 +7538,12 @@ regFlags
 	^ flagsReg
 ! !
 
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 09:15:36'!
+!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 15:24:13'!
 alignTo: aNumber
-	| current count |
-	current := memory position.
-	count := (current alignedTo: aNumber) - current.
-	"NoOps are 1 byte in x86 but 4 bytes in RV64G"
-	self noOp: count / 4! !
+	| current |
+	current := memory position. "Should always be modulo 32"
+	self assert: ((current alignedTo: aNumber) = current).
+! !
 
 !RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 08:06:45'!
 fitsIn12bits: anInteger
@@ -7914,9 +7937,12 @@ new
 
 ! !
 
-!RelocationFixup methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:39:39'!
+!RelocationFixup methodsFor: 'accessing' stamp: 'KenD 10/21/2022 09:14:46'!
 addressSize
-	^4
+	"RV64G is 8 bytes, but original code had 4 ??
+	Perhaps used for instruction size, rather than address size??"
+	self flag: #revisit.  
+	^ 8
 ! !
 
 !RelocationFixup methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:39:39'!
@@ -7946,11 +7972,11 @@ target
 	^target
 ! !
 
-!RelocationFixup methodsFor: 'services' stamp: 'KenD 9/26/2022 12:39:39'!
+!RelocationFixup methodsFor: 'services' stamp: 'KenD 10/17/2022 11:38:54'!
 patch: buffer with: solver
 	| delta address |
 	address := solver resolveLabel: target.
-	self ASSERT: address notNil.
+	self assert: address notNil.
 	relative
 		ifTrue: [
 			delta := address - source - size.
