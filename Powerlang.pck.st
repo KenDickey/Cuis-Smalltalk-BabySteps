@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 21 October 2022 at 9:40:00 am'!
+'From Cuis 6.0 [latest update: #5492] on 22 October 2022 at 4:27:05 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 42!
+!provides: 'Powerlang' 1 43!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -6755,12 +6755,12 @@ memRef32: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/21/2022 09:37:46'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/21/2022 10:03:26'!
 memRef32: baseReg offset: offsetReg
 	^ self memRef32
 		base: baseReg;
 		index: offsetReg;
-		scale: 1; "byte"
+		scale: 1; "byte ?"
 		yourself
 ! !
 
@@ -7197,6 +7197,16 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/22/2022 16:01:46'!
+load: dstReg convertingDoubleToIntegerFromMem: srcMemRef
+	"Assume signed integer target"
+	self loadDouble: FTmp0 fromMem: srcMemRef.
+	memory nextInstructionPut: 
+			(RV64FCVTD2I 
+				regDest: dstReg 
+				regA: FTmp0 
+				roundingMode: RoundNearestToEven).! !
+
 !RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/16/2022 15:00:31'!
 load: dstReg fromMem: srcMemRef
 
@@ -7473,9 +7483,19 @@ clearReg: reg
 		(RV64ADDI regDest: reg regSource: zeroReg imm12: 0).
 	! !
 
-!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/21/2022 09:36:16'!
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/22/2022 16:25:58'!
+loadEwithAddressOfRatA
+
+	self flag: #revisit.
+	memory nextInstructionPut: 
+			(RV64ADD destReg: RegTmp0 regA: RegR regB: RegA).
+	memory nextInstructionPut: 
+			(RV64ADDI destReg: RegE regSource: RegTmp0 imm12: wordSize negated)! !
+
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/22/2022 16:25:32'!
 loadLongMwithIPoffset: anInteger
 
+	self flag: #revisit.
 	(self fitsIn12bits: anInteger) 
 	ifTrue:  [
 		memory nextInstructionPut: 
@@ -7487,6 +7507,27 @@ loadLongMwithIPoffset: anInteger
 		self moveImm: anInteger to: tmp1Reg. "NB: uses `tmp0Reg` internally, but `tmp1Reg` OK"
 		self add: tmp1Reg to: RegM.
 	]! !
+
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/21/2022 10:08:52'!
+loadMXCSRfromA
+
+	self move: RegA to: flagsReg ! !
+
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/22/2022 16:24:55'!
+loadRwithArgPointer
+
+	self flag: #revisit.
+	memory nextInstructionPut: 
+			(RV64ADDI destReg: RegR regSource: RegFP imm12: (2 * self addressSize))! !
+
+!RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/22/2022 16:25:15'!
+loadSwithAddressOfSatA
+
+	self flag: #revisit.
+	memory nextInstructionPut: 
+			(RV64ADD destReg: RegTmp0 regA: RegS regB: RegA).
+	memory nextInstructionPut: 
+			(RV64ADDI destReg: RegS regSource: RegTmp0 imm12: wordSize negated)! !
 
 !RV64GCodeGenerator methodsFor: 'operations - register' stamp: 'KenD 10/5/2022 13:04:50'!
 move: srcReg to: dstReg
