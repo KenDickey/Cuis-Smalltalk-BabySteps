@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 23 October 2022 at 3:35:05 pm'!
+'From Cuis 6.0 [latest update: #5492] on 23 October 2022 at 3:45:19 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 46!
+!provides: 'Powerlang' 1 47!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -2055,22 +2055,25 @@ Copyright (c) 2020 Aucerna.
 !
 
 !RVMemoryReference commentStamp: '<historical>' prior: 0!
-I am an abstract description of a location in memory.
+I am an abstract description of a location in memory which is `widthInBits` wide.
 
 The offset part of a memory address can be specified directly as a static value 
-(called a displacement) or through an address computation made up of one 
+(called a `displacement`) or through an address computation made up of one 
 or more of the following components:
 
-      Displacement - An 8-, 16-, or 32-bit value.
-      Base - The value in a general-purpose register.
-      Index - The value in a general-purpose register.
-      Scale factor - A value of 2, 4, or 8 that is multiplied by the index value.
+      displacement - A 8-, 16-, or 32-bit value.
+      baseRegister - The value in a general-purpose register.
+      indexRegister - The value in a general-purpose register.
+      scale factor - A value of 2, 4, or 8 that is multiplied by the value in the indexRegister.
 
     The offset which results from adding these components is called an `effective address`. 
     Each of these components can have either a positive or negative (2s complement) value, 
     with the exception of the scaling factor.
 
-    EffectiveAddress := Base + (Index*Scale) + Displacement
+   Symbolically:
+        EffectiveAddress := Base + (Index*Scale) + Displacement
+
+   See  #RISCCodeGenerator>>lea:withMem: 
 !
 
 !DmrObjectFormat commentStamp: '<historical>' prior: 0!
@@ -7214,7 +7217,7 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 15:10:32'!
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 15:44:34'!
 lea: addressReg withMem: memRef
 
 	"Answer baseRegister + (indexRegister*scale) + displacement.
@@ -7230,9 +7233,10 @@ lea: addressReg withMem: memRef
 		ifTrue: [ self add: memRef index to: addressReg 		] 
 		ifFalse: [
 			self moveImm: memRef scale to: RegTmp0.
-			memory nextInstructionPut:  "i(ndex * scale)"
+			memory nextInstructionPut:  "(index * scale)"
 				(RV64MUL 		regDest: RegTmp1 regA: memRef index regB: RegTmp0).
-			self add: RegTmp1 to: addressReg 
+			memory nextInstructionPut: 
+				(RV64ADD regDest: addressReg regA: addressReg regB: RegTmp1).
 		]
 	]
  	
