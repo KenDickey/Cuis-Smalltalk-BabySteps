@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 23 October 2022 at 3:45:19 pm'!
+'From Cuis 6.0 [latest update: #5492] on 23 October 2022 at 4:03:57 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 47!
+!provides: 'Powerlang' 1 48!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -4118,14 +4118,14 @@ regX1
 	^ self subclassResponsibility
 ! !
 
-!ABI methodsFor: 'unclassified' stamp: 'KenD 9/26/2022 12:37:49'!
+!ABI methodsFor: 'unclassified' stamp: 'KenD 10/23/2022 15:53:47'!
 is32bits
-	^self bits = 32
+	^self widthInBits = 32
 ! !
 
-!ABI methodsFor: 'unclassified' stamp: 'KenD 9/26/2022 12:37:49'!
+!ABI methodsFor: 'unclassified' stamp: 'KenD 10/23/2022 15:53:37'!
 is64bits
-	^self bits = 64
+	^self widthInBits = 64
 ! !
 
 !RV64GABI methodsFor: 'registers - IR' stamp: 'KenD 9/27/2022 10:44:26'!
@@ -4233,10 +4233,15 @@ regZero
 
 	^RegZero! !
 
-!RV64GABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:41:42'!
+!RV64GABI methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:52:00'!
 bits
-	"Pointers are 8 bytes"
-	^ 64! !
+	"Pointers are 8 bytes with 8 bits per byte"
+	^ 64 "8 * 8"! !
+
+!RV64GABI methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:53:19'!
+widthInBits
+	"Pointers are 8 bytes with 8 bits per byte"
+	^ 64 "8 * 8"! !
 
 !RV64GABI methodsFor: 'accessing' stamp: 'KenD 9/26/2022 16:42:07'!
 wordSize
@@ -4248,6 +4253,21 @@ wordSizeShift
 
 	^ 3
 ! !
+
+!RV64GABI class methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:54:13'!
+widthInBits
+
+	^ 64 "8 bytes per pointer"! !
+
+!RV64GABI class methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:50:37'!
+wordSize
+
+	^ 8 "bytes per pointer"! !
+
+!RV64GABI class methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:50:16'!
+wordSizeShift
+	
+	^ 3! !
 
 !Assembler methodsFor: 'jumps' stamp: 'KenD 9/26/2022 12:38:17'!
 jumpIfEqualTo: label
@@ -6604,8 +6624,9 @@ test: srcReg withImm: imm
 	self subclassResponsibility
 ! !
 
-!CodeGenerator methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'accessing' stamp: 'KenD 10/23/2022 16:02:56'!
 addressBitSize
+	"# bytes * 8 bits per byte"
 	^self addressSize * 8
 
 ! !
@@ -8038,12 +8059,12 @@ new
 
 ! !
 
-!RelocationFixup methodsFor: 'accessing' stamp: 'KenD 10/21/2022 09:14:46'!
+!RelocationFixup methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:48:28'!
 addressSize
 	"RV64G is 8 bytes, but original code had 4 ??
 	Perhaps used for instruction size, rather than address size??"
 	self flag: #revisit.  
-	^ 8
+	^ RV64GABI wordSize
 ! !
 
 !RelocationFixup methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:39:39'!
