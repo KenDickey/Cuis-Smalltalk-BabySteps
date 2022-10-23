@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5492] on 22 October 2022 at 4:27:05 pm'!
+'From Cuis 6.0 [latest update: #5492] on 23 October 2022 at 3:35:05 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 43!
+!provides: 'Powerlang' 1 46!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -406,7 +406,7 @@ RelocationFixup class
 
 !classDefinition: #RVMemoryReference category: #'Powerlang-Core-Assembly-RISCV'!
 Object subclass: #RVMemoryReference
-	instanceVariableNames: 'length base index scale displacement'
+	instanceVariableNames: 'widthInBits baseRegister indexRegister scale displacement'
 	classVariableNames: ''
 	poolDictionaries: 'Registers'
 	category: 'Powerlang-Core-Assembly-RISCV'!
@@ -2057,9 +2057,20 @@ Copyright (c) 2020 Aucerna.
 !RVMemoryReference commentStamp: '<historical>' prior: 0!
 I am an abstract description of a location in memory.
 
-  `length` is my width in bits.
-  I live at reg(`base`)+`index`, but may be displaced.
-  `scale` seems to be width in bytes, but perhaps ???
+The offset part of a memory address can be specified directly as a static value 
+(called a displacement) or through an address computation made up of one 
+or more of the following components:
+
+      Displacement - An 8-, 16-, or 32-bit value.
+      Base - The value in a general-purpose register.
+      Index - The value in a general-purpose register.
+      Scale factor - A value of 2, 4, or 8 that is multiplied by the index value.
+
+    The offset which results from adding these components is called an `effective address`. 
+    Each of these components can have either a positive or negative (2s complement) value, 
+    with the exception of the scaling factor.
+
+    EffectiveAddress := Base + (Index*Scale) + Displacement
 !
 
 !DmrObjectFormat commentStamp: '<historical>' prior: 0!
@@ -7179,6 +7190,12 @@ call: srcReg withOffset: imm
 		(RV64JALR destReg: linkReg baseReg: srcReg immedOffset: imm).
 ! !
 
+!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/23/2022 14:28:30'!
+jumpToMem: memRef
+
+	self lea: RegTmp1 withMem: memRef.
+	self call: RegTmp1.! !
+
 !RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/5/2022 15:39:50'!
 return
 	"Return from subroutine"
@@ -7197,6 +7214,30 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 15:10:32'!
+lea: addressReg withMem: memRef
+
+	"Answer baseRegister + (indexRegister*scale) + displacement.
+	`indexRegister` may be RegZero (0).
+	`scale` may be 1."
+	(memRef base = addressReg) ifFalse: [
+		self move: memRef base to: addressReg.
+	].
+	self addImm: memRef displacement to: addressReg.
+	(memRef index isZero not)
+	ifTrue: [
+		(memRef scale = 1)
+		ifTrue: [ self add: memRef index to: addressReg 		] 
+		ifFalse: [
+			self moveImm: memRef scale to: RegTmp0.
+			memory nextInstructionPut:  "i(ndex * scale)"
+				(RV64MUL 		regDest: RegTmp1 regA: memRef index regB: RegTmp0).
+			self add: RegTmp1 to: addressReg 
+		]
+	]
+ 	
+	! !
+
 !RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/22/2022 16:01:46'!
 load: dstReg convertingDoubleToIntegerFromMem: srcMemRef
 	"Assume signed integer target"
@@ -7207,7 +7248,7 @@ load: dstReg convertingDoubleToIntegerFromMem: srcMemRef
 				regA: FTmp0 
 				roundingMode: RoundNearestToEven).! !
 
-!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/16/2022 15:00:31'!
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 15:31:08'!
 load: dstReg fromMem: srcMemRef
 
 	"Load `dstReg` from memory location `srcMemRef`.
@@ -7223,12 +7264,13 @@ load: dstReg fromMem: srcMemRef
 	 This somewhat weird behavior is heritage of x86."
 	
 	| bitWidth |
-	bitWidth := srcMemRef length.
+	self lea: RegTmp1 withMem: srcMemRef.
+	bitWidth := srcMemRef widthInBits.
 	bitWidth isNil ifTrue: [ self error: 'Unknown memory bitWidth' ].
 	(bitWidth = 64)
 	ifTrue: [ "load 64 bit Double-wide Integer"
 		memory nextInstructionPut: 
-			(RV64LD destReg: dstReg baseReg: srcMemRef base immedOffset: srcMemRef offset)
+			(RV64LD destReg: dstReg baseReg: RegTmp1 immedOffset: 0)
 	]
 	ifFalse: [
 		(bitWidth = 32)
@@ -7236,8 +7278,8 @@ load: dstReg fromMem: srcMemRef
 			memory nextInstructionPut: 
 				(RV64LWU "zero extended Load Word Unsigned"
 					destReg: dstReg 
-					baseReg: srcMemRef base 
-					immedOffset: srcMemRef offset)
+					baseReg: RegTmp1 
+					immedOffset: 0)
 		] 
 		ifFalse: [
 			(bitWidth = 16)
@@ -7245,8 +7287,8 @@ load: dstReg fromMem: srcMemRef
 				memory nextInstructionPut: "load 16 bit HalfWord"
 					(RV64LHU 
 						destReg: tmp0Reg 
-						baseReg: srcMemRef base 
-						immedOffset: srcMemRef offset).
+						baseReg: RegTmp1 
+						immedOffset: 0).
 				memory nextInstructionPut: "shift out lower 16 bits"
 					(RV64SRLI  destReg: dstReg  regSource: dstReg imm12: 16).
 				memory nextInstructionPut: "upper bits back where they started"
@@ -7259,8 +7301,8 @@ load: dstReg fromMem: srcMemRef
 				memory nextInstructionPut: "load 8 bit Byte"
 					(RV64LB 
 						destReg: tmp0Reg 
-						baseReg: srcMemRef base 
-						immedOffset: srcMemRef offset).
+						baseReg: RegTmp1 
+						immedOffset: 0).
 				memory nextInstructionPut: "shift out lower 8 bits"
 					(RV64SRLI  destReg: dstReg  regSource: dstReg imm12: 8).
 				memory nextInstructionPut: "upper bits back where they started"
@@ -7272,14 +7314,28 @@ load: dstReg fromMem: srcMemRef
 	]
 		! !
 
-!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/21/2022 09:24:41'!
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 15:32:51'!
 loadDouble: dstReg fromMem: srcMemRef
-	"Load 64-bit floating point `dstReg` from memory location `srcMemRef`"
+	"Load 64-bit floating point `dstReg` from memory location spec: `srcMemRef`"
+	self lea: RegTmp1 withMem: srcMemRef.
 	memory nextInstructionPut: 
-			(RV64FLD 
-				destReg: dstReg 
-				baseReg: srcMemRef base 
-				immedOffset: srcMemRef offset)! !
+		(RV64FLD destReg: dstReg baseReg: RegTmp1 immedOffset: 0)! !
+
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 08:36:53'!
+loadReg: destReg withBase: baseReg offset: imm
+
+	(self fitsIn12bits: imm) 
+	ifTrue: [
+		memory nextInstructionPut: 
+			(RV64LD destReg: destReg baseReg: baseReg immedOffset: imm)
+	]
+	ifFalse: [
+		self moveImm: imm to: tmp0Reg.
+		memory nextInstructionPut: 
+			(RV64ADD regDest: tmp0Reg regA: baseReg regB: tmp0Reg).
+		memory nextInstructionPut: 
+			(RV64LD destReg: destReg baseReg: tmp0Reg immedOffset: 0)
+	]! !
 
 !RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/15/2022 17:13:23'!
 add: src1Reg to: src2andDstReg
@@ -7579,23 +7635,23 @@ regFlags
 	^ flagsReg
 ! !
 
+!RV64GCodeGenerator methodsFor: 'testing' stamp: 'KenD 10/16/2022 08:06:45'!
+fitsIn12bits: anInteger
+	"Signed integer `anInteger` fits in immediate12 ?"
+	^ (anInteger between: -16r800 and: 16r7FF) ! !
+
+!RV64GCodeGenerator methodsFor: 'testing' stamp: 'KenD 10/16/2022 08:44:02'!
+is8byteAligned: integerAddress
+
+	"Does address have lower 3 bits all zero ?"
+	^ (integerAddress bitAnd: 02r0111) isZero! !
+
 !RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 15:24:13'!
 alignTo: aNumber
 	| current |
 	current := memory position. "Should always be modulo 32"
 	self assert: ((current alignedTo: aNumber) = current).
 ! !
-
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 08:06:45'!
-fitsIn12bits: anInteger
-	"Signed integer `anInteger` fits in immediate12 ?"
-	^ (anInteger between: -16r800 and: 16r7FF) ! !
-
-!RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 08:44:02'!
-is8byteAligned: integerAddress
-
-	"Does address have lower 3 bits all zero ?"
-	^ (integerAddress bitAnd: 02r0111) isZero! !
 
 !RV64GCodeGenerator methodsFor: 'system calls' stamp: 'KenD 10/5/2022 13:52:32'!
 breakpoint
@@ -8056,14 +8112,15 @@ relativeFrom: source to: target
 	^self new beRelative; from: source to: target
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-base
-	^ base
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:15:50'!
+baseRegister
+	^ baseRegister
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-base:register
-	base := register.
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:15:27'!
+baseRegister: register
+
+	baseRegister := register.
 ! !
 
 !RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
@@ -8076,24 +8133,14 @@ displacement:something
 	displacement := something.
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-index
-	^ index
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:16:16'!
+indexRegister
+	^ indexRegister
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-index:register
-	index := register.
-! !
-
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-length
-	^ length
-! !
-
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-length:anInteger
-	length := anInteger.
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:16:55'!
+indexRegister: register
+	indexRegister := register.
 ! !
 
 !RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/16/2022 13:43:14'!
@@ -8102,19 +8149,31 @@ scale
 	^ scale
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/16/2022 13:43:38'!
-scale: numBytes
-	self assert: (#(1 2 4 8) includes: numBytes).
-	scale := numBytes.
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 14:45:53'!
+scale: intScale
+
+	self assert: (#(1 2 4 8) includes: intScale).
+	scale := intScale.
 ! !
 
-!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/16/2022 14:22:25'!
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:18:58'!
+widthInBits
+	^ widthInBits
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:18:58'!
+widthInBits:anInteger
+
+	widthInBits := anInteger.
+! !
+
+!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/23/2022 15:18:26'!
 initialize
 	"Invoked when a new instance is created."
 
 	super initialize.
-	self length: 64. "default is pointer size (8 bytes)"
-	index := 0.
+	self widthInBits: 64. "default is pointer size (8 bytes)"
+	indexRegister := 0.
 	scale := 1.
 	displacement := 0.
 ! !
