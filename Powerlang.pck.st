@@ -1,256 +1,256 @@
-'From Cuis 6.0 [latest update: #5492] on 23 October 2022 at 4:03:57 pm'!
+'From Cuis 6.0 [latest update: #5494] on 24 October 2022 at 10:35:22 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 48!
+!provides: 'Powerlang' 1 50!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
-SystemOrganization addCategory: #'Powerlang-Core'!
-SystemOrganization addCategory: #'Powerlang-Core-Assembler-Intel'!
-SystemOrganization addCategory: #'Powerlang-Core-Assembly'!
-SystemOrganization addCategory: #'Powerlang-Core-Assembly-RISCV'!
-SystemOrganization addCategory: #'Powerlang-Core-Building'!
-SystemOrganization addCategory: #'Powerlang-Core-Execution'!
-SystemOrganization addCategory: #'Powerlang-Core-Execution-LMR'!
-SystemOrganization addCategory: #'Powerlang-Core-Metaphysics'!
-SystemOrganization addCategory: #'Powerlang-Core-Mirrors'!
-SystemOrganization addCategory: #'Powerlang-Core-Nativization'!
-SystemOrganization addCategory: #'Powerlang-Core-SCompiler'!
-SystemOrganization addCategory: #'Powerlang-Core-SCompiler-Bindings'!
-SystemOrganization addCategory: #'Powerlang-Core-SCompiler-Smalltalk'!
-SystemOrganization addCategory: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SystemOrganization addCategory: #'Powerlang-Core-SExpressions'!
+SystemOrganization addCategory: 'Powerlang-Core'!
+SystemOrganization addCategory: 'Powerlang-Core-Assembler-Intel'!
+SystemOrganization addCategory: 'Powerlang-Core-Assembly'!
+SystemOrganization addCategory: 'Powerlang-Core-Assembly-RISCV'!
+SystemOrganization addCategory: 'Powerlang-Core-Building'!
+SystemOrganization addCategory: 'Powerlang-Core-Execution'!
+SystemOrganization addCategory: 'Powerlang-Core-Execution-LMR'!
+SystemOrganization addCategory: 'Powerlang-Core-Metaphysics'!
+SystemOrganization addCategory: 'Powerlang-Core-Mirrors'!
+SystemOrganization addCategory: 'Powerlang-Core-Nativization'!
+SystemOrganization addCategory: 'Powerlang-Core-SCompiler'!
+SystemOrganization addCategory: 'Powerlang-Core-SCompiler-Bindings'!
+SystemOrganization addCategory: 'Powerlang-Core-SCompiler-Smalltalk'!
+SystemOrganization addCategory: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SystemOrganization addCategory: 'Powerlang-Core-SExpressions'!
 SystemOrganization addCategory: 'Powerlang-Core-Emulation'!
 SystemOrganization addCategory: 'Powerlang-Compatibility-Pharo'!
 SystemOrganization addCategory: 'Powerlang-Tests-SCompiler'!
 
 
-!classDefinition: #CharacterConstants category: #'Powerlang-Core'!
+!classDefinition: #CharacterConstants category: 'Powerlang-Core'!
 SharedPool subclass: #CharacterConstants
 	instanceVariableNames: ''
 	classVariableNames: 'Cr Lf Newline Space Tab'
 	poolDictionaries: ''
 	category: 'Powerlang-Core'!
-!classDefinition: 'CharacterConstants class' category: #'Powerlang-Core'!
+!classDefinition: 'CharacterConstants class' category: 'Powerlang-Core'!
 CharacterConstants class
 	instanceVariableNames: ''!
 
-!classDefinition: #OperandTypeFlags category: #'Powerlang-Core-Assembler-Intel'!
+!classDefinition: #OperandTypeFlags category: 'Powerlang-Core-Assembler-Intel'!
 SharedPool subclass: #OperandTypeFlags
 	instanceVariableNames: ''
 	classVariableNames: 'ConstantType ImmediateType MemoryType RegisterGP RegisterGroupMask RegisterSIMD RegisterSegment RegisterSpecific RegisterType'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Assembler-Intel'!
-!classDefinition: 'OperandTypeFlags class' category: #'Powerlang-Core-Assembler-Intel'!
+!classDefinition: 'OperandTypeFlags class' category: 'Powerlang-Core-Assembler-Intel'!
 OperandTypeFlags class
 	instanceVariableNames: ''!
 
-!classDefinition: #RegistersRISCV category: #'Powerlang-Core-Assembly-RISCV'!
+!classDefinition: #RegistersRISCV category: 'Powerlang-Core-Assembly-RISCV'!
 SharedPool subclass: #RegistersRISCV
 	instanceVariableNames: ''
 	classVariableNames: 'RegA RegE RegFP RegFalse RegFlags RegG RegLink RegM RegNil RegR RegS RegSP RegT RegTmp0 RegTmp1 RegTrue RegV RegX0 RegX1 RegZero'
 	poolDictionaries: 'RISC5Regs'
 	category: 'Powerlang-Core-Assembly-RISCV'!
-!classDefinition: 'RegistersRISCV class' category: #'Powerlang-Core-Assembly-RISCV'!
+!classDefinition: 'RegistersRISCV class' category: 'Powerlang-Core-Assembly-RISCV'!
 RegistersRISCV class
 	instanceVariableNames: ''!
 
-!classDefinition: #ObjectHeaderMasks category: #'Powerlang-Core-Metaphysics'!
+!classDefinition: #ObjectHeaderMasks category: 'Powerlang-Core-Metaphysics'!
 SharedPool subclass: #ObjectHeaderMasks
 	instanceVariableNames: ''
 	classVariableNames: 'IsArrayed IsBytes IsNamed IsSmall'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'ObjectHeaderMasks class' category: #'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectHeaderMasks class' category: 'Powerlang-Core-Metaphysics'!
 ObjectHeaderMasks class
 	instanceVariableNames: ''!
 
-!classDefinition: #ObjectHeaderOffsets category: #'Powerlang-Core-Metaphysics'!
+!classDefinition: #ObjectHeaderOffsets category: 'Powerlang-Core-Metaphysics'!
 SharedPool subclass: #ObjectHeaderOffsets
 	instanceVariableNames: ''
 	classVariableNames: 'BehaviorOffset FlagsOffset HashOffset LargeSizeOffset SizeOffset'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'ObjectHeaderOffsets class' category: #'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectHeaderOffsets class' category: 'Powerlang-Core-Metaphysics'!
 ObjectHeaderOffsets class
 	instanceVariableNames: ''!
 
-!classDefinition: #CompiledBlockFormatMasks category: #'Powerlang-Core-Mirrors'!
+!classDefinition: #CompiledBlockFormatMasks category: 'Powerlang-Core-Mirrors'!
 SharedPool subclass: #CompiledBlockFormatMasks
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Mirrors'!
-!classDefinition: 'CompiledBlockFormatMasks class' category: #'Powerlang-Core-Mirrors'!
+!classDefinition: 'CompiledBlockFormatMasks class' category: 'Powerlang-Core-Mirrors'!
 CompiledBlockFormatMasks class
 	instanceVariableNames: ''!
 
-!classDefinition: #CompiledMethodFormatMasks category: #'Powerlang-Core-Mirrors'!
+!classDefinition: #CompiledMethodFormatMasks category: 'Powerlang-Core-Mirrors'!
 SharedPool subclass: #CompiledMethodFormatMasks
 	instanceVariableNames: ''
 	classVariableNames: 'ArgCount BlockCount TempCount'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Mirrors'!
-!classDefinition: 'CompiledMethodFormatMasks class' category: #'Powerlang-Core-Mirrors'!
+!classDefinition: 'CompiledMethodFormatMasks class' category: 'Powerlang-Core-Mirrors'!
 CompiledMethodFormatMasks class
 	instanceVariableNames: ''!
 
-!classDefinition: #FrameOffsets category: #'Powerlang-Core-Mirrors'!
+!classDefinition: #FrameOffsets category: 'Powerlang-Core-Mirrors'!
 SharedPool subclass: #FrameOffsets
 	instanceVariableNames: ''
 	classVariableNames: 'CallerIndex LastArgumentIndex MethodIndex ReceiverIndex ReturnAddressIndex'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Mirrors'!
-!classDefinition: 'FrameOffsets class' category: #'Powerlang-Core-Mirrors'!
+!classDefinition: 'FrameOffsets class' category: 'Powerlang-Core-Mirrors'!
 FrameOffsets class
 	instanceVariableNames: 'CallerIndex LastArgumentIndex MethodIndex ReceiverIndex ReturnAddressIndex'!
 
-!classDefinition: #SpeciesFormatMasks category: #'Powerlang-Core-Mirrors'!
+!classDefinition: #SpeciesFormatMasks category: 'Powerlang-Core-Mirrors'!
 SharedPool subclass: #SpeciesFormatMasks
 	instanceVariableNames: ''
 	classVariableNames: 'InstSize IsPointers'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Mirrors'!
-!classDefinition: 'SpeciesFormatMasks class' category: #'Powerlang-Core-Mirrors'!
+!classDefinition: 'SpeciesFormatMasks class' category: 'Powerlang-Core-Mirrors'!
 SpeciesFormatMasks class
 	instanceVariableNames: 'InstSize IsPointers'!
 
-!classDefinition: #InlineMessageLinkerFlags category: #'Powerlang-Core-Nativization'!
+!classDefinition: #InlineMessageLinkerFlags category: 'Powerlang-Core-Nativization'!
 SharedPool subclass: #InlineMessageLinkerFlags
 	instanceVariableNames: ''
 	classVariableNames: '_ExtendedSize _Flags _Hash _Reserved _SmallSize'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'InlineMessageLinkerFlags class' category: #'Powerlang-Core-Nativization'!
+!classDefinition: 'InlineMessageLinkerFlags class' category: 'Powerlang-Core-Nativization'!
 InlineMessageLinkerFlags class
 	instanceVariableNames: '_ExtendedSize _Flags _Hash _Reserved _SmallSize'!
 
-!classDefinition: #SendSiteFlags category: #'Powerlang-Core-Nativization'!
+!classDefinition: #SendSiteFlags category: 'Powerlang-Core-Nativization'!
 SharedPool subclass: #SendSiteFlags
 	instanceVariableNames: ''
 	classVariableNames: 'HasBeenReset IsPolymorphic IsStaticSend IsSuperSend'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'SendSiteFlags class' category: #'Powerlang-Core-Nativization'!
+!classDefinition: 'SendSiteFlags class' category: 'Powerlang-Core-Nativization'!
 SendSiteFlags class
 	instanceVariableNames: 'HasBeenReset IsPolymorphic IsStaticSend IsSuperSend'!
 
-!classDefinition: #SCompiledBlockFlags category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SCompiledBlockFlags category: 'Powerlang-Core-SCompiler'!
 SharedPool subclass: #SCompiledBlockFlags
 	instanceVariableNames: ''
 	classVariableNames: 'BlockArgCount BlockCapturesHome BlockCapturesSelf BlockEnvCount BlockId BlockTempCount'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCompiledBlockFlags class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompiledBlockFlags class' category: 'Powerlang-Core-SCompiler'!
 SCompiledBlockFlags class
 	instanceVariableNames: 'BlockArgCount BlockCapturesHome BlockCapturesSelf BlockEnvCount BlockId BlockTempCount'!
 
-!classDefinition: #SCompiledMethodFlags category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SCompiledMethodFlags category: 'Powerlang-Core-SCompiler'!
 SharedPool subclass: #SCompiledMethodFlags
 	instanceVariableNames: ''
 	classVariableNames: 'ArgCount BlockCount CapturesSelf Debuggable EnvCount HasEnvironment HasFrame TempCount'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCompiledMethodFlags class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompiledMethodFlags class' category: 'Powerlang-Core-SCompiler'!
 SCompiledMethodFlags class
 	instanceVariableNames: 'ArgCount BlockCount CapturesSelf Debuggable EnvCount HasEnvironment HasFrame TempCount'!
 
-!classDefinition: #AstBindingTypes category: #'Powerlang-Core-SExpressions'!
+!classDefinition: #AstBindingTypes category: 'Powerlang-Core-SExpressions'!
 SharedPool subclass: #AstBindingTypes
 	instanceVariableNames: ''
 	classVariableNames: 'ArgumentId DynamicVarId FalseId NestedDynamicVarId NilId PopRid PushRid SelfId SuperId TemporaryId TrueId'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'AstBindingTypes class' category: #'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstBindingTypes class' category: 'Powerlang-Core-SExpressions'!
 AstBindingTypes class
 	instanceVariableNames: 'ArgumentId DynamicVarId FalseId NestedDynamicVarId NilId PopRid PushRid SelfId SuperId TemporaryId TrueId'!
 
-!classDefinition: #AstNodeTypes category: #'Powerlang-Core-SExpressions'!
+!classDefinition: #AstNodeTypes category: 'Powerlang-Core-SExpressions'!
 SharedPool subclass: #AstNodeTypes
 	instanceVariableNames: ''
 	classVariableNames: 'AssignmentId BlockId BraceId CascadeId IdentifierId LiteralId MessageId MethodId PragmaId ReturnId'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'AstNodeTypes class' category: #'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstNodeTypes class' category: 'Powerlang-Core-SExpressions'!
 AstNodeTypes class
 	instanceVariableNames: 'AssignmentId BlockId BraceId CascadeId IdentifierId LiteralId MessageId MethodId PragmaId ReturnId'!
 
-!classDefinition: #ClosureElementTypes category: #'Powerlang-Core-SExpressions'!
+!classDefinition: #ClosureElementTypes category: 'Powerlang-Core-SExpressions'!
 SharedPool subclass: #ClosureElementTypes
 	instanceVariableNames: ''
 	classVariableNames: 'Environment EnvironmentValue LocalArgument Self'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'ClosureElementTypes class' category: #'Powerlang-Core-SExpressions'!
+!classDefinition: 'ClosureElementTypes class' category: 'Powerlang-Core-SExpressions'!
 ClosureElementTypes class
 	instanceVariableNames: ''!
 
-!classDefinition: #SExpressionTypes category: #'Powerlang-Core-SExpressions'!
+!classDefinition: #SExpressionTypes category: 'Powerlang-Core-SExpressions'!
 SharedPool subclass: #SExpressionTypes
 	instanceVariableNames: ''
 	classVariableNames: 'AssignmentId BlockId BraceId CascadeId IdentifierId LiteralId MessageId MethodId PragmaId ReturnId'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SExpressionTypes class' category: #'Powerlang-Core-SExpressions'!
+!classDefinition: 'SExpressionTypes class' category: 'Powerlang-Core-SExpressions'!
 SExpressionTypes class
 	instanceVariableNames: ''!
 
-!classDefinition: #SClosure category: #'Powerlang-Core-Metaphysics'!
+!classDefinition: #SClosure category: 'Powerlang-Core-Metaphysics'!
 Array variableSubclass: #SClosure
 	instanceVariableNames: 'block home'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'SClosure class' category: #'Powerlang-Core-Metaphysics'!
+!classDefinition: 'SClosure class' category: 'Powerlang-Core-Metaphysics'!
 SClosure class
 	instanceVariableNames: ''!
 
-!classDefinition: #NativeCode category: #'Powerlang-Core-Nativization'!
+!classDefinition: #NativeCode category: 'Powerlang-Core-Nativization'!
 Array variableSubclass: #NativeCode
 	instanceVariableNames: 'machineCode compiledCode'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'NativeCode class' category: #'Powerlang-Core-Nativization'!
+!classDefinition: 'NativeCode class' category: 'Powerlang-Core-Nativization'!
 NativeCode class
 	instanceVariableNames: ''!
 
-!classDefinition: #SCompiledMethod category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SCompiledMethod category: 'Powerlang-Core-SCompiler'!
 Array variableSubclass: #SCompiledMethod
 	instanceVariableNames: 'format optimizedCode astcodes class selector source'
 	classVariableNames: ''
 	poolDictionaries: 'SCompiledMethodFlags'
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCompiledMethod class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompiledMethod class' category: 'Powerlang-Core-SCompiler'!
 SCompiledMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #SCallbackMethod category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SCallbackMethod category: 'Powerlang-Core-SCompiler'!
 SCompiledMethod variableSubclass: #SCallbackMethod
 	instanceVariableNames: 'receiver descriptor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCallbackMethod class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCallbackMethod class' category: 'Powerlang-Core-SCompiler'!
 SCallbackMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #SCalloutMethod category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SCalloutMethod category: 'Powerlang-Core-SCompiler'!
 SCompiledMethod variableSubclass: #SCalloutMethod
 	instanceVariableNames: 'descriptor symbol address'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCalloutMethod class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCalloutMethod class' category: 'Powerlang-Core-SCompiler'!
 SCalloutMethod class
 	instanceVariableNames: ''!
 
-!classDefinition: #SFFIDescriptor category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SFFIDescriptor category: 'Powerlang-Core-SCompiler'!
 ByteArray variableByteSubclass: #SFFIDescriptor
 	instanceVariableNames: ''
 	classVariableNames: 'FFICallingConventions FFITypes'
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SFFIDescriptor class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SFFIDescriptor class' category: 'Powerlang-Core-SCompiler'!
 SFFIDescriptor class
 	instanceVariableNames: 'FFICallingConventions FFITypes'!
 
@@ -264,1723 +264,43 @@ Dictionary subclass: #PoolDictionary
 PoolDictionary class
 	instanceVariableNames: ''!
 
-!classDefinition: #SCompilationError category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SCompilationError category: 'Powerlang-Core-SCompiler'!
 Error subclass: #SCompilationError
 	instanceVariableNames: 'compiler resumable retryable stretch'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCompilationError class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompilationError class' category: 'Powerlang-Core-SCompiler'!
 SCompilationError class
 	instanceVariableNames: ''!
 
-!classDefinition: #SInvalidPragmaError category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SInvalidPragmaError category: 'Powerlang-Core-SCompiler'!
 SCompilationError subclass: #SInvalidPragmaError
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SInvalidPragmaError class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SInvalidPragmaError class' category: 'Powerlang-Core-SCompiler'!
 SInvalidPragmaError class
 	instanceVariableNames: ''!
 
-!classDefinition: #SUndeclaredIdentifierError category: #'Powerlang-Core-SCompiler'!
+!classDefinition: #SUndeclaredIdentifierError category: 'Powerlang-Core-SCompiler'!
 SCompilationError subclass: #SUndeclaredIdentifierError
 	instanceVariableNames: 'identifier assigned'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SUndeclaredIdentifierError class' category: #'Powerlang-Core-SCompiler'!
+!classDefinition: 'SUndeclaredIdentifierError class' category: 'Powerlang-Core-SCompiler'!
 SUndeclaredIdentifierError class
 	instanceVariableNames: ''!
 
-!classDefinition: #NumberParser2 category: #'Powerlang-Core'!
-Object subclass: #NumberParser2
-	instanceVariableNames: 'stream error return'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core'!
-!classDefinition: 'NumberParser2 class' category: #'Powerlang-Core'!
-NumberParser2 class
-	instanceVariableNames: ''!
-
-!classDefinition: #OperandEncoding category: #'Powerlang-Core-Assembler-Intel'!
-Object subclass: #OperandEncoding
-	instanceVariableNames: 'name selectors descriptions immediate modrm'
-	classVariableNames: 'Encodings'
-	poolDictionaries: 'Registers'
-	category: 'Powerlang-Core-Assembler-Intel'!
-!classDefinition: 'OperandEncoding class' category: #'Powerlang-Core-Assembler-Intel'!
-OperandEncoding class
-	instanceVariableNames: ''!
-
-!classDefinition: #ABI category: #'Powerlang-Core-Assembly'!
-Object subclass: #ABI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Assembly'!
-!classDefinition: 'ABI class' category: #'Powerlang-Core-Assembly'!
-ABI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64GABI category: #'Powerlang-Core-Assembly-RISCV'!
-ABI subclass: #RV64GABI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: 'RegistersRISCV'
-	category: 'Powerlang-Core-Assembly-RISCV'!
-!classDefinition: 'RV64GABI class' category: #'Powerlang-Core-Assembly-RISCV'!
-RV64GABI class
-	instanceVariableNames: ''!
-
-!classDefinition: #Assembler category: #'Powerlang-Core-Assembly'!
-Object subclass: #Assembler
-	instanceVariableNames: 'codegen labels literals'
-	classVariableNames: 'IndexedLabels'
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Assembly'!
-!classDefinition: 'Assembler class' category: #'Powerlang-Core-Assembly'!
-Assembler class
-	instanceVariableNames: 'IndexedLabels'!
-
-!classDefinition: #CodeGenerator category: #'Powerlang-Core-Assembly'!
-Object subclass: #CodeGenerator
-	instanceVariableNames: 'abi wordSize memory'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Assembly'!
-!classDefinition: 'CodeGenerator class' category: #'Powerlang-Core-Assembly'!
-CodeGenerator class
-	instanceVariableNames: ''!
-
-!classDefinition: #RISCCodeGenerator category: #'Powerlang-Core-Assembly'!
-CodeGenerator subclass: #RISCCodeGenerator
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: 'RegistersRISCV'
-	category: 'Powerlang-Core-Assembly'!
-!classDefinition: 'RISCCodeGenerator class' category: #'Powerlang-Core-Assembly'!
-RISCCodeGenerator class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64GCodeGenerator category: #'Powerlang-Core-Assembly-RISCV'!
-RISCCodeGenerator subclass: #RV64GCodeGenerator
-	instanceVariableNames: 'zeroReg flagsReg tmp0Reg tmp1Reg linkReg'
-	classVariableNames: ''
-	poolDictionaries: 'RegistersRISCV'
-	category: 'Powerlang-Core-Assembly-RISCV'!
-!classDefinition: 'RV64GCodeGenerator class' category: #'Powerlang-Core-Assembly-RISCV'!
-RV64GCodeGenerator class
-	instanceVariableNames: ''!
-
-!classDefinition: #NativeCodeReference category: #'Powerlang-Core-Assembly'!
-Object subclass: #NativeCodeReference
-	instanceVariableNames: 'source sourceOffset target absolute'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Assembly'!
-!classDefinition: 'NativeCodeReference class' category: #'Powerlang-Core-Assembly'!
-NativeCodeReference class
-	instanceVariableNames: ''!
-
-!classDefinition: #RelocatableBuffer category: #'Powerlang-Core-Assembly'!
-Object subclass: #RelocatableBuffer
-	instanceVariableNames: 'stream address fixups'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Assembly'!
-!classDefinition: 'RelocatableBuffer class' category: #'Powerlang-Core-Assembly'!
-RelocatableBuffer class
-	instanceVariableNames: ''!
-
-!classDefinition: #RelocationFixup category: #'Powerlang-Core-Assembly'!
-Object subclass: #RelocationFixup
-	instanceVariableNames: 'source target relative size'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Assembly'!
-!classDefinition: 'RelocationFixup class' category: #'Powerlang-Core-Assembly'!
-RelocationFixup class
-	instanceVariableNames: ''!
-
-!classDefinition: #RVMemoryReference category: #'Powerlang-Core-Assembly-RISCV'!
-Object subclass: #RVMemoryReference
-	instanceVariableNames: 'widthInBits baseRegister indexRegister scale displacement'
-	classVariableNames: ''
-	poolDictionaries: 'Registers'
-	category: 'Powerlang-Core-Assembly-RISCV'!
-!classDefinition: 'RVMemoryReference class' category: #'Powerlang-Core-Assembly-RISCV'!
-RVMemoryReference class
-	instanceVariableNames: ''!
-
-!classDefinition: #LookupNativizer category: #'Powerlang-Core-Building'!
-Object subclass: #LookupNativizer
-	instanceVariableNames: 'bootstrapper methods'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Building'!
-!classDefinition: 'LookupNativizer class' category: #'Powerlang-Core-Building'!
-LookupNativizer class
-	instanceVariableNames: ''!
-
-!classDefinition: #ObjectMap category: #'Powerlang-Core-Building'!
-Object subclass: #ObjectMap
-	instanceVariableNames: 'behavior spec'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Building'!
-!classDefinition: 'ObjectMap class' category: #'Powerlang-Core-Building'!
-ObjectMap class
-	instanceVariableNames: ''!
-
-!classDefinition: #SmalltalkBootstrapper category: #'Powerlang-Core-Building'!
-Object subclass: #SmalltalkBootstrapper
-	instanceVariableNames: 'builder'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Building'!
-!classDefinition: 'SmalltalkBootstrapper class' category: #'Powerlang-Core-Building'!
-SmalltalkBootstrapper class
-	instanceVariableNames: ''!
-
-!classDefinition: #DMRBootstrapper category: #'Powerlang-Core-Building'!
-SmalltalkBootstrapper subclass: #DMRBootstrapper
-	instanceVariableNames: 'nativizer image'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Building'!
-!classDefinition: 'DMRBootstrapper class' category: #'Powerlang-Core-Building'!
-DMRBootstrapper class
-	instanceVariableNames: ''!
-
-!classDefinition: #EvaluationContext category: #'Powerlang-Core-Execution'!
-Object subclass: #EvaluationContext
-	instanceVariableNames: 'system'
-	classVariableNames: ''
-	poolDictionaries: 'ClosureElementTypes'
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'EvaluationContext class' category: #'Powerlang-Core-Execution'!
-EvaluationContext class
-	instanceVariableNames: ''!
-
-!classDefinition: #LinkedEvaluationContext category: #'Powerlang-Core-Execution'!
-EvaluationContext subclass: #LinkedEvaluationContext
-	instanceVariableNames: 'parent method arguments temporaries environment isBlock _self'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'LinkedEvaluationContext class' category: #'Powerlang-Core-Execution'!
-LinkedEvaluationContext class
-	instanceVariableNames: ''!
-
-!classDefinition: #IterativeLinkedEvaluationContext category: #'Powerlang-Core-Execution'!
-LinkedEvaluationContext subclass: #IterativeLinkedEvaluationContext
-	instanceVariableNames: 'operands work'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'IterativeLinkedEvaluationContext class' category: #'Powerlang-Core-Execution'!
-IterativeLinkedEvaluationContext class
-	instanceVariableNames: ''!
-
-!classDefinition: #RecursiveLinkedEvaluationContext category: #'Powerlang-Core-Execution'!
-LinkedEvaluationContext subclass: #RecursiveLinkedEvaluationContext
-	instanceVariableNames: 'nonLocalReturn'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'RecursiveLinkedEvaluationContext class' category: #'Powerlang-Core-Execution'!
-RecursiveLinkedEvaluationContext class
-	instanceVariableNames: ''!
-
-!classDefinition: #StackedEvaluationContext category: #'Powerlang-Core-Execution'!
-EvaluationContext subclass: #StackedEvaluationContext
-	instanceVariableNames: 'stack regSP regBP regM regS regE pc'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'StackedEvaluationContext class' category: #'Powerlang-Core-Execution'!
-StackedEvaluationContext class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkEvaluator category: #'Powerlang-Core-Execution'!
-Object subclass: #PowertalkEvaluator
-	instanceVariableNames: 'runtime falseObj trueObj nilObj context undermessages primitives messageCount'
-	classVariableNames: ''
-	poolDictionaries: 'ClosureElementTypes'
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkEvaluator class' category: #'Powerlang-Core-Execution'!
-PowertalkEvaluator class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkIterativeInterpreter category: #'Powerlang-Core-Execution'!
-PowertalkEvaluator subclass: #PowertalkIterativeInterpreter
-	instanceVariableNames: 'regR'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkIterativeInterpreter class' category: #'Powerlang-Core-Execution'!
-PowertalkIterativeInterpreter class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkIterativeLinkedInterpreter category: #'Powerlang-Core-Execution'!
-PowertalkIterativeInterpreter subclass: #PowertalkIterativeLinkedInterpreter
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkIterativeLinkedInterpreter class' category: #'Powerlang-Core-Execution'!
-PowertalkIterativeLinkedInterpreter class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkLinkedLinearInterpreter category: #'Powerlang-Core-Execution'!
-PowertalkIterativeLinkedInterpreter subclass: #PowertalkLinkedLinearInterpreter
-	instanceVariableNames: 'linearizer'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkLinkedLinearInterpreter class' category: #'Powerlang-Core-Execution'!
-PowertalkLinkedLinearInterpreter class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkLinkedTreeInterpreter category: #'Powerlang-Core-Execution'!
-PowertalkIterativeLinkedInterpreter subclass: #PowertalkLinkedTreeInterpreter
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkLinkedTreeInterpreter class' category: #'Powerlang-Core-Execution'!
-PowertalkLinkedTreeInterpreter class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkIterativeStackedInterpreter category: #'Powerlang-Core-Execution'!
-PowertalkIterativeInterpreter subclass: #PowertalkIterativeStackedInterpreter
-	instanceVariableNames: 'linearizer work'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkIterativeStackedInterpreter class' category: #'Powerlang-Core-Execution'!
-PowertalkIterativeStackedInterpreter class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkRecursiveInterpreter category: #'Powerlang-Core-Execution'!
-PowertalkEvaluator subclass: #PowertalkRecursiveInterpreter
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkRecursiveInterpreter class' category: #'Powerlang-Core-Execution'!
-PowertalkRecursiveInterpreter class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkRuntime category: #'Powerlang-Core-Execution'!
-Object subclass: #PowertalkRuntime
-	instanceVariableNames: 'methodCache falseObj trueObj nilObj interpreter overrides symbolCache'
-	classVariableNames: ''
-	poolDictionaries: 'ClosureElementTypes'
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'PowertalkRuntime class' category: #'Powerlang-Core-Execution'!
-PowertalkRuntime class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowertalkLMR category: #'Powerlang-Core-Execution-LMR'!
-PowertalkRuntime subclass: #PowertalkLMR
-	instanceVariableNames: 'kernel wordSize bootstrapper behaviorNextIndex behaviorMethodDictionaryIndex behaviorClassIndex classNameIndex methodFlagsIndex symbolTable maxSMI minSMI knownSymbols arrayClass metaclassClass speciesInstanceBehaviorIndex speciesFormatIndex methodOptimizedCodeIndex methodAstcodesIndex methodInstSize methodClassBindingIndex speciesSuperclassIndex methodClass smallIntegerClass blockClass speciesIvarsIndex dictionaryTableIndex metaclassInstanceClassIndex classModuleIndex moduleNamespaceIndex byteArrayClass stringClass closureBlockIndex closureClass lastHash blockMethodIndex behaviorClass classNamespacesIndex largePositiveIntegerClass largeNegativeIntegerClass'
-	classVariableNames: ''
-	poolDictionaries: 'SCompiledBlockFlags SCompiledMethodFlags'
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'PowertalkLMR class' category: #'Powerlang-Core-Execution-LMR'!
-PowertalkLMR class
-	instanceVariableNames: ''!
-
-!classDefinition: #SExpressionLinearizer category: #'Powerlang-Core-Execution'!
-Object subclass: #SExpressionLinearizer
-	instanceVariableNames: 'operations primitives inBlock runtime greaterThan one plus stackTop dropsArguments not equalsEquals ifTrue ifFalse ifTrueIfFalse ifFalseIfTrue ifNil ifNotNil ifNilIfNotNil ifNotNilIfNil whileTrue whileFalse whileTrue_ whileFalse_ toDo toByDo repeat timesRepeat andNot orNot'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution'!
-!classDefinition: 'SExpressionLinearizer class' category: #'Powerlang-Core-Execution'!
-SExpressionLinearizer class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRObject category: #'Powerlang-Core-Execution-LMR'!
-Object subclass: #LMRObject
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRObject class' category: #'Powerlang-Core-Execution-LMR'!
-LMRObject class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRHeapObject category: #'Powerlang-Core-Execution-LMR'!
-LMRObject subclass: #LMRHeapObject
-	instanceVariableNames: 'header'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRHeapObject class' category: #'Powerlang-Core-Execution-LMR'!
-LMRHeapObject class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRByteObject category: #'Powerlang-Core-Execution-LMR'!
-LMRHeapObject subclass: #LMRByteObject
-	instanceVariableNames: 'bytes'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRByteObject class' category: #'Powerlang-Core-Execution-LMR'!
-LMRByteObject class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRExecutableCode category: #'Powerlang-Core-Execution-LMR'!
-LMRHeapObject subclass: #LMRExecutableCode
-	instanceVariableNames: 'code'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRExecutableCode class' category: #'Powerlang-Core-Execution-LMR'!
-LMRExecutableCode class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRSlotObject category: #'Powerlang-Core-Execution-LMR'!
-LMRHeapObject subclass: #LMRSlotObject
-	instanceVariableNames: 'slots'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRSlotObject class' category: #'Powerlang-Core-Execution-LMR'!
-LMRSlotObject class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRBehaviorObject category: #'Powerlang-Core-Execution-LMR'!
-LMRSlotObject subclass: #LMRBehaviorObject
-	instanceVariableNames: 'runtime'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRBehaviorObject class' category: #'Powerlang-Core-Execution-LMR'!
-LMRBehaviorObject class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRSmallInteger category: #'Powerlang-Core-Execution-LMR'!
-LMRObject subclass: #LMRSmallInteger
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRSmallInteger class' category: #'Powerlang-Core-Execution-LMR'!
-LMRSmallInteger class
-	instanceVariableNames: ''!
-
-!classDefinition: #LMRObjectHeader category: #'Powerlang-Core-Execution-LMR'!
-Object subclass: #LMRObjectHeader
-	instanceVariableNames: 'behavior flags size hash'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Execution-LMR'!
-!classDefinition: 'LMRObjectHeader class' category: #'Powerlang-Core-Execution-LMR'!
-LMRObjectHeader class
-	instanceVariableNames: ''!
-
-!classDefinition: #ObjectFormat category: #'Powerlang-Core-Metaphysics'!
-Object subclass: #ObjectFormat
-	instanceVariableNames: 'runtime storage'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'ObjectFormat class' category: #'Powerlang-Core-Metaphysics'!
-ObjectFormat class
-	instanceVariableNames: ''!
-
-!classDefinition: #DmrObjectFormat category: #'Powerlang-Core-Metaphysics'!
-ObjectFormat subclass: #DmrObjectFormat
-	instanceVariableNames: 'wordSize'
-	classVariableNames: ''
-	poolDictionaries: 'ObjectHeaderMasks ObjectHeaderOffsets'
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'DmrObjectFormat class' category: #'Powerlang-Core-Metaphysics'!
-DmrObjectFormat class
-	instanceVariableNames: ''!
-
-!classDefinition: #ObjectShape category: #'Powerlang-Core-Metaphysics'!
-Object subclass: #ObjectShape
-	instanceVariableNames: 'name fields'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'ObjectShape class' category: #'Powerlang-Core-Metaphysics'!
-ObjectShape class
-	instanceVariableNames: ''!
-
-!classDefinition: #SExpressionInterpreter category: #'Powerlang-Core-Metaphysics'!
-Object subclass: #SExpressionInterpreter
-	instanceVariableNames: 'receiver arguments temporaries returned returnValue method parent gateBuilder blockAstcodes environment'
-	classVariableNames: ''
-	poolDictionaries: 'private'
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'SExpressionInterpreter class' category: #'Powerlang-Core-Metaphysics'!
-SExpressionInterpreter class
-	instanceVariableNames: ''!
-
-!classDefinition: #SmalltalkInterpreter category: #'Powerlang-Core-Metaphysics'!
-SExpressionInterpreter subclass: #SmalltalkInterpreter
-	instanceVariableNames: 'localRuntime'
-	classVariableNames: 'Underprimitives'
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'SmalltalkInterpreter class' category: #'Powerlang-Core-Metaphysics'!
-SmalltalkInterpreter class
-	instanceVariableNames: 'underprimitives'!
-
-!classDefinition: #ShapeMap category: #'Powerlang-Core-Metaphysics'!
-Object subclass: #ShapeMap
-	instanceVariableNames: 'shapes'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'ShapeMap class' category: #'Powerlang-Core-Metaphysics'!
-ShapeMap class
-	instanceVariableNames: ''!
-
-!classDefinition: #Storage category: #'Powerlang-Core-Metaphysics'!
-Object subclass: #Storage
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'Storage class' category: #'Powerlang-Core-Metaphysics'!
-Storage class
-	instanceVariableNames: ''!
-
-!classDefinition: #StorageReadError category: #'Powerlang-Core-Metaphysics'!
-Object subclass: #StorageReadError
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Metaphysics'!
-!classDefinition: 'StorageReadError class' category: #'Powerlang-Core-Metaphysics'!
-StorageReadError class
-	instanceVariableNames: ''!
-
-!classDefinition: #BinaryMessageNativizer category: #'Powerlang-Core-Nativization'!
-Object subclass: #BinaryMessageNativizer
-	instanceVariableNames: 'message assembler nativizer done failed'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'BinaryMessageNativizer class' category: #'Powerlang-Core-Nativization'!
-BinaryMessageNativizer class
-	instanceVariableNames: ''!
-
-!classDefinition: #InlinedMessageNativizer category: #'Powerlang-Core-Nativization'!
-Object subclass: #InlinedMessageNativizer
-	instanceVariableNames: 'message assembler nativizer start end'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'InlinedMessageNativizer class' category: #'Powerlang-Core-Nativization'!
-InlinedMessageNativizer class
-	instanceVariableNames: ''!
-
-!classDefinition: #MessageLinker category: #'Powerlang-Core-Nativization'!
-Object subclass: #MessageLinker
-	instanceVariableNames: 'filter'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'MessageLinker class' category: #'Powerlang-Core-Nativization'!
-MessageLinker class
-	instanceVariableNames: ''!
-
-!classDefinition: #CompositeMessageLinker category: #'Powerlang-Core-Nativization'!
-MessageLinker subclass: #CompositeMessageLinker
-	instanceVariableNames: 'candidates'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'CompositeMessageLinker class' category: #'Powerlang-Core-Nativization'!
-CompositeMessageLinker class
-	instanceVariableNames: ''!
-
-!classDefinition: #HaltingSend category: #'Powerlang-Core-Nativization'!
-MessageLinker subclass: #HaltingSend
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'HaltingSend class' category: #'Powerlang-Core-Nativization'!
-HaltingSend class
-	instanceVariableNames: ''!
-
-!classDefinition: #InlineMessageLinker category: #'Powerlang-Core-Nativization'!
-MessageLinker subclass: #InlineMessageLinker
-	instanceVariableNames: 'assembler map'
-	classVariableNames: ''
-	poolDictionaries: 'InlineMessageLinkerFlags Registers'
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'InlineMessageLinker class' category: #'Powerlang-Core-Nativization'!
-InlineMessageLinker class
-	instanceVariableNames: ''!
-
-!classDefinition: #InvokeLinker category: #'Powerlang-Core-Nativization'!
-MessageLinker subclass: #InvokeLinker
-	instanceVariableNames: 'invoker sends'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'InvokeLinker class' category: #'Powerlang-Core-Nativization'!
-InvokeLinker class
-	instanceVariableNames: ''!
-
-!classDefinition: #LookupLinker category: #'Powerlang-Core-Nativization'!
-MessageLinker subclass: #LookupLinker
-	instanceVariableNames: 'lookup lookupSuper'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'LookupLinker class' category: #'Powerlang-Core-Nativization'!
-LookupLinker class
-	instanceVariableNames: ''!
-
-!classDefinition: #LazyLinker category: #'Powerlang-Core-Nativization'!
-LookupLinker subclass: #LazyLinker
-	instanceVariableNames: 'sends'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'LazyLinker class' category: #'Powerlang-Core-Nativization'!
-LazyLinker class
-	instanceVariableNames: ''!
-
-!classDefinition: #NativizationEnvironment category: #'Powerlang-Core-Nativization'!
-Object subclass: #NativizationEnvironment
-	instanceVariableNames: 'platform optimizedMethods invokedMethods inlinedMethods messageLinker globals writeBarrier safepointCheck cachedNativizer busy'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'NativizationEnvironment class' category: #'Powerlang-Core-Nativization'!
-NativizationEnvironment class
-	instanceVariableNames: ''!
-
-!classDefinition: #NativizationPlatform category: #'Powerlang-Core-Nativization'!
-Object subclass: #NativizationPlatform
-	instanceVariableNames: 'name wordSize abi codeGeneratorClass'
-	classVariableNames: 'Default'
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'NativizationPlatform class' category: #'Powerlang-Core-Nativization'!
-NativizationPlatform class
-	instanceVariableNames: 'Default'!
-
-!classDefinition: #Opcode category: #'Powerlang-Core-Nativization'!
-Object subclass: #Opcode
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'Opcode class' category: #'Powerlang-Core-Nativization'!
-Opcode class
-	instanceVariableNames: ''!
-
-!classDefinition: #EnsureSmallIntegerOpcode category: #'Powerlang-Core-Nativization'!
-Opcode subclass: #EnsureSmallIntegerOpcode
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'EnsureSmallIntegerOpcode class' category: #'Powerlang-Core-Nativization'!
-EnsureSmallIntegerOpcode class
-	instanceVariableNames: ''!
-
-!classDefinition: #EnsureASmallInteger category: #'Powerlang-Core-Nativization'!
-EnsureSmallIntegerOpcode subclass: #EnsureASmallInteger
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'EnsureASmallInteger class' category: #'Powerlang-Core-Nativization'!
-EnsureASmallInteger class
-	instanceVariableNames: ''!
-
-!classDefinition: #EnsureRSmallInteger category: #'Powerlang-Core-Nativization'!
-EnsureSmallIntegerOpcode subclass: #EnsureRSmallInteger
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'EnsureRSmallInteger class' category: #'Powerlang-Core-Nativization'!
-EnsureRSmallInteger class
-	instanceVariableNames: ''!
-
-!classDefinition: #SExpressionNativizer category: #'Powerlang-Core-Nativization'!
-Object subclass: #SExpressionNativizer
-	instanceVariableNames: 'environment method remainingBlocks safepointCheck mainCode stackCount fallbacks activeScript ir'
-	classVariableNames: ''
-	poolDictionaries: 'private'
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'SExpressionNativizer class' category: #'Powerlang-Core-Nativization'!
-SExpressionNativizer class
-	instanceVariableNames: ''!
-
-!classDefinition: #SendSite category: #'Powerlang-Core-Nativization'!
-Object subclass: #SendSite
-	instanceVariableNames: 'instructions selector cache tally format'
-	classVariableNames: ''
-	poolDictionaries: 'SendSiteFlags'
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'SendSite class' category: #'Powerlang-Core-Nativization'!
-SendSite class
-	instanceVariableNames: ''!
-
-!classDefinition: #StackFrameCursor category: #'Powerlang-Core-Nativization'!
-Object subclass: #StackFrameCursor
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-Nativization'!
-!classDefinition: 'StackFrameCursor class' category: #'Powerlang-Core-Nativization'!
-StackFrameCursor class
-	instanceVariableNames: ''!
-
-!classDefinition: #IdentifierBinder category: #'Powerlang-Core-SCompiler'!
-Object subclass: #IdentifierBinder
-	instanceVariableNames: 'contents'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'IdentifierBinder class' category: #'Powerlang-Core-SCompiler'!
-IdentifierBinder class
-	instanceVariableNames: ''!
-
-!classDefinition: #StaticBinder category: #'Powerlang-Core-SCompiler'!
-IdentifierBinder subclass: #StaticBinder
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'StaticBinder class' category: #'Powerlang-Core-SCompiler'!
-StaticBinder class
-	instanceVariableNames: ''!
-
-!classDefinition: #LocalEnvironment category: #'Powerlang-Core-SCompiler'!
-Object subclass: #LocalEnvironment
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: 'ClosureElementTypes'
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'LocalEnvironment class' category: #'Powerlang-Core-SCompiler'!
-LocalEnvironment class
-	instanceVariableNames: ''!
-
-!classDefinition: #ArrayEnvironment category: #'Powerlang-Core-SCompiler'!
-LocalEnvironment subclass: #ArrayEnvironment
-	instanceVariableNames: 'index'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'ArrayEnvironment class' category: #'Powerlang-Core-SCompiler'!
-ArrayEnvironment class
-	instanceVariableNames: ''!
-
-!classDefinition: #StackEnvironment category: #'Powerlang-Core-SCompiler'!
-LocalEnvironment subclass: #StackEnvironment
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'StackEnvironment class' category: #'Powerlang-Core-SCompiler'!
-StackEnvironment class
-	instanceVariableNames: ''!
-
-!classDefinition: #ArgumentEnvironment category: #'Powerlang-Core-SCompiler'!
-StackEnvironment subclass: #ArgumentEnvironment
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'ArgumentEnvironment class' category: #'Powerlang-Core-SCompiler'!
-ArgumentEnvironment class
-	instanceVariableNames: ''!
-
-!classDefinition: #InlinedArgEnvironment category: #'Powerlang-Core-SCompiler'!
-StackEnvironment subclass: #InlinedArgEnvironment
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'InlinedArgEnvironment class' category: #'Powerlang-Core-SCompiler'!
-InlinedArgEnvironment class
-	instanceVariableNames: ''!
-
-!classDefinition: #MessageInliner category: #'Powerlang-Core-SCompiler'!
-Object subclass: #MessageInliner
-	instanceVariableNames: 'message'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'MessageInliner class' category: #'Powerlang-Core-SCompiler'!
-MessageInliner class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCompilationResult category: #'Powerlang-Core-SCompiler'!
-Object subclass: #SCompilationResult
-	instanceVariableNames: 'compiler error ast method'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCompilationResult class' category: #'Powerlang-Core-SCompiler'!
-SCompilationResult class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCompiledBlock category: #'Powerlang-Core-SCompiler'!
-Object subclass: #SCompiledBlock
-	instanceVariableNames: 'format optimizedCode method'
-	classVariableNames: ''
-	poolDictionaries: 'SCompiledBlockFlags'
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCompiledBlock class' category: #'Powerlang-Core-SCompiler'!
-SCompiledBlock class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCompiler category: #'Powerlang-Core-SCompiler'!
-Object subclass: #SCompiler
-	instanceVariableNames: 'errorHandler result class'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SCompiler class' category: #'Powerlang-Core-SCompiler'!
-SCompiler class
-	instanceVariableNames: ''!
-
-!classDefinition: #SParseTreeVisitor category: #'Powerlang-Core-SCompiler'!
-Object subclass: #SParseTreeVisitor
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SParseTreeVisitor class' category: #'Powerlang-Core-SCompiler'!
-SParseTreeVisitor class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSemanticVisitor category: #'Powerlang-Core-SCompiler'!
-SParseTreeVisitor subclass: #SSemanticVisitor
-	instanceVariableNames: 'inliner'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'SSemanticVisitor class' category: #'Powerlang-Core-SCompiler'!
-SSemanticVisitor class
-	instanceVariableNames: ''!
-
-!classDefinition: #AstcodeEncoder category: #'Powerlang-Core-SExpressions'!
-SParseTreeVisitor subclass: #AstcodeEncoder
-	instanceVariableNames: 'method stream script'
-	classVariableNames: ''
-	poolDictionaries: 'AstBindingTypes AstNodeTypes ClosureElementTypes'
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'AstcodeEncoder class' category: #'Powerlang-Core-SExpressions'!
-AstcodeEncoder class
-	instanceVariableNames: ''!
-
-!classDefinition: #ScriptScope category: #'Powerlang-Core-SCompiler'!
-Object subclass: #ScriptScope
-	instanceVariableNames: 'script arguments temporaries stackSize envSize captureSelf'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'ScriptScope class' category: #'Powerlang-Core-SCompiler'!
-ScriptScope class
-	instanceVariableNames: ''!
-
-!classDefinition: #BlockScope category: #'Powerlang-Core-SCompiler'!
-ScriptScope subclass: #BlockScope
-	instanceVariableNames: 'environments captured'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'BlockScope class' category: #'Powerlang-Core-SCompiler'!
-BlockScope class
-	instanceVariableNames: ''!
-
-!classDefinition: #MethodScope category: #'Powerlang-Core-SCompiler'!
-ScriptScope subclass: #MethodScope
-	instanceVariableNames: 'pseudo'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler'!
-!classDefinition: 'MethodScope class' category: #'Powerlang-Core-SCompiler'!
-MethodScope class
-	instanceVariableNames: ''!
-
-!classDefinition: #Binding category: #'Powerlang-Core-SCompiler-Bindings'!
-Object subclass: #Binding
-	instanceVariableNames: 'name'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'Binding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-Binding class
-	instanceVariableNames: ''!
-
-!classDefinition: #AssociationBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-Binding subclass: #AssociationBinding
-	instanceVariableNames: 'association'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'AssociationBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-AssociationBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #PoolVarBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-AssociationBinding subclass: #PoolVarBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'PoolVarBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-PoolVarBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #DynamicBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-Binding subclass: #DynamicBinding
-	instanceVariableNames: ''
-	classVariableNames: 'Default'
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'DynamicBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-DynamicBinding class
-	instanceVariableNames: 'Default'!
-
-!classDefinition: #NestedDynamicBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-DynamicBinding subclass: #NestedDynamicBinding
-	instanceVariableNames: 'parent'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'NestedDynamicBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-NestedDynamicBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #LiteralBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-Binding subclass: #LiteralBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'LiteralBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-LiteralBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #FalseBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-LiteralBinding subclass: #FalseBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'FalseBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-FalseBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #NilBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-LiteralBinding subclass: #NilBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'NilBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-NilBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #TrueBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-LiteralBinding subclass: #TrueBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'TrueBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-TrueBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #LocalBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-Binding subclass: #LocalBinding
-	instanceVariableNames: 'index environment declaration'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'LocalBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-LocalBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #ArgumentBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-LocalBinding subclass: #ArgumentBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'ArgumentBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-ArgumentBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #TemporaryBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-LocalBinding subclass: #TemporaryBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'TemporaryBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-TemporaryBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SelfBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-Binding subclass: #SelfBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'SelfBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-SelfBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SuperBinding category: #'Powerlang-Core-SCompiler-Bindings'!
-SelfBinding subclass: #SuperBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Bindings'!
-!classDefinition: 'SuperBinding class' category: #'Powerlang-Core-SCompiler-Bindings'!
-SuperBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSmalltalkCompiler category: #'Powerlang-Core-SCompiler-Smalltalk'!
-Object subclass: #SSmalltalkCompiler
-	instanceVariableNames: 'frontend source ast result headless blocks leaf activeScript'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk'!
-!classDefinition: 'SSmalltalkCompiler class' category: #'Powerlang-Core-SCompiler-Smalltalk'!
-SSmalltalkCompiler class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSmalltalkParser category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-Object subclass: #SSmalltalkParser
-	instanceVariableNames: 'compiler scanner token next'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SSmalltalkParser class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SSmalltalkParser class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSmalltalkScanner category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-Object subclass: #SSmalltalkScanner
-	instanceVariableNames: 'compiler stream'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SSmalltalkScanner class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SSmalltalkScanner class
-	instanceVariableNames: ''!
-
-!classDefinition: #SToken category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-Object subclass: #SToken
-	instanceVariableNames: 'compiler stretch comments'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SToken class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SToken class
-	instanceVariableNames: ''!
-
-!classDefinition: #SEndToken category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SToken subclass: #SEndToken
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SEndToken class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SEndToken class
-	instanceVariableNames: ''!
-
-!classDefinition: #SParseNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SToken subclass: #SParseNode
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SParseNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SAssignmentNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SAssignmentNode
-	instanceVariableNames: 'assignees expression operators'
-	classVariableNames: 'Token'
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SAssignmentNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SAssignmentNode class
-	instanceVariableNames: 'Token'!
-
-!classDefinition: #SBraceNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SBraceNode
-	instanceVariableNames: 'elements message'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SBraceNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SBraceNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCascadeNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SCascadeNode
-	instanceVariableNames: 'receiver messages optimized'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SCascadeNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SCascadeNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCommentNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SCommentNode
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SCommentNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SCommentNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SIdentifierNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SIdentifierNode
-	instanceVariableNames: 'name binding'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SIdentifierNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SIdentifierNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SLiteralNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SLiteralNode
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SLiteralNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SLiteralNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SNumberNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SLiteralNode subclass: #SNumberNode
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SNumberNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SNumberNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SStringNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SLiteralNode subclass: #SStringNode
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SStringNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SStringNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SMessageNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SMessageNode
-	instanceVariableNames: 'selector receiver arguments inlined'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SMessageNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SMessageNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCascadeMessageNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SMessageNode subclass: #SCascadeMessageNode
-	instanceVariableNames: 'cascade'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SCascadeMessageNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SCascadeMessageNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SReturnNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SReturnNode
-	instanceVariableNames: 'expression return'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SReturnNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SReturnNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SScriptNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SScriptNode
-	instanceVariableNames: 'statements arguments temporaries children scope'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SScriptNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SScriptNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SBlockNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SScriptNode subclass: #SBlockNode
-	instanceVariableNames: 'inlined index parent'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SBlockNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SBlockNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SMethodNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SScriptNode subclass: #SMethodNode
-	instanceVariableNames: 'selector pragma'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SMethodNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SMethodNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSelectorNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SParseNode subclass: #SSelectorNode
-	instanceVariableNames: 'symbol keywords'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SSelectorNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SSelectorNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SPragmaNode category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SToken subclass: #SPragmaNode
-	instanceVariableNames: 'type name info'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SPragmaNode class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SPragmaNode class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSymbolicToken category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SToken subclass: #SSymbolicToken
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SSymbolicToken class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SSymbolicToken class
-	instanceVariableNames: ''!
-
-!classDefinition: #SDelimiterToken category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SSymbolicToken subclass: #SDelimiterToken
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SDelimiterToken class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SDelimiterToken class
-	instanceVariableNames: ''!
-
-!classDefinition: #SStringToken category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SSymbolicToken subclass: #SStringToken
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-!classDefinition: 'SStringToken class' category: #'Powerlang-Core-SCompiler-Smalltalk-Parser'!
-SStringToken class
-	instanceVariableNames: ''!
-
-!classDefinition: #AstcodeDecoder category: #'Powerlang-Core-SExpressions'!
-Object subclass: #AstcodeDecoder
-	instanceVariableNames: 'method stream builder'
-	classVariableNames: 'BindingTypes NodeTypes'
-	poolDictionaries: 'AstBindingTypes AstNodeTypes'
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'AstcodeDecoder class' category: #'Powerlang-Core-SExpressions'!
-AstcodeDecoder class
-	instanceVariableNames: 'BindingTypes NodeTypes'!
-
-!classDefinition: #SBinding category: #'Powerlang-Core-SExpressions'!
-Object subclass: #SBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SBinding class' category: #'Powerlang-Core-SExpressions'!
-SBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SAssociationBinding category: #'Powerlang-Core-SExpressions'!
-SBinding subclass: #SAssociationBinding
-	instanceVariableNames: 'index association'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SAssociationBinding class' category: #'Powerlang-Core-SExpressions'!
-SAssociationBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SDynamicBinding category: #'Powerlang-Core-SExpressions'!
-SBinding subclass: #SDynamicBinding
-	instanceVariableNames: 'name cache'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SDynamicBinding class' category: #'Powerlang-Core-SExpressions'!
-SDynamicBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SNestedDynamicBinding category: #'Powerlang-Core-SExpressions'!
-SDynamicBinding subclass: #SNestedDynamicBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SNestedDynamicBinding class' category: #'Powerlang-Core-SExpressions'!
-SNestedDynamicBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SInstVarBinding category: #'Powerlang-Core-SExpressions'!
-SBinding subclass: #SInstVarBinding
-	instanceVariableNames: 'index'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SInstVarBinding class' category: #'Powerlang-Core-SExpressions'!
-SInstVarBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SLiteralBinding category: #'Powerlang-Core-SExpressions'!
-SBinding subclass: #SLiteralBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SLiteralBinding class' category: #'Powerlang-Core-SExpressions'!
-SLiteralBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SFalseBinding category: #'Powerlang-Core-SExpressions'!
-SLiteralBinding subclass: #SFalseBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SFalseBinding class' category: #'Powerlang-Core-SExpressions'!
-SFalseBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SNilBinding category: #'Powerlang-Core-SExpressions'!
-SLiteralBinding subclass: #SNilBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SNilBinding class' category: #'Powerlang-Core-SExpressions'!
-SNilBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #STrueBinding category: #'Powerlang-Core-SExpressions'!
-SLiteralBinding subclass: #STrueBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'STrueBinding class' category: #'Powerlang-Core-SExpressions'!
-STrueBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SLocalBinding category: #'Powerlang-Core-SExpressions'!
-SBinding subclass: #SLocalBinding
-	instanceVariableNames: 'position environment'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SLocalBinding class' category: #'Powerlang-Core-SExpressions'!
-SLocalBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SArgumentBinding category: #'Powerlang-Core-SExpressions'!
-SLocalBinding subclass: #SArgumentBinding
-	instanceVariableNames: 'inlined'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SArgumentBinding class' category: #'Powerlang-Core-SExpressions'!
-SArgumentBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #STemporaryBinding category: #'Powerlang-Core-SExpressions'!
-SLocalBinding subclass: #STemporaryBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'STemporaryBinding class' category: #'Powerlang-Core-SExpressions'!
-STemporaryBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSelfBinding category: #'Powerlang-Core-SExpressions'!
-SBinding subclass: #SSelfBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SSelfBinding class' category: #'Powerlang-Core-SExpressions'!
-SSelfBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SSuperBinding category: #'Powerlang-Core-SExpressions'!
-SSelfBinding subclass: #SSuperBinding
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SSuperBinding class' category: #'Powerlang-Core-SExpressions'!
-SSuperBinding class
-	instanceVariableNames: ''!
-
-!classDefinition: #SExpression category: #'Powerlang-Core-SExpressions'!
-Object subclass: #SExpression
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SExpression class' category: #'Powerlang-Core-SExpressions'!
-SExpression class
-	instanceVariableNames: ''!
-
-!classDefinition: #SAssignment category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SAssignment
-	instanceVariableNames: 'assignees expression'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SAssignment class' category: #'Powerlang-Core-SExpressions'!
-SAssignment class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCascade category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SCascade
-	instanceVariableNames: 'receiver messages'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SCascade class' category: #'Powerlang-Core-SExpressions'!
-SCascade class
-	instanceVariableNames: ''!
-
-!classDefinition: #SCascadeMessage category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SCascadeMessage
-	instanceVariableNames: 'selector arguments cascade cache'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SCascadeMessage class' category: #'Powerlang-Core-SExpressions'!
-SCascadeMessage class
-	instanceVariableNames: ''!
-
-!classDefinition: #SIdentifier category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SIdentifier
-	instanceVariableNames: 'binding'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SIdentifier class' category: #'Powerlang-Core-SExpressions'!
-SIdentifier class
-	instanceVariableNames: ''!
-
-!classDefinition: #SLiteralVar category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SLiteralVar
-	instanceVariableNames: 'index'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SLiteralVar class' category: #'Powerlang-Core-SExpressions'!
-SLiteralVar class
-	instanceVariableNames: ''!
-
-!classDefinition: #SLiteral category: #'Powerlang-Core-SExpressions'!
-SLiteralVar subclass: #SLiteral
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SLiteral class' category: #'Powerlang-Core-SExpressions'!
-SLiteral class
-	instanceVariableNames: ''!
-
-!classDefinition: #SMessage category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SMessage
-	instanceVariableNames: 'selector receiver arguments cache inlined'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SMessage class' category: #'Powerlang-Core-SExpressions'!
-SMessage class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOperation category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SOperation
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOperation class' category: #'Powerlang-Core-SExpressions'!
-SOperation class
-	instanceVariableNames: ''!
-
-!classDefinition: #SInlinerOperation category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SInlinerOperation
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SInlinerOperation class' category: #'Powerlang-Core-SExpressions'!
-SInlinerOperation class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpJump category: #'Powerlang-Core-SExpressions'!
-SInlinerOperation subclass: #SOpJump
-	instanceVariableNames: 'target'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpJump class' category: #'Powerlang-Core-SExpressions'!
-SOpJump class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpJumpFalse category: #'Powerlang-Core-SExpressions'!
-SOpJump subclass: #SOpJumpFalse
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpJumpFalse class' category: #'Powerlang-Core-SExpressions'!
-SOpJumpFalse class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpJumpTrue category: #'Powerlang-Core-SExpressions'!
-SOpJump subclass: #SOpJumpTrue
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpJumpTrue class' category: #'Powerlang-Core-SExpressions'!
-SOpJumpTrue class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpLoadRfromFrame category: #'Powerlang-Core-SExpressions'!
-SInlinerOperation subclass: #SOpLoadRfromFrame
-	instanceVariableNames: 'index'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpLoadRfromFrame class' category: #'Powerlang-Core-SExpressions'!
-SOpLoadRfromFrame class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpPopR category: #'Powerlang-Core-SExpressions'!
-SInlinerOperation subclass: #SOpPopR
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpPopR class' category: #'Powerlang-Core-SExpressions'!
-SOpPopR class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpStoreRintoFrame category: #'Powerlang-Core-SExpressions'!
-SInlinerOperation subclass: #SOpStoreRintoFrame
-	instanceVariableNames: 'index'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpStoreRintoFrame class' category: #'Powerlang-Core-SExpressions'!
-SOpStoreRintoFrame class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpAssign category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpAssign
-	instanceVariableNames: 'assignees'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpAssign class' category: #'Powerlang-Core-SExpressions'!
-SOpAssign class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpDispatchMessage category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpDispatchMessage
-	instanceVariableNames: 'message'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpDispatchMessage class' category: #'Powerlang-Core-SExpressions'!
-SOpDispatchMessage class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpDropToS category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpDropToS
-	instanceVariableNames: 'count'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpDropToS class' category: #'Powerlang-Core-SExpressions'!
-SOpDropToS class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpLoadRfromStack category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpLoadRfromStack
-	instanceVariableNames: 'index'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpLoadRfromStack class' category: #'Powerlang-Core-SExpressions'!
-SOpLoadRfromStack class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpLoadRwithNil category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpLoadRwithNil
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpLoadRwithNil class' category: #'Powerlang-Core-SExpressions'!
-SOpLoadRwithNil class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpLoadRwithSelf category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpLoadRwithSelf
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpLoadRwithSelf class' category: #'Powerlang-Core-SExpressions'!
-SOpLoadRwithSelf class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpPrimitive category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpPrimitive
-	instanceVariableNames: 'block'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpPrimitive class' category: #'Powerlang-Core-SExpressions'!
-SOpPrimitive class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpPushR category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpPushR
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpPushR class' category: #'Powerlang-Core-SExpressions'!
-SOpPushR class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpRestart category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpRestart
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpRestart class' category: #'Powerlang-Core-SExpressions'!
-SOpRestart class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpReturn category: #'Powerlang-Core-SExpressions'!
-SOperation subclass: #SOpReturn
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpReturn class' category: #'Powerlang-Core-SExpressions'!
-SOpReturn class
-	instanceVariableNames: ''!
-
-!classDefinition: #SOpNonLocalReturn category: #'Powerlang-Core-SExpressions'!
-SOpReturn subclass: #SOpNonLocalReturn
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SOpNonLocalReturn class' category: #'Powerlang-Core-SExpressions'!
-SOpNonLocalReturn class
-	instanceVariableNames: ''!
-
-!classDefinition: #SPragma category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SPragma
-	instanceVariableNames: 'name'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SPragma class' category: #'Powerlang-Core-SExpressions'!
-SPragma class
-	instanceVariableNames: ''!
-
-!classDefinition: #SReturn category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SReturn
-	instanceVariableNames: 'local expression'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SReturn class' category: #'Powerlang-Core-SExpressions'!
-SReturn class
-	instanceVariableNames: ''!
-
-!classDefinition: #SScript category: #'Powerlang-Core-SExpressions'!
-SExpression subclass: #SScript
-	instanceVariableNames: 'statements compiledCode'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SScript class' category: #'Powerlang-Core-SExpressions'!
-SScript class
-	instanceVariableNames: ''!
-
-!classDefinition: #SBlock category: #'Powerlang-Core-SExpressions'!
-SScript subclass: #SBlock
-	instanceVariableNames: 'index capturedVariables inlinedArgs'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SBlock class' category: #'Powerlang-Core-SExpressions'!
-SBlock class
-	instanceVariableNames: ''!
-
-!classDefinition: #SMethod category: #'Powerlang-Core-SExpressions'!
-SScript subclass: #SMethod
-	instanceVariableNames: 'pragma'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Powerlang-Core-SExpressions'!
-!classDefinition: 'SMethod class' category: #'Powerlang-Core-SExpressions'!
-SMethod class
-	instanceVariableNames: ''!
-
-!classDefinition: #PowerLangPackage category: #'Powerlang-Core'!
+!classDefinition: #PowerLangPackage category: 'Powerlang-Core'!
 CodePackage subclass: #PowerLangPackage
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core'!
-!classDefinition: 'PowerLangPackage class' category: #'Powerlang-Core'!
+!classDefinition: 'PowerLangPackage class' category: 'Powerlang-Core'!
 PowerLangPackage class
 	instanceVariableNames: ''!
 
@@ -1992,6 +312,1686 @@ TestCase subclass: #ScriptScopeTest
 	category: 'Powerlang-Tests-SCompiler'!
 !classDefinition: 'ScriptScopeTest class' category: 'Powerlang-Tests-SCompiler'!
 ScriptScopeTest class
+	instanceVariableNames: ''!
+
+!classDefinition: #NumberParser2 category: 'Powerlang-Core'!
+Object subclass: #NumberParser2
+	instanceVariableNames: 'stream error return'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core'!
+!classDefinition: 'NumberParser2 class' category: 'Powerlang-Core'!
+NumberParser2 class
+	instanceVariableNames: ''!
+
+!classDefinition: #OperandEncoding category: 'Powerlang-Core-Assembler-Intel'!
+Object subclass: #OperandEncoding
+	instanceVariableNames: 'name selectors descriptions immediate modrm'
+	classVariableNames: 'Encodings'
+	poolDictionaries: 'Registers'
+	category: 'Powerlang-Core-Assembler-Intel'!
+!classDefinition: 'OperandEncoding class' category: 'Powerlang-Core-Assembler-Intel'!
+OperandEncoding class
+	instanceVariableNames: ''!
+
+!classDefinition: #ABI category: 'Powerlang-Core-Assembly'!
+Object subclass: #ABI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Assembly'!
+!classDefinition: 'ABI class' category: 'Powerlang-Core-Assembly'!
+ABI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64GABI category: 'Powerlang-Core-Assembly-RISCV'!
+ABI subclass: #RV64GABI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: 'RegistersRISCV'
+	category: 'Powerlang-Core-Assembly-RISCV'!
+!classDefinition: 'RV64GABI class' category: 'Powerlang-Core-Assembly-RISCV'!
+RV64GABI class
+	instanceVariableNames: ''!
+
+!classDefinition: #Assembler category: 'Powerlang-Core-Assembly'!
+Object subclass: #Assembler
+	instanceVariableNames: 'codegen labels literals'
+	classVariableNames: 'IndexedLabels'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Assembly'!
+!classDefinition: 'Assembler class' category: 'Powerlang-Core-Assembly'!
+Assembler class
+	instanceVariableNames: 'IndexedLabels'!
+
+!classDefinition: #CodeGenerator category: 'Powerlang-Core-Assembly'!
+Object subclass: #CodeGenerator
+	instanceVariableNames: 'abi wordSize memory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Assembly'!
+!classDefinition: 'CodeGenerator class' category: 'Powerlang-Core-Assembly'!
+CodeGenerator class
+	instanceVariableNames: ''!
+
+!classDefinition: #RISCCodeGenerator category: 'Powerlang-Core-Assembly'!
+CodeGenerator subclass: #RISCCodeGenerator
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: 'RegistersRISCV'
+	category: 'Powerlang-Core-Assembly'!
+!classDefinition: 'RISCCodeGenerator class' category: 'Powerlang-Core-Assembly'!
+RISCCodeGenerator class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64GCodeGenerator category: 'Powerlang-Core-Assembly-RISCV'!
+RISCCodeGenerator subclass: #RV64GCodeGenerator
+	instanceVariableNames: 'zeroReg flagsReg tmp0Reg tmp1Reg linkReg'
+	classVariableNames: ''
+	poolDictionaries: 'RegistersRISCV'
+	category: 'Powerlang-Core-Assembly-RISCV'!
+!classDefinition: 'RV64GCodeGenerator class' category: 'Powerlang-Core-Assembly-RISCV'!
+RV64GCodeGenerator class
+	instanceVariableNames: ''!
+
+!classDefinition: #NativeCodeReference category: 'Powerlang-Core-Assembly'!
+Object subclass: #NativeCodeReference
+	instanceVariableNames: 'source sourceOffset target absolute'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Assembly'!
+!classDefinition: 'NativeCodeReference class' category: 'Powerlang-Core-Assembly'!
+NativeCodeReference class
+	instanceVariableNames: ''!
+
+!classDefinition: #RelocatableBuffer category: 'Powerlang-Core-Assembly'!
+Object subclass: #RelocatableBuffer
+	instanceVariableNames: 'stream address fixups'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Assembly'!
+!classDefinition: 'RelocatableBuffer class' category: 'Powerlang-Core-Assembly'!
+RelocatableBuffer class
+	instanceVariableNames: ''!
+
+!classDefinition: #RelocationFixup category: 'Powerlang-Core-Assembly'!
+Object subclass: #RelocationFixup
+	instanceVariableNames: 'source target relative size'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Assembly'!
+!classDefinition: 'RelocationFixup class' category: 'Powerlang-Core-Assembly'!
+RelocationFixup class
+	instanceVariableNames: ''!
+
+!classDefinition: #RVMemoryReference category: 'Powerlang-Core-Assembly-RISCV'!
+Object subclass: #RVMemoryReference
+	instanceVariableNames: 'widthInBits baseRegister indexRegister scale offset'
+	classVariableNames: ''
+	poolDictionaries: 'Registers'
+	category: 'Powerlang-Core-Assembly-RISCV'!
+!classDefinition: 'RVMemoryReference class' category: 'Powerlang-Core-Assembly-RISCV'!
+RVMemoryReference class
+	instanceVariableNames: ''!
+
+!classDefinition: #LookupNativizer category: 'Powerlang-Core-Building'!
+Object subclass: #LookupNativizer
+	instanceVariableNames: 'bootstrapper methods'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Building'!
+!classDefinition: 'LookupNativizer class' category: 'Powerlang-Core-Building'!
+LookupNativizer class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectMap category: 'Powerlang-Core-Building'!
+Object subclass: #ObjectMap
+	instanceVariableNames: 'behavior spec'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Building'!
+!classDefinition: 'ObjectMap class' category: 'Powerlang-Core-Building'!
+ObjectMap class
+	instanceVariableNames: ''!
+
+!classDefinition: #SmalltalkBootstrapper category: 'Powerlang-Core-Building'!
+Object subclass: #SmalltalkBootstrapper
+	instanceVariableNames: 'builder'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Building'!
+!classDefinition: 'SmalltalkBootstrapper class' category: 'Powerlang-Core-Building'!
+SmalltalkBootstrapper class
+	instanceVariableNames: ''!
+
+!classDefinition: #DMRBootstrapper category: 'Powerlang-Core-Building'!
+SmalltalkBootstrapper subclass: #DMRBootstrapper
+	instanceVariableNames: 'nativizer image'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Building'!
+!classDefinition: 'DMRBootstrapper class' category: 'Powerlang-Core-Building'!
+DMRBootstrapper class
+	instanceVariableNames: ''!
+
+!classDefinition: #EvaluationContext category: 'Powerlang-Core-Execution'!
+Object subclass: #EvaluationContext
+	instanceVariableNames: 'system'
+	classVariableNames: ''
+	poolDictionaries: 'ClosureElementTypes'
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'EvaluationContext class' category: 'Powerlang-Core-Execution'!
+EvaluationContext class
+	instanceVariableNames: ''!
+
+!classDefinition: #LinkedEvaluationContext category: 'Powerlang-Core-Execution'!
+EvaluationContext subclass: #LinkedEvaluationContext
+	instanceVariableNames: 'parent method arguments temporaries environment isBlock _self'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'LinkedEvaluationContext class' category: 'Powerlang-Core-Execution'!
+LinkedEvaluationContext class
+	instanceVariableNames: ''!
+
+!classDefinition: #IterativeLinkedEvaluationContext category: 'Powerlang-Core-Execution'!
+LinkedEvaluationContext subclass: #IterativeLinkedEvaluationContext
+	instanceVariableNames: 'operands work'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'IterativeLinkedEvaluationContext class' category: 'Powerlang-Core-Execution'!
+IterativeLinkedEvaluationContext class
+	instanceVariableNames: ''!
+
+!classDefinition: #RecursiveLinkedEvaluationContext category: 'Powerlang-Core-Execution'!
+LinkedEvaluationContext subclass: #RecursiveLinkedEvaluationContext
+	instanceVariableNames: 'nonLocalReturn'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'RecursiveLinkedEvaluationContext class' category: 'Powerlang-Core-Execution'!
+RecursiveLinkedEvaluationContext class
+	instanceVariableNames: ''!
+
+!classDefinition: #StackedEvaluationContext category: 'Powerlang-Core-Execution'!
+EvaluationContext subclass: #StackedEvaluationContext
+	instanceVariableNames: 'stack regSP regBP regM regS regE pc'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'StackedEvaluationContext class' category: 'Powerlang-Core-Execution'!
+StackedEvaluationContext class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkEvaluator category: 'Powerlang-Core-Execution'!
+Object subclass: #PowertalkEvaluator
+	instanceVariableNames: 'runtime falseObj trueObj nilObj context undermessages primitives messageCount'
+	classVariableNames: ''
+	poolDictionaries: 'ClosureElementTypes'
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkEvaluator class' category: 'Powerlang-Core-Execution'!
+PowertalkEvaluator class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkIterativeInterpreter category: 'Powerlang-Core-Execution'!
+PowertalkEvaluator subclass: #PowertalkIterativeInterpreter
+	instanceVariableNames: 'regR'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkIterativeInterpreter class' category: 'Powerlang-Core-Execution'!
+PowertalkIterativeInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkIterativeLinkedInterpreter category: 'Powerlang-Core-Execution'!
+PowertalkIterativeInterpreter subclass: #PowertalkIterativeLinkedInterpreter
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkIterativeLinkedInterpreter class' category: 'Powerlang-Core-Execution'!
+PowertalkIterativeLinkedInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkLinkedLinearInterpreter category: 'Powerlang-Core-Execution'!
+PowertalkIterativeLinkedInterpreter subclass: #PowertalkLinkedLinearInterpreter
+	instanceVariableNames: 'linearizer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkLinkedLinearInterpreter class' category: 'Powerlang-Core-Execution'!
+PowertalkLinkedLinearInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkLinkedTreeInterpreter category: 'Powerlang-Core-Execution'!
+PowertalkIterativeLinkedInterpreter subclass: #PowertalkLinkedTreeInterpreter
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkLinkedTreeInterpreter class' category: 'Powerlang-Core-Execution'!
+PowertalkLinkedTreeInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkIterativeStackedInterpreter category: 'Powerlang-Core-Execution'!
+PowertalkIterativeInterpreter subclass: #PowertalkIterativeStackedInterpreter
+	instanceVariableNames: 'linearizer work'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkIterativeStackedInterpreter class' category: 'Powerlang-Core-Execution'!
+PowertalkIterativeStackedInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkRecursiveInterpreter category: 'Powerlang-Core-Execution'!
+PowertalkEvaluator subclass: #PowertalkRecursiveInterpreter
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkRecursiveInterpreter class' category: 'Powerlang-Core-Execution'!
+PowertalkRecursiveInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkRuntime category: 'Powerlang-Core-Execution'!
+Object subclass: #PowertalkRuntime
+	instanceVariableNames: 'methodCache falseObj trueObj nilObj interpreter overrides symbolCache'
+	classVariableNames: ''
+	poolDictionaries: 'ClosureElementTypes'
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'PowertalkRuntime class' category: 'Powerlang-Core-Execution'!
+PowertalkRuntime class
+	instanceVariableNames: ''!
+
+!classDefinition: #PowertalkLMR category: 'Powerlang-Core-Execution-LMR'!
+PowertalkRuntime subclass: #PowertalkLMR
+	instanceVariableNames: 'kernel wordSize bootstrapper behaviorNextIndex behaviorMethodDictionaryIndex behaviorClassIndex classNameIndex methodFlagsIndex symbolTable maxSMI minSMI knownSymbols arrayClass metaclassClass speciesInstanceBehaviorIndex speciesFormatIndex methodOptimizedCodeIndex methodAstcodesIndex methodInstSize methodClassBindingIndex speciesSuperclassIndex methodClass smallIntegerClass blockClass speciesIvarsIndex dictionaryTableIndex metaclassInstanceClassIndex classModuleIndex moduleNamespaceIndex byteArrayClass stringClass closureBlockIndex closureClass lastHash blockMethodIndex behaviorClass classNamespacesIndex largePositiveIntegerClass largeNegativeIntegerClass'
+	classVariableNames: ''
+	poolDictionaries: 'SCompiledBlockFlags SCompiledMethodFlags'
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'PowertalkLMR class' category: 'Powerlang-Core-Execution-LMR'!
+PowertalkLMR class
+	instanceVariableNames: ''!
+
+!classDefinition: #SExpressionLinearizer category: 'Powerlang-Core-Execution'!
+Object subclass: #SExpressionLinearizer
+	instanceVariableNames: 'operations primitives inBlock runtime greaterThan one plus stackTop dropsArguments not equalsEquals ifTrue ifFalse ifTrueIfFalse ifFalseIfTrue ifNil ifNotNil ifNilIfNotNil ifNotNilIfNil whileTrue whileFalse whileTrue_ whileFalse_ toDo toByDo repeat timesRepeat andNot orNot'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution'!
+!classDefinition: 'SExpressionLinearizer class' category: 'Powerlang-Core-Execution'!
+SExpressionLinearizer class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRObject category: 'Powerlang-Core-Execution-LMR'!
+Object subclass: #LMRObject
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRObject class' category: 'Powerlang-Core-Execution-LMR'!
+LMRObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRHeapObject category: 'Powerlang-Core-Execution-LMR'!
+LMRObject subclass: #LMRHeapObject
+	instanceVariableNames: 'header'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRHeapObject class' category: 'Powerlang-Core-Execution-LMR'!
+LMRHeapObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRByteObject category: 'Powerlang-Core-Execution-LMR'!
+LMRHeapObject subclass: #LMRByteObject
+	instanceVariableNames: 'bytes'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRByteObject class' category: 'Powerlang-Core-Execution-LMR'!
+LMRByteObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRExecutableCode category: 'Powerlang-Core-Execution-LMR'!
+LMRHeapObject subclass: #LMRExecutableCode
+	instanceVariableNames: 'code'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRExecutableCode class' category: 'Powerlang-Core-Execution-LMR'!
+LMRExecutableCode class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRSlotObject category: 'Powerlang-Core-Execution-LMR'!
+LMRHeapObject subclass: #LMRSlotObject
+	instanceVariableNames: 'slots'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRSlotObject class' category: 'Powerlang-Core-Execution-LMR'!
+LMRSlotObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRBehaviorObject category: 'Powerlang-Core-Execution-LMR'!
+LMRSlotObject subclass: #LMRBehaviorObject
+	instanceVariableNames: 'runtime'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRBehaviorObject class' category: 'Powerlang-Core-Execution-LMR'!
+LMRBehaviorObject class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRSmallInteger category: 'Powerlang-Core-Execution-LMR'!
+LMRObject subclass: #LMRSmallInteger
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRSmallInteger class' category: 'Powerlang-Core-Execution-LMR'!
+LMRSmallInteger class
+	instanceVariableNames: ''!
+
+!classDefinition: #LMRObjectHeader category: 'Powerlang-Core-Execution-LMR'!
+Object subclass: #LMRObjectHeader
+	instanceVariableNames: 'behavior flags size hash'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Execution-LMR'!
+!classDefinition: 'LMRObjectHeader class' category: 'Powerlang-Core-Execution-LMR'!
+LMRObjectHeader class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectFormat category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #ObjectFormat
+	instanceVariableNames: 'runtime storage'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectFormat class' category: 'Powerlang-Core-Metaphysics'!
+ObjectFormat class
+	instanceVariableNames: ''!
+
+!classDefinition: #DmrObjectFormat category: 'Powerlang-Core-Metaphysics'!
+ObjectFormat subclass: #DmrObjectFormat
+	instanceVariableNames: 'wordSize'
+	classVariableNames: ''
+	poolDictionaries: 'ObjectHeaderMasks ObjectHeaderOffsets'
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'DmrObjectFormat class' category: 'Powerlang-Core-Metaphysics'!
+DmrObjectFormat class
+	instanceVariableNames: ''!
+
+!classDefinition: #ObjectShape category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #ObjectShape
+	instanceVariableNames: 'name fields'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ObjectShape class' category: 'Powerlang-Core-Metaphysics'!
+ObjectShape class
+	instanceVariableNames: ''!
+
+!classDefinition: #SExpressionInterpreter category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #SExpressionInterpreter
+	instanceVariableNames: 'receiver arguments temporaries returned returnValue method parent gateBuilder blockAstcodes environment'
+	classVariableNames: ''
+	poolDictionaries: 'private'
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'SExpressionInterpreter class' category: 'Powerlang-Core-Metaphysics'!
+SExpressionInterpreter class
+	instanceVariableNames: ''!
+
+!classDefinition: #SmalltalkInterpreter category: 'Powerlang-Core-Metaphysics'!
+SExpressionInterpreter subclass: #SmalltalkInterpreter
+	instanceVariableNames: 'localRuntime'
+	classVariableNames: 'Underprimitives'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'SmalltalkInterpreter class' category: 'Powerlang-Core-Metaphysics'!
+SmalltalkInterpreter class
+	instanceVariableNames: 'underprimitives'!
+
+!classDefinition: #ShapeMap category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #ShapeMap
+	instanceVariableNames: 'shapes'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'ShapeMap class' category: 'Powerlang-Core-Metaphysics'!
+ShapeMap class
+	instanceVariableNames: ''!
+
+!classDefinition: #Storage category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #Storage
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'Storage class' category: 'Powerlang-Core-Metaphysics'!
+Storage class
+	instanceVariableNames: ''!
+
+!classDefinition: #StorageReadError category: 'Powerlang-Core-Metaphysics'!
+Object subclass: #StorageReadError
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Metaphysics'!
+!classDefinition: 'StorageReadError class' category: 'Powerlang-Core-Metaphysics'!
+StorageReadError class
+	instanceVariableNames: ''!
+
+!classDefinition: #BinaryMessageNativizer category: 'Powerlang-Core-Nativization'!
+Object subclass: #BinaryMessageNativizer
+	instanceVariableNames: 'message assembler nativizer done failed'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'BinaryMessageNativizer class' category: 'Powerlang-Core-Nativization'!
+BinaryMessageNativizer class
+	instanceVariableNames: ''!
+
+!classDefinition: #InlinedMessageNativizer category: 'Powerlang-Core-Nativization'!
+Object subclass: #InlinedMessageNativizer
+	instanceVariableNames: 'message assembler nativizer start end'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'InlinedMessageNativizer class' category: 'Powerlang-Core-Nativization'!
+InlinedMessageNativizer class
+	instanceVariableNames: ''!
+
+!classDefinition: #MessageLinker category: 'Powerlang-Core-Nativization'!
+Object subclass: #MessageLinker
+	instanceVariableNames: 'filter'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'MessageLinker class' category: 'Powerlang-Core-Nativization'!
+MessageLinker class
+	instanceVariableNames: ''!
+
+!classDefinition: #CompositeMessageLinker category: 'Powerlang-Core-Nativization'!
+MessageLinker subclass: #CompositeMessageLinker
+	instanceVariableNames: 'candidates'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'CompositeMessageLinker class' category: 'Powerlang-Core-Nativization'!
+CompositeMessageLinker class
+	instanceVariableNames: ''!
+
+!classDefinition: #HaltingSend category: 'Powerlang-Core-Nativization'!
+MessageLinker subclass: #HaltingSend
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'HaltingSend class' category: 'Powerlang-Core-Nativization'!
+HaltingSend class
+	instanceVariableNames: ''!
+
+!classDefinition: #InlineMessageLinker category: 'Powerlang-Core-Nativization'!
+MessageLinker subclass: #InlineMessageLinker
+	instanceVariableNames: 'assembler map'
+	classVariableNames: ''
+	poolDictionaries: 'InlineMessageLinkerFlags Registers'
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'InlineMessageLinker class' category: 'Powerlang-Core-Nativization'!
+InlineMessageLinker class
+	instanceVariableNames: ''!
+
+!classDefinition: #InvokeLinker category: 'Powerlang-Core-Nativization'!
+MessageLinker subclass: #InvokeLinker
+	instanceVariableNames: 'invoker sends'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'InvokeLinker class' category: 'Powerlang-Core-Nativization'!
+InvokeLinker class
+	instanceVariableNames: ''!
+
+!classDefinition: #LookupLinker category: 'Powerlang-Core-Nativization'!
+MessageLinker subclass: #LookupLinker
+	instanceVariableNames: 'lookup lookupSuper'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'LookupLinker class' category: 'Powerlang-Core-Nativization'!
+LookupLinker class
+	instanceVariableNames: ''!
+
+!classDefinition: #LazyLinker category: 'Powerlang-Core-Nativization'!
+LookupLinker subclass: #LazyLinker
+	instanceVariableNames: 'sends'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'LazyLinker class' category: 'Powerlang-Core-Nativization'!
+LazyLinker class
+	instanceVariableNames: ''!
+
+!classDefinition: #NativizationEnvironment category: 'Powerlang-Core-Nativization'!
+Object subclass: #NativizationEnvironment
+	instanceVariableNames: 'platform optimizedMethods invokedMethods inlinedMethods messageLinker globals writeBarrier safepointCheck cachedNativizer busy'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'NativizationEnvironment class' category: 'Powerlang-Core-Nativization'!
+NativizationEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #NativizationPlatform category: 'Powerlang-Core-Nativization'!
+Object subclass: #NativizationPlatform
+	instanceVariableNames: 'name wordSize abi codeGeneratorClass'
+	classVariableNames: 'Default'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'NativizationPlatform class' category: 'Powerlang-Core-Nativization'!
+NativizationPlatform class
+	instanceVariableNames: 'Default'!
+
+!classDefinition: #Opcode category: 'Powerlang-Core-Nativization'!
+Object subclass: #Opcode
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'Opcode class' category: 'Powerlang-Core-Nativization'!
+Opcode class
+	instanceVariableNames: ''!
+
+!classDefinition: #EnsureSmallIntegerOpcode category: 'Powerlang-Core-Nativization'!
+Opcode subclass: #EnsureSmallIntegerOpcode
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'EnsureSmallIntegerOpcode class' category: 'Powerlang-Core-Nativization'!
+EnsureSmallIntegerOpcode class
+	instanceVariableNames: ''!
+
+!classDefinition: #EnsureASmallInteger category: 'Powerlang-Core-Nativization'!
+EnsureSmallIntegerOpcode subclass: #EnsureASmallInteger
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'EnsureASmallInteger class' category: 'Powerlang-Core-Nativization'!
+EnsureASmallInteger class
+	instanceVariableNames: ''!
+
+!classDefinition: #EnsureRSmallInteger category: 'Powerlang-Core-Nativization'!
+EnsureSmallIntegerOpcode subclass: #EnsureRSmallInteger
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'EnsureRSmallInteger class' category: 'Powerlang-Core-Nativization'!
+EnsureRSmallInteger class
+	instanceVariableNames: ''!
+
+!classDefinition: #SExpressionNativizer category: 'Powerlang-Core-Nativization'!
+Object subclass: #SExpressionNativizer
+	instanceVariableNames: 'environment method remainingBlocks safepointCheck mainCode stackCount fallbacks activeScript ir'
+	classVariableNames: ''
+	poolDictionaries: 'private'
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'SExpressionNativizer class' category: 'Powerlang-Core-Nativization'!
+SExpressionNativizer class
+	instanceVariableNames: ''!
+
+!classDefinition: #SendSite category: 'Powerlang-Core-Nativization'!
+Object subclass: #SendSite
+	instanceVariableNames: 'instructions selector cache tally format'
+	classVariableNames: ''
+	poolDictionaries: 'SendSiteFlags'
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'SendSite class' category: 'Powerlang-Core-Nativization'!
+SendSite class
+	instanceVariableNames: ''!
+
+!classDefinition: #StackFrameCursor category: 'Powerlang-Core-Nativization'!
+Object subclass: #StackFrameCursor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-Nativization'!
+!classDefinition: 'StackFrameCursor class' category: 'Powerlang-Core-Nativization'!
+StackFrameCursor class
+	instanceVariableNames: ''!
+
+!classDefinition: #IdentifierBinder category: 'Powerlang-Core-SCompiler'!
+Object subclass: #IdentifierBinder
+	instanceVariableNames: 'contents'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'IdentifierBinder class' category: 'Powerlang-Core-SCompiler'!
+IdentifierBinder class
+	instanceVariableNames: ''!
+
+!classDefinition: #StaticBinder category: 'Powerlang-Core-SCompiler'!
+IdentifierBinder subclass: #StaticBinder
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'StaticBinder class' category: 'Powerlang-Core-SCompiler'!
+StaticBinder class
+	instanceVariableNames: ''!
+
+!classDefinition: #LocalEnvironment category: 'Powerlang-Core-SCompiler'!
+Object subclass: #LocalEnvironment
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: 'ClosureElementTypes'
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'LocalEnvironment class' category: 'Powerlang-Core-SCompiler'!
+LocalEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #ArrayEnvironment category: 'Powerlang-Core-SCompiler'!
+LocalEnvironment subclass: #ArrayEnvironment
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'ArrayEnvironment class' category: 'Powerlang-Core-SCompiler'!
+ArrayEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #StackEnvironment category: 'Powerlang-Core-SCompiler'!
+LocalEnvironment subclass: #StackEnvironment
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'StackEnvironment class' category: 'Powerlang-Core-SCompiler'!
+StackEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #ArgumentEnvironment category: 'Powerlang-Core-SCompiler'!
+StackEnvironment subclass: #ArgumentEnvironment
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'ArgumentEnvironment class' category: 'Powerlang-Core-SCompiler'!
+ArgumentEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #InlinedArgEnvironment category: 'Powerlang-Core-SCompiler'!
+StackEnvironment subclass: #InlinedArgEnvironment
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'InlinedArgEnvironment class' category: 'Powerlang-Core-SCompiler'!
+InlinedArgEnvironment class
+	instanceVariableNames: ''!
+
+!classDefinition: #MessageInliner category: 'Powerlang-Core-SCompiler'!
+Object subclass: #MessageInliner
+	instanceVariableNames: 'message'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'MessageInliner class' category: 'Powerlang-Core-SCompiler'!
+MessageInliner class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCompilationResult category: 'Powerlang-Core-SCompiler'!
+Object subclass: #SCompilationResult
+	instanceVariableNames: 'compiler error ast method'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompilationResult class' category: 'Powerlang-Core-SCompiler'!
+SCompilationResult class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCompiledBlock category: 'Powerlang-Core-SCompiler'!
+Object subclass: #SCompiledBlock
+	instanceVariableNames: 'format optimizedCode method'
+	classVariableNames: ''
+	poolDictionaries: 'SCompiledBlockFlags'
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompiledBlock class' category: 'Powerlang-Core-SCompiler'!
+SCompiledBlock class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCompiler category: 'Powerlang-Core-SCompiler'!
+Object subclass: #SCompiler
+	instanceVariableNames: 'errorHandler result class'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SCompiler class' category: 'Powerlang-Core-SCompiler'!
+SCompiler class
+	instanceVariableNames: ''!
+
+!classDefinition: #SParseTreeVisitor category: 'Powerlang-Core-SCompiler'!
+Object subclass: #SParseTreeVisitor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SParseTreeVisitor class' category: 'Powerlang-Core-SCompiler'!
+SParseTreeVisitor class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSemanticVisitor category: 'Powerlang-Core-SCompiler'!
+SParseTreeVisitor subclass: #SSemanticVisitor
+	instanceVariableNames: 'inliner'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'SSemanticVisitor class' category: 'Powerlang-Core-SCompiler'!
+SSemanticVisitor class
+	instanceVariableNames: ''!
+
+!classDefinition: #AstcodeEncoder category: 'Powerlang-Core-SExpressions'!
+SParseTreeVisitor subclass: #AstcodeEncoder
+	instanceVariableNames: 'method stream script'
+	classVariableNames: ''
+	poolDictionaries: 'AstBindingTypes AstNodeTypes ClosureElementTypes'
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstcodeEncoder class' category: 'Powerlang-Core-SExpressions'!
+AstcodeEncoder class
+	instanceVariableNames: ''!
+
+!classDefinition: #ScriptScope category: 'Powerlang-Core-SCompiler'!
+Object subclass: #ScriptScope
+	instanceVariableNames: 'script arguments temporaries stackSize envSize captureSelf'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'ScriptScope class' category: 'Powerlang-Core-SCompiler'!
+ScriptScope class
+	instanceVariableNames: ''!
+
+!classDefinition: #BlockScope category: 'Powerlang-Core-SCompiler'!
+ScriptScope subclass: #BlockScope
+	instanceVariableNames: 'environments captured'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'BlockScope class' category: 'Powerlang-Core-SCompiler'!
+BlockScope class
+	instanceVariableNames: ''!
+
+!classDefinition: #MethodScope category: 'Powerlang-Core-SCompiler'!
+ScriptScope subclass: #MethodScope
+	instanceVariableNames: 'pseudo'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'MethodScope class' category: 'Powerlang-Core-SCompiler'!
+MethodScope class
+	instanceVariableNames: ''!
+
+!classDefinition: #Binding category: 'Powerlang-Core-SCompiler-Bindings'!
+Object subclass: #Binding
+	instanceVariableNames: 'name'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'Binding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding class
+	instanceVariableNames: ''!
+
+!classDefinition: #AssociationBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #AssociationBinding
+	instanceVariableNames: 'association'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'AssociationBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+AssociationBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #PoolVarBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+AssociationBinding subclass: #PoolVarBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'PoolVarBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+PoolVarBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #DynamicBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #DynamicBinding
+	instanceVariableNames: ''
+	classVariableNames: 'Default'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'DynamicBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+DynamicBinding class
+	instanceVariableNames: 'Default'!
+
+!classDefinition: #NestedDynamicBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+DynamicBinding subclass: #NestedDynamicBinding
+	instanceVariableNames: 'parent'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'NestedDynamicBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+NestedDynamicBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #LiteralBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #LiteralBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'LiteralBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+LiteralBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #FalseBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LiteralBinding subclass: #FalseBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'FalseBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+FalseBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #NilBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LiteralBinding subclass: #NilBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'NilBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+NilBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #TrueBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LiteralBinding subclass: #TrueBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'TrueBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+TrueBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #LocalBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #LocalBinding
+	instanceVariableNames: 'index environment declaration'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'LocalBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+LocalBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #ArgumentBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LocalBinding subclass: #ArgumentBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'ArgumentBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+ArgumentBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #TemporaryBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+LocalBinding subclass: #TemporaryBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'TemporaryBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+TemporaryBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SelfBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+Binding subclass: #SelfBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'SelfBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+SelfBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SuperBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+SelfBinding subclass: #SuperBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'SuperBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+SuperBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSmalltalkCompiler category: 'Powerlang-Core-SCompiler-Smalltalk'!
+Object subclass: #SSmalltalkCompiler
+	instanceVariableNames: 'frontend source ast result headless blocks leaf activeScript'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk'!
+!classDefinition: 'SSmalltalkCompiler class' category: 'Powerlang-Core-SCompiler-Smalltalk'!
+SSmalltalkCompiler class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSmalltalkParser category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+Object subclass: #SSmalltalkParser
+	instanceVariableNames: 'compiler scanner token next'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SSmalltalkParser class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSmalltalkParser class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSmalltalkScanner category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+Object subclass: #SSmalltalkScanner
+	instanceVariableNames: 'compiler stream'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SSmalltalkScanner class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSmalltalkScanner class
+	instanceVariableNames: ''!
+
+!classDefinition: #SToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+Object subclass: #SToken
+	instanceVariableNames: 'compiler stretch comments'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #SEndToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SToken subclass: #SEndToken
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SEndToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SEndToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #SParseNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SToken subclass: #SParseNode
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SParseNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SAssignmentNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SAssignmentNode
+	instanceVariableNames: 'assignees expression operators'
+	classVariableNames: 'Token'
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SAssignmentNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SAssignmentNode class
+	instanceVariableNames: 'Token'!
+
+!classDefinition: #SBraceNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SBraceNode
+	instanceVariableNames: 'elements message'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SBraceNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SBraceNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCascadeNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SCascadeNode
+	instanceVariableNames: 'receiver messages optimized'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SCascadeNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SCascadeNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCommentNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SCommentNode
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SCommentNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SCommentNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SIdentifierNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SIdentifierNode
+	instanceVariableNames: 'name binding'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SIdentifierNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SIdentifierNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLiteralNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SLiteralNode
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SLiteralNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SLiteralNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SNumberNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SLiteralNode subclass: #SNumberNode
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SNumberNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SNumberNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SStringNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SLiteralNode subclass: #SStringNode
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SStringNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SStringNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SMessageNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SMessageNode
+	instanceVariableNames: 'selector receiver arguments inlined'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SMessageNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SMessageNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCascadeMessageNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SMessageNode subclass: #SCascadeMessageNode
+	instanceVariableNames: 'cascade'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SCascadeMessageNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SCascadeMessageNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SReturnNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SReturnNode
+	instanceVariableNames: 'expression return'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SReturnNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SReturnNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SScriptNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SScriptNode
+	instanceVariableNames: 'statements arguments temporaries children scope'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SScriptNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SScriptNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SBlockNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SScriptNode subclass: #SBlockNode
+	instanceVariableNames: 'inlined index parent'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SBlockNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SBlockNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SMethodNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SScriptNode subclass: #SMethodNode
+	instanceVariableNames: 'selector pragma'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SMethodNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SMethodNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSelectorNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SParseNode subclass: #SSelectorNode
+	instanceVariableNames: 'symbol keywords'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SSelectorNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSelectorNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SPragmaNode category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SToken subclass: #SPragmaNode
+	instanceVariableNames: 'type name info'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SPragmaNode class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SPragmaNode class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSymbolicToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SToken subclass: #SSymbolicToken
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SSymbolicToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSymbolicToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #SDelimiterToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSymbolicToken subclass: #SDelimiterToken
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SDelimiterToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SDelimiterToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #SStringToken category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SSymbolicToken subclass: #SStringToken
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+!classDefinition: 'SStringToken class' category: 'Powerlang-Core-SCompiler-Smalltalk-Parser'!
+SStringToken class
+	instanceVariableNames: ''!
+
+!classDefinition: #AstcodeDecoder category: 'Powerlang-Core-SExpressions'!
+Object subclass: #AstcodeDecoder
+	instanceVariableNames: 'method stream builder'
+	classVariableNames: 'BindingTypes NodeTypes'
+	poolDictionaries: 'AstBindingTypes AstNodeTypes'
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'AstcodeDecoder class' category: 'Powerlang-Core-SExpressions'!
+AstcodeDecoder class
+	instanceVariableNames: 'BindingTypes NodeTypes'!
+
+!classDefinition: #SBinding category: 'Powerlang-Core-SExpressions'!
+Object subclass: #SBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SBinding class' category: 'Powerlang-Core-SExpressions'!
+SBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SAssociationBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SAssociationBinding
+	instanceVariableNames: 'index association'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SAssociationBinding class' category: 'Powerlang-Core-SExpressions'!
+SAssociationBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SDynamicBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SDynamicBinding
+	instanceVariableNames: 'name cache'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SDynamicBinding class' category: 'Powerlang-Core-SExpressions'!
+SDynamicBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SNestedDynamicBinding category: 'Powerlang-Core-SExpressions'!
+SDynamicBinding subclass: #SNestedDynamicBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SNestedDynamicBinding class' category: 'Powerlang-Core-SExpressions'!
+SNestedDynamicBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SInstVarBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SInstVarBinding
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SInstVarBinding class' category: 'Powerlang-Core-SExpressions'!
+SInstVarBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLiteralBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SLiteralBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLiteralBinding class' category: 'Powerlang-Core-SExpressions'!
+SLiteralBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SFalseBinding category: 'Powerlang-Core-SExpressions'!
+SLiteralBinding subclass: #SFalseBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SFalseBinding class' category: 'Powerlang-Core-SExpressions'!
+SFalseBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SNilBinding category: 'Powerlang-Core-SExpressions'!
+SLiteralBinding subclass: #SNilBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SNilBinding class' category: 'Powerlang-Core-SExpressions'!
+SNilBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #STrueBinding category: 'Powerlang-Core-SExpressions'!
+SLiteralBinding subclass: #STrueBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'STrueBinding class' category: 'Powerlang-Core-SExpressions'!
+STrueBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLocalBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SLocalBinding
+	instanceVariableNames: 'position environment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLocalBinding class' category: 'Powerlang-Core-SExpressions'!
+SLocalBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SArgumentBinding category: 'Powerlang-Core-SExpressions'!
+SLocalBinding subclass: #SArgumentBinding
+	instanceVariableNames: 'inlined'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SArgumentBinding class' category: 'Powerlang-Core-SExpressions'!
+SArgumentBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #STemporaryBinding category: 'Powerlang-Core-SExpressions'!
+SLocalBinding subclass: #STemporaryBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'STemporaryBinding class' category: 'Powerlang-Core-SExpressions'!
+STemporaryBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSelfBinding category: 'Powerlang-Core-SExpressions'!
+SBinding subclass: #SSelfBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SSelfBinding class' category: 'Powerlang-Core-SExpressions'!
+SSelfBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SSuperBinding category: 'Powerlang-Core-SExpressions'!
+SSelfBinding subclass: #SSuperBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SSuperBinding class' category: 'Powerlang-Core-SExpressions'!
+SSuperBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #SExpression category: 'Powerlang-Core-SExpressions'!
+Object subclass: #SExpression
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SExpression class' category: 'Powerlang-Core-SExpressions'!
+SExpression class
+	instanceVariableNames: ''!
+
+!classDefinition: #SAssignment category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SAssignment
+	instanceVariableNames: 'assignees expression'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SAssignment class' category: 'Powerlang-Core-SExpressions'!
+SAssignment class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCascade category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SCascade
+	instanceVariableNames: 'receiver messages'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SCascade class' category: 'Powerlang-Core-SExpressions'!
+SCascade class
+	instanceVariableNames: ''!
+
+!classDefinition: #SCascadeMessage category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SCascadeMessage
+	instanceVariableNames: 'selector arguments cascade cache'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SCascadeMessage class' category: 'Powerlang-Core-SExpressions'!
+SCascadeMessage class
+	instanceVariableNames: ''!
+
+!classDefinition: #SIdentifier category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SIdentifier
+	instanceVariableNames: 'binding'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SIdentifier class' category: 'Powerlang-Core-SExpressions'!
+SIdentifier class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLiteralVar category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SLiteralVar
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLiteralVar class' category: 'Powerlang-Core-SExpressions'!
+SLiteralVar class
+	instanceVariableNames: ''!
+
+!classDefinition: #SLiteral category: 'Powerlang-Core-SExpressions'!
+SLiteralVar subclass: #SLiteral
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SLiteral class' category: 'Powerlang-Core-SExpressions'!
+SLiteral class
+	instanceVariableNames: ''!
+
+!classDefinition: #SMessage category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SMessage
+	instanceVariableNames: 'selector receiver arguments cache inlined'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SMessage class' category: 'Powerlang-Core-SExpressions'!
+SMessage class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOperation category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SOperation
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOperation class' category: 'Powerlang-Core-SExpressions'!
+SOperation class
+	instanceVariableNames: ''!
+
+!classDefinition: #SInlinerOperation category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SInlinerOperation
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SInlinerOperation class' category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpJump category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpJump
+	instanceVariableNames: 'target'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpJump class' category: 'Powerlang-Core-SExpressions'!
+SOpJump class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpJumpFalse category: 'Powerlang-Core-SExpressions'!
+SOpJump subclass: #SOpJumpFalse
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpJumpFalse class' category: 'Powerlang-Core-SExpressions'!
+SOpJumpFalse class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpJumpTrue category: 'Powerlang-Core-SExpressions'!
+SOpJump subclass: #SOpJumpTrue
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpJumpTrue class' category: 'Powerlang-Core-SExpressions'!
+SOpJumpTrue class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRfromFrame category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpLoadRfromFrame
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRfromFrame class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRfromFrame class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpPopR category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpPopR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpPopR class' category: 'Powerlang-Core-SExpressions'!
+SOpPopR class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpStoreRintoFrame category: 'Powerlang-Core-SExpressions'!
+SInlinerOperation subclass: #SOpStoreRintoFrame
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpStoreRintoFrame class' category: 'Powerlang-Core-SExpressions'!
+SOpStoreRintoFrame class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpAssign category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpAssign
+	instanceVariableNames: 'assignees'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpAssign class' category: 'Powerlang-Core-SExpressions'!
+SOpAssign class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpDispatchMessage category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpDispatchMessage
+	instanceVariableNames: 'message'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpDispatchMessage class' category: 'Powerlang-Core-SExpressions'!
+SOpDispatchMessage class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpDropToS category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpDropToS
+	instanceVariableNames: 'count'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpDropToS class' category: 'Powerlang-Core-SExpressions'!
+SOpDropToS class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRfromStack category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpLoadRfromStack
+	instanceVariableNames: 'index'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRfromStack class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRfromStack class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRwithNil category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpLoadRwithNil
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRwithNil class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRwithNil class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpLoadRwithSelf category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpLoadRwithSelf
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpLoadRwithSelf class' category: 'Powerlang-Core-SExpressions'!
+SOpLoadRwithSelf class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpPrimitive category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpPrimitive
+	instanceVariableNames: 'block'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpPrimitive class' category: 'Powerlang-Core-SExpressions'!
+SOpPrimitive class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpPushR category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpPushR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpPushR class' category: 'Powerlang-Core-SExpressions'!
+SOpPushR class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpRestart category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpRestart
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpRestart class' category: 'Powerlang-Core-SExpressions'!
+SOpRestart class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpReturn category: 'Powerlang-Core-SExpressions'!
+SOperation subclass: #SOpReturn
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpReturn class' category: 'Powerlang-Core-SExpressions'!
+SOpReturn class
+	instanceVariableNames: ''!
+
+!classDefinition: #SOpNonLocalReturn category: 'Powerlang-Core-SExpressions'!
+SOpReturn subclass: #SOpNonLocalReturn
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SOpNonLocalReturn class' category: 'Powerlang-Core-SExpressions'!
+SOpNonLocalReturn class
+	instanceVariableNames: ''!
+
+!classDefinition: #SPragma category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SPragma
+	instanceVariableNames: 'name'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SPragma class' category: 'Powerlang-Core-SExpressions'!
+SPragma class
+	instanceVariableNames: ''!
+
+!classDefinition: #SReturn category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SReturn
+	instanceVariableNames: 'local expression'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SReturn class' category: 'Powerlang-Core-SExpressions'!
+SReturn class
+	instanceVariableNames: ''!
+
+!classDefinition: #SScript category: 'Powerlang-Core-SExpressions'!
+SExpression subclass: #SScript
+	instanceVariableNames: 'statements compiledCode'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SScript class' category: 'Powerlang-Core-SExpressions'!
+SScript class
+	instanceVariableNames: ''!
+
+!classDefinition: #SBlock category: 'Powerlang-Core-SExpressions'!
+SScript subclass: #SBlock
+	instanceVariableNames: 'index capturedVariables inlinedArgs'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SBlock class' category: 'Powerlang-Core-SExpressions'!
+SBlock class
+	instanceVariableNames: ''!
+
+!classDefinition: #SMethod category: 'Powerlang-Core-SExpressions'!
+SScript subclass: #SMethod
+	instanceVariableNames: 'pragma'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SExpressions'!
+!classDefinition: 'SMethod class' category: 'Powerlang-Core-SExpressions'!
+SMethod class
 	instanceVariableNames: ''!
 
 !classDefinition: #MethodEvaluator category: 'Powerlang-Core-Emulation'!
@@ -2057,13 +2057,12 @@ Copyright (c) 2020 Aucerna.
 !RVMemoryReference commentStamp: '<historical>' prior: 0!
 I am an abstract description of a location in memory which is `widthInBits` wide.
 
-The offset part of a memory address can be specified directly as a static value 
-(called a `displacement`) or through an address computation made up of one 
-or more of the following components:
+The `offset` part of a memory address can be specified directly as a static value 
+or through an address computation made up of one or more of the following components:
 
-      displacement - A 8-, 16-, or 32-bit value.
-      baseRegister - The value in a general-purpose register.
-      indexRegister - The value in a general-purpose register.
+      offset - An 8, 16, or 32-bit value.
+      baseRegister - contains the base address.
+      indexRegister - contains an index off of the base.
       scale factor - A value of 2, 4, or 8 that is multiplied by the value in the indexRegister.
 
     The offset which results from adding these components is called an `effective address`. 
@@ -2071,7 +2070,16 @@ or more of the following components:
     with the exception of the scaling factor.
 
    Symbolically:
-        EffectiveAddress := Base + (Index*Scale) + Displacement
+        EffectiveAddress := Base + (Index*Scale) + Offset
+
+   For OOPS (Object Pointers)
+                 header
+   Base---> slot1
+                 slot2
+                 slot3
+
+   With zero based index, 8 byte addresses,
+      slot3 is at address: (Base + (index=2 * scale=8) + 0)
 
    See  #RISCCodeGenerator>>lea:withMem: 
 !
@@ -2946,6 +2954,855 @@ stretch: aStretch
 assignment: aBoolean
 	assigned := aBoolean
 ! !
+
+!PowerLangPackage class methodsFor: 'installing' stamp: 'KenD 6/7/2021 14:10:45'!
+postPackageInstall
+
+	self inform: 'PowerLang is PRE-alpha. Expect breakage'! !
+
+!PowerLangPackage class methodsFor: 'installing' stamp: 'KenD 6/7/2021 14:34:38'!
+prePackageInstall
+
+	"We override SystemDictionary>>globals.
+	Let the user OK or bring up debugger.."
+	
+	self assert: (PopUpMenu confirm:
+				 'PowerLang overrides SystemDictionary>>globals; Yes->OK | No->Debug').
+				
+	"We may have been loaded before.  If not, capture COPY of
+	Smalltalk SystemDictionary initial bindings."
+	(Smalltalk includesKey: #globals)
+		ifFalse: [ Smalltalk at: #globals put: Smalltalk copy ].
+	"Might have nil globals; just in case.."
+	(Smalltalk at: #globals)
+		ifNil: [ Smalltalk at: #globals put: Smalltalk copy ].
+! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:16:41'!
+test010resolveClass 
+	| binding |
+	binding := SCompiler new smalltalkCompiler methodNode scope resolve: 'Point'.
+	self
+		assert: binding isGlobal;
+		assert: binding isClassBinding;
+		assert: binding name = #Point;
+		assert: binding association == (Smalltalk globals associationAt: #Point)! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:12'!
+test010resolveClassVariables 
+	| scope |
+	scope := self scopeFor: Symbol.
+	self checkClassVarsOf: Symbol in: scope! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:24'!
+test010resolveGlobal 
+	| binding |
+	binding := SCompiler new smalltalkCompiler methodNode scope resolve: 'Smalltalk'.
+	self
+		assert: binding isGlobal;
+		deny: binding isClassBinding;
+		assert: binding name = #Smalltalk;
+		assert: binding association == (Smalltalk globals associationAt: #Smalltalk)! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:35'!
+test010resolveInstanceVariables 
+	| scope |
+	scope := self scopeFor: Point.
+	self checkInstVarsOf: Point in: scope! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:46'!
+test010resolveSelf 
+	| scope receiver sup |
+	scope := self scopeFor: Object.
+	receiver := scope resolve: 'self'.
+	sup := scope resolve: 'super'.
+	self
+		assert: receiver isSelf;
+		assert: receiver name = 'self';
+		assert: sup isSuper;
+		assert: sup name = 'super'! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:57'!
+test011resolveUnknownGlobal 
+	| binding point |
+	self precondition: (Smalltalk includesKey: 'Foo678' existingSymbol) not.
+	binding := MethodScope new resolve: 'Foo678'.
+	self assert: binding isUnresolved.
+	point := self scopeFor: Point.
+	binding := point resolve: 'Foo678'.
+	self assert: binding isUnresolved! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:11'!
+test020resolveMethodArguments 
+	| scope |
+	scope := self scopeFor: Point.
+	scope
+		defineArgument: 'arg1';
+		defineArgument: 'arg2';
+		positionDefinedLocals.
+	self
+		checkArgs: #('arg1' 'arg2') in: scope;
+		checkInstVarsOf: Point in: scope! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:21'!
+test021resolveMethodTemporaries 
+	| scope |
+	scope := self scopeFor: Point.
+	scope defineTemporary: 't1'; defineTemporary: 't2'; positionDefinedLocals.
+	self
+		checkTemps: #('t1' 't2') in: scope;
+		checkInstVarsOf: Point in: scope! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:32'!
+test030resolveNestedTemporaryConflictingWithIvar 
+	| ast b3 x |
+	ast := self compile: 'foo  [ | x | [[x]] ]' in: Point.
+	b3 := ast children first children first children first.
+	x := b3 statements first binding.
+	self
+		assert: x
+		isEnvTemp: 'x'
+		at: 1
+		index: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:46'!
+test040declareMethodArguments 
+	| ast scope |
+	ast := self compile: 'foo: anArg bar: anotherArg' in: Point.
+	scope := ast scope.
+	self
+		checkArgs: #('anArg' 'anotherArg') in: scope;
+		checkInstVarsOf: Point in: scope! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:20:24'!
+test041declareMethodTemporaries 
+	| ast scope |
+	ast := self compile: 'foo | t1 t2 | ' in: Point.
+	scope := ast scope.
+	self
+		checkTemps: #('t1' 't2') in: scope;
+		checkInstVarsOf: Point in: scope! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:20:39'!
+test042declareMethodTempsWithArgs 
+	| ast scope |
+	ast := self compile: 'foo: arg1 bar: arg2 | t1 t2 | ' in: Point.
+	scope := ast scope.
+	self
+		checkArgs: #('arg1' 'arg2') in: scope;
+		checkTemps: #('t1' 't2') in: scope;
+		checkInstVarsOf: Point in: scope! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:05'!
+test050useMethodTemps 
+	| ast scope t1 t2 |
+	ast := self compile: 'foo | t1 t2 | t1. t2' in: Point.
+	scope := ast scope.
+	t1 := ast statements first binding.
+	t2 := ast statements second binding.
+	self
+		checkTemps: #('t1' 't2') in: scope;
+		checkInstVarsOf: Point in: scope;
+		assert: t1 isTemporary;
+		assert: t1 isInStack;
+		assert: t1 name = 't1';
+		assert: t1 index = 1;
+		assert: t2 isTemporary;
+		assert: t2 isInStack;
+		assert: t2 name = 't2';
+		assert: t2 index = 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:16'!
+test051useMethodArgs 
+	| ast scope a1 a2 |
+	ast := self compile: 'foo: a1 bar: a2 a1. a2' in: Point.
+	scope := ast scope.
+	a1 := ast statements first binding.
+	a2 := ast statements second binding.
+	self
+		checkArgs: #('a1' 'a2') in: scope;
+		checkInstVarsOf: Point in: scope;
+		assert: a1 isArgument;
+		assert: a1 isInStack;
+		assert: a1 name = 'a1';
+		assert: a1 index = 1;
+		assert: a2 isArgument;
+		assert: a2 isInStack;
+		assert: a2 name = 'a2';
+		assert: a2 index = 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:33'!
+test052useMethodTempsAndArgs 
+	| ast scope a1 a2 t1 t2 |
+	ast := self compile: 'foo: a1 bar: a2 | t1 t2 | t1. t2. a1. a2' in: Point.
+	scope := ast scope.
+	t1 := ast statements first binding.
+	t2 := ast statements second binding.
+	a1 := ast statements third binding.
+	a2 := ast statements fourth binding.
+	self
+		checkArgs: #('a1' 'a2') in: scope;
+		checkTemps: #('t1' 't2') in: scope;
+		checkInstVarsOf: Point in: scope;
+		assert: t1 isTemporary;
+		assert: t1 isInStack;
+		assert: t1 name = 't1';
+		assert: t1 index = 1;
+		assert: t2 isTemporary;
+		assert: t2 isInStack;
+		assert: t2 name = 't2';
+		assert: t2 index = 2;
+		assert: a1 isArgument;
+		assert: a1 isInStack;
+		assert: a1 name = 'a1';
+		assert: a1 index = 1;
+		assert: a2 isArgument;
+		assert: a2 isInStack;
+		assert: a2 name = 'a2';
+		assert: a2 index = 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:49'!
+test053useBlockArgs 
+	| ast block scope a1 a2 |
+	ast := self compile: 'foo [:a1 :a2 | a1. a2]' in: Point.
+	block := ast children first.
+	scope := block scope.
+	a1 := block statements first binding.
+	a2 := block statements second binding.
+	self
+		checkArgs: #('a1' 'a2') in: scope;
+		assert: a1 isStackArg: 'a1' at: 1;
+		assert: a2 isStackArg: 'a2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:59'!
+test053useSiblingBlockArgs 
+	| ast block1 block2 a1 a2 |
+	ast := self compile: 'foo [:a1 | a1]. [:a2 | a2]' in: Point.
+	block1 := ast children first.
+	block2 := ast children second.
+	a1 := block1 statements first binding.
+	a2 := block2 statements first binding.
+	self
+		checkArgs: #('a1') in: block1 scope;
+		checkArgs: #('a2') in: block2 scope;
+		assert: a1 isStackArg: 'a1' at: 1;
+		assert: a2 isStackArg: 'a2' at: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:10'!
+test054useBlockTemps 
+	| ast block scope t1 t2 |
+	ast := self compile: 'foo [| t1 t2 | t1. t2]' in: Point.
+	block := ast children first.
+	scope := block scope.
+	t1 := block statements first binding.
+	t2 := block statements second binding.
+	self
+		checkTemps: #('t1' 't2') in: scope;
+		assert: t1 isStackTemp: 't1' at: 1;
+		assert: t2 isStackTemp: 't2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:24'!
+test055methodUseGlobal 
+	| ast global |
+	ast := self compile: 'foo Collection' in: Point.
+	global := ast statements first binding.
+	self
+		assert: global isClassBinding;
+		assert: global name = #Collection;
+		assert: global association = (Smalltalk globals associationAt: #Collection)! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:36'!
+test060useNestedMethodArgs 
+	| ast block ma1 ma2 ba1 ba2 |
+	ast := self compile: 'foo: a1 bar: a2  a1. a2. [a1. a2]' in: Object.
+	block := ast children first.
+	ma1 := ast statements first binding.
+	ma2 := ast statements second binding.
+	ba1 := block statements first binding.
+	ba2 := block statements second binding.
+	self
+		checkArgs: #('a1' 'a2') in: ast scope;
+		assert: ma1 isStackArg: 'a1' at: 1;
+		assert: ma2 isStackArg: 'a2' at: 2;
+		assert: ba1 isEnvArg: 'a1' at: 1;
+		assert: ba2 isEnvArg: 'a2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:48'!
+test061useNestedMethodSiblingBlockTemps 
+	| ast block1 block2 b1t1 b2t2 |
+	ast := self compile: 'foo | t1 t2 | [t1]. [t2]' in: Object.
+	block1 := ast children first.
+	block2 := ast children second.
+	b1t1 := block1 statements first binding.
+	b2t2 := block2 statements first binding.
+	self
+		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
+		assert: b1t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:14'!
+test061useNestedMethodTemps 
+	| ast block bt1 bt2 |
+	ast := self compile: 'foo | t1 t2 | [t1. t2]' in: Object.
+	block := ast children first.
+	bt1 := block statements first binding.
+	bt2 := block statements second binding.
+	self
+		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
+		assert: bt1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: bt2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:26'!
+test062useNestedBlockArgs 
+	| ast block1 block2 b1a1 b1a2 b2a1 b2a2 |
+	ast := self compile: 'foo [:a1 :a2 | [a1. a2] ]' in: Object.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b1a1 := block1 scope resolve: 'a1'.
+	b1a2 := block1 scope resolve: 'a2'.
+	b2a1 := block2 statements first binding.
+	b2a2 := block2 statements second binding.
+	self
+		checkArgs: #('a1' 'a2') in: block1 scope;
+		assert: b1a1 isStackArg: 'a1' at: 1;
+		assert: b1a2 isStackArg: 'a2' at: 2;
+		assert: b2a1 isEnvArg: 'a1' at: 1;
+		assert: b2a2 isEnvArg: 'a2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:38'!
+test063useNestedBlockTemps 
+	| ast block1 block2 b2t1 b2t2 |
+	ast := self compile: 'foo [| t1 t2 | [t1. t2]]' in: Object.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b2t1 := block2 statements first binding.
+	b2t2 := block2 statements second binding.
+	self
+		checkClosureEnvTemps: #('t1' 't2') in: block1 scope at: nil;
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:49'!
+test064useSiblingBlocksNestedTemps 
+	| ast block1 block2 block3 b2t1 b3t2 |
+	ast := self compile: 'foo [| t1 t2 | [t1]. [t2]]' in: Object.
+	block1 := ast children first.
+	block2 := block1 children first.
+	block3 := block1 children second.
+	b2t1 := block2 statements first binding.
+	b3t2 := block3 statements first binding.
+	self
+		checkClosureEnvTemps: #('t1' 't2') in: block1 scope at: nil;
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b3t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:24:01'!
+test065useNestedBlockAndMethodTemps 
+	| ast block1 block2 b2t1 b2t2 |
+	ast := self compile: 'foo | t1 | [| t2 | [t1. t2]]' in: Object.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b2t1 := block2 statements first binding.
+	b2t2 := block2 statements second binding.
+	self
+		checkEnvTemps: #('t1') in: ast scope at: nil;
+		checkClosureEnvTemps: #('t2') in: block1 scope at: nil;
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 2
+			index: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:35:36'!
+test070useDoublyNestedMethodArgs 
+	| ast block1 block2 b1a1 b1a2 b2a1 b2a2 |
+	ast := self compile: 'foo: a1 bar: a2  [[a1. a2]]' in: Object.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b1a1 := block1 scope resolve: 'a1'.
+	b1a2 := block1 scope resolve: 'a2'.
+	b2a1 := block2 statements first binding.
+	b2a2 := block2 statements second binding.
+	self
+		checkArgs: #('a1' 'a2') in: ast scope;
+		assert: b1a1 isEnvArg: 'a1' at: 1;
+		assert: b1a2 isEnvArg: 'a2' at: 2;
+		assert: b2a1 isEnvArg: 'a1' at: 1;
+		assert: b2a2 isEnvArg: 'a2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:35:49'!
+test071useDoublyNestedMethodTemps 
+	| ast block1 block2 b1t1 b1t2 b2t1 b2t2 |
+	ast := self compile: 'foo | t1 t2 | [[t1. t2]]' in: Object.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b1t1 := block1 scope resolve: 't1'.
+	b1t2 := block1 scope resolve: 't2'.
+	b2t1 := block2 statements first binding.
+	b2t2 := block2 statements second binding.
+	self
+		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
+		assert: b1t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b1t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2;
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:03'!
+test075useDoublyNestedMethodArgsWithTemps 
+	| ast block1 block2 b1a1 b1a2 b1t1 b1t2 b2a1 b2a2 b2t1 b2t2 |
+	ast := self
+		compile: 'foo: a1 bar: a2 | t1 | [| t2 | [a1. a2. t1. t2]]'
+		in: Object.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b1a1 := block1 scope resolve: 'a1'.
+	b1a2 := block1 scope resolve: 'a2'.
+	b1t1 := block1 scope resolve: 't1'.
+	b1t2 := block1 scope resolve: 't2'.
+	b2a1 := block2 statements first binding.
+	b2a2 := block2 statements second binding.
+	b2t1 := block2 statements third binding.
+	b2t2 := block2 statements fourth binding.
+	self
+		checkArgs: #('a1' 'a2') in: ast scope;
+		assert: b1a1 isEnvArg: 'a1' at: 2;
+		assert: b1a2 isEnvArg: 'a2' at: 3;
+		assert: b1t2
+			isEnvTemp: 't2'
+			at: nil
+			index: 4;
+		assert: b1t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 2
+			index: 4;
+		assert: b2a1 isEnvArg: 'a1' at: 3;
+		assert: b2a2 isEnvArg: 'a2' at: 4! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:16'!
+test080captureSelf 
+	| ast block receiver |
+	ast := self compile: 'foo [self]' in: Object.
+	block := ast children first.
+	receiver := block statements first binding.
+	self
+		assert: receiver isSelf;
+		assert: ast environmentSize = 0;
+		assert: block scope capturesSelf;
+		assert: block environmentSize equals: 1;
+		assert: block scope home == nil! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:28'!
+test090useNonLocalReturn 
+	| ast block |
+	ast := self compile: 'foo [^1]' in: Object.
+	block := ast children first.
+	self
+		assert: ast environmentSize = 0;
+		assert: ast needsEnvironment;
+		assert: block environmentSize = 1;
+		assert: block scope home == ast! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:39'!
+test091nonLocalReturnSelf 
+	| ast block |
+	ast := self compile: 'foo [^self]' in: Object.
+	block := ast children first.
+	self
+		assert: ast environmentSize = 0;
+		assert: ast needsEnvironment;
+		assert: block environmentSize = 2;
+		assert: block scope home == ast! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:52'!
+test100inlineUseMethodArgs 
+	| ast block a1 a2 |
+	ast := self compile: 'foo: a1 bar: a2  1 ifTrue: [a1. a2]' in: Point.
+	block := ast children first.
+	a1 := block statements first binding.
+	a2 := block statements second binding.
+	self
+		checkArgs: #('a1' 'a2') in: ast scope;
+		assert: a1 isStackArg: 'a1' at: 1;
+		assert: a2 isStackArg: 'a2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:05'!
+test101inlineUseMethodTemps 
+	| ast t1 t2 block |
+	ast := self compile: 'foo | t1 t2 | 1 ifTrue: [t1. t2]' in: Point.
+	block := ast children first.
+	t1 := block statements first binding.
+	t2 := block statements second binding.
+	self
+		checkTemps: #('t1' 't2') in: ast scope;
+		assert: t1 isStackTemp: 't1' at: 1;
+		assert: t2 isStackTemp: 't2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:19'!
+test102inlineUseMethodArgsAndTemps 
+	| ast block a1 a2 t1 t2 |
+	ast := self
+		compile: 'foo: a1 bar: a2  | t1 t2 | 1 ifTrue: [a1. a2. t1. t2]'
+		in: Point.
+	block := ast children first.
+	a1 := block statements first binding.
+	a2 := block statements second binding.
+	t1 := block statements third binding.
+	t2 := block statements fourth binding.
+	self
+		checkArgs: #('a1' 'a2') in: ast scope;
+		assert: a1 isStackArg: 'a1' at: 1;
+		assert: a2 isStackArg: 'a2' at: 2;
+		assert: t1 isStackTemp: 't1' at: 1;
+		assert: t2 isStackTemp: 't2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:29'!
+test110inlineUseMixedMethodTemps 
+	| ast t1 t2 block |
+	ast := self compile: 'foo | t1 | 1 ifTrue: [ | t2 | t1. t2]' in: Point.
+	block := ast children first.
+	t1 := block statements first binding.
+	t2 := block statements second binding.
+	self
+		checkTemps: #('t1') in: ast scope;
+		assert: t1 isStackTemp: 't1' at: 1;
+		assert: t2 isStackTemp: 't2' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:42'!
+test120inlineEnvironmentTemp 
+	| ast block1 block2 mt1 mt2 b1t1 b1t2 b2t2 |
+	ast := self
+		compile: 'foo | t1 | 1 ifTrue: [ | t2 | t1. [t2]]'
+		in: Point.
+	block1 := ast children first.
+	block2 := block1 children first.
+	mt1 := ast scope resolve: 't1'.
+	mt2 := ast scope resolve: 't2'.
+	b1t1 := block1 statements first binding.
+	b1t2 := block1 scope resolve: 't2'.
+	b2t2 := block2 scope resolve: 't2'.
+	self
+		checkTemps: #('t1') in: ast scope;
+		assert: mt2 isUnresolved;
+		assert: mt1 isStackTemp: 't1' at: 1;
+		assert: b1t1 isStackTemp: 't1' at: 1;
+		assert: b1t2
+			isEnvTemp: 't2'
+			at: nil
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 1;
+		assert: ast scope environmentSize = 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:54'!
+test130inlineBlockArg 
+	| ast block a1 |
+	ast := self compile: 'foo  1 ifNotNil: [:a1 | 1 ]' in: Point.
+	block := ast children first.
+	a1 := block scope resolve: 'a1'.
+	self assert: a1 isStackInlineArg: 'a1' at: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:04'!
+test131inlineBlockArgWithTemp 
+	| ast block t1 a1 |
+	ast := self compile: 'foo | t1 | 1 ifNotNil: [:a1 | 1 ]' in: Point.
+	block := ast children first.
+	t1 := ast scope resolve: 't1'.
+	a1 := block scope resolve: 'a1'.
+	self
+		assert: t1 isStackTemp: 't1' at: 1;
+		assert: a1 isStackInlineArg: 'a1' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:15'!
+test132inlineBlockArgWithTemps 
+	| ast block t1 a1 t2 |
+	ast := self compile: 'foo | t1 | 1 ifNotNil: [:a1 | | t2 | 1 ]' in: Point.
+	block := ast children first.
+	t1 := ast scope resolve: 't1'.
+	a1 := block scope resolve: 'a1'.
+	t2 := block scope resolve: 't2'.
+	self
+		assert: t1 isStackTemp: 't1' at: 1;
+		assert: t2 isStackTemp: 't2' at: 2;
+		assert: a1 isStackInlineArg: 'a1' at: 3! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:25'!
+test133inlineBlockArgWithEnvTemps 
+	| ast block1 mt1 b1a1 b1t2 |
+	ast := self
+		compile: 'foo | t1 | 1 ifNotNil: [:a1 | | t2 | 1. [t2] ]'
+		in: Point.
+	block1 := ast children first.
+	mt1 := ast scope resolve: 't1'.
+	b1a1 := block1 scope resolve: 'a1'.
+	b1t2 := block1 scope resolve: 't2'.
+	self
+		assert: mt1 isStackTemp: 't1' at: 1;
+		assert: b1t2 isEnvTemp: 't2' at: nil index: 1;
+		assert: b1a1 isStackInlineArg: 'a1' at: 2! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:36'!
+test134inlineBlockArgNestedAccess 
+	| ast block1 block2 b1a1 b2a1 |
+	ast := self compile: 'foo  1 ifNotNil: [:a1 | [a1] ]' in: Point.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b1a1 := block1 scope resolve: 'a1'.
+	b2a1 := block2 scope resolve: 'a1'.
+	self
+		assert: b1a1 isEnvArg: 'a1' at: 1;
+		assert: b2a1 isEnvArg: 'a1' at: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:46'!
+test135inlineBlockWithArgInRealBlockCaptured 
+	| ast block1 block2 block3 b2a1 b3a1 |
+	"Args of inlined blocks can go to the stack of the real block, unless captured. Because the
+	 capture bytecode doesn't have a slot type for 'copy from stack temps' (it has capture from
+	 stack in 	 args zone, capture the current env, and capture a value in the current env)"
+	ast := self compile: 'foo  [1 ifNotNil: [:a1 | [a1] ]]' in: Point.
+	block1 := ast children first.
+	block2 := block1 children first.
+	block3 := block2 children first.
+	b2a1 := block2 scope resolve: 'a1'.
+	b3a1 := block3 scope resolve: 'a1'.
+	self
+		assert: b2a1 isEnvArg: 'a1' at: 1;
+		assert: b3a1 isEnvArg: 'a1' at: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:56'!
+test136inlineBlockWithArgCapturedByInlinedBlock 
+	| ast block1 block2 b1a1 b2a1 |
+	ast := self compile: 'foo 1 ifNotNil: [:a1 | a1. 2 ifTrue: [a1]]' in: Point.
+	block1 := ast children first.
+	block2 := block1 children first.
+	b1a1 := block1 scope resolve: 'a1'.
+	b2a1 := block2 scope resolve: 'a1'.
+	self
+		assert: b1a1 isStackInlineArg: 'a1' at: 1;
+		assert: b2a1 isStackInlineArg: 'a1' at: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:39:10'!
+test137inlineBlockWithArgCapturedByInlinedBlockInRealBlock 
+	| ast block1 block2 block3 b1a1 b3a1 |
+	ast := self
+		compile: 'foo 1 ifNotNil: [:a1 | [2 ifTrue: [a1]]]'
+		in: Point.
+	block1 := ast children first.
+	block2 := block1 children first.
+	block3 := block2 children first.
+	b1a1 := block1 scope resolve: 'a1'.
+	b3a1 := block3 scope resolve: 'a1'.
+	self
+		assert: b1a1 isEnvArg: 'a1' at: 1;
+		assert: b3a1 isEnvArg: 'a1' at: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:39:23'!
+test138blockWithInlinedBlockWithTempCaptured 
+	| ast block1 block2 block3 b2t1 b3t1 block |
+	ast := self compile: 'foo [true ifTrue: [| t1 | [t1]]]' in: Point.
+	block1 := ast children first.
+	block2 := block1 children first.
+	block3 := block2 children first.
+	b2t1 := block2 scope resolve: 't1'.
+	b3t1 := block3 scope resolve: 't1'.
+	self
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: nil
+			index: 1;
+		assert: b3t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1! !
+
+!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:39:54'!
+test140blockWithInlinedBlockHasEnv 
+	| ast |
+	ast := self compile: 'foo [true ifTrue: [^self]]'.
+	self assert: ast needsEnvironment! !
+
+!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:12'!
+assert: binding isEnvArg: name at: index 
+
+	self
+		assert: binding isArgument;
+		assert: binding name = name;
+		assert: binding index = index;
+		assert: binding isInArray;
+		assert: binding environmentIndex = nil! !
+
+!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:28'!
+assert: binding
+isEnvTemp: name
+at: environment
+index: index 
+
+	self
+		assert: binding isTemporary;
+		assert: binding isInArray;
+		assert: binding name = name;
+		assert: binding index = index;
+		assert: binding environment = environment! !
+
+!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:40'!
+assert: binding isStackArg: name at: index 
+
+	self
+		assert: binding isArgument;
+		assert: binding isInStack;
+		assert: binding name = name;
+		assert: binding index = index! !
+
+!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:55'!
+assert: binding isStackInlineArg: name at: index 
+
+	self
+		assert: binding isArgument;
+		assert: binding isInStack;
+		assert: binding name = name;
+		assert: binding index = index;
+		assert: binding environmentObject class = InlinedArgEnvironment! !
+
+!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:14:08'!
+assert: binding isStackTemp: name at: index 
+
+	self
+		assert: binding isTemporary;
+		assert: binding isInStack;
+		assert: binding name = name;
+		assert: binding index = index! !
+
+!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:19'!
+checkArgs: names in: scope 
+
+	names withIndexDo: [:name :index | | binding |
+		binding := scope resolve: name.
+		self
+			assert: binding isArgument;
+			assert: binding name = name;
+			assert: binding index = index]! !
+
+!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:30'!
+checkClassVarsOf: aSpecies in: scope 
+
+	aSpecies withAllSuperclasses do: [:c | 
+		c classPool associationsDo: [:assoc | | name binding |
+			name := assoc key.
+			binding := scope resolve: name.
+			self
+				assert: binding isClassVariable;
+				assert: binding name = name;
+				assert: binding association == assoc]]! !
+
+!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:42'!
+checkClosureEnvTemps: names in: scope at: environment 
+	| offset |
+	offset := scope environmentSizeUpToCapturedArguments.
+	names withIndexDo: [:name :index | | binding |
+		binding := scope resolve: name.
+		self
+			assert: binding isTemporary;
+			assert: binding isInArray;
+			assert: binding name = name;
+			assert: binding index = (index + offset);
+			assert: binding environment = environment]! !
+
+!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:54'!
+checkEnvTemps: names in: scope at: environment 
+
+	names withIndexDo: [:name :index | | binding |
+		binding := scope resolve: name.
+		self
+			assert: binding isTemporary;
+			assert: binding isInArray;
+			assert: binding name = name;
+			assert: binding index = index;
+			assert: binding environment = environment]! !
+
+!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:15:07'!
+checkInstVarsOf: aSpecies in: scope 
+
+	aSpecies allInstVarNames withIndexDo: [:name :i | | binding |
+		binding := scope resolve: name.
+		self
+			assert: binding isInstVar;
+			assert: binding name = name;
+			assert: binding index = i]! !
+
+!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:15:18'!
+checkTemps: names in: scope 
+
+	names withIndexDo: [:name :index | | binding |
+		binding := scope resolve: name.
+		self assert: binding isStackTemp: name at: index]! !
+
+!ScriptScopeTest methodsFor: 'compiling' stamp: 'KenD 6/5/2021 07:15:31'!
+compile: aString 
+
+	^self compile: aString in: UndefinedObject! !
+
+!ScriptScopeTest methodsFor: 'compiling' stamp: 'KenD 6/5/2021 07:15:44'!
+compile: aString in: aClass 
+
+	^SCompiler parse: aString in: aClass! !
+
+!ScriptScopeTest methodsFor: 'as yet unclassified' stamp: 'KenD 6/5/2021 07:15:57'!
+precondition: aBoolean 
+
+	self assert: aBoolean description: 'Precondition for this test is not met'! !
+
+!ScriptScopeTest methodsFor: 'as yet unclassified' stamp: 'KenD 6/5/2021 07:16:08'!
+scopeFor: aSpecies 
+
+	^MethodScope new species: aSpecies! !
 
 !NumberParser2 methodsFor: 'accessing' stamp: 'KenD 6/3/2021 07:14:24'!
 error
@@ -7238,24 +8095,23 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 15:44:34'!
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/24/2022 10:21:25'!
 lea: addressReg withMem: memRef
 
-	"Answer baseRegister + (indexRegister*scale) + displacement.
+	"Answer baseRegister + (indexRegister*scale) + offset.
 	`indexRegister` may be RegZero (0).
-	`scale` may be 1."
-	(memRef base = addressReg) ifFalse: [
-		self move: memRef base to: addressReg.
-	].
-	self addImm: memRef displacement to: addressReg.
-	(memRef index isZero not)
-	ifTrue: [
+	`scale` may be 1. 2, 4, or 8"
+	(memRef baseRegister = addressReg)
+		ifFalse: [ self move: memRef baseRegister to: addressReg ].
+	(memRef offset isZero)
+		ifFalse: [ self addImm: memRef offset to: addressReg ].
+	(memRef index isZero)
+	ifFalse: [
 		(memRef scale = 1)
 		ifTrue: [ self add: memRef index to: addressReg 		] 
 		ifFalse: [
-			self moveImm: memRef scale to: RegTmp0.
-			memory nextInstructionPut:  "(index * scale)"
-				(RV64MUL 		regDest: RegTmp1 regA: memRef index regB: RegTmp0).
+			memory nextInstructionPut:  "(index * scale) is just a shift"
+				(RV64SLLI 		regDest: RegTmp1 regSource: memRef indexRegister imm12: memRef scale).
 			memory nextInstructionPut: 
 				(RV64ADD regDest: addressReg regA: addressReg regB: RegTmp1).
 		]
@@ -7789,12 +8645,12 @@ syscall: callNumber arg: reg0 arg: reg1 arg: reg2 arg: reg3 arg: reg4 arg: reg5
 	self move: 10 to: RegR.  "Result from A0 into RegR"
 	 ! !
 
-!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 10/4/2022 11:00:12'!
+!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 10/24/2022 10:23:40'!
 memRef
 	"superclass CodeGenerator says that I am responsible to implement this method"
 
 	^ RVMemoryReference new
-		length: self wordSize * 8
+		widthInBits: self wordSize * 8
 ! !
 
 !RV64GCodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
@@ -8137,6 +8993,12 @@ relativeFrom: source to: target
 	^self new beRelative; from: source to: target
 ! !
 
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/24/2022 10:31:48'!
+base: register
+
+	self baseRegister: register.
+! !
+
 !RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:15:50'!
 baseRegister
 	^ baseRegister
@@ -8148,14 +9010,16 @@ baseRegister: register
 	baseRegister := register.
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-displacement
-	^ displacement
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/24/2022 10:32:22'!
+displacement: addressDelta
+
+	self offset: addressDelta
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/4/2022 11:04:49'!
-displacement:something
-	displacement := something.
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/24/2022 10:31:32'!
+index: register
+
+	self indexRegister: register.
 ! !
 
 !RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:16:16'!
@@ -8163,9 +9027,28 @@ indexRegister
 	^ indexRegister
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:16:55'!
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/24/2022 10:30:36'!
 indexRegister: register
+
 	indexRegister := register.
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/24/2022 10:33:24'!
+length:  anInteger
+
+	self widthInBits: anInteger.
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/24/2022 10:18:56'!
+offset
+
+	^ offset
+! !
+
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/24/2022 10:19:38'!
+offset: addressDelta
+
+	offset := addressDelta
 ! !
 
 !RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/16/2022 13:43:14'!
@@ -8192,7 +9075,7 @@ widthInBits:anInteger
 	widthInBits := anInteger.
 ! !
 
-!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/23/2022 15:18:26'!
+!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/24/2022 10:14:56'!
 initialize
 	"Invoked when a new instance is created."
 
@@ -8200,7 +9083,7 @@ initialize
 	self widthInBits: 64. "default is pointer size (8 bytes)"
 	indexRegister := 0.
 	scale := 1.
-	displacement := 0.
+	offset := 0.
 ! !
 
 !RVMemoryReference methodsFor: 'printing & storing' stamp: 'KenD 10/4/2022 11:04:49'!
@@ -24658,855 +25541,6 @@ acceptVisitor: visitor
 	^visitor visitMethod: self
 ! !
 
-!PowerLangPackage class methodsFor: 'installing' stamp: 'KenD 6/7/2021 14:10:45'!
-postPackageInstall
-
-	self inform: 'PowerLang is PRE-alpha. Expect breakage'! !
-
-!PowerLangPackage class methodsFor: 'installing' stamp: 'KenD 6/7/2021 14:34:38'!
-prePackageInstall
-
-	"We override SystemDictionary>>globals.
-	Let the user OK or bring up debugger.."
-	
-	self assert: (PopUpMenu confirm:
-				 'PowerLang overrides SystemDictionary>>globals; Yes->OK | No->Debug').
-				
-	"We may have been loaded before.  If not, capture COPY of
-	Smalltalk SystemDictionary initial bindings."
-	(Smalltalk includesKey: #globals)
-		ifFalse: [ Smalltalk at: #globals put: Smalltalk copy ].
-	"Might have nil globals; just in case.."
-	(Smalltalk at: #globals)
-		ifNil: [ Smalltalk at: #globals put: Smalltalk copy ].
-! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:16:41'!
-test010resolveClass 
-	| binding |
-	binding := SCompiler new smalltalkCompiler methodNode scope resolve: 'Point'.
-	self
-		assert: binding isGlobal;
-		assert: binding isClassBinding;
-		assert: binding name = #Point;
-		assert: binding association == (Smalltalk globals associationAt: #Point)! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:12'!
-test010resolveClassVariables 
-	| scope |
-	scope := self scopeFor: Symbol.
-	self checkClassVarsOf: Symbol in: scope! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:24'!
-test010resolveGlobal 
-	| binding |
-	binding := SCompiler new smalltalkCompiler methodNode scope resolve: 'Smalltalk'.
-	self
-		assert: binding isGlobal;
-		deny: binding isClassBinding;
-		assert: binding name = #Smalltalk;
-		assert: binding association == (Smalltalk globals associationAt: #Smalltalk)! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:35'!
-test010resolveInstanceVariables 
-	| scope |
-	scope := self scopeFor: Point.
-	self checkInstVarsOf: Point in: scope! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:46'!
-test010resolveSelf 
-	| scope receiver sup |
-	scope := self scopeFor: Object.
-	receiver := scope resolve: 'self'.
-	sup := scope resolve: 'super'.
-	self
-		assert: receiver isSelf;
-		assert: receiver name = 'self';
-		assert: sup isSuper;
-		assert: sup name = 'super'! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:18:57'!
-test011resolveUnknownGlobal 
-	| binding point |
-	self precondition: (Smalltalk includesKey: 'Foo678' existingSymbol) not.
-	binding := MethodScope new resolve: 'Foo678'.
-	self assert: binding isUnresolved.
-	point := self scopeFor: Point.
-	binding := point resolve: 'Foo678'.
-	self assert: binding isUnresolved! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:11'!
-test020resolveMethodArguments 
-	| scope |
-	scope := self scopeFor: Point.
-	scope
-		defineArgument: 'arg1';
-		defineArgument: 'arg2';
-		positionDefinedLocals.
-	self
-		checkArgs: #('arg1' 'arg2') in: scope;
-		checkInstVarsOf: Point in: scope! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:21'!
-test021resolveMethodTemporaries 
-	| scope |
-	scope := self scopeFor: Point.
-	scope defineTemporary: 't1'; defineTemporary: 't2'; positionDefinedLocals.
-	self
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:32'!
-test030resolveNestedTemporaryConflictingWithIvar 
-	| ast b3 x |
-	ast := self compile: 'foo  [ | x | [[x]] ]' in: Point.
-	b3 := ast children first children first children first.
-	x := b3 statements first binding.
-	self
-		assert: x
-		isEnvTemp: 'x'
-		at: 1
-		index: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:19:46'!
-test040declareMethodArguments 
-	| ast scope |
-	ast := self compile: 'foo: anArg bar: anotherArg' in: Point.
-	scope := ast scope.
-	self
-		checkArgs: #('anArg' 'anotherArg') in: scope;
-		checkInstVarsOf: Point in: scope! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:20:24'!
-test041declareMethodTemporaries 
-	| ast scope |
-	ast := self compile: 'foo | t1 t2 | ' in: Point.
-	scope := ast scope.
-	self
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:20:39'!
-test042declareMethodTempsWithArgs 
-	| ast scope |
-	ast := self compile: 'foo: arg1 bar: arg2 | t1 t2 | ' in: Point.
-	scope := ast scope.
-	self
-		checkArgs: #('arg1' 'arg2') in: scope;
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:05'!
-test050useMethodTemps 
-	| ast scope t1 t2 |
-	ast := self compile: 'foo | t1 t2 | t1. t2' in: Point.
-	scope := ast scope.
-	t1 := ast statements first binding.
-	t2 := ast statements second binding.
-	self
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope;
-		assert: t1 isTemporary;
-		assert: t1 isInStack;
-		assert: t1 name = 't1';
-		assert: t1 index = 1;
-		assert: t2 isTemporary;
-		assert: t2 isInStack;
-		assert: t2 name = 't2';
-		assert: t2 index = 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:16'!
-test051useMethodArgs 
-	| ast scope a1 a2 |
-	ast := self compile: 'foo: a1 bar: a2 a1. a2' in: Point.
-	scope := ast scope.
-	a1 := ast statements first binding.
-	a2 := ast statements second binding.
-	self
-		checkArgs: #('a1' 'a2') in: scope;
-		checkInstVarsOf: Point in: scope;
-		assert: a1 isArgument;
-		assert: a1 isInStack;
-		assert: a1 name = 'a1';
-		assert: a1 index = 1;
-		assert: a2 isArgument;
-		assert: a2 isInStack;
-		assert: a2 name = 'a2';
-		assert: a2 index = 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:33'!
-test052useMethodTempsAndArgs 
-	| ast scope a1 a2 t1 t2 |
-	ast := self compile: 'foo: a1 bar: a2 | t1 t2 | t1. t2. a1. a2' in: Point.
-	scope := ast scope.
-	t1 := ast statements first binding.
-	t2 := ast statements second binding.
-	a1 := ast statements third binding.
-	a2 := ast statements fourth binding.
-	self
-		checkArgs: #('a1' 'a2') in: scope;
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope;
-		assert: t1 isTemporary;
-		assert: t1 isInStack;
-		assert: t1 name = 't1';
-		assert: t1 index = 1;
-		assert: t2 isTemporary;
-		assert: t2 isInStack;
-		assert: t2 name = 't2';
-		assert: t2 index = 2;
-		assert: a1 isArgument;
-		assert: a1 isInStack;
-		assert: a1 name = 'a1';
-		assert: a1 index = 1;
-		assert: a2 isArgument;
-		assert: a2 isInStack;
-		assert: a2 name = 'a2';
-		assert: a2 index = 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:49'!
-test053useBlockArgs 
-	| ast block scope a1 a2 |
-	ast := self compile: 'foo [:a1 :a2 | a1. a2]' in: Point.
-	block := ast children first.
-	scope := block scope.
-	a1 := block statements first binding.
-	a2 := block statements second binding.
-	self
-		checkArgs: #('a1' 'a2') in: scope;
-		assert: a1 isStackArg: 'a1' at: 1;
-		assert: a2 isStackArg: 'a2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:21:59'!
-test053useSiblingBlockArgs 
-	| ast block1 block2 a1 a2 |
-	ast := self compile: 'foo [:a1 | a1]. [:a2 | a2]' in: Point.
-	block1 := ast children first.
-	block2 := ast children second.
-	a1 := block1 statements first binding.
-	a2 := block2 statements first binding.
-	self
-		checkArgs: #('a1') in: block1 scope;
-		checkArgs: #('a2') in: block2 scope;
-		assert: a1 isStackArg: 'a1' at: 1;
-		assert: a2 isStackArg: 'a2' at: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:10'!
-test054useBlockTemps 
-	| ast block scope t1 t2 |
-	ast := self compile: 'foo [| t1 t2 | t1. t2]' in: Point.
-	block := ast children first.
-	scope := block scope.
-	t1 := block statements first binding.
-	t2 := block statements second binding.
-	self
-		checkTemps: #('t1' 't2') in: scope;
-		assert: t1 isStackTemp: 't1' at: 1;
-		assert: t2 isStackTemp: 't2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:24'!
-test055methodUseGlobal 
-	| ast global |
-	ast := self compile: 'foo Collection' in: Point.
-	global := ast statements first binding.
-	self
-		assert: global isClassBinding;
-		assert: global name = #Collection;
-		assert: global association = (Smalltalk globals associationAt: #Collection)! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:36'!
-test060useNestedMethodArgs 
-	| ast block ma1 ma2 ba1 ba2 |
-	ast := self compile: 'foo: a1 bar: a2  a1. a2. [a1. a2]' in: Object.
-	block := ast children first.
-	ma1 := ast statements first binding.
-	ma2 := ast statements second binding.
-	ba1 := block statements first binding.
-	ba2 := block statements second binding.
-	self
-		checkArgs: #('a1' 'a2') in: ast scope;
-		assert: ma1 isStackArg: 'a1' at: 1;
-		assert: ma2 isStackArg: 'a2' at: 2;
-		assert: ba1 isEnvArg: 'a1' at: 1;
-		assert: ba2 isEnvArg: 'a2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:22:48'!
-test061useNestedMethodSiblingBlockTemps 
-	| ast block1 block2 b1t1 b2t2 |
-	ast := self compile: 'foo | t1 t2 | [t1]. [t2]' in: Object.
-	block1 := ast children first.
-	block2 := ast children second.
-	b1t1 := block1 statements first binding.
-	b2t2 := block2 statements first binding.
-	self
-		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
-		assert: b1t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b2t2
-			isEnvTemp: 't2'
-			at: 1
-			index: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:14'!
-test061useNestedMethodTemps 
-	| ast block bt1 bt2 |
-	ast := self compile: 'foo | t1 t2 | [t1. t2]' in: Object.
-	block := ast children first.
-	bt1 := block statements first binding.
-	bt2 := block statements second binding.
-	self
-		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
-		assert: bt1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: bt2
-			isEnvTemp: 't2'
-			at: 1
-			index: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:26'!
-test062useNestedBlockArgs 
-	| ast block1 block2 b1a1 b1a2 b2a1 b2a2 |
-	ast := self compile: 'foo [:a1 :a2 | [a1. a2] ]' in: Object.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b1a1 := block1 scope resolve: 'a1'.
-	b1a2 := block1 scope resolve: 'a2'.
-	b2a1 := block2 statements first binding.
-	b2a2 := block2 statements second binding.
-	self
-		checkArgs: #('a1' 'a2') in: block1 scope;
-		assert: b1a1 isStackArg: 'a1' at: 1;
-		assert: b1a2 isStackArg: 'a2' at: 2;
-		assert: b2a1 isEnvArg: 'a1' at: 1;
-		assert: b2a2 isEnvArg: 'a2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:38'!
-test063useNestedBlockTemps 
-	| ast block1 block2 b2t1 b2t2 |
-	ast := self compile: 'foo [| t1 t2 | [t1. t2]]' in: Object.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b2t1 := block2 statements first binding.
-	b2t2 := block2 statements second binding.
-	self
-		checkClosureEnvTemps: #('t1' 't2') in: block1 scope at: nil;
-		assert: b2t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b2t2
-			isEnvTemp: 't2'
-			at: 1
-			index: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:23:49'!
-test064useSiblingBlocksNestedTemps 
-	| ast block1 block2 block3 b2t1 b3t2 |
-	ast := self compile: 'foo [| t1 t2 | [t1]. [t2]]' in: Object.
-	block1 := ast children first.
-	block2 := block1 children first.
-	block3 := block1 children second.
-	b2t1 := block2 statements first binding.
-	b3t2 := block3 statements first binding.
-	self
-		checkClosureEnvTemps: #('t1' 't2') in: block1 scope at: nil;
-		assert: b2t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b3t2
-			isEnvTemp: 't2'
-			at: 1
-			index: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:24:01'!
-test065useNestedBlockAndMethodTemps 
-	| ast block1 block2 b2t1 b2t2 |
-	ast := self compile: 'foo | t1 | [| t2 | [t1. t2]]' in: Object.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b2t1 := block2 statements first binding.
-	b2t2 := block2 statements second binding.
-	self
-		checkEnvTemps: #('t1') in: ast scope at: nil;
-		checkClosureEnvTemps: #('t2') in: block1 scope at: nil;
-		assert: b2t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b2t2
-			isEnvTemp: 't2'
-			at: 2
-			index: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:35:36'!
-test070useDoublyNestedMethodArgs 
-	| ast block1 block2 b1a1 b1a2 b2a1 b2a2 |
-	ast := self compile: 'foo: a1 bar: a2  [[a1. a2]]' in: Object.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b1a1 := block1 scope resolve: 'a1'.
-	b1a2 := block1 scope resolve: 'a2'.
-	b2a1 := block2 statements first binding.
-	b2a2 := block2 statements second binding.
-	self
-		checkArgs: #('a1' 'a2') in: ast scope;
-		assert: b1a1 isEnvArg: 'a1' at: 1;
-		assert: b1a2 isEnvArg: 'a2' at: 2;
-		assert: b2a1 isEnvArg: 'a1' at: 1;
-		assert: b2a2 isEnvArg: 'a2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:35:49'!
-test071useDoublyNestedMethodTemps 
-	| ast block1 block2 b1t1 b1t2 b2t1 b2t2 |
-	ast := self compile: 'foo | t1 t2 | [[t1. t2]]' in: Object.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b1t1 := block1 scope resolve: 't1'.
-	b1t2 := block1 scope resolve: 't2'.
-	b2t1 := block2 statements first binding.
-	b2t2 := block2 statements second binding.
-	self
-		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
-		assert: b1t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b1t2
-			isEnvTemp: 't2'
-			at: 1
-			index: 2;
-		assert: b2t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b2t2
-			isEnvTemp: 't2'
-			at: 1
-			index: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:03'!
-test075useDoublyNestedMethodArgsWithTemps 
-	| ast block1 block2 b1a1 b1a2 b1t1 b1t2 b2a1 b2a2 b2t1 b2t2 |
-	ast := self
-		compile: 'foo: a1 bar: a2 | t1 | [| t2 | [a1. a2. t1. t2]]'
-		in: Object.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b1a1 := block1 scope resolve: 'a1'.
-	b1a2 := block1 scope resolve: 'a2'.
-	b1t1 := block1 scope resolve: 't1'.
-	b1t2 := block1 scope resolve: 't2'.
-	b2a1 := block2 statements first binding.
-	b2a2 := block2 statements second binding.
-	b2t1 := block2 statements third binding.
-	b2t2 := block2 statements fourth binding.
-	self
-		checkArgs: #('a1' 'a2') in: ast scope;
-		assert: b1a1 isEnvArg: 'a1' at: 2;
-		assert: b1a2 isEnvArg: 'a2' at: 3;
-		assert: b1t2
-			isEnvTemp: 't2'
-			at: nil
-			index: 4;
-		assert: b1t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b2t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1;
-		assert: b2t2
-			isEnvTemp: 't2'
-			at: 2
-			index: 4;
-		assert: b2a1 isEnvArg: 'a1' at: 3;
-		assert: b2a2 isEnvArg: 'a2' at: 4! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:16'!
-test080captureSelf 
-	| ast block receiver |
-	ast := self compile: 'foo [self]' in: Object.
-	block := ast children first.
-	receiver := block statements first binding.
-	self
-		assert: receiver isSelf;
-		assert: ast environmentSize = 0;
-		assert: block scope capturesSelf;
-		assert: block environmentSize equals: 1;
-		assert: block scope home == nil! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:28'!
-test090useNonLocalReturn 
-	| ast block |
-	ast := self compile: 'foo [^1]' in: Object.
-	block := ast children first.
-	self
-		assert: ast environmentSize = 0;
-		assert: ast needsEnvironment;
-		assert: block environmentSize = 1;
-		assert: block scope home == ast! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:39'!
-test091nonLocalReturnSelf 
-	| ast block |
-	ast := self compile: 'foo [^self]' in: Object.
-	block := ast children first.
-	self
-		assert: ast environmentSize = 0;
-		assert: ast needsEnvironment;
-		assert: block environmentSize = 2;
-		assert: block scope home == ast! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:36:52'!
-test100inlineUseMethodArgs 
-	| ast block a1 a2 |
-	ast := self compile: 'foo: a1 bar: a2  1 ifTrue: [a1. a2]' in: Point.
-	block := ast children first.
-	a1 := block statements first binding.
-	a2 := block statements second binding.
-	self
-		checkArgs: #('a1' 'a2') in: ast scope;
-		assert: a1 isStackArg: 'a1' at: 1;
-		assert: a2 isStackArg: 'a2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:05'!
-test101inlineUseMethodTemps 
-	| ast t1 t2 block |
-	ast := self compile: 'foo | t1 t2 | 1 ifTrue: [t1. t2]' in: Point.
-	block := ast children first.
-	t1 := block statements first binding.
-	t2 := block statements second binding.
-	self
-		checkTemps: #('t1' 't2') in: ast scope;
-		assert: t1 isStackTemp: 't1' at: 1;
-		assert: t2 isStackTemp: 't2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:19'!
-test102inlineUseMethodArgsAndTemps 
-	| ast block a1 a2 t1 t2 |
-	ast := self
-		compile: 'foo: a1 bar: a2  | t1 t2 | 1 ifTrue: [a1. a2. t1. t2]'
-		in: Point.
-	block := ast children first.
-	a1 := block statements first binding.
-	a2 := block statements second binding.
-	t1 := block statements third binding.
-	t2 := block statements fourth binding.
-	self
-		checkArgs: #('a1' 'a2') in: ast scope;
-		assert: a1 isStackArg: 'a1' at: 1;
-		assert: a2 isStackArg: 'a2' at: 2;
-		assert: t1 isStackTemp: 't1' at: 1;
-		assert: t2 isStackTemp: 't2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:29'!
-test110inlineUseMixedMethodTemps 
-	| ast t1 t2 block |
-	ast := self compile: 'foo | t1 | 1 ifTrue: [ | t2 | t1. t2]' in: Point.
-	block := ast children first.
-	t1 := block statements first binding.
-	t2 := block statements second binding.
-	self
-		checkTemps: #('t1') in: ast scope;
-		assert: t1 isStackTemp: 't1' at: 1;
-		assert: t2 isStackTemp: 't2' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:42'!
-test120inlineEnvironmentTemp 
-	| ast block1 block2 mt1 mt2 b1t1 b1t2 b2t2 |
-	ast := self
-		compile: 'foo | t1 | 1 ifTrue: [ | t2 | t1. [t2]]'
-		in: Point.
-	block1 := ast children first.
-	block2 := block1 children first.
-	mt1 := ast scope resolve: 't1'.
-	mt2 := ast scope resolve: 't2'.
-	b1t1 := block1 statements first binding.
-	b1t2 := block1 scope resolve: 't2'.
-	b2t2 := block2 scope resolve: 't2'.
-	self
-		checkTemps: #('t1') in: ast scope;
-		assert: mt2 isUnresolved;
-		assert: mt1 isStackTemp: 't1' at: 1;
-		assert: b1t1 isStackTemp: 't1' at: 1;
-		assert: b1t2
-			isEnvTemp: 't2'
-			at: nil
-			index: 1;
-		assert: b2t2
-			isEnvTemp: 't2'
-			at: 1
-			index: 1;
-		assert: ast scope environmentSize = 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:37:54'!
-test130inlineBlockArg 
-	| ast block a1 |
-	ast := self compile: 'foo  1 ifNotNil: [:a1 | 1 ]' in: Point.
-	block := ast children first.
-	a1 := block scope resolve: 'a1'.
-	self assert: a1 isStackInlineArg: 'a1' at: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:04'!
-test131inlineBlockArgWithTemp 
-	| ast block t1 a1 |
-	ast := self compile: 'foo | t1 | 1 ifNotNil: [:a1 | 1 ]' in: Point.
-	block := ast children first.
-	t1 := ast scope resolve: 't1'.
-	a1 := block scope resolve: 'a1'.
-	self
-		assert: t1 isStackTemp: 't1' at: 1;
-		assert: a1 isStackInlineArg: 'a1' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:15'!
-test132inlineBlockArgWithTemps 
-	| ast block t1 a1 t2 |
-	ast := self compile: 'foo | t1 | 1 ifNotNil: [:a1 | | t2 | 1 ]' in: Point.
-	block := ast children first.
-	t1 := ast scope resolve: 't1'.
-	a1 := block scope resolve: 'a1'.
-	t2 := block scope resolve: 't2'.
-	self
-		assert: t1 isStackTemp: 't1' at: 1;
-		assert: t2 isStackTemp: 't2' at: 2;
-		assert: a1 isStackInlineArg: 'a1' at: 3! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:25'!
-test133inlineBlockArgWithEnvTemps 
-	| ast block1 mt1 b1a1 b1t2 |
-	ast := self
-		compile: 'foo | t1 | 1 ifNotNil: [:a1 | | t2 | 1. [t2] ]'
-		in: Point.
-	block1 := ast children first.
-	mt1 := ast scope resolve: 't1'.
-	b1a1 := block1 scope resolve: 'a1'.
-	b1t2 := block1 scope resolve: 't2'.
-	self
-		assert: mt1 isStackTemp: 't1' at: 1;
-		assert: b1t2 isEnvTemp: 't2' at: nil index: 1;
-		assert: b1a1 isStackInlineArg: 'a1' at: 2! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:36'!
-test134inlineBlockArgNestedAccess 
-	| ast block1 block2 b1a1 b2a1 |
-	ast := self compile: 'foo  1 ifNotNil: [:a1 | [a1] ]' in: Point.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b1a1 := block1 scope resolve: 'a1'.
-	b2a1 := block2 scope resolve: 'a1'.
-	self
-		assert: b1a1 isEnvArg: 'a1' at: 1;
-		assert: b2a1 isEnvArg: 'a1' at: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:46'!
-test135inlineBlockWithArgInRealBlockCaptured 
-	| ast block1 block2 block3 b2a1 b3a1 |
-	"Args of inlined blocks can go to the stack of the real block, unless captured. Because the
-	 capture bytecode doesn't have a slot type for 'copy from stack temps' (it has capture from
-	 stack in 	 args zone, capture the current env, and capture a value in the current env)"
-	ast := self compile: 'foo  [1 ifNotNil: [:a1 | [a1] ]]' in: Point.
-	block1 := ast children first.
-	block2 := block1 children first.
-	block3 := block2 children first.
-	b2a1 := block2 scope resolve: 'a1'.
-	b3a1 := block3 scope resolve: 'a1'.
-	self
-		assert: b2a1 isEnvArg: 'a1' at: 1;
-		assert: b3a1 isEnvArg: 'a1' at: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:38:56'!
-test136inlineBlockWithArgCapturedByInlinedBlock 
-	| ast block1 block2 b1a1 b2a1 |
-	ast := self compile: 'foo 1 ifNotNil: [:a1 | a1. 2 ifTrue: [a1]]' in: Point.
-	block1 := ast children first.
-	block2 := block1 children first.
-	b1a1 := block1 scope resolve: 'a1'.
-	b2a1 := block2 scope resolve: 'a1'.
-	self
-		assert: b1a1 isStackInlineArg: 'a1' at: 1;
-		assert: b2a1 isStackInlineArg: 'a1' at: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:39:10'!
-test137inlineBlockWithArgCapturedByInlinedBlockInRealBlock 
-	| ast block1 block2 block3 b1a1 b3a1 |
-	ast := self
-		compile: 'foo 1 ifNotNil: [:a1 | [2 ifTrue: [a1]]]'
-		in: Point.
-	block1 := ast children first.
-	block2 := block1 children first.
-	block3 := block2 children first.
-	b1a1 := block1 scope resolve: 'a1'.
-	b3a1 := block3 scope resolve: 'a1'.
-	self
-		assert: b1a1 isEnvArg: 'a1' at: 1;
-		assert: b3a1 isEnvArg: 'a1' at: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:39:23'!
-test138blockWithInlinedBlockWithTempCaptured 
-	| ast block1 block2 block3 b2t1 b3t1 block |
-	ast := self compile: 'foo [true ifTrue: [| t1 | [t1]]]' in: Point.
-	block1 := ast children first.
-	block2 := block1 children first.
-	block3 := block2 children first.
-	b2t1 := block2 scope resolve: 't1'.
-	b3t1 := block3 scope resolve: 't1'.
-	self
-		assert: b2t1
-			isEnvTemp: 't1'
-			at: nil
-			index: 1;
-		assert: b3t1
-			isEnvTemp: 't1'
-			at: 1
-			index: 1! !
-
-!ScriptScopeTest methodsFor: 'testing' stamp: 'KenD 6/5/2021 07:39:54'!
-test140blockWithInlinedBlockHasEnv 
-	| ast |
-	ast := self compile: 'foo [true ifTrue: [^self]]'.
-	self assert: ast needsEnvironment! !
-
-!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:12'!
-assert: binding isEnvArg: name at: index 
-
-	self
-		assert: binding isArgument;
-		assert: binding name = name;
-		assert: binding index = index;
-		assert: binding isInArray;
-		assert: binding environmentIndex = nil! !
-
-!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:28'!
-assert: binding
-isEnvTemp: name
-at: environment
-index: index 
-
-	self
-		assert: binding isTemporary;
-		assert: binding isInArray;
-		assert: binding name = name;
-		assert: binding index = index;
-		assert: binding environment = environment! !
-
-!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:40'!
-assert: binding isStackArg: name at: index 
-
-	self
-		assert: binding isArgument;
-		assert: binding isInStack;
-		assert: binding name = name;
-		assert: binding index = index! !
-
-!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:13:55'!
-assert: binding isStackInlineArg: name at: index 
-
-	self
-		assert: binding isArgument;
-		assert: binding isInStack;
-		assert: binding name = name;
-		assert: binding index = index;
-		assert: binding environmentObject class = InlinedArgEnvironment! !
-
-!ScriptScopeTest methodsFor: 'assertions' stamp: 'KenD 6/5/2021 07:14:08'!
-assert: binding isStackTemp: name at: index 
-
-	self
-		assert: binding isTemporary;
-		assert: binding isInStack;
-		assert: binding name = name;
-		assert: binding index = index! !
-
-!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:19'!
-checkArgs: names in: scope 
-
-	names withIndexDo: [:name :index | | binding |
-		binding := scope resolve: name.
-		self
-			assert: binding isArgument;
-			assert: binding name = name;
-			assert: binding index = index]! !
-
-!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:30'!
-checkClassVarsOf: aSpecies in: scope 
-
-	aSpecies withAllSuperclasses do: [:c | 
-		c classPool associationsDo: [:assoc | | name binding |
-			name := assoc key.
-			binding := scope resolve: name.
-			self
-				assert: binding isClassVariable;
-				assert: binding name = name;
-				assert: binding association == assoc]]! !
-
-!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:42'!
-checkClosureEnvTemps: names in: scope at: environment 
-	| offset |
-	offset := scope environmentSizeUpToCapturedArguments.
-	names withIndexDo: [:name :index | | binding |
-		binding := scope resolve: name.
-		self
-			assert: binding isTemporary;
-			assert: binding isInArray;
-			assert: binding name = name;
-			assert: binding index = (index + offset);
-			assert: binding environment = environment]! !
-
-!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:14:54'!
-checkEnvTemps: names in: scope at: environment 
-
-	names withIndexDo: [:name :index | | binding |
-		binding := scope resolve: name.
-		self
-			assert: binding isTemporary;
-			assert: binding isInArray;
-			assert: binding name = name;
-			assert: binding index = index;
-			assert: binding environment = environment]! !
-
-!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:15:07'!
-checkInstVarsOf: aSpecies in: scope 
-
-	aSpecies allInstVarNames withIndexDo: [:name :i | | binding |
-		binding := scope resolve: name.
-		self
-			assert: binding isInstVar;
-			assert: binding name = name;
-			assert: binding index = i]! !
-
-!ScriptScopeTest methodsFor: 'checking' stamp: 'KenD 6/5/2021 07:15:18'!
-checkTemps: names in: scope 
-
-	names withIndexDo: [:name :index | | binding |
-		binding := scope resolve: name.
-		self assert: binding isStackTemp: name at: index]! !
-
-!ScriptScopeTest methodsFor: 'compiling' stamp: 'KenD 6/5/2021 07:15:31'!
-compile: aString 
-
-	^self compile: aString in: UndefinedObject! !
-
-!ScriptScopeTest methodsFor: 'compiling' stamp: 'KenD 6/5/2021 07:15:44'!
-compile: aString in: aClass 
-
-	^SCompiler parse: aString in: aClass! !
-
-!ScriptScopeTest methodsFor: 'as yet unclassified' stamp: 'KenD 6/5/2021 07:15:57'!
-precondition: aBoolean 
-
-	self assert: aBoolean description: 'Precondition for this test is not met'! !
-
-!ScriptScopeTest methodsFor: 'as yet unclassified' stamp: 'KenD 6/5/2021 07:16:08'!
-scopeFor: aSpecies 
-
-	^MethodScope new species: aSpecies! !
-
 !MethodEvaluator methodsFor: 'accessing' stamp: 'KenD 3/3/2021 11:08:51'!
 argumentAt: index in: anInteger 
 	| env |
@@ -26318,6 +26352,126 @@ primitivePrintString
 
 	^self printString! !
 
+!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:51:39'!
+configureCompiler: aCompiler! !
+
+!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/5/2021 08:23:15'!
+isSpecies 
+	
+	^ true! !
+
+!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:46:44'!
+allSharedPoolsUsing: globals 
+
+	^self allSharedPools ! !
+
+!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/10/2021 12:53:29'!
+indexOfSlot: instVarName 
+	self flag: #KenD_Revisit.
+	"^self instVarIndexFor: instVarName"
+	
+	"Nota Bene: returns zero on failure; use nil?"
+	^self instVarNames findFirst: [ :name | name = instVarName ]! !
+
+!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:47:07'!
+localPools 
+
+	^#()! !
+
+!Class methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:50'!
+instanceSide
+
+	^ self! !
+
+!Metaclass methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:30'!
+instanceSide
+
+	^ thisClass! !
+
+!ClassOrganizer methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:48:08'!
+selectorsFor: aString 
+	| protocol |
+	protocol := self protocolNamed: aString.
+	^protocol methodSelectors! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:43'!
+bin 
+	"
+	255 bin
+	"
+	^self printStringBase: 2! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:24'!
+bin: bits 
+	"
+	(2 bin: 7) size = 7
+	"
+	| pad bin |
+	pad := String new: bits withAll: $0.
+	bin := pad , self bin.
+	^ bin copyFrom: bin size - bits + 1 to: bin size! !
+
+!Integer methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:53:06'!
+bitShiftRight: anInteger 
+
+	^self bitShift: 0 - anInteger! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:30:23'!
+bitsAt: aStretch 
+	"
+	(2r001101010 bitField: (3 thru: 6)) bin = '1010'
+	(-16r40000000 bitField: (29 thru: 31)) bin = '100'
+	"
+	| shifted mask |
+	shifted := self bitShiftRight: aStretch start - 1.
+	mask := 1 bitShift: aStretch length.
+	^shifted bitAnd: mask - 1! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:29:27'!
+bitsAt: aStretch put: anInteger 
+	"
+	((2r001101100 bitsAt: (3 thru: 6) put: 2r1101) bitField: (3 thru: 6)) bin = '1101'
+	((2r100 bitsAt: (29 thru: 31) put: 2r101) bitField: (29 thru: 31)) bin = '101'
+	((2r100 bitsAt: (29 thru: 31) put: 2r101) bitField: (1 thru: 3)) bin = '100'
+	"
+	| shifted max |
+	shifted := anInteger bitShift: aStretch start - 1.
+	max := 1 bitShift: aStretch length.
+	anInteger < max ifFalse: [self error: 'invalid argument'].
+	^(self bitsClear: aStretch) bitOr: shifted! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:29:57'!
+bitsClear: aStretch 
+	"
+	(2r111100110 bitsClear: (3 thru: 6)) = 2r111000010
+	"
+	| mask |
+	mask := (1 bitShift: aStretch end) - (1 bitShift: aStretch start - 1).
+	^self bitAnd: mask bitInvert! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:30:51'!
+isOnBit: n
+
+	^(self bitAnd: n) = n! !
+
+!Integer methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:54:20'!
+linearFeedbackShiftRandom: key 
+	"
+	LFSR implementation (avoids 0 by definition).
+	More keys at: https://users.ece.cmu.edu/~koopman/lfsr/index.html
+	"
+
+	| shifted |
+	shifted := self bitShift: -1.
+	^ (self bitAnd: 1) = 0
+		ifTrue: [ shifted ]
+		ifFalse: [ shifted bitXor: key ]! !
+
+!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/29/2022 14:03:31'!
+thru: anInteger
+	^Stretch from: self thru: anInteger
+! !
+
 !Collection methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:48:46'!
 anyone 
 
@@ -26371,6 +26525,11 @@ indexOfSubCollection: aSubCollection
 		startingAt: 1
 		ifAbsent: [0]! !
 
+!Symbol methodsFor: '*powerlang-core' stamp: 'KenD 6/3/2021 13:53:01'!
+isBinary 
+
+	^self precedence = 2! !
+
 !ArrayedCollection class methodsFor: '*powerlang-core' stamp: 'KenD 6/17/2021 13:20:02'!
 with: anObject withAll: aCollection
 
@@ -26401,11 +26560,6 @@ asLittleEndianPositiveInteger
 	
 
 ! !
-
-!Symbol methodsFor: '*powerlang-core' stamp: 'KenD 6/3/2021 13:53:01'!
-isBinary 
-
-	^self precedence = 2! !
 
 !Dictionary methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:50:25'!
 removeAllSuchThat: aBlock 
@@ -26581,126 +26735,6 @@ nextULongPut: anInteger
 		| bi |
 		bi := anInteger byteAt: i.
 		self nextPut: bi ]! !
-
-!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:51:39'!
-configureCompiler: aCompiler! !
-
-!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/5/2021 08:23:15'!
-isSpecies 
-	
-	^ true! !
-
-!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:46:44'!
-allSharedPoolsUsing: globals 
-
-	^self allSharedPools ! !
-
-!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/10/2021 12:53:29'!
-indexOfSlot: instVarName 
-	self flag: #KenD_Revisit.
-	"^self instVarIndexFor: instVarName"
-	
-	"Nota Bene: returns zero on failure; use nil?"
-	^self instVarNames findFirst: [ :name | name = instVarName ]! !
-
-!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:47:07'!
-localPools 
-
-	^#()! !
-
-!Class methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:50'!
-instanceSide
-
-	^ self! !
-
-!Metaclass methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:30'!
-instanceSide
-
-	^ thisClass! !
-
-!ClassOrganizer methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:48:08'!
-selectorsFor: aString 
-	| protocol |
-	protocol := self protocolNamed: aString.
-	^protocol methodSelectors! !
-
-!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:43'!
-bin 
-	"
-	255 bin
-	"
-	^self printStringBase: 2! !
-
-!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:24'!
-bin: bits 
-	"
-	(2 bin: 7) size = 7
-	"
-	| pad bin |
-	pad := String new: bits withAll: $0.
-	bin := pad , self bin.
-	^ bin copyFrom: bin size - bits + 1 to: bin size! !
-
-!Integer methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:53:06'!
-bitShiftRight: anInteger 
-
-	^self bitShift: 0 - anInteger! !
-
-!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:30:23'!
-bitsAt: aStretch 
-	"
-	(2r001101010 bitField: (3 thru: 6)) bin = '1010'
-	(-16r40000000 bitField: (29 thru: 31)) bin = '100'
-	"
-	| shifted mask |
-	shifted := self bitShiftRight: aStretch start - 1.
-	mask := 1 bitShift: aStretch length.
-	^shifted bitAnd: mask - 1! !
-
-!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:29:27'!
-bitsAt: aStretch put: anInteger 
-	"
-	((2r001101100 bitsAt: (3 thru: 6) put: 2r1101) bitField: (3 thru: 6)) bin = '1101'
-	((2r100 bitsAt: (29 thru: 31) put: 2r101) bitField: (29 thru: 31)) bin = '101'
-	((2r100 bitsAt: (29 thru: 31) put: 2r101) bitField: (1 thru: 3)) bin = '100'
-	"
-	| shifted max |
-	shifted := anInteger bitShift: aStretch start - 1.
-	max := 1 bitShift: aStretch length.
-	anInteger < max ifFalse: [self error: 'invalid argument'].
-	^(self bitsClear: aStretch) bitOr: shifted! !
-
-!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:29:57'!
-bitsClear: aStretch 
-	"
-	(2r111100110 bitsClear: (3 thru: 6)) = 2r111000010
-	"
-	| mask |
-	mask := (1 bitShift: aStretch end) - (1 bitShift: aStretch start - 1).
-	^self bitAnd: mask bitInvert! !
-
-!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:30:51'!
-isOnBit: n
-
-	^(self bitAnd: n) = n! !
-
-!Integer methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:54:20'!
-linearFeedbackShiftRandom: key 
-	"
-	LFSR implementation (avoids 0 by definition).
-	More keys at: https://users.ece.cmu.edu/~koopman/lfsr/index.html
-	"
-
-	| shifted |
-	shifted := self bitShift: -1.
-	^ (self bitAnd: 1) = 0
-		ifTrue: [ shifted ]
-		ifFalse: [ shifted bitXor: key ]! !
-
-!Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/29/2022 14:03:31'!
-thru: anInteger
-	^Stretch from: self thru: anInteger
-! !
 CharacterConstants initialize!
 OperandTypeFlags initialize!
 RegistersRISCV initialize!
