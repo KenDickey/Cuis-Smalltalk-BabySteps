@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5494] on 24 October 2022 at 10:35:22 am'!
+'From Cuis 6.0 [latest update: #5494] on 24 October 2022 at 11:37:55 am'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 50!
+!provides: 'Powerlang' 1 51!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -2063,7 +2063,7 @@ or through an address computation made up of one or more of the following compon
       offset - An 8, 16, or 32-bit value.
       baseRegister - contains the base address.
       indexRegister - contains an index off of the base.
-      scale factor - A value of 2, 4, or 8 that is multiplied by the value in the indexRegister.
+      scale factor - A value of 1, 2, 4, or 8 that is multiplied by the value in the indexRegister.
 
     The offset which results from adding these components is called an `effective address`. 
     Each of these components can have either a positive or negative (2s complement) value, 
@@ -2072,16 +2072,19 @@ or through an address computation made up of one or more of the following compon
    Symbolically:
         EffectiveAddress := Base + (Index*Scale) + Offset
 
-   For OOPS (Object Pointers)
+   For OOPS (Object Pointers):
+
                  header
    Base---> slot1
                  slot2
                  slot3
 
    With zero based index, 8 byte addresses,
-      slot3 is at address: (Base + (index=2 * scale=8) + 0)
+      slot3 is at address: (Base + (index=2 * scale=8) + offset=0)
 
-   See  #RISCCodeGenerator>>lea:withMem: 
+  Note Calculations in:
+	 #CodeGenerator>>memRef:indexImm:
+	 #RV64GCodeGenerator>>lea:withMem: 
 !
 
 !DmrObjectFormat commentStamp: '<historical>' prior: 0!
