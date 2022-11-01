@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5494] on 24 October 2022 at 11:37:55 am'!
+'From Cuis 6.0 [latest update: #5494] on 1 November 2022 at 3:28:09 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 51!
+!provides: 'Powerlang' 1 53!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -2634,24 +2634,25 @@ tempCount: anInteger
 	format := format bitsAt: TempCount put: anInteger
 ! !
 
-!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 10/1/2022 15:04:32'!
+!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 11/1/2022 11:31:17'!
 gtDisplayOn: stream
-stream
+
+	stream
 		nextPutAll: self classBinding name;
 		nextPutAll: '>>';
 		print: selector
 ! !
 
-!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 10/1/2022 15:04:32'!
+!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 11/1/2022 10:51:24'!
 printOn: aStream
 	aStream
 		print: self classBinding;
 		nextPutAll: '>>';
 		print: selector;
-		cr.
+		newLine.
 	source
 		ifNotNil: [ aStream
-				cr;
+				newLine;
 				nextPutAll: source ]
 ! !
 
@@ -7605,12 +7606,12 @@ memRef16
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:33'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/31/2022 13:59:58'!
 memRef16: baseReg offset: offsetReg
 	^ self memRef16
 		base: baseReg;
 		index: offsetReg;
-		scale: 1;
+		scale: 2; "2 bytes"
 		yourself
 ! !
 
@@ -7650,12 +7651,12 @@ memRef32: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/21/2022 10:03:26'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/31/2022 14:00:24'!
 memRef32: baseReg offset: offsetReg
 	^ self memRef32
 		base: baseReg;
 		index: offsetReg;
-		scale: 1; "byte ?"
+		scale: 4; "bytes"
 		yourself
 ! !
 
@@ -7683,13 +7684,13 @@ memRef8
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:47'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/31/2022 14:00:43'!
 memRef8: baseReg index: indexReg
 	^ self memRef8 
 		base: baseReg; 
 		displacement: -1;
 		index: indexReg;
-		scale: 1;
+		scale: 1; "1 byte"
 		yourself
 
 ! !
@@ -7966,8 +7967,9 @@ pop: srcReg
 		addImm: wordSize to: self regSP 
 ! !
 
-!RISCCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/4/2022 13:09:19'!
+!RISCCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/31/2022 13:48:27'!
 push: srcReg
+	"Stack is 16 byte aligned, so pushing sometimes adds a pad"
 	| memref |
 	memref := self memRef base: self regSP; displacement: -8. "Stack grows down"
 	self
@@ -8096,6 +8098,14 @@ return: imm12offset
 	"Nota Bene: unshifted imm12offset is sign extended and the lowest bit set to zero"
 	memory nextInstructionPut: 
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
+! !
+
+!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 10/24/2022 10:23:40'!
+memRef
+	"superclass CodeGenerator says that I am responsible to implement this method"
+
+	^ RVMemoryReference new
+		widthInBits: self wordSize * 8
 ! !
 
 !RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/24/2022 10:21:25'!
@@ -8519,17 +8529,6 @@ regFlags
 	^ flagsReg
 ! !
 
-!RV64GCodeGenerator methodsFor: 'testing' stamp: 'KenD 10/16/2022 08:06:45'!
-fitsIn12bits: anInteger
-	"Signed integer `anInteger` fits in immediate12 ?"
-	^ (anInteger between: -16r800 and: 16r7FF) ! !
-
-!RV64GCodeGenerator methodsFor: 'testing' stamp: 'KenD 10/16/2022 08:44:02'!
-is8byteAligned: integerAddress
-
-	"Does address have lower 3 bits all zero ?"
-	^ (integerAddress bitAnd: 02r0111) isZero! !
-
 !RV64GCodeGenerator methodsFor: 'services' stamp: 'KenD 10/16/2022 15:24:13'!
 alignTo: aNumber
 	| current |
@@ -8648,13 +8647,16 @@ syscall: callNumber arg: reg0 arg: reg1 arg: reg2 arg: reg3 arg: reg4 arg: reg5
 	self move: 10 to: RegR.  "Result from A0 into RegR"
 	 ! !
 
-!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 10/24/2022 10:23:40'!
-memRef
-	"superclass CodeGenerator says that I am responsible to implement this method"
+!RV64GCodeGenerator methodsFor: 'testing' stamp: 'KenD 10/16/2022 08:06:45'!
+fitsIn12bits: anInteger
+	"Signed integer `anInteger` fits in immediate12 ?"
+	^ (anInteger between: -16r800 and: 16r7FF) ! !
 
-	^ RVMemoryReference new
-		widthInBits: self wordSize * 8
-! !
+!RV64GCodeGenerator methodsFor: 'testing' stamp: 'KenD 10/16/2022 08:44:02'!
+is8byteAligned: integerAddress
+
+	"Does address have lower 3 bits all zero ?"
+	^ (integerAddress bitAnd: 02r0111) isZero! !
 
 !RV64GCodeGenerator class methodsFor: 'instance creation' stamp: 'KenD 9/27/2022 13:46:16'!
 new
@@ -9977,14 +9979,14 @@ storeAssociation: association value: anObject
 	system storeAssociation: association value: anObject 
 ! !
 
-!EvaluationContext methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:34:52'!
+!EvaluationContext methodsFor: 'printing' stamp: 'KenD 11/1/2022 10:51:52'!
 printOn: aStream
  self backtrace
 				do: [ :frame | 
 					frame
 						do: [ :elem | elem printOn: aStream ]
 						separatedBy: [ aStream nextPutAll: '. ' ].
-					aStream cr ]
+					aStream newLine ]
 ! !
 
 !LinkedEvaluationContext methodsFor: 'visiting' stamp: 'KenD 9/30/2022 12:14:22'!
@@ -10488,16 +10490,16 @@ popOperands: anInteger
 	^ result
 ! !
 
-!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 11/1/2022 10:52:06'!
 printOn: aStream
 	| slot |
-	regSP to: regBP + 3 do: [ :i | slot := stack at: i. aStream nextPutAll: i hex; nextPutAll: ' -> '; print: slot;cr ].
-	aStream nextPutAll: '...'; cr.
+	regSP to: regBP + 3 do: [ :i | slot := stack at: i. aStream nextPutAll: i hex; nextPutAll: ' -> '; print: slot; newLine ].
+	aStream nextPutAll: '...'; newLine.
 
 super printOn: aStream
 ! !
 
-!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
+!StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 11/1/2022 10:52:13'!
 printStack
 	^String
 		streamContents: [ :stream | 
@@ -10508,7 +10510,7 @@ printStack
 					nextPutAll: i hex;
 					nextPutAll: ' -> ';
 					print: slot;
-					cr ] ]
+					newLine ] ]
 ! !
 
 !StackedEvaluationContext methodsFor: 'initialization' stamp: 'KenD 9/29/2022 14:36:01'!
@@ -11607,12 +11609,12 @@ evaluateClosure: closure withArgs: arguments
 	^ self prepareForBlock: sblock
 ! !
 
-!PowertalkLinkedLinearInterpreter methodsFor: 'visiting' stamp: 'KenD 9/30/2022 12:26:46'!
+!PowertalkLinkedLinearInterpreter methodsFor: 'visiting' stamp: 'KenD 11/1/2022 10:52:23'!
 evaluate
 	| operation |
 	[ operation := context nextOperation. operation notNil]
 		whileTrue: [ 			operation acceptVisitor: self ].
-	Transcript print: 'MessageCount: ' , messageCount asString; cr.
+	Transcript print: 'MessageCount: ' , messageCount asString; newLine.
 	^ regR
 ! !
 
@@ -11712,13 +11714,13 @@ dropToS
 	context pushOperation: SOpDropToS new
 ! !
 
-!PowertalkLinkedTreeInterpreter methodsFor: 'accessing' stamp: 'KenD 9/30/2022 12:26:58'!
+!PowertalkLinkedTreeInterpreter methodsFor: 'accessing' stamp: 'KenD 11/1/2022 10:52:28'!
 evaluate
 	| operation |
 	[ context hasWork ]
 		whileTrue: [ operation := context popOperation.
 			operation acceptVisitor: self ].
-	Transcript print: 'MessageCount: ' , messageCount asString; cr.
+	Transcript print: 'MessageCount: ' , messageCount asString; newLine.
 	^ regR
 ! !
 
@@ -16206,35 +16208,35 @@ emitSend: aSymbol using: anAssembler
 	anAssembler breakpoint
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:48:34'!
 assembleAsFloatInto
-	#_asFloatInto:.
+	<inline: #_asFloatInto:>.
 	assembler
 		loadX0withRasDouble;
 		storeLargeX0inA.
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:53:55'!
 assembleAsNative
 	| noninteger |
-	#_asNative.
+	<inline: #_asNative>.
 	noninteger := assembler labeledIntegerBitTestOfR.
 	assembler
 		convertRtoNativeInteger;
 		@ noninteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:54:06'!
 assembleAsObject
-	#_asObject.
+	<inline: #_asObject>.
 	assembler clearSafeRintegerBit
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:54:20'!
 assembleAsPointer
 	| nonInteger |
-	#_asPointer.
+	<inline: #_asPointer>.
 	nonInteger := assembler labeledIntegerBitTestOfR.
 	assembler
 		convertRtoNativeInteger;
@@ -16242,26 +16244,26 @@ assembleAsPointer
 		setSafeRintegerBit
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:54:32'!
 assembleAsSmallInteger
-	#_asSmallInteger.
+	<inline: #_asSmallInteger>.
 	assembler convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:54:42'!
 assembleBasicAt
 	| oop |
-	#_basicAt:.
+	<inline: #_basicAt:>.
 	oop := assembler labeledIntegerNativizationOfA.
 	assembler
 		loadRwithRatA;
 		@ oop
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:54:52'!
 assembleBasicAtPut
 	| nonInteger |
-	#_basicAt:put:.
+	<inline: #_basicAt:put:>.
 	nonInteger := assembler labeledIntegerNativizationOfA.
 	assembler
 		storeTinRatA;
@@ -16269,9 +16271,9 @@ assembleBasicAtPut
 		loadRwithT
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:56:27'!
 assembleBasicCopyFromToWith
-	#_basicCopyFrom:to:with:.
+	<inline: #_basicCopyFrom:to:with:>.
 	assembler
 		pushE;
 		convertAtoNativeInteger;
@@ -16284,62 +16286,62 @@ assembleBasicCopyFromToWith
 		popE
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:56:40'!
 assembleBasicFlags
-	#_basicFlags.
+	<inline: #_basicFlags>.
 	self emitByteAtOffset: _Flags
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:57:07'!
 assembleBasicFlagsPut
-	#_basicFlags:.
+	<inline: #_basicFlags:>.
 	self emitByteAtOffsetPut: _Flags
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:57:41'!
 assembleBasicHash
-	#_basicHash.
+	<inline: #_basicHash>.
 	assembler
 		loadZeroExtendShortRwithRoffset: _Hash;
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:57:55'!
 assembleBasicHashPut
 	| nonInteger |
-	#_basicHash:.
+	<inline: #_basicHash:>.
 	nonInteger := assembler labeledIntegerNativizationOfA.
 	assembler
 		storeShortAinRoffset: _Hash;
 		@ nonInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:58:05'!
 assembleBasicSize
-	#_smallSize.
+	<inline: #_smallSize>.
 	self emitByteAtOffset: _SmallSize
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:58:15'!
 assembleBasicSizePut
-	#_smallSize:.
+	<inline: #_smallSize:>.
 	self emitByteAtOffsetPut: _SmallSize
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:58:32'!
 assembleBasicULongAt
 	| nonInteger |
-	#_basicULongAt:.
+	<inline: #_basicULongAt:>.
 	nonInteger := assembler labeledIntegerNativizationOfA.
 	assembler
 		loadZeroExtendLongRwithRatA;
 		@ nonInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:58:44'!
 assembleBasicULongAtPut
 	| nonInteger |
-	#_basicULongAt:put:.
+	<inline: #_basicULongAt:put:>.
 	nonInteger := assembler labeledIntegerNativizationOfA.
 	assembler
 		storeLongTinRatA;
@@ -16347,31 +16349,31 @@ assembleBasicULongAtPut
 		loadRwithT
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:58:53'!
 assembleBeCurrent
-	#_beCurrent.
+	<inline: #_beCurrent>.
 	assembler
 		loadRwithRindex: 1;
 		clearSafeRintegerBit;
 		loadFPwithR
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:59:05'!
 assembleBeEnvironment
-	#_beEnvironment.
+	<inline: #_beEnvironment>.
 	assembler loadEwithR
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:59:17'!
 assembleBeFramePointer
-	#_beFramePointer.
+	<inline: #_beFramePointer>.
 	assembler storeRinFPindex: 1
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:59:31'!
 assembleBitShiftLeft
 	| success |
-	#_bitShiftLeft:.
+	<inline: #_bitShiftLeft:>.
 	success := assembler newLabel.
 	assembler
 		loadTwithA;
@@ -16390,9 +16392,9 @@ assembleBitShiftLeft
 		@ success
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 13:59:55'!
 assembleBitShiftRight
-	#_bitShiftRight:.
+	<inline: #_bitShiftRight:>.
 	assembler
 		move: assembler regA to: assembler regT;
 		convertToNativeInteger: assembler regT;
@@ -16400,10 +16402,10 @@ assembleBitShiftRight
 		setIntegerBit: assembler regR
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:00:07'!
 assembleBusyWait
 	| loop |
-	#_busyWait.
+	<inline: #_busyWait>.
 	loop := assembler newLabel.
 	assembler
 		loadTwithImmediate: 0;
@@ -16413,10 +16415,10 @@ assembleBusyWait
 		shortJumpIfEqualTo: loop
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:00:23'!
 assembleByteAt
 	| nonInteger |
-	#_byteAt:.
+	<inline: #_byteAt:>.
 	nonInteger := assembler labeledIntegerNativizationOfA.
 	assembler
 		loadZeroExtendByteRwithRatA;
@@ -16424,10 +16426,10 @@ assembleByteAt
 		@ nonInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:00:35'!
 assembleByteAtPut
 	| nonInteger1 nonInteger2 |
-	#_byteAt:put:.
+	<inline: #_byteAt:put:>.
 	nonInteger1 := assembler labeledIntegerNativizationOfA.
 	nonInteger2 := assembler labeledIntegerNativizationOfT.
 	assembler
@@ -16438,9 +16440,9 @@ assembleByteAtPut
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:00:48'!
 assembleCDeclCallWithArguments
-	#_cdeclCallWithArguments:.
+	<inline: #_cdeclCallWithArguments:>.
 	assembler
 		loadZeroExtendByteTwithAindex: _SmallSize + 1;
 		shiftTright: assembler wordSizeShift;
@@ -16461,9 +16463,9 @@ assembleCDeclCallWithArguments
 		popS
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:01:00'!
 assembleCallWithArguments
-	#_stdcallWithArguments:.
+	<inline: #_stdcallWithArguments:>.
 	assembler
 		loadZeroExtendByteTwithAindex: _SmallSize + 1;
 		shiftTright: assembler wordSizeShift;
@@ -16473,15 +16475,15 @@ assembleCallWithArguments
 	assembler callR
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:01:08'!
 assembleEnvironment
-	#_environment.
+	<inline: #_environment>.
 	assembler loadRwithE
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:01:23'!
 assembleExpandInStackSized
-	#_expandInStackSized:.
+	<inline: #_expandInStackSized:>.
 	assembler
 		convertAtoNativeInteger;
 		loadTwithA;
@@ -16490,20 +16492,20 @@ assembleExpandInStackSized
 				addRwithImmediate: assembler wordSize ]
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:01:36'!
 assembleExtendedSize
-	#_largeSize.
+	<inline: #_largeSize>.
 	assembler
 		loadZeroExtendLongRwithRindex: _ExtendedSize;
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:01:45'!
 assembleFloatEquals
 	"
 	first compare magnitudes to set error bit if NaN
 	"
-	#_floatEquals:.
+	<inline: #_floatEquals:>.
 	assembler
 		pushR;
 		loadLargeX0withRindirect;
@@ -16517,9 +16519,9 @@ assembleFloatEquals
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:01:58'!
 assembleFloatFractionPartInto
-	#_floatFractionPartInto:.
+	<inline: #_floatFractionPartInto:>.
 	assembler
 		loadLargeX0withRindirect;
 		roundDoubleX0intoX1;
@@ -16528,9 +16530,9 @@ assembleFloatFractionPartInto
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:02:11'!
 assembleFloatLessThan
-	#_floatLessThan:.
+	<inline: #_floatLessThan:>.
 	assembler
 		loadLargeX0withRindirect;
 		compareLessThanDoubleX0withAindirect;
@@ -16540,9 +16542,9 @@ assembleFloatLessThan
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:02:28'!
 assembleFloatMinusInto
-	#_floatMinus:into:.
+	<inline: #_floatMinus:into:>.
 	assembler
 		loadLargeX0withRindirect;
 		loadLargeX1withAindirect;
@@ -16551,9 +16553,9 @@ assembleFloatMinusInto
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:02:37'!
 assembleFloatMultiplyInto
-	#_floatMultiply:into:.
+	<inline: #_floatMultiply:into:>.
 	assembler
 		loadLargeX0withRindirect;
 		loadLargeX1withAindirect;
@@ -16562,9 +16564,9 @@ assembleFloatMultiplyInto
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:02:45'!
 assembleFloatPlusInto
-	#_floatPlus:into:.
+	<inline: #_floatPlus:into:>.
 	assembler
 		loadLargeX0withRindirect;
 		loadLargeX1withAindirect;
@@ -16573,9 +16575,9 @@ assembleFloatPlusInto
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:02:57'!
 assembleFloatQuotientInto
-	#_floatQuotient:into:.
+	<inline: #_floatQuotient:into:>.
 	assembler
 		loadLargeX0withRindirect;
 		loadLargeX1withAindirect;
@@ -16584,9 +16586,9 @@ assembleFloatQuotientInto
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:03:07'!
 assembleFloatSqrtInto
-	#_floatSqrtInto:.
+	<inline: #_floatSqrtInto:>.
 	assembler
 		loadLargeX0withRindirect;
 		sqrtDoubleX0;
@@ -16594,34 +16596,34 @@ assembleFloatSqrtInto
 	self readFloatStatus
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:03:16'!
 assembleFloatTruncated
-	#_floatTruncated.
+	<inline: #_floatTruncated>.
 	assembler loadRconvertingDoublePointedByR.
 	self readFloatStatus.
 	assembler convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:03:24'!
 assembleFramePointer
-	#_framePointer.
+	<inline: #_framePointer>.
 	assembler loadRwithFPindex: 1
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:03:55'!
 assembleGetTIBValue
 	| nonInteger |
-	#_getThreadInformationBlockValue.
+	<inline: #_getThreadInformationBlockValue>.
 	nonInteger := assembler labeledIntegerNativizationOfR.
 	assembler
 		loadRwithTIBatR;
 		@ nonInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:04:12'!
 assembleGetThreadValue
 	| nonInteger uninitialized |
-		#_getThreadValue.
+	<inline: #_getThreadValue>.
 	nonInteger := assembler labeledIntegerNativizationOfR.
 	uninitialized := assembler newLabel.
 	assembler
@@ -16635,9 +16637,9 @@ assembleGetThreadValue
 				loadRwithNil ]
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:04:30'!
 assembleHigh16
-	#_high16.
+	<inline: #_high16>.
 	assembler wordSize > 4
 		ifTrue: [ assembler clearRhigh32 ].
 	assembler
@@ -16645,17 +16647,17 @@ assembleHigh16
 		setSafeRintegerBit
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:04:37'!
 assembleHigh32
-	#_high32.
+	<inline: #_high32>.
 	assembler
 		shiftLogicalRright: 31;
 		setSafeRintegerBit
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:04:49'!
 assembleHoldRefererIfNeeded
-	#_holdRefererIfNeeded:.
+	<inline: #_holdRefererIfNeeded:>.
 	assembler
 		pushA;
 		loadAwithGlobal: #WriteBarrier;
@@ -16663,9 +16665,9 @@ assembleHoldRefererIfNeeded
 		popA
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:05:05'!
 assembleIntegerMultiplyByInto
-	#_integerMultiplyBy:into:.
+	<inline: #_integerMultiplyBy:into:>.
 	assembler
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
@@ -16675,55 +16677,55 @@ assembleIntegerMultiplyByInto
 		loadRwithT
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:05:19'!
 assembleInvoke
-	#_invoke:.
+	<inline: #_invoke:>.
 	assembler
 		loadMwithA;
 		callIndirectM
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:05:37'!
 assembleLeadingZeroBitCount
-	#_leadingZeroBitCount.
+	<inline: #_leadingZeroBitCount>.
 	assembler
 		convertRtoNativeInteger;
 		leadingRzeroCount;
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:05:46'!
 assembleLoadFloatStatusFrom
-	#_status:.
+	<inline: #_status:>.
 	assembler loadMXCSRfromA
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:05:57'!
 assembleLow16
-	#_low16.
+	<inline: #_low16>.
 	assembler
 		andRwithImmediate: 16rFFFF;
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:06:06'!
 assembleLow32
-	#_low32.
+	<inline: #_low32>.
 	assembler wordSize > 4
 		ifTrue: [ assembler
 				andRwithImmediate: 16rFFFFFFFF;
 				convertRtoSmallInteger ]
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:06:15'!
 assembleNativeHalt
-	#_halt.
+	<inline: #_halt>.
 	assembler breakpoint
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:06:25'!
 assembleNilSlots
-	#_nilSlots:.
+	<inline: #_nilSlots:>.
 	assembler
 		pushE;
 		loadEwithR;
@@ -16734,20 +16736,20 @@ assembleNilSlots
 		popE
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:06:35'!
 assembleObjectAtOffset
 	| nonInteger1 |
-	#_objectAtOffset:.
+	<inline: #_objectAtOffset:>.
 	nonInteger1 := assembler labeledIntegerNativizationOfA.
 	assembler
 		loadRwithRatOffsetA;
 		@ nonInteger1
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:06:44'!
 assembleObjectAtOffsetPut
 	| oop |
-	#_objectAtOffset:put:.
+	<inline: #_objectAtOffset:put:>.
 	oop := assembler labeledIntegerNativizationOfA.
 	assembler
 		storeTinRatOffsetA;
@@ -16756,15 +16758,15 @@ assembleObjectAtOffsetPut
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:06:57'!
 assembleOop
-	#_oop.
+	<inline: #_oop>.
 	^ assembler convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:07:10'!
 assembleQuotientTowardZero
-	#_quotientTowardZero:.
+	<inline: #_quotientTowardZero:>.
 	assembler
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
@@ -16773,18 +16775,18 @@ assembleQuotientTowardZero
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:07:20'!
 assembleRelease
-	#_release.
+	<inline: #_release>.
 	assembler
 		lock;
 		decRindirect
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:07:31'!
 assembleRemainderTowardZero
 	| adapt convert |
-	#_remainderTowardZero:.
+	<inline: #_remainderTowardZero:>.
 	adapt := assembler newLabel.
 	convert := assembler newLabel.
 	assembler
@@ -16806,15 +16808,15 @@ assembleRemainderTowardZero
 		convertRtoSmallInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:07:49'!
 assembleRestore
-	#_restore.
+	<inline: #_restore>.
 	assembler loadEwithR
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:07:58'!
 assembleRestoreAndTransferControlWithContext
-	#_restoreAndTransferControlWithContext:.
+	<inline: #_restoreAndTransferControlWithContext:>.
 	assembler
 		clearSafeRintegerBit;
 		loadFPwithR;
@@ -16830,9 +16832,9 @@ assembleRestoreAndTransferControlWithContext
 		return: 0
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:08:12'!
 assembleRestoreWithContext
-	#_restoreWithContext:.
+	<inline: #_restoreWithContext:>.
 	assembler
 		clearSafeRintegerBit;
 		loadFPwithR;
@@ -16842,9 +16844,9 @@ assembleRestoreWithContext
 		loadFPwithR
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:08:21'!
 assembleSaveCurrentEnvironment
-	#_saveCurrentEnvironment.
+	<inline: #_saveCurrentEnvironment>.
 	assembler
 		clearSafeRintegerBit;
 		pushE;
@@ -16853,18 +16855,18 @@ assembleSaveCurrentEnvironment
 		setSafeRintegerBit
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:08:29'!
 assembleSetTIBValue
-	#_setThreadInformationBlockValue:.
+	<inline: #_setThreadInformationBlockValue:>.
 	assembler
 		convertRtoNativeInteger;
 		storeTIBatRwithA
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:08:37'!
 assembleSetThreadValue
 	| nonInteger |
-	#_setThreadValue:.
+	<inline: #_setThreadValue:>.
 	nonInteger := assembler labeledIntegerNativizationOfR.
 	assembler
 		storeAinThreadVariableAtIndexR;
@@ -16872,10 +16874,10 @@ assembleSetThreadValue
 	assembler @ nonInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:08:47'!
 assembleSmallIntegerByteAt
 	| nonInteger |
-	#_smallIntegerByteAt:.
+	<inline: #_smallIntegerByteAt:>.
 	nonInteger := assembler labeledIntegerNativizationOfA.
 	assembler
 		convertRtoNativeInteger;
@@ -16886,22 +16888,22 @@ assembleSmallIntegerByteAt
 		@ nonInteger
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:09:00'!
 assembleStoreDoubleResult
-	#_storeDoubleResult.
+	<inline: #_storeDoubleResult>.
 	assembler storeDoubleResultInRindirect
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:09:09'!
 assembleStoreFloatStatusInto
-	#_readStatusOn:.
+	<inline: #_readStatusOn:>.
 	assembler storeMXCSRintoA
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:09:17'!
 assembleTestSmallInteger
 	| integer |
-	#_isSmallInteger.
+	<inline: #_isSmallInteger>.
 	integer := assembler newLabel.
 	assembler
 		testRintegerBit;
@@ -16911,21 +16913,21 @@ assembleTestSmallInteger
 		@ integer
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:09:46'!
 assembleThisContext
-	#_thisContext.
+	<inline: #_thisContext>.
 	assembler loadRwithFP setRintegerBit
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:09:57'!
 assembleTimesTwoPower
-	#_timesTwoPower:.
+	<inline: #_timesTwoPower:>.
 	assembler clearFPUFlags scaleFloatOnRWithA clearFPUFlags
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:10:15'!
 assembleTransferControlDiscardingLastArgTo
-	#_transferControlDiscardingLastArgTo:.
+	<inline: #_transferControlDiscardingLastArgTo:>.
 	assembler
 		restoreCallerFrame;
 		popSPindirect;
@@ -16933,16 +16935,16 @@ assembleTransferControlDiscardingLastArgTo
 		jumpToMindex: 1
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:10:28'!
 assembleTransferControlTo
-	#_transferControlTo:.
+	<inline: #_transferControlTo:>.
 	assembler restoreCallerFrame; loadMwithA; jumpToMindex: 1
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:10:38'!
 assembleULargeAtOffset
 	| overflow1 overflow2 end |
-	#_uLargeAtOffset:.
+	<inline: #_uLargeAtOffset:>.
 	overflow1 := assembler newLabel.
 	overflow2 := assembler newLabel.
 	end := assembler newLabel.
@@ -16961,9 +16963,9 @@ assembleULargeAtOffset
 		@ end
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:10:51'!
 assembleULargeAtOffsetInto
-	#_uLargeAtOffset:into:.
+	<inline: #_uLargeAtOffset:into:>.
 	assembler
 		convertAtoNativeInteger;
 		loadAwithRoffsetAtA;
@@ -16971,10 +16973,10 @@ assembleULargeAtOffsetInto
 		loadRwithT
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:11:00'!
 assembleULargeAtOffsetPut
 	| end notSmall |
-	#_uLargeAtOffset:put:.
+	<inline: #_uLargeAtOffset:put:>.
 	notSmall := assembler
 		convertAtoNativeInteger;
 		labeledIntegerBitTestOfT.
@@ -16988,10 +16990,10 @@ assembleULargeAtOffsetPut
 		storeTinRatOffsetA
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:11:09'!
 assembleULongAtOffset
 	| overflow1 overflow2 end |
-	#_uLongAtOffset:.
+	<inline: #_uLongAtOffset:>.
 	overflow1 := assembler newLabel.
 	overflow2 := assembler newLabel.
 	end := assembler newLabel.
@@ -17010,9 +17012,9 @@ assembleULongAtOffset
 		@ end
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:11:17'!
 assembleULongAtOffsetInto
-	#_uLongAtOffset:into:.
+	<inline: #_uLongAtOffset:into:>.
 	assembler
 		convertAtoNativeInteger;
 		loadLongRwithRatOffsetA;
@@ -17020,10 +17022,10 @@ assembleULongAtOffsetInto
 		loadRwithT
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:11:24'!
 assembleULongAtOffsetPut
 	| end oop |
-	#_uLongAtOffset:put:.
+	<inline: #_uLongAtOffset:put:>.
 	oop := assembler
 		convertAtoNativeInteger;
 		labeledIntegerBitTestOfT.
@@ -17037,10 +17039,10 @@ assembleULongAtOffsetPut
 		storeLongTinRatOffsetA
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:11:32'!
 assembleUShortAtOffsetPut
 	| end notSmall |
-	#_uShortAtOffset:put:.
+	<inline: #_uShortAtOffset:put:>.
 	notSmall := assembler
 		convertAtoNativeInteger;
 		labeledIntegerBitTestOfT.
@@ -17055,9 +17057,9 @@ assembleUShortAtOffsetPut
 		storeShortTinRatOffsetA
 ! !
 
-!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'private - assemble' stamp: 'KenD 11/1/2022 14:11:39'!
 assembleZeroSlots
-	#_zeroSlots:.
+	<inline: #_zeroSlots:>.
 	assembler
 		pushE;
 		loadEwithR;
@@ -17134,10 +17136,10 @@ emitSendDebuggable: aSymbol using: anAssembler
 	self emitSend: aSymbol using: anAssembler 
 ! !
 
-!InlineMessageLinker methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'initialization' stamp: 'KenD 11/1/2022 14:14:44'!
 initialize
 	map := Dictionary new.
-	self class supported do:[:each|map add: each].
+	self class supported do: [:each | map add: each].
 	self filter: map keys asIdentitySet
 
 	"
@@ -17146,14 +17148,15 @@ initialize
 
 ! !
 
-!InlineMessageLinker class methodsFor: 'private' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker class methodsFor: 'private' stamp: 'KenD 11/1/2022 14:16:12'!
 supported
 	| selectors |
 	selectors := self organization selectorsFor: #'private - assemble'.
 	^selectors collect: [:selector | | cm key |
 		cm := self >> selector.
-		key := cm literals detect: [:each | each isSymbol and:[each first == $_ ]].
-		key -> selector]. 
+		key := (cm pragmaAt: #inline:) argumentAt: 1. 
+		key -> selector
+	]. 
 
 	"
 	InlineMessageLinker supported
@@ -17579,6 +17582,14 @@ shouldInline: aSymbol
 	^inlinedMethods anySatisfy: [ :m | m selector = aSymbol ]
 ! !
 
+!NativizationEnvironment methodsFor: 'queries' stamp: 'KenD 11/1/2022 11:51:34'!
+shouldOptimize: method
+	| selector classname |
+	selector := method selector.
+	classname := method classBinding name.
+	^ optimizedMethods anySatisfy: [:m | m selector = selector and: [ m classBinding name = classname ]  ]
+! !
+
 !NativizationEnvironment methodsFor: 'printing & storing' stamp: 'KenD 9/26/2022 12:35:21'!
 printOn:aStream
 	"append a printed representation of the receiver to the argument, aStream"
@@ -17594,7 +17605,7 @@ completeInitialization
 	cachedNativizer := self newExpressionNativizer 
 ! !
 
-!NativizationEnvironment methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:35:21'!
+!NativizationEnvironment methodsFor: 'initialization' stamp: 'KenD 11/1/2022 14:55:11'!
 initialize
 	busy := false.
 	optimizedMethods := OrderedCollection new.
@@ -17603,12 +17614,13 @@ initialize
 	messageLinker := CompositeMessageLinker new.
 	messageLinker add: InlineMessageLinker new.
 	globals := Array new: self class globalNames size.
-	self
+	self flag: #FixMe.
+	"self
 		initializeGlobals;
 		inlinedMethods: self class inlinedMethods;
 		invokedMethods: self class invokedMethods;
 		optimizedMethods: self class optimizedMethods
-! !
+"! !
 
 !NativizationEnvironment methodsFor: 'initialization' stamp: 'KenD 9/26/2022 12:35:21'!
 setupMessageLinkers
@@ -17658,12 +17670,12 @@ invokedMethods
 	^self undermethods , (self methodSubset: map)
 ! !
 
-!NativizationEnvironment class methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:35:21'!
+!NativizationEnvironment class methodsFor: 'accessing' stamp: 'KenD 11/1/2022 11:36:20'!
 methodSubset: aDictionary
 	| result |
 	result := OrderedCollection new.
 	aDictionary keysAndValuesDo: [ :species :selectors | 
-		selectors collect: [:sel | | m | species >> sel ifNil: [self ASSERT: false] ] into: result].
+		selectors collect: [:sel |  species >> sel ifNil: [self assert: false] ] into: result].
 	^result
 ! !
 
@@ -17685,6 +17697,24 @@ optimizedMethods
 		(Memory -> #(shallowCopy:))}.
 	^self undermethods , (self methodSubset: map)
 ! !
+
+!NativizationEnvironment class methodsFor: 'instance creation' stamp: 'KenD 11/1/2022 14:56:16'!
+forPlatform: aNativizationPlatform
+	| env |
+
+	env := self basicNew initialize.
+	env platform: aNativizationPlatform.
+	^ env
+! !
+
+!NativizationEnvironment class methodsFor: 'instance creation' stamp: 'KenD 11/1/2022 13:25:42'!
+forTesting
+
+	^ self forPlatform: NativizationPlatform default! !
+
+!NativizationEnvironment class methodsFor: 'instance creation' stamp: 'KenD 11/1/2022 12:18:47'!
+new
+	self shouldNotImplement. "Use #forPlatform: instead"! !
 
 !NativizationPlatform methodsFor: 'initialization' stamp: 'KenD 9/28/2022 11:29:49'!
 abi: anABI
@@ -17777,7 +17807,7 @@ default: aNativizationPlatform
 	Default := aNativizationPlatform.
 ! !
 
-!NativizationPlatform class methodsFor: 'accessing' stamp: 'KenD 10/4/2022 12:53:21'!
+!NativizationPlatform class methodsFor: 'accessing' stamp: 'KenD 11/1/2022 10:39:43'!
 host
 	"Return platform for the machine this code is running on."
 
@@ -17792,7 +17822,7 @@ host
 
 	self error:'Unssuported host: ', host.	
 "
-	self signal: #FixME.
+	self flag: #FixME.
 	
 	^ self riscv64_linux_gnu
 
@@ -18729,7 +18759,7 @@ methodWithBlock
 	^self methodForSource: 'foo [1] value'
 ! !
 
-!SExpressionNativizer class methodsFor: 'instance creation' stamp: 'KenD 9/26/2022 12:36:28'!
+!SExpressionNativizer class methodsFor: 'instance creation' stamp: 'KenD 11/1/2022 13:26:03'!
 nativize: aCompiledMethod
 
 	^ NativizationEnvironment forTesting newExpressionNativizer
@@ -19774,7 +19804,7 @@ encodeArgument: anInteger env: environment
 		nextIntegerPut: encoded
 ! !
 
-!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 9/28/2022 13:23:46'!
+!AstcodeEncoder methodsFor: 'visiting' stamp: 'KenD 11/1/2022 15:07:44'!
 encodeClosureElements: aBlockNode
 	| scope parent |
 	scope := aBlockNode scope.
@@ -19784,7 +19814,7 @@ encodeClosureElements: aBlockNode
 		scope capturedEnvironments do: [:e | | index |
 			e == parent ifTrue: [s nextPut: Environment] ifFalse: [
 				index := aBlockNode environmentIndexOf: e.
-				self ASSERT: index notNil.
+				self assert: index notNil.
 				s nextPut: EnvironmentValue; nextPut: index]].
 		scope capturedArguments do: [:a | | binding |
 			binding := aBlockNode parent scope resolve: a name.
@@ -24007,9 +24037,9 @@ nextUnsignedInteger
 		ifFalse: [value - 128 + (self nextUnsignedInteger bitShift: 7)]
 ! !
 
-!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 10/2/2022 14:01:04'!
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 11/1/2022 15:26:28'!
 bindingTypeOf: id
-	^ BindingTypes at: id
+	^ self class bindingTypes at: id
 ! !
 
 !AstcodeDecoder methodsFor: 'public' stamp: 'KenD 10/2/2022 14:01:04'!
@@ -24199,9 +24229,9 @@ nextSymbolOrNil
 	^index !!= 0 ifTrue: [ self literalAt: index]
 ! !
 
-!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 10/2/2022 14:01:04'!
+!AstcodeDecoder methodsFor: 'public' stamp: 'KenD 11/1/2022 15:26:41'!
 nodeTypeOf: id
-	^NodeTypes at: id
+	^self class nodeTypes at: id
 ! !
 
 !AstcodeDecoder methodsFor: 'unclassified' stamp: 'KenD 10/2/2022 14:01:04'!
@@ -24249,6 +24279,16 @@ new
 	^ self basicNew initialize.
 
 ! !
+
+!AstcodeDecoder class methodsFor: 'accessing' stamp: 'KenD 11/1/2022 15:26:08'!
+bindingTypes
+
+	^BindingTypes ! !
+
+!AstcodeDecoder class methodsFor: 'accessing' stamp: 'KenD 11/1/2022 15:25:55'!
+nodeTypes
+
+	^NodeTypes ! !
 
 !SBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:53:08'!
 assign: value within: aPowertalkRuntime
@@ -24733,7 +24773,7 @@ isAssignment
 	^true
 ! !
 
-!SAssignment methodsFor: 'testing' stamp: 'KenD 9/30/2022 12:28:29'!
+!SAssignment methodsFor: 'testing' stamp: 'KenD 11/1/2022 10:52:37'!
 printOn: aStream indent: anInteger
 	aStream tab: anInteger; nextPutAll: '{AssignmentId.'.
 	assignees
@@ -24741,7 +24781,7 @@ printOn: aStream indent: anInteger
 			aStream cr.
 			identifier printOn: aStream indent: anInteger + 1]
 		separatedBy: [aStream nextPutAll: '.'].
-	aStream nextPutAll: '.'; cr.
+	aStream nextPutAll: '.'; newLine.
 	expression printOn: aStream indent: anInteger + 1.
 	aStream nextPutAll: '}'
 ! !
@@ -25089,14 +25129,14 @@ methodFor: requiredType
 	^ nil
 ! !
 
-!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
+!SMessage methodsFor: 'printing' stamp: 'KenD 11/1/2022 10:52:50'!
 printOn: aStream indent: anInteger
-	aStream tab: anInteger; nextPutAll: '{MessageId. '; print: selector; nextPutAll: '. '; cr.
+	aStream tab: anInteger; nextPutAll: '{MessageId. '; print: selector; nextPutAll: '. '; newLine.
 	receiver printOn: aStream indent: anInteger + 1.
-	aStream nextPutAll: '.'; cr.
+	aStream nextPutAll: '.'; newLine.
 	arguments
 		do: [:statement | statement printOn: aStream indent: anInteger + 1]
-		separatedBy: [aStream nextPutAll: '. '; cr].
+		separatedBy: [aStream nextPutAll: '. '; newLine].
 	aStream nextPutAll: '}'
 ! !
 
@@ -25353,9 +25393,9 @@ local: aBoolean
 	local := aBoolean
 ! !
 
-!SReturn methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:19:31'!
+!SReturn methodsFor: 'visiting' stamp: 'KenD 11/1/2022 10:52:55'!
 printOn: aStream indent: anInteger
-	aStream tab: anInteger; nextPutAll: '{ReturnId.'; cr.
+	aStream tab: anInteger; nextPutAll: '{ReturnId.'; newLine.
 	expression printOn: aStream indent: anInteger + 1.
 	aStream nextPutAll: '}'
 ! !
@@ -25385,11 +25425,11 @@ initialize
 	statements := #()
 ! !
 
-!SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
+!SScript methodsFor: 'printing' stamp: 'KenD 11/1/2022 10:53:00'!
 printOn: aStream indent: anInteger
 	statements
 		do: [:statement | statement printOn: aStream indent: anInteger + 1]
-		separatedBy: [aStream nextPutAll: '.'; cr]
+		separatedBy: [aStream nextPutAll: '.'; newLine]
 ! !
 
 !SScript methodsFor: 'printing' stamp: 'KenD 9/29/2022 13:53:47'!
@@ -25480,13 +25520,13 @@ isInlined
 	^ compiledCode isNil
 ! !
 
-!SBlock methodsFor: 'unclassified' stamp: 'KenD 9/30/2022 12:29:24'!
+!SBlock methodsFor: 'unclassified' stamp: 'KenD 11/1/2022 10:53:05'!
 printOn: aStream indent: anInteger
 	aStream
 		tab: anInteger;
 		nextPutAll: '{BlockId. capturedVariables: ';
 		print: capturedVariables;
-		cr.
+		newLine.
 	super printOn: aStream indent: anInteger.
 	aStream nextPutAll: '}'
 ! !
@@ -25526,10 +25566,13 @@ primitive
 	^pragma ifNotNil: [ pragma name ]
 ! !
 
-!SMethod methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:50'!
+!SMethod methodsFor: 'printing' stamp: 'KenD 11/1/2022 10:53:36'!
 printOn: aStream indent: anInteger
-	aStream nextPutAll: '{MethodId. '; cr.
-	pragma ifNotNil: [ (pragma isKindOf: SExpression) ifTrue: [ pragma printOn: aStream indent: anInteger + 1] ifFalse: [ aStream tab: anInteger + 1; print: pragma ] ].
+	aStream nextPutAll: '{MethodId. '; newLine.
+	pragma ifNotNil: [ (pragma isKindOf: SExpression) 
+					ifTrue: [ pragma printOn: aStream indent: anInteger + 1] 
+					ifFalse: [ aStream tab: anInteger + 1; print: pragma ] 
+	].
 	super printOn: aStream indent: anInteger.
 	aStream nextPutAll: '}'
 ! !
@@ -26391,11 +26434,10 @@ instanceSide
 
 	^ thisClass! !
 
-!ClassOrganizer methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:48:08'!
+!ClassOrganizer methodsFor: '*powerlang-core' stamp: 'KenD 11/1/2022 13:34:40'!
 selectorsFor: aString 
-	| protocol |
-	protocol := self protocolNamed: aString.
-	^protocol methodSelectors! !
+
+	^ self listAtCategoryNamed: aString! !
 
 !Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:43'!
 bin 
