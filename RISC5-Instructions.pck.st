@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5492] on 16 October 2022 at 3:01:47 pm'!
+'From Cuis 6.0 [latest update: #5494] on 2 November 2022 at 12:53:16 pm'!
 'Description RISC-V 32 bit Instruction opcodes for RV64G
 
 NB: Not all instructions supported
@@ -8,828 +8,828 @@ NB: Not all instructions supported
  - Some mnemonics changed for clarification
      E.g. Move value from DoubleFloat register into Integer register
 	is ''FmvD2I'' not ''FMV.X.D'''!
-!provides: 'RISC5-Instructions' 1 50!
-SystemOrganization addCategory: #'RISC5-Instructions'!
+!provides: 'RISC5-Instructions' 1 51!
+SystemOrganization addCategory: 'RISC5-Instructions'!
 
 
-!classDefinition: #RISC5Regs category: #'RISC5-Instructions'!
+!classDefinition: #RISC5Regs category: 'RISC5-Instructions'!
 SharedPool subclass: #RISC5Regs
 	instanceVariableNames: ''
 	classVariableNames: 'Arg0 Arg1 Arg2 Arg3 Arg4 Arg5 Arg6 Arg7 DYNamic F0 F1 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F2 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F3 F30 F31 F4 F5 F6 F7 F8 F9 FArg0 FArg1 FArg2 FArg3 FArg4 FArg5 FArg6 FArg7 FSav0 FSav1 FSav10 FSav11 FSav2 FSav3 FSav4 FSav5 FSav6 FSav7 FSav8 FSav9 FTmp0 FTmp1 FTmp10 FTmp11 FTmp2 FTmp3 FTmp4 FTmp5 FTmp6 FTmp7 FTmp8 FTmp9 FramePtr GlobalPtr ReturnAddr RoundDown RoundNearestToEven RoundNearestToMax RoundTwordZero RoundUp Sav0 Sav1 Sav10 Sav11 Sav2 Sav3 Sav4 Sav5 Sav6 Sav7 Sav8 Sav9 SizeDouble SizeHalf SizeQuad SizeSingle StackPtr ThreadPtr Tmp0 Tmp1 Tmp2 Tmp3 Tmp4 Tmp5 Tmp6 X0 X1 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X2 X20 X21 X22 X23 X24 X25 X26 X27 X28 X29 X3 X30 X31 X4 X5 X6 X7 X8 X9 Zero'
 	poolDictionaries: ''
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RISC5Regs class' category: #'RISC5-Instructions'!
+!classDefinition: 'RISC5Regs class' category: 'RISC5-Instructions'!
 RISC5Regs class
 	instanceVariableNames: ''!
 
-!classDefinition: #RISC5Instructions category: #'RISC5-Instructions'!
-Object subclass: #RISC5Instructions
-	instanceVariableNames: 'destReg'
-	classVariableNames: 'FRegs IRegs'
-	poolDictionaries: 'RISC5Regs'
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RISC5Instructions class' category: #'RISC5-Instructions'!
-RISC5Instructions class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64Branch category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64Branch
-	instanceVariableNames: 'regA regB immHi immLo'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64Branch class' category: #'RISC5-Instructions'!
-RV64Branch class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64BEQ category: #'RISC5-Instructions'!
-RV64Branch subclass: #RV64BEQ
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64BEQ class' category: #'RISC5-Instructions'!
-RV64BEQ class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64BGE category: #'RISC5-Instructions'!
-RV64Branch subclass: #RV64BGE
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64BGE class' category: #'RISC5-Instructions'!
-RV64BGE class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64BGEU category: #'RISC5-Instructions'!
-RV64Branch subclass: #RV64BGEU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64BGEU class' category: #'RISC5-Instructions'!
-RV64BGEU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64BLT category: #'RISC5-Instructions'!
-RV64Branch subclass: #RV64BLT
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64BLT class' category: #'RISC5-Instructions'!
-RV64BLT class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64BLTU category: #'RISC5-Instructions'!
-RV64Branch subclass: #RV64BLTU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64BLTU class' category: #'RISC5-Instructions'!
-RV64BLTU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64BNE category: #'RISC5-Instructions'!
-RV64Branch subclass: #RV64BNE
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64BNE class' category: #'RISC5-Instructions'!
-RV64BNE class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64Immediate category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64Immediate
-	instanceVariableNames: 'sourceReg immediate12'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64Immediate class' category: #'RISC5-Instructions'!
-RV64Immediate class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64ADDI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64ADDI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64ADDI class' category: #'RISC5-Instructions'!
-RV64ADDI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64ANDI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64ANDI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64ANDI class' category: #'RISC5-Instructions'!
-RV64ANDI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64EBREAK category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64EBREAK
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64EBREAK class' category: #'RISC5-Instructions'!
-RV64EBREAK class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64ECALL category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64ECALL
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64ECALL class' category: #'RISC5-Instructions'!
-RV64ECALL class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64ORI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64ORI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64ORI class' category: #'RISC5-Instructions'!
-RV64ORI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SLLI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64SLLI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SLLI class' category: #'RISC5-Instructions'!
-RV64SLLI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SLTI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64SLTI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SLTI class' category: #'RISC5-Instructions'!
-RV64SLTI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SLTIU category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64SLTIU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SLTIU class' category: #'RISC5-Instructions'!
-RV64SLTIU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SRAI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64SRAI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SRAI class' category: #'RISC5-Instructions'!
-RV64SRAI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SRLI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64SRLI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SRLI class' category: #'RISC5-Instructions'!
-RV64SRLI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64XORI category: #'RISC5-Instructions'!
-RV64Immediate subclass: #RV64XORI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64XORI class' category: #'RISC5-Instructions'!
-RV64XORI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64JAL category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64JAL
-	instanceVariableNames: 'bit31 bits21to30 bit20 bits12to19'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64JAL class' category: #'RISC5-Instructions'!
-RV64JAL class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64JALR category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64JALR
-	instanceVariableNames: 'baseReg immedOffset'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64JALR class' category: #'RISC5-Instructions'!
-RV64JALR class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64Load category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64Load
-	instanceVariableNames: 'immedOffset baseReg'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64Load class' category: #'RISC5-Instructions'!
-RV64Load class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FLD category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64FLD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FLD class' category: #'RISC5-Instructions'!
-RV64FLD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LB category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64LB
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LB class' category: #'RISC5-Instructions'!
-RV64LB class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LBU category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64LBU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LBU class' category: #'RISC5-Instructions'!
-RV64LBU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LD category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64LD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LD class' category: #'RISC5-Instructions'!
-RV64LD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LH category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64LH
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LH class' category: #'RISC5-Instructions'!
-RV64LH class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LHU category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64LHU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LHU class' category: #'RISC5-Instructions'!
-RV64LHU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LW category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64LW
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LW class' category: #'RISC5-Instructions'!
-RV64LW class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LWU category: #'RISC5-Instructions'!
-RV64Load subclass: #RV64LWU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LWU class' category: #'RISC5-Instructions'!
-RV64LWU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64Reg3Reg category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64Reg3Reg
-	instanceVariableNames: 'regA regB'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64Reg3Reg class' category: #'RISC5-Instructions'!
-RV64Reg3Reg class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64ADD category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64ADD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64ADD class' category: #'RISC5-Instructions'!
-RV64ADD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64NOOP category: #'RISC5-Instructions'!
-RV64ADD subclass: #RV64NOOP
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64NOOP class' category: #'RISC5-Instructions'!
-RV64NOOP class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64AND category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64AND
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64AND class' category: #'RISC5-Instructions'!
-RV64AND class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64DFloatReg2Reg category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64DFloatReg2Reg
-	instanceVariableNames: 'roundingMode'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64DFloatReg2Reg class' category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FCVTD2I category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg subclass: #RV64FCVTD2I
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FCVTD2I class' category: #'RISC5-Instructions'!
-RV64FCVTD2I class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FCVTD2UI category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg subclass: #RV64FCVTD2UI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FCVTD2UI class' category: #'RISC5-Instructions'!
-RV64FCVTD2UI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FCVTI2D category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg subclass: #RV64FCVTI2D
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FCVTI2D class' category: #'RISC5-Instructions'!
-RV64FCVTI2D class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FCVTUI2D category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg subclass: #RV64FCVTUI2D
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FCVTUI2D class' category: #'RISC5-Instructions'!
-RV64FCVTUI2D class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FMVD2IR category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg subclass: #RV64FMVD2IR
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FMVD2IR class' category: #'RISC5-Instructions'!
-RV64FMVD2IR class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FMVI2DR category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg subclass: #RV64FMVI2DR
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FMVI2DR class' category: #'RISC5-Instructions'!
-RV64FMVI2DR class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FSQRT category: #'RISC5-Instructions'!
-RV64DFloatReg2Reg subclass: #RV64FSQRT
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FSQRT class' category: #'RISC5-Instructions'!
-RV64FSQRT class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64DFloatReg3Reg category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64DFloatReg3Reg
-	instanceVariableNames: 'roundingMode'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64DFloatReg3Reg class' category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FADD category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FADD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FADD class' category: #'RISC5-Instructions'!
-RV64FADD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FDIV category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FDIV
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FDIV class' category: #'RISC5-Instructions'!
-RV64FDIV class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FEQ category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FEQ
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FEQ class' category: #'RISC5-Instructions'!
-RV64FEQ class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FLE category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FLE
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FLE class' category: #'RISC5-Instructions'!
-RV64FLE class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FLT category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FLT
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FLT class' category: #'RISC5-Instructions'!
-RV64FLT class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FMAX category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FMAX
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FMAX class' category: #'RISC5-Instructions'!
-RV64FMAX class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FMIN category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FMIN
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FMIN class' category: #'RISC5-Instructions'!
-RV64FMIN class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FMUL category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FMUL
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FMUL class' category: #'RISC5-Instructions'!
-RV64FMUL class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FSUB category: #'RISC5-Instructions'!
-RV64DFloatReg3Reg subclass: #RV64FSUB
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FSUB class' category: #'RISC5-Instructions'!
-RV64FSUB class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64DIV category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64DIV
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64DIV class' category: #'RISC5-Instructions'!
-RV64DIV class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64DIVU category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64DIVU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64DIVU class' category: #'RISC5-Instructions'!
-RV64DIVU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64MUL category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64MUL
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64MUL class' category: #'RISC5-Instructions'!
-RV64MUL class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64OR category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64OR
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64OR class' category: #'RISC5-Instructions'!
-RV64OR class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64REM category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64REM
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64REM class' category: #'RISC5-Instructions'!
-RV64REM class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64REMU category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64REMU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64REMU class' category: #'RISC5-Instructions'!
-RV64REMU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SLL category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64SLL
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SLL class' category: #'RISC5-Instructions'!
-RV64SLL class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SLT category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64SLT
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SLT class' category: #'RISC5-Instructions'!
-RV64SLT class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SLTU category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64SLTU
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SLTU class' category: #'RISC5-Instructions'!
-RV64SLTU class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SRA category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64SRA
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SRA class' category: #'RISC5-Instructions'!
-RV64SRA class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SRL category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64SRL
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SRL class' category: #'RISC5-Instructions'!
-RV64SRL class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SUB category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64SUB
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SUB class' category: #'RISC5-Instructions'!
-RV64SUB class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64XOR category: #'RISC5-Instructions'!
-RV64Reg3Reg subclass: #RV64XOR
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64XOR class' category: #'RISC5-Instructions'!
-RV64XOR class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64Reg4Reg category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64Reg4Reg
-	instanceVariableNames: 'regA regB regC roundMode precision'
-	classVariableNames: 'DYN Dfmt Hfmt Qfmr RDN RME RMM RTZ RUP Sfmt'
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64Reg4Reg class' category: #'RISC5-Instructions'!
-RV64Reg4Reg class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FMADD category: #'RISC5-Instructions'!
-RV64Reg4Reg subclass: #RV64FMADD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FMADD class' category: #'RISC5-Instructions'!
-RV64FMADD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FMSUB category: #'RISC5-Instructions'!
-RV64Reg4Reg subclass: #RV64FMSUB
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FMSUB class' category: #'RISC5-Instructions'!
-RV64FMSUB class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FNMADD category: #'RISC5-Instructions'!
-RV64Reg4Reg subclass: #RV64FNMADD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FNMADD class' category: #'RISC5-Instructions'!
-RV64FNMADD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FNMSUB category: #'RISC5-Instructions'!
-RV64Reg4Reg subclass: #RV64FNMSUB
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FNMSUB class' category: #'RISC5-Instructions'!
-RV64FNMSUB class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64Store category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64Store
-	instanceVariableNames: 'baseReg immLo immHi'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64Store class' category: #'RISC5-Instructions'!
-RV64Store class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64FSD category: #'RISC5-Instructions'!
-RV64Store subclass: #RV64FSD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64FSD class' category: #'RISC5-Instructions'!
-RV64FSD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SB category: #'RISC5-Instructions'!
-RV64Store subclass: #RV64SB
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SB class' category: #'RISC5-Instructions'!
-RV64SB class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SD category: #'RISC5-Instructions'!
-RV64Store subclass: #RV64SD
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SD class' category: #'RISC5-Instructions'!
-RV64SD class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SH category: #'RISC5-Instructions'!
-RV64Store subclass: #RV64SH
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SH class' category: #'RISC5-Instructions'!
-RV64SH class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64SW category: #'RISC5-Instructions'!
-RV64Store subclass: #RV64SW
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64SW class' category: #'RISC5-Instructions'!
-RV64SW class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64UpperAddr category: #'RISC5-Instructions'!
-RISC5Instructions subclass: #RV64UpperAddr
-	instanceVariableNames: 'immediate20'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64UpperAddr class' category: #'RISC5-Instructions'!
-RV64UpperAddr class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64AUIPC category: #'RISC5-Instructions'!
-RV64UpperAddr subclass: #RV64AUIPC
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64AUIPC class' category: #'RISC5-Instructions'!
-RV64AUIPC class
-	instanceVariableNames: ''!
-
-!classDefinition: #RV64LUI category: #'RISC5-Instructions'!
-RV64UpperAddr subclass: #RV64LUI
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'RISC5-Instructions'!
-!classDefinition: 'RV64LUI class' category: #'RISC5-Instructions'!
-RV64LUI class
-	instanceVariableNames: ''!
-
-!classDefinition: #RISC5InstructionsTests category: #'RISC5-Instructions'!
+!classDefinition: #RISC5InstructionsTests category: 'RISC5-Instructions'!
 TestCase subclass: #RISC5InstructionsTests
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: 'RISC5Regs'
 	category: 'RISC5-Instructions'!
-!classDefinition: 'RISC5InstructionsTests class' category: #'RISC5-Instructions'!
+!classDefinition: 'RISC5InstructionsTests class' category: 'RISC5-Instructions'!
 RISC5InstructionsTests class
+	instanceVariableNames: ''!
+
+!classDefinition: #RISC5Instructions category: 'RISC5-Instructions'!
+Object subclass: #RISC5Instructions
+	instanceVariableNames: 'destReg'
+	classVariableNames: 'FRegs IRegs'
+	poolDictionaries: 'RISC5Regs'
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RISC5Instructions class' category: 'RISC5-Instructions'!
+RISC5Instructions class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64Branch category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Branch
+	instanceVariableNames: 'regA regB immHi immLo'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64Branch class' category: 'RISC5-Instructions'!
+RV64Branch class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64BEQ category: 'RISC5-Instructions'!
+RV64Branch subclass: #RV64BEQ
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64BEQ class' category: 'RISC5-Instructions'!
+RV64BEQ class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64BGE category: 'RISC5-Instructions'!
+RV64Branch subclass: #RV64BGE
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64BGE class' category: 'RISC5-Instructions'!
+RV64BGE class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64BGEU category: 'RISC5-Instructions'!
+RV64Branch subclass: #RV64BGEU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64BGEU class' category: 'RISC5-Instructions'!
+RV64BGEU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64BLT category: 'RISC5-Instructions'!
+RV64Branch subclass: #RV64BLT
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64BLT class' category: 'RISC5-Instructions'!
+RV64BLT class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64BLTU category: 'RISC5-Instructions'!
+RV64Branch subclass: #RV64BLTU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64BLTU class' category: 'RISC5-Instructions'!
+RV64BLTU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64BNE category: 'RISC5-Instructions'!
+RV64Branch subclass: #RV64BNE
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64BNE class' category: 'RISC5-Instructions'!
+RV64BNE class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64Immediate category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Immediate
+	instanceVariableNames: 'sourceReg immediate12'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64Immediate class' category: 'RISC5-Instructions'!
+RV64Immediate class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64ADDI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64ADDI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64ADDI class' category: 'RISC5-Instructions'!
+RV64ADDI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64ANDI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64ANDI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64ANDI class' category: 'RISC5-Instructions'!
+RV64ANDI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64EBREAK category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64EBREAK
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64EBREAK class' category: 'RISC5-Instructions'!
+RV64EBREAK class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64ECALL category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64ECALL
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64ECALL class' category: 'RISC5-Instructions'!
+RV64ECALL class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64ORI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64ORI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64ORI class' category: 'RISC5-Instructions'!
+RV64ORI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SLLI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64SLLI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SLLI class' category: 'RISC5-Instructions'!
+RV64SLLI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SLTI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64SLTI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SLTI class' category: 'RISC5-Instructions'!
+RV64SLTI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SLTIU category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64SLTIU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SLTIU class' category: 'RISC5-Instructions'!
+RV64SLTIU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SRAI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64SRAI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SRAI class' category: 'RISC5-Instructions'!
+RV64SRAI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SRLI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64SRLI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SRLI class' category: 'RISC5-Instructions'!
+RV64SRLI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64XORI category: 'RISC5-Instructions'!
+RV64Immediate subclass: #RV64XORI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64XORI class' category: 'RISC5-Instructions'!
+RV64XORI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64JAL category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64JAL
+	instanceVariableNames: 'bit31 bits21to30 bit20 bits12to19'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64JAL class' category: 'RISC5-Instructions'!
+RV64JAL class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64JALR category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64JALR
+	instanceVariableNames: 'baseReg immedOffset'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64JALR class' category: 'RISC5-Instructions'!
+RV64JALR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64Load category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Load
+	instanceVariableNames: 'immedOffset baseReg'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64Load class' category: 'RISC5-Instructions'!
+RV64Load class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FLD category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64FLD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FLD class' category: 'RISC5-Instructions'!
+RV64FLD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LB category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64LB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LB class' category: 'RISC5-Instructions'!
+RV64LB class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LBU category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64LBU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LBU class' category: 'RISC5-Instructions'!
+RV64LBU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LD category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64LD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LD class' category: 'RISC5-Instructions'!
+RV64LD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LH category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64LH
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LH class' category: 'RISC5-Instructions'!
+RV64LH class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LHU category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64LHU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LHU class' category: 'RISC5-Instructions'!
+RV64LHU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LW category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64LW
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LW class' category: 'RISC5-Instructions'!
+RV64LW class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LWU category: 'RISC5-Instructions'!
+RV64Load subclass: #RV64LWU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LWU class' category: 'RISC5-Instructions'!
+RV64LWU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64Reg3Reg category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Reg3Reg
+	instanceVariableNames: 'regA regB'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64Reg3Reg class' category: 'RISC5-Instructions'!
+RV64Reg3Reg class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64ADD category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64ADD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64ADD class' category: 'RISC5-Instructions'!
+RV64ADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64NOOP category: 'RISC5-Instructions'!
+RV64ADD subclass: #RV64NOOP
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64NOOP class' category: 'RISC5-Instructions'!
+RV64NOOP class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64AND category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64AND
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64AND class' category: 'RISC5-Instructions'!
+RV64AND class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64DFloatReg2Reg category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DFloatReg2Reg
+	instanceVariableNames: 'roundingMode'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DFloatReg2Reg class' category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTD2I category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTD2I
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTD2I class' category: 'RISC5-Instructions'!
+RV64FCVTD2I class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTD2UI category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTD2UI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTD2UI class' category: 'RISC5-Instructions'!
+RV64FCVTD2UI class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTI2D category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTI2D
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTI2D class' category: 'RISC5-Instructions'!
+RV64FCVTI2D class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FCVTUI2D category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FCVTUI2D
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FCVTUI2D class' category: 'RISC5-Instructions'!
+RV64FCVTUI2D class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMVD2IR category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FMVD2IR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMVD2IR class' category: 'RISC5-Instructions'!
+RV64FMVD2IR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMVI2DR category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FMVI2DR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMVI2DR class' category: 'RISC5-Instructions'!
+RV64FMVI2DR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FSQRT category: 'RISC5-Instructions'!
+RV64DFloatReg2Reg subclass: #RV64FSQRT
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FSQRT class' category: 'RISC5-Instructions'!
+RV64FSQRT class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64DFloatReg3Reg category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DFloatReg3Reg
+	instanceVariableNames: 'roundingMode'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DFloatReg3Reg class' category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FADD category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FADD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FADD class' category: 'RISC5-Instructions'!
+RV64FADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FDIV category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FDIV
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FDIV class' category: 'RISC5-Instructions'!
+RV64FDIV class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FEQ category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FEQ
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FEQ class' category: 'RISC5-Instructions'!
+RV64FEQ class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FLE category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FLE
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FLE class' category: 'RISC5-Instructions'!
+RV64FLE class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FLT category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FLT
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FLT class' category: 'RISC5-Instructions'!
+RV64FLT class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMAX category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FMAX
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMAX class' category: 'RISC5-Instructions'!
+RV64FMAX class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMIN category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FMIN
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMIN class' category: 'RISC5-Instructions'!
+RV64FMIN class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMUL category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FMUL
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMUL class' category: 'RISC5-Instructions'!
+RV64FMUL class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FSUB category: 'RISC5-Instructions'!
+RV64DFloatReg3Reg subclass: #RV64FSUB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FSUB class' category: 'RISC5-Instructions'!
+RV64FSUB class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64DIV category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DIV
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DIV class' category: 'RISC5-Instructions'!
+RV64DIV class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64DIVU category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64DIVU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64DIVU class' category: 'RISC5-Instructions'!
+RV64DIVU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64MUL category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64MUL
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64MUL class' category: 'RISC5-Instructions'!
+RV64MUL class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64OR category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64OR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64OR class' category: 'RISC5-Instructions'!
+RV64OR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64REM category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64REM
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64REM class' category: 'RISC5-Instructions'!
+RV64REM class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64REMU category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64REMU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64REMU class' category: 'RISC5-Instructions'!
+RV64REMU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SLL category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64SLL
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SLL class' category: 'RISC5-Instructions'!
+RV64SLL class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SLT category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64SLT
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SLT class' category: 'RISC5-Instructions'!
+RV64SLT class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SLTU category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64SLTU
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SLTU class' category: 'RISC5-Instructions'!
+RV64SLTU class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SRA category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64SRA
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SRA class' category: 'RISC5-Instructions'!
+RV64SRA class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SRL category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64SRL
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SRL class' category: 'RISC5-Instructions'!
+RV64SRL class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SUB category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64SUB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SUB class' category: 'RISC5-Instructions'!
+RV64SUB class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64XOR category: 'RISC5-Instructions'!
+RV64Reg3Reg subclass: #RV64XOR
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64XOR class' category: 'RISC5-Instructions'!
+RV64XOR class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64Reg4Reg category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Reg4Reg
+	instanceVariableNames: 'regA regB regC roundMode precision'
+	classVariableNames: 'DYN Dfmt Hfmt Qfmr RDN RME RMM RTZ RUP Sfmt'
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64Reg4Reg class' category: 'RISC5-Instructions'!
+RV64Reg4Reg class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMADD category: 'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FMADD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMADD class' category: 'RISC5-Instructions'!
+RV64FMADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FMSUB category: 'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FMSUB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FMSUB class' category: 'RISC5-Instructions'!
+RV64FMSUB class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FNMADD category: 'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FNMADD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FNMADD class' category: 'RISC5-Instructions'!
+RV64FNMADD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FNMSUB category: 'RISC5-Instructions'!
+RV64Reg4Reg subclass: #RV64FNMSUB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FNMSUB class' category: 'RISC5-Instructions'!
+RV64FNMSUB class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64Store category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64Store
+	instanceVariableNames: 'baseReg immLo immHi'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64Store class' category: 'RISC5-Instructions'!
+RV64Store class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64FSD category: 'RISC5-Instructions'!
+RV64Store subclass: #RV64FSD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64FSD class' category: 'RISC5-Instructions'!
+RV64FSD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SB category: 'RISC5-Instructions'!
+RV64Store subclass: #RV64SB
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SB class' category: 'RISC5-Instructions'!
+RV64SB class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SD category: 'RISC5-Instructions'!
+RV64Store subclass: #RV64SD
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SD class' category: 'RISC5-Instructions'!
+RV64SD class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SH category: 'RISC5-Instructions'!
+RV64Store subclass: #RV64SH
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SH class' category: 'RISC5-Instructions'!
+RV64SH class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64SW category: 'RISC5-Instructions'!
+RV64Store subclass: #RV64SW
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64SW class' category: 'RISC5-Instructions'!
+RV64SW class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64UpperAddr category: 'RISC5-Instructions'!
+RISC5Instructions subclass: #RV64UpperAddr
+	instanceVariableNames: 'immediate20'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64UpperAddr class' category: 'RISC5-Instructions'!
+RV64UpperAddr class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64AUIPC category: 'RISC5-Instructions'!
+RV64UpperAddr subclass: #RV64AUIPC
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64AUIPC class' category: 'RISC5-Instructions'!
+RV64AUIPC class
+	instanceVariableNames: ''!
+
+!classDefinition: #RV64LUI category: 'RISC5-Instructions'!
+RV64UpperAddr subclass: #RV64LUI
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'RISC5-Instructions'!
+!classDefinition: 'RV64LUI class' category: 'RISC5-Instructions'!
+RV64LUI class
 	instanceVariableNames: ''!
 
 
@@ -1264,6 +1264,45 @@ initialize
 	SizeQuad := 2r11. "Quad Precision"
 ! !
 
+!RISC5InstructionsTests methodsFor: 'tests - RV64I' stamp: 'KenD 9/9/2022 12:22:21'!
+testRV64I
+
+	self assert: (RV64ADD regDest: X3 regA: X1 regB: X2) instruction 
+		= 2r0000000001000001000000110110011.
+	self assert: (RV64SUB regDest: 3 regA: 1 regB: 2) instruction
+		= 2r1000000001000001000000110110011.
+	self assert: (RV64SUB regDest: 3 regA: 1 regB: 2) printString 
+		= 'sub  GlobalPtr, ReturnAddr,StackPtr' .
+	"... ... ..."
+	self assert: 
+	  (RV64LD regDest: 1 regBase: 3 immediateOffset: 16rFFF) 
+		instruction 
+		= 2r11111111111100011011000010000011.
+		    "10987654321098765432109876543210"
+	"iimmOffset 20:31][baseReg 15:19][func3 12:14][destReg 7:11][opcode 6:0]"
+	self assert: ((RV64LB regDest: 10 regBase: 12 immediateOffset: 16rFFF) 
+				offset printStringBase: 16)
+				= 'FFF'.
+	self assert: 
+		((RV64LB regDest: 10 regBase: 12 immediateOffset: 16rA5A) 
+			printString )
+			=  'lb  Arg0, Arg2, 16rA5A' .
+	self assert:
+		(RV64JAL regDest: 1 offset: 2r11000000111000000001) instruction
+		= 2r11000000001110000001000011101111.
+		
+	self assert:
+		(RV64JAL regDest: 1 offset: 2r11000000111000000011)  offset
+		= 2r110000001110000000110.
+	
+	self assert: 
+		(RV64JAL regDest: 1 offset: 2r11000000111000000001)  printString
+		= 'jal  ReturnAddr, 16r181C02' .
+	self assert:
+		(RV64LUI regDest: 1 immediate: 16rC0E03)  printString 
+		 = 'lui  ReturnAddr, 16rC0E03' 
+		! !
+
 !RISC5Instructions methodsFor: 'initialization' stamp: 'KenD 10/5/2022 11:37:08'!
 destReg: regDest
 	"Common to all instruction variants"
@@ -1316,6 +1355,11 @@ initialize
 		  FArg2 FArg3 FArg4 FArg5 FArg6 FArg7 
 		  FSav2 FSav3 FSav4 FSav5 FSav6 FSav7 FSav8 FSav9 FSav10 FSav11 
 		  FTmp8 FTmp9 FTmp10 FTmp11).! !
+
+!RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 11/2/2022 07:57:44'!
+fitsIn12bits: anInteger
+	"Signed integer `anInteger` fits in immediate12 ?"
+	^ (anInteger between: -16r800 and: 16r7FF) ! !
 
 !RISC5Instructions class methodsFor: 'testing' stamp: 'KenD 9/5/2022 12:41:40'!
 helloCodeInto: byteStream
@@ -1574,10 +1618,10 @@ printString
 		(self class regName: sourceReg), ', ', 
 		'16r', (immediate12 printStringBase: 16).  "FIXME: 0x??"! !
 
-!RV64Immediate class methodsFor: 'instance creation' stamp: 'KenD 5/3/2021 15:25:13'!
+!RV64Immediate class methodsFor: 'instance creation' stamp: 'KenD 11/2/2022 07:58:09'!
 regDest: destReg regSource: reg1 imm12: immediate12
 
-	(immediate12 bitAnd: 16rFFF) = immediate12 
+	(self fitsIn12bits: immediate12) 
 		ifFalse: [DomainError signal: 'too big for 12 bit immediate'].
 		
 	^self new destReg: destReg regSource: reg1  imm12: immediate12 ! !
@@ -2787,8 +2831,8 @@ opcode
 	"Opcode for all S-type instructions"
 	^2r0100011! !
 
-!RV64Store methodsFor: 'initialization' stamp: 'KenD 5/7/2021 15:58:53'!
-srcReg: rs baseReg: rb  immLo: lo mmHi: hi
+!RV64Store methodsFor: 'initialization' stamp: 'KenD 11/2/2022 12:22:35'!
+srcReg: rs baseReg: rb  immLo: lo immHi: hi
 
 	super destReg: rs.
 	baseReg := rb.
@@ -2931,44 +2975,5 @@ opName
 opcode
 	"Opcode for LUI"
 	^2r0110111! !
-
-!RISC5InstructionsTests methodsFor: 'tests - RV64I' stamp: 'KenD 9/9/2022 12:22:21'!
-testRV64I
-
-	self assert: (RV64ADD regDest: X3 regA: X1 regB: X2) instruction 
-		= 2r0000000001000001000000110110011.
-	self assert: (RV64SUB regDest: 3 regA: 1 regB: 2) instruction
-		= 2r1000000001000001000000110110011.
-	self assert: (RV64SUB regDest: 3 regA: 1 regB: 2) printString 
-		= 'sub  GlobalPtr, ReturnAddr,StackPtr' .
-	"... ... ..."
-	self assert: 
-	  (RV64LD regDest: 1 regBase: 3 immediateOffset: 16rFFF) 
-		instruction 
-		= 2r11111111111100011011000010000011.
-		    "10987654321098765432109876543210"
-	"iimmOffset 20:31][baseReg 15:19][func3 12:14][destReg 7:11][opcode 6:0]"
-	self assert: ((RV64LB regDest: 10 regBase: 12 immediateOffset: 16rFFF) 
-				offset printStringBase: 16)
-				= 'FFF'.
-	self assert: 
-		((RV64LB regDest: 10 regBase: 12 immediateOffset: 16rA5A) 
-			printString )
-			=  'lb  Arg0, Arg2, 16rA5A' .
-	self assert:
-		(RV64JAL regDest: 1 offset: 2r11000000111000000001) instruction
-		= 2r11000000001110000001000011101111.
-		
-	self assert:
-		(RV64JAL regDest: 1 offset: 2r11000000111000000011)  offset
-		= 2r110000001110000000110.
-	
-	self assert: 
-		(RV64JAL regDest: 1 offset: 2r11000000111000000001)  printString
-		= 'jal  ReturnAddr, 16r181C02' .
-	self assert:
-		(RV64LUI regDest: 1 immediate: 16rC0E03)  printString 
-		 = 'lui  ReturnAddr, 16rC0E03' 
-		! !
 RISC5Regs initialize!
 RISC5Instructions initialize!

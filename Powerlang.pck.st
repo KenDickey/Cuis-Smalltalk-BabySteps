@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5494] on 1 November 2022 at 3:28:09 pm'!
+'From Cuis 6.0 [latest update: #5494] on 2 November 2022 at 12:53:23 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 53!
+!provides: 'Powerlang' 1 54!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7606,11 +7606,12 @@ memRef16
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/31/2022 13:59:58'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:28:43'!
 memRef16: baseReg offset: offsetReg
 	^ self memRef16
 		base: baseReg;
 		index: offsetReg;
+		widthInBits: 16;
 		scale: 2; "2 bytes"
 		yourself
 ! !
@@ -7631,13 +7632,14 @@ memRef32
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:38'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:28:04'!
 memRef32: baseReg index: indexReg
 	^ self memRef32 
 		base: baseReg; 
 		displacement: -4;
 		index: indexReg;
-		scale: 4;
+		widthInBits: 32;
+		scale: 1;
 		yourself
 
 ! !
@@ -7651,12 +7653,13 @@ memRef32: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/31/2022 14:00:24'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:27:49'!
 memRef32: baseReg offset: offsetReg
 	^ self memRef32
 		base: baseReg;
 		index: offsetReg;
-		scale: 4; "bytes"
+		widthInBits: 32;
+		scale: 1; 
 		yourself
 ! !
 
@@ -7684,12 +7687,13 @@ memRef8
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/31/2022 14:00:43'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:28:56'!
 memRef8: baseReg index: indexReg
 	^ self memRef8 
 		base: baseReg; 
 		displacement: -1;
 		index: indexReg;
+		widthInBits: 8;
 		scale: 1; "1 byte"
 		yourself
 
@@ -7704,24 +7708,24 @@ memRef8: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:51'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:27:08'!
 memRef: baseReg index: indexRef
 	^ self memRef 
 		base: baseReg; 
 		displacement: self addressSize negated;
 		index: indexRef;
-		scale: self addressSize;
+		scale: 1;
 		yourself
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:55'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:26:52'!
 memRef: baseReg index: indexRef offsetImm: anInteger
 	^ self memRef 
 		base: baseReg; 
 		displacement: anInteger;
 		index: indexRef;
-		scale: self addressSize;
+		scale: 1;
 		yourself
 
 ! !
@@ -8108,25 +8112,26 @@ memRef
 		widthInBits: self wordSize * 8
 ! !
 
-!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/24/2022 10:21:25'!
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 11/2/2022 08:00:39'!
 lea: addressReg withMem: memRef
 
 	"Answer baseRegister + (indexRegister*scale) + offset.
 	`indexRegister` may be RegZero (0).
-	`scale` may be 1. 2, 4, or 8"
+	`scale` may be 1. 2, 4, or 8
+	`addressReg` may be tmp1, NEVER tmp0 !!"
 	(memRef baseRegister = addressReg)
 		ifFalse: [ self move: memRef baseRegister to: addressReg ].
 	(memRef offset isZero)
 		ifFalse: [ self addImm: memRef offset to: addressReg ].
-	(memRef index isZero)
+	(memRef indexRegister isZero)
 	ifFalse: [
 		(memRef scale = 1)
 		ifTrue: [ self add: memRef index to: addressReg 		] 
 		ifFalse: [
 			memory nextInstructionPut:  "(index * scale) is just a shift"
-				(RV64SLLI 		regDest: RegTmp1 regSource: memRef indexRegister imm12: memRef scale).
+				(RV64SLLI 		regDest: RegTmp0 regSource: memRef indexRegister imm12: memRef scale).
 			memory nextInstructionPut: 
-				(RV64ADD regDest: addressReg regA: addressReg regB: RegTmp1).
+				(RV64ADD regDest: addressReg regA: addressReg regB: RegTmp0).
 		]
 	]
  	
@@ -8142,11 +8147,14 @@ load: dstReg convertingDoubleToIntegerFromMem: srcMemRef
 				regA: FTmp0 
 				roundingMode: RoundNearestToEven).! !
 
-!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 10/23/2022 15:31:08'!
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 11/2/2022 12:51:11'!
 load: dstReg fromMem: srcMemRef
 
 	"Load `dstReg` from memory location `srcMemRef`.
 	 The size of data loaded is specified in `srcMemRef`.
+	
+	Nota Bene: Uses BOTH tmp0 and tmp1, 
+			 so `dstReg` cannot be either !!
 	 
 	 When loading 32bits into 64bit register, high 32bits must be
 	 cleared (in other words, 32bit value is *zero* extended to
@@ -8164,39 +8172,31 @@ load: dstReg fromMem: srcMemRef
 	(bitWidth = 64)
 	ifTrue: [ "load 64 bit Double-wide Integer"
 		memory nextInstructionPut: 
-			(RV64LD destReg: dstReg baseReg: RegTmp1 immedOffset: 0)
+			(RV64LD regDest: dstReg regBase: RegTmp1 immediateOffset: 0)
 	]
 	ifFalse: [
 		(bitWidth = 32)
 		ifTrue: [
 			memory nextInstructionPut: 
 				(RV64LWU "zero extended Load Word Unsigned"
-					destReg: dstReg 
-					baseReg: RegTmp1 
-					immedOffset: 0)
+					regDest: dstReg regBase: RegTmp1 immediateOffset: 0)
 		] 
 		ifFalse: [
 			(bitWidth = 16)
 			ifTrue: [
 				memory nextInstructionPut: "load 16 bit HalfWord"
-					(RV64LHU 
-						destReg: tmp0Reg 
-						baseReg: RegTmp1 
-						immedOffset: 0).
+					(RV64LHU regDest: tmp0Reg regBase: RegTmp1 immediateOffset: 0).
 				memory nextInstructionPut: "shift out lower 16 bits"
-					(RV64SRLI  destReg: dstReg  regSource: dstReg imm12: 16).
+					(RV64SRLI destReg: dstReg  regSource: dstReg imm12: 16).
 				memory nextInstructionPut: "upper bits back where they started"
-					(RV64SLLI  destReg: dstReg  regSource: dstReg imm12: 16).
+					(RV64SLLI destReg: dstReg  regSource: dstReg imm12: 16).
 				memory nextInstructionPut: "glue the pieces together"
 					(RV64AND regDest: dstReg regA: dstReg regB: tmp0Reg)
 			] 
 			ifFalse: [
 				self assert: (bitWidth = 8).
 				memory nextInstructionPut: "load 8 bit Byte"
-					(RV64LB 
-						destReg: tmp0Reg 
-						baseReg: RegTmp1 
-						immedOffset: 0).
+					(RV64LB regDest: tmp0Reg regBase: RegTmp1 immediateOffset: 0).
 				memory nextInstructionPut: "shift out lower 8 bits"
 					(RV64SRLI  destReg: dstReg  regSource: dstReg imm12: 8).
 				memory nextInstructionPut: "upper bits back where they started"
@@ -8231,7 +8231,46 @@ loadReg: destReg withBase: baseReg offset: imm
 			(RV64LD destReg: destReg baseReg: tmp0Reg immedOffset: 0)
 	]! !
 
-!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 10/15/2022 17:13:23'!
+!RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 11/2/2022 07:46:40'!
+store: srcReg intoMem: dstMemRef
+
+	"Store `srcReg` value into memory location `dstMemRef`.
+	 The bitSize of value is specified in `dstMemRef`.
+	
+	Nota Bene: Uses BOTH tmp0 and tmp1, 
+			 so `srcReg` cannot be either !!"
+	
+	| bitWidth |
+	self lea: RegTmp1 withMem: dstMemRef.
+	bitWidth := dstMemRef widthInBits.
+	bitWidth isNil ifTrue: [ self error: 'Unknown memory bitWidth' ].
+	(bitWidth = 64)
+	ifTrue: [ 
+		memory nextInstructionPut:  "store 64 bit DoubleWord"
+			(RV64SD regSource: srcReg regBase: RegTmp1 immediateOffset: 0)
+	]
+	ifFalse: [
+		(bitWidth = 32)
+		ifTrue: [
+			memory nextInstructionPut: "store 32 bit Word"
+				(RV64SW regSource: srcReg regBase: RegTmp1 immediateOffset: 0)
+		] 
+		ifFalse: [
+			(bitWidth = 16)
+			ifTrue: [
+				memory nextInstructionPut: "store 16 bit HalfWord"
+					(RV64SH regSource: srcReg regBase: RegTmp1 immediateOffset: 0)
+			] 
+			ifFalse: [
+				self assert: (bitWidth = 8).
+				memory nextInstructionPut: "store 8 bit Byte"
+					(RV64SB regSource: srcReg regBase: RegTmp1 immediateOffset: 0)
+			] 
+		]
+	]
+		! !
+
+!RV64GCodeGenerator methodsFor: 'operations - arithmetic' stamp: 'KenD 11/2/2022 07:59:07'!
 add: src1Reg to: src2andDstReg
 	"Signed Addition with flagsReg nonZero on overflow
 
@@ -8242,7 +8281,7 @@ add: src1Reg to: src2andDstReg
 
 	 "tmp1Reg to 1 if (regB < 0)"
 	memory nextInstructionPut: 
-		(RV64SLTI destReg: tmp1Reg regSource: src2andDstReg imm12: 0).
+		(RV64SLTI regDest: tmp1Reg regSource: src2andDstReg imm12: 0).
 		
 	 "Do the addition that may overflow"
 	memory nextInstructionPut: 
@@ -8750,10 +8789,9 @@ nextDoublePut: large
 
 ! !
 
-!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 10/4/2022 16:31:43'!
+!RelocatableBuffer methodsFor: 'writing' stamp: 'KenD 11/2/2022 07:54:35'!
 nextInstructionPut: rv64gInstruction
 	"Assemble instruction into 4 byte unsigned integer and add to stream"
-	self signal: #NoCompressedInstructionsUsed.
 	stream nextULongPut: rv64gInstruction instruction
 ! !
 
@@ -25109,16 +25147,6 @@ initialize
 ! !
 
 !SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
-isInlined
-	^ inlined
-! !
-
-!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
-isMessage
-	^true
-! !
-
-!SMessage methodsFor: 'printing' stamp: 'KenD 9/29/2022 14:12:37'!
 methodFor: requiredType
 	| type |
 	cache ifNil: [ ^ nil ].
@@ -25168,6 +25196,22 @@ selector: aSelector
 !SMessage methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:12:37'!
 argumentCount
 	^arguments size
+! !
+
+!SMessage methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:37'!
+isInlined
+	^ inlined
+! !
+
+!SMessage methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:37'!
+isMessage
+	^true
+! !
+
+!SMessage methodsFor: 'testing' stamp: 'KenD 11/2/2022 12:43:49'!
+isOptimized
+	self flag: #ReVisit.
+	^ cache notNil 
 ! !
 
 !SMessage class methodsFor: 'unclassified' stamp: 'KenD 9/29/2022 14:12:37'!
