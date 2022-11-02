@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5494] on 2 November 2022 at 1:12:19 pm'!
+'From Cuis 6.0 [latest update: #5494] on 2 November 2022 at 1:21:12 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 55!
+!provides: 'Powerlang' 1 56!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -426,7 +426,7 @@ RelocationFixup class
 
 !classDefinition: #RVMemoryReference category: 'Powerlang-Core-Assembly-RISCV'!
 Object subclass: #RVMemoryReference
-	instanceVariableNames: 'widthInBits baseRegister indexRegister scale offset'
+	instanceVariableNames: 'widthInBits baseRegister indexRegister offset'
 	classVariableNames: ''
 	poolDictionaries: 'Registers'
 	category: 'Powerlang-Core-Assembly-RISCV'!
@@ -2063,7 +2063,9 @@ or through an address computation made up of one or more of the following compon
       offset - An 8, 16, or 32-bit value.
       baseRegister - contains the base address.
       indexRegister - contains an index off of the base.
-      scale factor - A value of 1, 2, 4, or 8 that is multiplied by the value in the indexRegister.
+Note:
+      scale - A value of 1, 2, 4, or 8 that is multiplied by the value in the indexRegister
+		This is simply the number of bytes per index, i.e. (widthInBits / bitsPerByte).
 
     The offset which results from adding these components is called an `effective address`. 
     Each of these components can have either a positive or negative (2s complement) value, 
@@ -6205,13 +6207,12 @@ loadAwithR
 	codegen move: codegen regR to: codegen regA
 ! !
 
-!Assembler methodsFor: 'loading' stamp: 'KenD 10/16/2022 13:44:09'!
+!Assembler methodsFor: 'loading' stamp: 'KenD 11/2/2022 13:16:49'!
 loadAwithRoffsetAtA
 	| memref |
 	memref := codegen memRef
 				base: codegen regR;
-				index: codegen regA;
-				scale: 1.
+				index: codegen regA.
 	codegen
 		load: codegen regA
 		fromMem: memref
@@ -6420,13 +6421,12 @@ loadRwithNil
 	codegen move: codegen regNil to: codegen regR
 ! !
 
-!Assembler methodsFor: 'loading' stamp: 'KenD 10/16/2022 13:44:27'!
+!Assembler methodsFor: 'loading' stamp: 'KenD 11/2/2022 13:17:00'!
 loadRwithRatOffsetA
 	| memref |
 	memref := codegen memRef
 				base: codegen regR;
-				index: codegen regA;
-				scale: 1.
+				index: codegen regA.
 	codegen
 		load: codegen regR
 		fromMem:
@@ -7598,11 +7598,11 @@ memRef
 	self subclassResponsibility
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:00:20'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:17:07'!
 memRef16
 	"Return clean instance of memory reference."
 
-	^ self memRef widthInBits: 16; scale: 2; yourself
+	^ self memRef widthInBits: 16; yourself
 
 ! !
 
@@ -7622,11 +7622,11 @@ memRef16: baseReg offsetImm: offsetImm
 		yourself
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:01:04'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:17:12'!
 memRef32
 	"Return clean instance of memory reference."
 
-	^ self memRef widthInBits: 32; scale: 4; yourself
+	^ self memRef widthInBits: 32; yourself
 
 ! !
 
@@ -7673,11 +7673,11 @@ memRef64: baseReg indexImm: indexImm
 		yourself
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:06:34'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:17:18'!
 memRef8
 	"Answer reference to a single byte"
 
-	^ self memRef widthInBits: 8; scale: 1; yourself
+	^ self memRef widthInBits: 8; yourself
 
 ! !
 
@@ -8095,13 +8095,12 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:04:14'!
+!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:17:31'!
 memRef
 	"Default for RV64G is size for 64 bit references."
 
 	^ RVMemoryReference new
 		widthInBits: self wordSize * 8;
-		scale: self wordSize;
 		yourself
 ! !
 
@@ -9087,17 +9086,10 @@ offset: addressDelta
 	offset := addressDelta
 ! !
 
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/16/2022 13:43:14'!
+!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 11/2/2022 13:15:25'!
 scale
-
-	^ scale
-! !
-
-!RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 14:45:53'!
-scale: intScale
-
-	self assert: (#(1 2 4 8) includes: intScale).
-	scale := intScale.
+	"Answer bytes per index"
+	^ widthInBits / 8
 ! !
 
 !RVMemoryReference methodsFor: 'accessing' stamp: 'KenD 10/23/2022 15:18:58'!
