@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5494] on 2 November 2022 at 12:53:23 pm'!
+'From Cuis 6.0 [latest update: #5494] on 2 November 2022 at 1:12:19 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 54!
+!provides: 'Powerlang' 1 55!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -7598,21 +7598,19 @@ memRef
 	self subclassResponsibility
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:00:20'!
 memRef16
 	"Return clean instance of memory reference."
 
-	^ self memRef length: 16; yourself
+	^ self memRef widthInBits: 16; scale: 2; yourself
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:28:43'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:00:34'!
 memRef16: baseReg offset: offsetReg
 	^ self memRef16
 		base: baseReg;
 		index: offsetReg;
-		widthInBits: 16;
-		scale: 2; "2 bytes"
 		yourself
 ! !
 
@@ -7624,22 +7622,20 @@ memRef16: baseReg offsetImm: offsetImm
 		yourself
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:01:04'!
 memRef32
 	"Return clean instance of memory reference."
 
-	^ self memRef length: 32; yourself
+	^ self memRef widthInBits: 32; scale: 4; yourself
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:28:04'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:01:18'!
 memRef32: baseReg index: indexReg
 	^ self memRef32 
 		base: baseReg; 
 		displacement: -4;
 		index: indexReg;
-		widthInBits: 32;
-		scale: 1;
 		yourself
 
 ! !
@@ -7653,21 +7649,19 @@ memRef32: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:27:49'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:01:32'!
 memRef32: baseReg offset: offsetReg
 	^ self memRef32
 		base: baseReg;
 		index: offsetReg;
-		widthInBits: 32;
-		scale: 1; 
 		yourself
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:05:11'!
 memRef64
 	"Return clean instance of memory reference."
 
-	^ self memRef length: 64; yourself
+	^ self memRef "defaults OK"
 
 ! !
 
@@ -7679,22 +7673,20 @@ memRef64: baseReg indexImm: indexImm
 		yourself
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:06:34'!
 memRef8
-	"Return clean instance of memory reference."
+	"Answer reference to a single byte"
 
-	^ self memRef length: 8; yourself
+	^ self memRef widthInBits: 8; scale: 1; yourself
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:28:56'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:06:44'!
 memRef8: baseReg index: indexReg
 	^ self memRef8 
 		base: baseReg; 
 		displacement: -1;
 		index: indexReg;
-		widthInBits: 8;
-		scale: 1; "1 byte"
 		yourself
 
 ! !
@@ -7708,30 +7700,30 @@ memRef8: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:27:08'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:12:02'!
 memRef: baseReg index: indexRef
+	"Nota Bene: Zero based slot indexing"
 	^ self memRef 
 		base: baseReg; 
-		displacement: self addressSize negated;
+		displacement: (self addressSize negated);
 		index: indexRef;
-		scale: 1;
 		yourself
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 07:26:52'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:07:27'!
 memRef: baseReg index: indexRef offsetImm: anInteger
 	^ self memRef 
 		base: baseReg; 
 		displacement: anInteger;
 		index: indexRef;
-		scale: 1;
 		yourself
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:09:56'!
 memRef: baseReg indexImm: indexImm
+	"Nota Bene: Zero based slot indexing"
 	^ self memRef 
 		base: baseReg; 
 		displacement: (indexImm - 1) * self addressSize;
@@ -7739,12 +7731,11 @@ memRef: baseReg indexImm: indexImm
 
 ! !
 
-!CodeGenerator methodsFor: 'memory' stamp: 'KenD 10/16/2022 13:44:59'!
+!CodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:08:33'!
 memRef: baseReg offset: indexReg
 	^ self memRef
 		base: baseReg;
 		index: indexReg;
-		scale: 1;
 		yourself
 ! !
 
@@ -8104,12 +8095,14 @@ return: imm12offset
 		(RV64JALR regDest: zeroReg regBase: linkReg offset: imm12offset).
 ! !
 
-!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 10/24/2022 10:23:40'!
+!RV64GCodeGenerator methodsFor: 'memory' stamp: 'KenD 11/2/2022 13:04:14'!
 memRef
-	"superclass CodeGenerator says that I am responsible to implement this method"
+	"Default for RV64G is size for 64 bit references."
 
 	^ RVMemoryReference new
-		widthInBits: self wordSize * 8
+		widthInBits: self wordSize * 8;
+		scale: self wordSize;
+		yourself
 ! !
 
 !RV64GCodeGenerator methodsFor: 'memory - load/store' stamp: 'KenD 11/2/2022 08:00:39'!
@@ -9118,14 +9111,14 @@ widthInBits:anInteger
 	widthInBits := anInteger.
 ! !
 
-!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 10/24/2022 10:14:56'!
+!RVMemoryReference methodsFor: 'initialization' stamp: 'KenD 11/2/2022 12:57:46'!
 initialize
 	"Invoked when a new instance is created."
 
 	super initialize.
 	self widthInBits: 64. "default is pointer size (8 bytes)"
 	indexRegister := 0.
-	scale := 1.
+	scale := 8.
 	offset := 0.
 ! !
 
