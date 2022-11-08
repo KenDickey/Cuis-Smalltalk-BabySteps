@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5494] on 2 November 2022 at 1:21:12 pm'!
+'From Cuis 6.0 [latest update: #5494] on 8 November 2022 at 2:52:13 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 56!
+!provides: 'Powerlang' 1 57!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -5282,9 +5282,11 @@ breakpoint
 	codegen breakpoint
 ! !
 
-!Assembler methodsFor: 'operations - arithmetic' stamp: 'KenD 9/26/2022 12:38:17'!
+!Assembler methodsFor: 'operations - arithmetic' stamp: 'KenD 11/8/2022 14:46:57'!
 callIndirectA
+	"Looks like this shoule be indirect through a `SendSite`"
 	| memref |
+	self flag: 	#ExpectSendSite.
 	memref := codegen memRef: codegen regA indexImm: 1.
 	codegen callIndirect: memref
 ! !
@@ -7535,9 +7537,9 @@ wordSize
 	^wordSize
 ! !
 
-!CodeGenerator methodsFor: 'accessing' stamp: 'KenD 9/26/2022 12:38:32'!
+!CodeGenerator methodsFor: 'accessing' stamp: 'KenD 11/8/2022 14:49:42'!
 wordSize: anInteger
-	self ASSERT: anInteger == 8.
+	self assert: anInteger == 8.
 	wordSize := anInteger.
 ! !
 
@@ -10703,7 +10705,7 @@ isIdentical: anObject to: anotherObject
 						and: [ anObject value = anotherObject value ] ] ]
 ! !
 
-!PowertalkEvaluator methodsFor: 'accessing' stamp: 'KenD 9/30/2022 12:21:07'!
+!PowertalkEvaluator methodsFor: 'accessing' stamp: 'KenD 11/8/2022 14:50:04'!
 lookup: aSymbol startingAt: aBehavior sendSite: anSMessage
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
@@ -10715,7 +10717,7 @@ lookup: aSymbol startingAt: aBehavior sendSite: anSMessage
 					^ block ].
 			symbol := runtime symbolFrom: aSymbol.
 			method := runtime lookup: symbol startingAt: aBehavior.
-			self ASSERT: method notNil.
+			self assert: method notNil.
 			anSMessage
 				registerCacheWith: runtime;
 				cache: method when: aBehavior ].
@@ -12138,7 +12140,7 @@ send: aSymbol to: receiver with: arguments super: aBoolean
 
 ! !
 
-!PowertalkRecursiveInterpreter methodsFor: 'visiting' stamp: 'KenD 9/30/2022 12:27:09'!
+!PowertalkRecursiveInterpreter methodsFor: 'visiting' stamp: 'KenD 11/8/2022 14:50:11'!
 send: aSymbol to: receiver with: arguments super: aBoolean sendSite: anSMessage
 	| behavior method environment size |
 	anSMessage cachedUndermessage
@@ -12152,7 +12154,7 @@ send: aSymbol to: receiver with: arguments super: aBoolean sendSite: anSMessage
 		sendSite: anSMessage.
 	method class == BlockClosure
 		ifTrue: [ ^ method value: receiver value: arguments ].
-	self ASSERT: method notNil.
+	self assert: method notNil.
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
 	context := RecursiveLinkedEvaluationContext new
@@ -13846,7 +13848,7 @@ visitIdentifier: anSIdentifier
 	operations add: anSIdentifier
 ! !
 
-!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
+!SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 11/8/2022 14:50:20'!
 visitInlinedMessage: anSMessage
 	| selector |
 	selector := anSMessage selector.
@@ -13892,7 +13894,7 @@ visitInlinedMessage: anSMessage
 	(selector beginsWith: #and:)
 		ifTrue: [ ^ self inlineAnd: anSMessage ].
 
-	self ASSERT: false
+	self assert: false
 ! !
 
 !SExpressionLinearizer methodsFor: 'initialization' stamp: 'KenD 9/29/2022 12:33:20'!
@@ -14069,10 +14071,10 @@ bytes
 	^bytes
 ! !
 
-!LMRByteObject methodsFor: 'accessing' stamp: 'KenD 9/30/2022 12:16:12'!
+!LMRByteObject methodsFor: 'accessing' stamp: 'KenD 11/8/2022 14:50:27'!
 bytes: aByteArray
-	self ASSERT: aByteArray size = header size.
-	self ASSERT: aByteArray class == ByteArray.
+	self assert: aByteArray size = header size.
+	self assert: aByteArray class == ByteArray.
 	bytes := aByteArray
 ! !
 
@@ -14445,10 +14447,10 @@ initialize
 	wordSize := 8
 ! !
 
-!DmrObjectFormat methodsFor: 'services' stamp: 'KenD 9/30/2022 12:12:28'!
+!DmrObjectFormat methodsFor: 'services' stamp: 'KenD 11/8/2022 14:50:34'!
 integerOf: oid
 	| shifted complement |
-	self ASSERT: oid odd.
+	self assert: oid odd.
 	shifted := oid bitShift: -1. 
 	complement := 1 bitShift: storage wordSize * 8 - 1.
 	^ oid >= complement
@@ -14889,7 +14891,7 @@ dispatch: message to: msgReceiver
 	^ msgReceiver _gate dispatch: message from: self
 ! !
 
-!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 11/8/2022 14:50:46'!
 dispatchSpecial: message
 	| selector mirror gate |
 	selector := message selector.
@@ -14909,7 +14911,7 @@ dispatchSpecial: message
 		ifTrue: [ ^ self subjectOnInteger: 0 in: gate handle runtime ].
 	selector == #_basicHash:
 		ifTrue: [ ^ message receiver ].
-	self ASSERT: false
+	self assert: false
 ! !
 
 !SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
@@ -15004,7 +15006,7 @@ visitLiteral: anSLiteral
 	^ handle mirage
 ! !
 
-!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 11/8/2022 14:50:51'!
 visitPrimitive: primitive
 	| gate new left right args rcvr runtime value class |
 	returned := true.
@@ -15106,10 +15108,10 @@ visitPrimitive: primitive
 			^ returnValue := receiver ].
 	primitive = #PrimeFor
 		ifTrue: [ ^ self primitivePrimeFor ].
-	self ASSERT: false
+	self assert: false
 ! !
 
-!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 9/29/2022 14:23:20'!
+!SmalltalkInterpreter methodsFor: 'visiting' stamp: 'KenD 11/8/2022 14:50:56'!
 visitPrimitiveOld: primitive
 	| gate new left right args rcvr |
 	returned := true.
@@ -15155,7 +15157,7 @@ visitPrimitiveOld: primitive
 				perform: #replaceFrom:to:with:startingAt:
 				withArguments: args asArray.
 			^ returnValue := receiver ].
-	self ASSERT: false
+	self assert: false
 ! !
 
 !SmalltalkInterpreter class methodsFor: 'class initialization' stamp: 'KenD 9/29/2022 14:25:25'!
@@ -15430,7 +15432,7 @@ inlineLessThan
 			assembler jumpTo: done ]
 ! !
 
-!BinaryMessageNativizer methodsFor: 'private' stamp: 'KenD 9/26/2022 12:29:42'!
+!BinaryMessageNativizer methodsFor: 'private' stamp: 'KenD 11/8/2022 14:51:01'!
 inlineMessage
 	| selector s |
 	s := message selector.
@@ -15472,7 +15474,7 @@ inlineMessage
 	selector = #bitXor:
 		ifTrue: [ ^ self inlineBitXor ].
 	"	selector = #bitShift: ifTrue: [^self inlineBitShift]."
-	self ASSERT: false
+	self assert: false
 ! !
 
 !BinaryMessageNativizer methodsFor: 'private' stamp: 'KenD 9/26/2022 12:29:42'!
@@ -15825,7 +15827,7 @@ inlineIfTrueIfFalse: aBoolean
 			assembler jumpTo: retry ]
 ! !
 
-!InlinedMessageNativizer methodsFor: 'nativizing' stamp: 'KenD 9/26/2022 12:33:01'!
+!InlinedMessageNativizer methodsFor: 'nativizing' stamp: 'KenD 11/8/2022 14:51:10'!
 inlineMessage
 	| selector |
 	selector := message selector.
@@ -15869,7 +15871,7 @@ inlineMessage
 		ifTrue: [ ^ self inlineAndNot ].
 	selector = #orNot:
 		ifTrue: [ ^ self inlineOrNot ].
-	self ASSERT: false
+	self assert: false
 ! !
 
 !InlinedMessageNativizer methodsFor: 'nativizing' stamp: 'KenD 9/26/2022 12:33:01'!
@@ -17141,7 +17143,7 @@ readFloatStatus
 		storeMXCSRintoA
 ! !
 
-!InlineMessageLinker methodsFor: 'nativizing' stamp: 'KenD 9/26/2022 12:32:24'!
+!InlineMessageLinker methodsFor: 'nativizing' stamp: 'KenD 11/8/2022 14:48:52'!
 emitSend: aSymbol using: anAssembler
 	| arity selector | 
 	assembler := anAssembler.
@@ -17149,7 +17151,7 @@ emitSend: aSymbol using: anAssembler
 	arity > 2 ifTrue: [assembler pop: assembler regS].
 	arity > 1 ifTrue: [assembler pop: assembler regT].
 	arity > 0 ifTrue: [assembler pop: assembler regA].
-	self ASSERT: arity <= 3 .
+	self assert: arity <= 3 .
 	selector := map at: aSymbol.
 	self perform: selector
 ! !
@@ -20382,13 +20384,13 @@ copyLocal: binding
 	^script isInlined ifTrue: [binding] ifFalse: [binding copy beInArray]
 ! !
 
-!BlockScope methodsFor: 'private' stamp: 'KenD 9/30/2022 12:09:36'!
+!BlockScope methodsFor: 'private' stamp: 'KenD 11/8/2022 14:51:17'!
 environmentIndexOf: aScriptNode
 	"
 	temporal compatibility
 	"
 	(aScriptNode isKindOf: SScriptNode)
-		ifFalse: [ self ASSERT: false. ^nil ].
+		ifFalse: [ self assert: false. ^nil ].
 	^self capturedEnvironmentIndexOf: aScriptNode
 ! !
 
@@ -20424,14 +20426,14 @@ positionCapturedLocals
 			ifFalse: [self positionCapturedTemporary: binding]]
 ! !
 
-!BlockScope methodsFor: 'private' stamp: 'KenD 9/30/2022 12:09:36'!
+!BlockScope methodsFor: 'private' stamp: 'KenD 11/8/2022 14:51:22'!
 positionCapturedTemporary: aTemporaryBinding
 	| outest index declaration |
 	outest := self scriptDefining: aTemporaryBinding name.
 	index := self capturedEnvironmentIndexOf: outest realScript.
 	aTemporaryBinding environmentIndex: index.
 	declaration := outest scope resolve: aTemporaryBinding name.
-	self ASSERT: declaration index isInteger.
+	self assert: declaration index isInteger.
 	aTemporaryBinding index: declaration index
 ! !
 
@@ -20484,9 +20486,9 @@ initialize
 	environments := OrderedCollection new
 ! !
 
-!MethodScope methodsFor: 'services' stamp: 'KenD 9/30/2022 12:19:08'!
+!MethodScope methodsFor: 'services' stamp: 'KenD 11/8/2022 14:51:27'!
 captureLocal: aLocalBinding
-	self ASSERT: (self resolveLocal: aLocalBinding name) notNil.
+	self assert: (self resolveLocal: aLocalBinding name) notNil.
 	^aLocalBinding
 ! !
 
@@ -20496,9 +20498,9 @@ captureSelf
 
 ! !
 
-!MethodScope methodsFor: 'services' stamp: 'KenD 9/30/2022 12:19:08'!
+!MethodScope methodsFor: 'services' stamp: 'KenD 11/8/2022 14:51:32'!
 environmentIndexOf: aScriptNode
-	self ASSERT: aScriptNode == script.
+	self assert: aScriptNode == script.
 	^nil
 ! !
 
@@ -20509,10 +20511,10 @@ resolve: aString
 	^ DynamicBinding named: aString
 ! !
 
-!MethodScope methodsFor: 'services' stamp: 'KenD 9/30/2022 12:19:08'!
+!MethodScope methodsFor: 'services' stamp: 'KenD 11/8/2022 14:51:36'!
 scriptDefining: aString
 	(self resolveLocal: aString) ifNotNil: [^script].
-	self ASSERT: false.
+	self assert: false.
 	^nil
 ! !
 
@@ -20559,9 +20561,9 @@ declaration
 	^self
 ! !
 
-!Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
+!Binding methodsFor: 'testing' stamp: 'KenD 11/8/2022 14:51:41'!
 encodeUsing: anAstcodeEncoder
-	self ASSERT: false
+	self assert: false
 ! !
 
 !Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
@@ -24592,9 +24594,9 @@ index: anInteger
 	position := anInteger
 ! !
 
-!SLocalBinding methodsFor: 'testing' stamp: 'KenD 9/29/2022 14:12:24'!
+!SLocalBinding methodsFor: 'testing' stamp: 'KenD 11/8/2022 14:51:46'!
 isInStack
-	self ASSERT: false.
+	self assert: false.
 	^ environment = 0
 ! !
 
