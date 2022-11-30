@@ -1,8 +1,8 @@
-'From Cuis 6.0 [latest update: #5559] on 29 November 2022 at 3:58:22 pm'!
+'From Cuis 6.0 [latest update: #5559] on 29 November 2022 at 4:02:02 pm'!
 'Description Zag Smalltalk
 
 https://github.com/dvmason/Zag-Smalltalk'!
-!provides: 'ASTSmalltalk' 1 10!
+!provides: 'ASTSmalltalk' 1 11!
 SystemOrganization addCategory: 'ASTSmalltalk-AST'!
 SystemOrganization addCategory: 'ASTSmalltalk-Compiler'!
 SystemOrganization addCategory: 'ASTSmalltalk-Threaded'!
@@ -300,6 +300,16 @@ Object subclass: #ASCompiler
 !classDefinition: 'ASCompiler class' category: 'ASTSmalltalk-Compiler'!
 ASCompiler class
 	instanceVariableNames: 'ClassIndices ClassMap'!
+
+!classDefinition: #ASPharoCompiler category: 'ASTSmalltalk-Compiler'!
+ASCompiler subclass: #ASPharoCompiler
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ASTSmalltalk-Compiler'!
+!classDefinition: 'ASPharoCompiler class' category: 'ASTSmalltalk-Compiler'!
+ASPharoCompiler class
+	instanceVariableNames: ''!
 
 !classDefinition: #ASSourceCompiler category: 'ASTSmalltalk-Compiler'!
 ASCompiler subclass: #ASSourceCompiler
@@ -917,6 +927,10 @@ to:by:do:, to:do: and timesRepeat:
 I implement the generic code for a Smalltalk -> AST compiler.
 
 I have subclasses to accept various input formats, notably Pharo ASTs and sourcecode
+!
+
+!ASPharoCompiler commentStamp: '<historical>' prior: 0!
+I will take a class in the current image and compile it to methods of ASTs
 !
 
 !ASSourceCompiler commentStamp: '<historical>' prior: 0!
@@ -1897,6 +1911,11 @@ initialize
 			ClassMap at: pharoClass instanceSide put: class instanceSide.
 			self flag: #FixMe
 			"ClassMap at: pharoClass classSide put: class classSide "] ]
+! !
+
+!ASPharoCompiler methodsFor: 'compiling' stamp: 'KenD 11/29/2022 15:59:55'!
+compileMethod: aCompiledMethod
+	^ (ASPharoVisitor compiler: self) visit: aCompiledMethod ast
 ! !
 
 !ASSourceCompiler methodsFor: 'parsing' stamp: 'KenD 11/29/2022 15:45:19'!
