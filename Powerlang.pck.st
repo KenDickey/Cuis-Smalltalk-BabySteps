@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5494] on 8 November 2022 at 2:52:13 pm'!
+'From Cuis 6.0 [latest update: #5552] on 14 November 2022 at 12:33:42 pm'!
 'Description Original + Bee RiscV64G code generation back end.'!
-!provides: 'Powerlang' 1 57!
+!provides: 'Powerlang' 1 60!
 !requires: 'BeeCompatibility' 1 25 nil!
 !requires: 'RISC5-Instructions' 1 28 nil!
 !requires: 'BeePParser' 1 19 nil!
@@ -974,6 +974,16 @@ Object subclass: #IdentifierBinder
 IdentifierBinder class
 	instanceVariableNames: ''!
 
+!classDefinition: #DynamicBinder category: 'Powerlang-Core-SCompiler'!
+IdentifierBinder subclass: #DynamicBinder
+	instanceVariableNames: 'type'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler'!
+!classDefinition: 'DynamicBinder class' category: 'Powerlang-Core-SCompiler'!
+DynamicBinder class
+	instanceVariableNames: ''!
+
 !classDefinition: #StaticBinder category: 'Powerlang-Core-SCompiler'!
 IdentifierBinder subclass: #StaticBinder
 	instanceVariableNames: ''
@@ -1126,7 +1136,7 @@ BlockScope class
 
 !classDefinition: #MethodScope category: 'Powerlang-Core-SCompiler'!
 ScriptScope subclass: #MethodScope
-	instanceVariableNames: 'pseudo'
+	instanceVariableNames: 'species pseudo ivars cvars pools globals'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Powerlang-Core-SCompiler'!
@@ -1152,6 +1162,16 @@ Binding subclass: #AssociationBinding
 	category: 'Powerlang-Core-SCompiler-Bindings'!
 !classDefinition: 'AssociationBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
 AssociationBinding class
+	instanceVariableNames: ''!
+
+!classDefinition: #GlobalBinding category: 'Powerlang-Core-SCompiler-Bindings'!
+AssociationBinding subclass: #GlobalBinding
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Powerlang-Core-SCompiler-Bindings'!
+!classDefinition: 'GlobalBinding class' category: 'Powerlang-Core-SCompiler-Bindings'!
+GlobalBinding class
 	instanceVariableNames: ''!
 
 !classDefinition: #PoolVarBinding category: 'Powerlang-Core-SCompiler-Bindings'!
@@ -2201,13 +2221,21 @@ initialize
 	HashOffset := -8.
 	LargeSizeOffset := -16! !
 
-!InlineMessageLinkerFlags class methodsFor: 'class initialization' stamp: 'KenD 9/26/2022 12:31:19'!
+!InlineMessageLinkerFlags class methodsFor: 'class initialization' stamp: 'KenD 11/8/2022 14:58:09'!
 initialize
+"
+	InlineMessageLinker  initialize.
+"
 	_Flags := -5.
 	_SmallSize := -6.
 	_Hash := -8.
 	_Reserved := -2.
 	_ExtendedSize := -3.
+	self at: #_Flags put: _Flags.
+	self at: #_SmallSize put: _SmallSize.
+	self at: #_Hash put: _Hash.
+	self at: #_Reserved put: _Reserved.
+	self at: #_ExtendedSize put: _ExtendedSize.
 
 ! !
 
@@ -2645,17 +2673,35 @@ gtDisplayOn: stream
 		print: selector
 ! !
 
-!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 11/1/2022 10:51:24'!
-printOn: aStream
+!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 11/10/2022 08:26:59'!
+printNameOn: aStream
 	aStream
 		print: self classBinding;
 		nextPutAll: '>>';
 		print: selector;
-		newLine.
+		newLine.! !
+
+!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 11/10/2022 08:28:13'!
+printOn: aStream
+
+	self printNameOn: aStream.
+	self printSourceOn: aStream
+	
+! !
+
+!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 11/10/2022 08:27:22'!
+printSourceOn: aStream
 	source
 		ifNotNil: [ aStream
 				newLine;
 				nextPutAll: source ]
+! !
+
+!SCompiledMethod methodsFor: 'printing' stamp: 'KenD 11/10/2022 08:39:52'!
+shortPrintString
+
+	^ String streamContents: [ :stream | self printNameOn: stream ]
+	
 ! !
 
 !SCompiledMethod methodsFor: 'accessing' stamp: 'KenD 10/1/2022 15:04:32'!
@@ -8072,6 +8118,15 @@ call: srcReg withOffset: imm
 	memory nextInstructionPut: 
 		(RV64JALR destReg: linkReg baseReg: srcReg immedOffset: imm).
 ! !
+
+!RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 11/8/2022 15:08:50'!
+jumpTo: label
+	| offset |
+	offset := 0. "assembler labels at: label."
+	self halt. "@@FIXME@@"
+	self moveImm: offset to: tmp1Reg.
+	self add: RegM to: tmp1Reg. "label is offset from Method code"
+	self call: RegTmp1.! !
 
 !RV64GCodeGenerator methodsFor: 'jumps' stamp: 'KenD 10/23/2022 14:28:30'!
 jumpToMem: memRef
@@ -18860,6 +18915,89 @@ new
 	^super new initialize
 ! !
 
+!DynamicBinder methodsFor: 'accessing' stamp: 'KenD 11/13/2022 13:02:41'!
+at: aString
+	| key assoc |
+	key := self keyFor: aString.
+	key ifNil: [ ^nil ].
+	assoc := contents associationAt: key ifAbsent: [^nil].
+	^(type on: assoc) name: key
+! !
+
+!DynamicBinder methodsFor: 'accessing' stamp: 'KenD 11/13/2022 13:02:41'!
+at: aString ifPresent: aBlock
+	| binding |
+	binding := self at: aString.
+	^binding notNil ifTrue: [aBlock value: binding]
+! !
+
+!DynamicBinder methodsFor: 'accessing' stamp: 'KenD 11/13/2022 13:02:41'!
+at: aString put: anObject
+	| key |
+	key := self keyFor: aString.
+	self ASSERT: contents !!== Smalltalk.
+	contents at: key put: anObject
+! !
+
+!DynamicBinder methodsFor: 'accessing' stamp: 'KenD 11/13/2022 13:02:41'!
+contents: aDictionary
+	contents := aDictionary
+! !
+
+!DynamicBinder methodsFor: 'accessing' stamp: 'KenD 11/13/2022 13:02:41'!
+poolNamed: aSymbol ifPresent: aBlock
+	| pool |
+	pool := contents at: aSymbol ifAbsent: nil.
+	^pool notNil ifTrue: [aBlock evaluateWith: pool]
+! !
+
+!DynamicBinder methodsFor: 'accessing' stamp: 'KenD 11/13/2022 13:02:41'!
+type: aClass
+	type := aClass
+! !
+
+!DynamicBinder methodsFor: 'private' stamp: 'KenD 11/13/2022 13:02:41'!
+keyFor: aString
+	^type usesSymbols ifTrue: [aString existingSymbol] ifFalse: [aString]
+! !
+
+!DynamicBinder methodsFor: 'private' stamp: 'KenD 11/13/2022 13:02:41'!
+on: aDictionary type: aClass
+	contents := aDictionary.
+	type := aClass
+! !
+
+!DynamicBinder methodsFor: 'printing' stamp: 'KenD 11/13/2022 13:02:41'!
+printOn: aStream indent: anInteger
+	aStream
+		tab: anInteger;
+		nextPutAll: 'binder for ';
+		nextPutAll: type name;
+		nextPutAll: ': '.
+	type == GlobalBinding
+		ifTrue: [aStream nextPut: $…]
+		ifFalse: [contents keys asArray printOn: aStream]
+! !
+
+!DynamicBinder class methodsFor: 'instance creation' stamp: 'KenD 11/13/2022 13:02:41'!
+of: type
+	^self new type: type
+! !
+
+!DynamicBinder class methodsFor: 'instance creation' stamp: 'KenD 11/13/2022 13:02:41'!
+on: aPoolDictionary
+	| type |
+	type := aPoolDictionary isConstant
+		ifTrue: [ConstantPoolBinding]
+		ifFalse: [PoolVarBinding].
+	^self new on: aPoolDictionary type: type
+! !
+
+!DynamicBinder class methodsFor: 'instance creation' stamp: 'KenD 11/13/2022 13:02:41'!
+on: aDictionary of: type
+	^self new on: aDictionary type: type
+! !
+
 !StaticBinder methodsFor: 'accessing' stamp: 'KenD 9/29/2022 14:30:20'!
 at: aString
 	^contents at: aString ifAbsent: nil
@@ -20504,35 +20642,121 @@ environmentIndexOf: aScriptNode
 	^nil
 ! !
 
-!MethodScope methodsFor: 'services' stamp: 'KenD 9/30/2022 12:19:08'!
-resolve: aString
-	(self resolveLocal: aString) ifNotNil: [ :binding | ^ binding ].
-	(self resolvePseudo: aString) ifNotNil: [ :binding | ^ binding ].
-	^ DynamicBinding named: aString
+!MethodScope methodsFor: 'services' stamp: 'KenD 11/13/2022 12:50:31'!
+poolFor: aString
+	cvars do: [:binder | binder at: aString ifPresent: [:b | ^binder contents]].
+	pools do: [:pool | pool at: aString ifPresent: [:b | ^pool contents]].
+	self error: 'not found'
 ! !
 
-!MethodScope methodsFor: 'services' stamp: 'KenD 11/8/2022 14:51:36'!
+!MethodScope methodsFor: 'services' stamp: 'KenD 11/13/2022 12:50:31'!
+resolve: aString
+	(self resolveLocal: aString) ifNotNil: [:binding | ^binding].
+	^self resolveShared: aString
+! !
+
+!MethodScope methodsFor: 'services' stamp: 'KenD 11/13/2022 12:50:31'!
+resolveShared: aString
+	(pseudo at: aString) ifNotNil: [:binding | ^binding].
+	(ivars at: aString) ifNotNil: [:binding | ^binding].
+	cvars do: [:binder | binder at: aString ifPresent: [:binding | ^binding]].
+	pools do: [:pool | pool at: aString ifPresent: [:binding | ^binding]].
+	^(globals at: aString) ifNil: [UnresolvedBinding new name: aString]
+! !
+
+!MethodScope methodsFor: 'services' stamp: 'KenD 11/13/2022 12:58:27'!
 scriptDefining: aString
 	(self resolveLocal: aString) ifNotNil: [^script].
+	(self resolveShared: aString) ifNotNil: [^script].
 	self assert: false.
 	^nil
 ! !
 
-!MethodScope methodsFor: 'initialization' stamp: 'KenD 9/30/2022 12:19:08'!
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+addPool: aPoolDictionary
+	| binder |
+	binder := DynamicBinder on: aPoolDictionary .
+	pools add: binder
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+addPool: aDictionary of: type
+	| dict |
+	dict := DynamicBinder on: aDictionary of: type.
+	pools add: dict
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+addPoolBinders: aCollection
+	pools addAll: aCollection
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+classBinding
+	^species
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
 initialize
 	super initialize.
+	globals := DynamicBinder on: Dictionary new of: GlobalBinding.
+	ivars := StaticBinder new.
+	cvars := OrderedCollection new. 
+	pools := OrderedCollection new.
 	self initializePseudoVars
 ! !
 
-!MethodScope methodsFor: 'initialization' stamp: 'KenD 9/30/2022 12:19:08'!
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+initializeClassVars
+	"
+		fixme: bootstrapping should be properly abstracted
+		and not checked with isKindOf:
+	"
+
+	| vars |
+	species instanceSide withAllSuperclasses
+		do: [ :class | 
+			| binder |
+			vars := class classPool.
+			binder := DynamicBinder on: vars of: ClassVarBinding.
+			cvars add: binder ]
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+initializeInstVars
+	species allInstVarNames withIndexDo: [:name :i | | binding |
+		binding := InstVarBinding new name: name; index: i.
+		ivars at: name put: binding]
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+initializePoolVars
+	| instance |
+	instance := species instanceSide.
+	(instance allSharedPoolsUsing: globals)
+		do:
+			[ :pool | self addPool: pool ] .
+	instance withAllSuperclasses
+		do: [ :class | class localPools do: [ :pool | self addPool: pool ] ]
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
 initializePseudoVars
 	pseudo := StaticBinder new.
 	pseudo
 		at: 'nil' put: NilBinding new;
 		at: 'true' put: TrueBinding new;
 		at: 'false' put: FalseBinding new;
-		at: 'self' put: SelfBinding new;
-		at: 'super' put: SuperBinding new
+		at: 'self' put: SelfBinding new
+! !
+
+!MethodScope methodsFor: 'initialization' stamp: 'KenD 11/13/2022 12:50:31'!
+species: aSpecies
+	species ifNotNil: [^self].
+	species := aSpecies.
+	self initializeInstVars; initializeClassVars; initializePoolVars.
+	species superclass isNil ifTrue: [^self].
+	pseudo at: 'super' put: SuperBinding new
 ! !
 
 !MethodScope methodsFor: 'as yet unclassified' stamp: 'KenD 9/30/2022 12:19:08'!
@@ -20549,6 +20773,30 @@ captureEnvironment: aScriptNode
 !MethodScope methodsFor: 'private' stamp: 'KenD 9/30/2022 12:19:08'!
 transferLocal: name
 	^self resolveLocal: name
+! !
+
+!MethodScope methodsFor: 'testing' stamp: 'KenD 11/13/2022 12:50:31'!
+hasMultipleBindingsFor: aString
+	"
+	temporal compatibility
+	"
+	| count |
+	count := 0.
+	cvars
+		do: [:binder | binder at: aString ifPresent: [:b | count := count + 1]].
+	pools
+		do: [:binder | binder at: aString ifPresent: [:b | count := count + 1]].
+	^count > 1
+! !
+
+!MethodScope methodsFor: 'accessing' stamp: 'KenD 11/13/2022 12:50:31'!
+namespace
+	^globals
+! !
+
+!MethodScope methodsFor: 'accessing' stamp: 'KenD 11/13/2022 12:50:31'!
+namespace: aDictionary
+	globals contents: aDictionary
 ! !
 
 !Binding methodsFor: 'testing' stamp: 'KenD 9/29/2022 13:59:00'!
@@ -20707,6 +20955,36 @@ usesSymbols
 on: anAssociation 
 
 	^self new association: anAssociation! !
+
+!GlobalBinding methodsFor: 'testing' stamp: 'KenD 11/13/2022 12:48:59'!
+emitLoadAusing: anAstcodeEncoder
+	anAstcodeEncoder encodeLoadAwithGlobal: association
+! !
+
+!GlobalBinding methodsFor: 'testing' stamp: 'KenD 11/13/2022 12:48:59'!
+encodeUsing: anAstcodeEmitter
+	anAstcodeEmitter encodeGlobalVar: association
+! !
+
+!GlobalBinding methodsFor: 'testing' stamp: 'KenD 11/13/2022 12:48:59'!
+isGlobal
+	^true
+! !
+
+!GlobalBinding class methodsFor: 'testing' stamp: 'KenD 11/13/2022 12:48:59'!
+usesSymbols
+	^true
+! !
+
+!GlobalBinding class methodsFor: 'private' stamp: 'KenD 11/13/2022 12:48:59'!
+on: anAssociation
+	| v class |
+	v := anAssociation value.
+	class := (v isSpecies or: [ v class == SlotObjectMap and: [v spec isMeta]])
+		ifTrue: [ ClassBinding ]
+		ifFalse: [ GlobalBinding ].
+	^ class new association: anAssociation
+! !
 
 !PoolVarBinding methodsFor: 'codeGeneration' stamp: 'KenD 3/2/2021 12:43:39'!
 emitLoadAusing: anAstcodeEncoder 
@@ -26429,47 +26707,6 @@ primitivePrintString
 
 	^self printString! !
 
-!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:51:39'!
-configureCompiler: aCompiler! !
-
-!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/5/2021 08:23:15'!
-isSpecies 
-	
-	^ true! !
-
-!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:46:44'!
-allSharedPoolsUsing: globals 
-
-	^self allSharedPools ! !
-
-!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/10/2021 12:53:29'!
-indexOfSlot: instVarName 
-	self flag: #KenD_Revisit.
-	"^self instVarIndexFor: instVarName"
-	
-	"Nota Bene: returns zero on failure; use nil?"
-	^self instVarNames findFirst: [ :name | name = instVarName ]! !
-
-!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:47:07'!
-localPools 
-
-	^#()! !
-
-!Class methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:50'!
-instanceSide
-
-	^ self! !
-
-!Metaclass methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:30'!
-instanceSide
-
-	^ thisClass! !
-
-!ClassOrganizer methodsFor: '*powerlang-core' stamp: 'KenD 11/1/2022 13:34:40'!
-selectorsFor: aString 
-
-	^ self listAtCategoryNamed: aString! !
-
 !Integer methodsFor: '*Powerlang-Core' stamp: 'KenD 9/30/2022 15:31:43'!
 bin 
 	"
@@ -26548,6 +26785,47 @@ thru: anInteger
 	^Stretch from: self thru: anInteger
 ! !
 
+!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:51:39'!
+configureCompiler: aCompiler! !
+
+!Behavior methodsFor: '*powerlang-core' stamp: 'KenD 6/5/2021 08:23:15'!
+isSpecies 
+	
+	^ true! !
+
+!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:46:44'!
+allSharedPoolsUsing: globals 
+
+	^self allSharedPools ! !
+
+!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/10/2021 12:53:29'!
+indexOfSlot: instVarName 
+	self flag: #KenD_Revisit.
+	"^self instVarIndexFor: instVarName"
+	
+	"Nota Bene: returns zero on failure; use nil?"
+	^self instVarNames findFirst: [ :name | name = instVarName ]! !
+
+!ClassDescription methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:47:07'!
+localPools 
+
+	^#()! !
+
+!Class methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:50'!
+instanceSide
+
+	^ self! !
+
+!Metaclass methodsFor: '*powerlang-core' stamp: 'KenD 6/8/2021 06:55:30'!
+instanceSide
+
+	^ thisClass! !
+
+!ClassOrganizer methodsFor: '*powerlang-core' stamp: 'KenD 11/1/2022 13:34:40'!
+selectorsFor: aString 
+
+	^ self listAtCategoryNamed: aString! !
+
 !Collection methodsFor: '*powerlang-core' stamp: 'KenD 6/2/2021 12:48:46'!
 anyone 
 
@@ -26602,6 +26880,11 @@ indexOfSubCollection: aSubCollection
 		ifAbsent: [0]! !
 
 !Symbol methodsFor: '*powerlang-core' stamp: 'KenD 6/3/2021 13:53:01'!
+isBinary 
+
+	^self precedence = 2! !
+
+!Utf8Symbol methodsFor: '*powerlang-core' stamp: 'KenD 11/12/2022 13:22:10'!
 isBinary 
 
 	^self precedence = 2! !
