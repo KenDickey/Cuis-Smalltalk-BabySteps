@@ -9,11 +9,12 @@ but not part of the official release builds.  For example, Linux on Aarch64/arm6
 
 The process is basically:
 ```git clone --depth 1 https://github.com/OpenSmalltalk/opensmalltalk-vm
-cd opensmalltalk-vm/building/linux64ARMv8```  [ pick os+cpu ]
+cd opensmalltalk-vm/building/linux64ARMv8  [ pick os+cpu ]
   [ read HowToBuild to get required libraries ]
-```cd squeak.cog.spur/build```    [or squeak.stack.spur/build ]
-```./mvm```
+cd squeak.cog.spur/build    [or squeak.stack.spur/build ]
+./mvm
 [ Answer `y` to "clean?" ]
+```
 
 "stack" => bytecode interpreter; "cog" => JIT compiler (faster)
 
