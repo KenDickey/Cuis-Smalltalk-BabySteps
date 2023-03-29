@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5733] on 29 March 2023 at 1:26:14 pm'!
+'From Cuis 6.0 [latest update: #5733] on 29 March 2023 at 3:17:31 pm'!
 'Description Pinocchio  Version 4 -- ported to Cuis Smalltalk with mods
 "Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
     https://scg.unibe.ch/archive/projects/Flue11a.pdf 
@@ -7,7 +7,7 @@
 See also:
     http://www.squeaksource.com/P4/
     https://scg.unibe.ch/assets/download/pinocchio/'!
-!provides: 'P4' 1 40!
+!provides: 'P4' 1 41!
 !requires: 'PEG' 1 15 nil!
 !requires: 'RISC5-Instructions' 1 23 nil!
 SystemOrganization addCategory: 'P4-ASM'!
@@ -31,7 +31,7 @@ SystemOrganization addCategory: 'P4-Kernel-Package'!
 SystemOrganization addCategory: 'P4-Kernel-String'!
 SystemOrganization addCategory: 'P4-Kernel-Structure'!
 SystemOrganization addCategory: 'P4-Parser'!
-SystemOrganization addCategory: 'P4-CuisBridge'!
+SystemOrganization addCategory: 'P4-PharoBridge'!
 SystemOrganization addCategory: 'P4-Presentation'!
 SystemOrganization addCategory: 'P4-Stream'!
 SystemOrganization addCategory: 'P4-SystemInstaller'!
@@ -41,6 +41,7 @@ SystemOrganization addCategory: 'P4-TAC-IR'!
 SystemOrganization addCategory: 'P4-TAC-Values'!
 SystemOrganization addCategory: 'P4-Test'!
 SystemOrganization addCategory: 'P4-Kernel-Callable'!
+SystemOrganization addCategory: 'P4-CuisBridge'!
 
 
 !classDefinition: #ASTTest category: 'P4-AST'!
@@ -15700,7 +15701,7 @@ canPerform: aSelector
 	].
 	^ false! !
 
-!Behavior methodsFor: '*P4' stamp: 'KenD 9/13/2022 14:35:37'!
+!Behavior methodsFor: '*P4' stamp: 'KenD 3/29/2023 15:16:01'!
 mapToPclass
 	^ {
 	ProtoObject                ->P4Object.  "@@KenD@@"
@@ -15712,6 +15713,7 @@ mapToPclass
 	Dictionary 				-> P4Dictionary.
 	Array 				-> P4Array.
 	Symbol 				-> P4Symbol.
+	UnicodeSymbol    -> P4Symbol.
 	String 				-> P4String.
 	UndefinedObject 	     -> P4UndefinedObject.
 	True 				-> P4True.
@@ -15781,12 +15783,25 @@ split: aString
 
 	^ aString findTokens: self asString! !
 
+!UnicodeCodePoint methodsFor: '*P4' stamp: 'KenD 3/29/2023 15:12:56'!
+asInteger
+
+	^ value! !
+
 !Collection methodsFor: '*P4' stamp: 'KenD 9/13/2022 12:54:27'!
 anyPerform: aSymbol
 	"Perform like #anySatisfy but use a symbol rather than a block"
 	
 	self do:[:item | (item perform: aSymbol) ifTrue: [^ true]].
 	^ false! !
+
+!CharacterSequence methodsFor: '*P4' stamp: 'KenD 3/29/2023 15:15:08'!
+contains: substring at: position
+	| size |
+	size := substring size.
+	position + size > self size ifTrue: [ ^ false ].
+	1 to: size do: [ :i | (self at: position + i) = (substring at: i) ifFalse: [ ^ false ]].
+	^ true! !
 
 !CharacterSequence methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:17:23'!
 split: aString
