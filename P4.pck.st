@@ -1,5 +1,5 @@
-'From Cuis 6.0 [latest update: #5483] on 20 September 2022 at 12:20:42 pm'!
-'Description Pinocchio  Version 4
+'From Cuis 6.0 [latest update: #5733] on 29 March 2023 at 1:26:14 pm'!
+'Description Pinocchio  Version 4 -- ported to Cuis Smalltalk with mods
 "Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
     https://scg.unibe.ch/archive/projects/Flue11a.pdf 
 "Optimizing Pinocchio"
@@ -7,7 +7,7 @@
 See also:
     http://www.squeaksource.com/P4/
     https://scg.unibe.ch/assets/download/pinocchio/'!
-!provides: 'P4' 1 38!
+!provides: 'P4' 1 40!
 !requires: 'PEG' 1 15 nil!
 !requires: 'RISC5-Instructions' 1 23 nil!
 SystemOrganization addCategory: 'P4-ASM'!
@@ -31,7 +31,7 @@ SystemOrganization addCategory: 'P4-Kernel-Package'!
 SystemOrganization addCategory: 'P4-Kernel-String'!
 SystemOrganization addCategory: 'P4-Kernel-Structure'!
 SystemOrganization addCategory: 'P4-Parser'!
-SystemOrganization addCategory: 'P4-PharoBridge'!
+SystemOrganization addCategory: 'P4-CuisBridge'!
 SystemOrganization addCategory: 'P4-Presentation'!
 SystemOrganization addCategory: 'P4-Stream'!
 SystemOrganization addCategory: 'P4-SystemInstaller'!
@@ -2553,34 +2553,34 @@ P4Object variableSubclass: #P4DoesNotUnderstand
 P4DoesNotUnderstand class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PharoBehavior category: 'P4-PharoBridge'!
-Object subclass: #P4PharoBehavior
-	instanceVariableNames: 'pharoInstance p4instance'
+!classDefinition: #P4CuisBehavior category: 'P4-CuisBridge'!
+Object subclass: #P4CuisBehavior
+	instanceVariableNames: 'cuisInstance p4instance'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'P4-PharoBridge'!
-!classDefinition: 'P4PharoBehavior class' category: 'P4-PharoBridge'!
-P4PharoBehavior class
+	category: 'P4-CuisBridge'!
+!classDefinition: 'P4CuisBehavior class' category: 'P4-CuisBridge'!
+P4CuisBehavior class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PharoClass category: 'P4-PharoBridge'!
-P4PharoBehavior subclass: #P4PharoClass
+!classDefinition: #P4CuisClass category: 'P4-CuisBridge'!
+P4CuisBehavior subclass: #P4CuisClass
 	instanceVariableNames: 'p4class'
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'P4-PharoBridge'!
-!classDefinition: 'P4PharoClass class' category: 'P4-PharoBridge'!
-P4PharoClass class
+	category: 'P4-CuisBridge'!
+!classDefinition: 'P4CuisClass class' category: 'P4-CuisBridge'!
+P4CuisClass class
 	instanceVariableNames: ''!
 
-!classDefinition: #P4PharoMetaclass category: 'P4-PharoBridge'!
-P4PharoBehavior subclass: #P4PharoMetaclass
+!classDefinition: #P4CuisMetaclass category: 'P4-CuisBridge'!
+P4CuisBehavior subclass: #P4CuisMetaclass
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
-	category: 'P4-PharoBridge'!
-!classDefinition: 'P4PharoMetaclass class' category: 'P4-PharoBridge'!
-P4PharoMetaclass class
+	category: 'P4-CuisBridge'!
+!classDefinition: 'P4CuisMetaclass class' category: 'P4-CuisBridge'!
+P4CuisMetaclass class
 	instanceVariableNames: ''!
 
 
@@ -4952,10 +4952,10 @@ shouldBeExported: methodAST
 currentClass: aClass
 	ast2tac currentClass: aClass    ! !
 
-!P4SmalltalkCompiler methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:19'!
+!P4SmalltalkCompiler methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:19:14'!
 host: anObject
 	ast2tac host: anObject .
-	ast2tac currentInstVars: anObject inPharo allInstVarNames.
+	ast2tac currentInstVars: anObject inCuis allInstVarNames.
 ! !
 
 !P4SmalltalkCompiler methodsFor: 'accessing' stamp: 'ToonVerwaest 6/24/2011 19:20'!
@@ -5233,9 +5233,9 @@ addClassReference: class for: allocated
 	classReference := self localDump: class theBehavior.
 	self referTo: classReference at: allocated pointerOffset: -2.	! !
 
-!P4BinaryOut methodsFor: 'initialize-release' stamp: 'ToonVerwaest 7/19/2011 12:47'!
-addPharoClasses: pharoClasses 
-	pharoClasses do: [ :pclass | todo add: (P4Package loadClass: pclass) ]! !
+!P4BinaryOut methodsFor: 'initialize-release' stamp: 'KenD 3/29/2023 13:25:04'!
+addCuisClasses: cuisClasses 
+	cuisClasses do: [ :pclass | todo add: (P4Package loadClass: pclass) ]! !
 
 !P4BinaryOut methodsFor: 'initialize-release' stamp: 'OliFlueckiger 7/7/2011 16:04'!
 alignObject
@@ -5371,16 +5371,16 @@ symbol: aSymbol
 todo
 	^todo ! !
 
-!P4BinaryOut methodsFor: 'initialize-release' stamp: 'OliFlueckiger 12/7/2011 18:44'!
+!P4BinaryOut methodsFor: 'initialize-release' stamp: 'KenD 3/29/2023 13:17:24'!
 todo: aTodo
 	| superclass |
 	(done includes: aTodo) ifTrue: [ ^ self ].
-	(aTodo isKindOf: P4PharoClass) ifTrue: [
+	(aTodo isKindOf: P4CuisClass) ifTrue: [
 		done add: aTodo.
 		^ todo add: aTodo ].
 	(aTodo isKindOf: P4SmalltalkBehavior) ifTrue: [ 
 		^ self todo: aTodo superclass].
-	(aTodo isKindOf: P4PharoMetaclass) ifTrue: [ ^ self ].
+	(aTodo isKindOf: P4CuisMetaclass) ifTrue: [ ^ self ].
 	(aTodo isKindOf: P4AbstractPackage) ifTrue: [ ^ self ].
 	"Classes can occur in type hints. the user is responsible for compiling the referenced types"
 	(aTodo isKindOf: P4Object class) ifTrue: [ ^ self ].
@@ -8687,13 +8687,13 @@ ifTrue: aBlock  ifFalse: aFalseBlock
 value
 	^ nil! !
 
-!P4AbstractPackage methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 17:23'!
+!P4AbstractPackage methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:16:48'!
 addClass: aName
 	<preventExport>
 	| reference |
 	self flag: 'ne'.
 	reference := members at: aName ifAbsentPut: [ |class superclass|
-		class := P4PharoClass new
+		class := P4CuisClass new
 					name: aName.
 		P4ClassReference new cls: class; package: self ].
 	^ reference cls.! !
@@ -8820,7 +8820,7 @@ byPathName: aName
 	^ P4RootPackage resolve: segments
 	! !
 
-!P4Package class methodsFor: 'pharo package loading' stamp: 'ToonVerwaest 7/21/2011 17:19'!
+!P4Package class methodsFor: 'pharo package loading' stamp: 'KenD 3/29/2023 13:19:42'!
 loadClass: aClass
 	| package |
 	aClass ifNil: [ ^ nil ].
@@ -8828,7 +8828,7 @@ loadClass: aClass
 	^ package at: aClass pname ifAbsent: [
 		(package addClass: aClass pname)   
 			superclass: (P4Package loadClass: aClass p4super);
-			inPharo: aClass;
+			inCuis: aClass;
 			metaclass: aClass p4class]! !
 
 !P4Package class methodsFor: 'pharo package loading' stamp: 'OliFlueckiger 7/5/2011 15:51'!
@@ -8979,9 +8979,9 @@ initialize
 initializeSeparator
 	^ PEGParser separators! !
 
-!P4AbstractGrammar methodsFor: 'parsing' stamp: 'ToonVerwaest 8/18/2010 13:34'!
+!P4AbstractGrammar methodsFor: 'parsing' stamp: 'KenD 3/29/2023 13:14:40'!
 match: string to: parser 
-	^ parser match: (PEGStringScanner on: string separator: self separator)! !
+	^ parser match: (PEGStringScanner on: string separator: PEGParser separators)! !
 
 !P4AbstractGrammar methodsFor: 'accessors' stamp: 'ToonVerwaest 8/18/2010 13:33'!
 parsers
@@ -10066,12 +10066,12 @@ wordSize
 wordSize: aWordSize
 	wordSize := aWordSize.! !
 
-!P4StaticClassInstaller methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 18:28'!
+!P4StaticClassInstaller methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:19:14'!
 compileClass: compiledClass
 	self flag: 'clean up pathOfClass stuff'.
-	compiledClass inPharo methodDictionary do: [ :aMethod | 
+	compiledClass inCuis methodDictionary do: [ :aMethod | 
 		methodInstaller installMethod: aMethod getSourceFromFile on: compiledClass ].
-	compiledClass pclass inPharo methodDictionary do: [ :aMethod | 
+	compiledClass pclass inCuis methodDictionary do: [ :aMethod | 
 		methodInstaller installMethod: aMethod getSourceFromFile on: compiledClass pclass ].
 	
 	dumper 
@@ -10079,16 +10079,16 @@ compileClass: compiledClass
 		dump: compiledClass theBehavior;
 		dump: compiledClass pclass; 
 		dump: compiledClass pclass theBehavior;
-		into: (self pathOfClass: compiledClass inPharo).! !
+		into: (self pathOfClass: compiledClass inCuis).! !
 
-!P4StaticClassInstaller methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 20:13'!
+!P4StaticClassInstaller methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:25:05'!
 compileClasses: classes
 	|toDump|
 	P4RootPackage flushPackages.
 	dumper dumpCoreObjects.
 
-	dumper addPharoClasses: classes.
-	dumper addPharoClasses:
+	dumper addCuisClasses: classes.
+	dumper addCuisClasses:
 	{
 		P4SymbolTable.
 		P4Symbol.
@@ -11234,11 +11234,11 @@ inlineCacheHitCheck: method
 		for: (self arg: 1 of: methodCompiler argCount) 
 		fallbackLabel: invokeBlock! !
 
-!P4A2THelper methodsFor: 'typeChecking' stamp: 'OliFlueckiger 12/7/2011 19:53'!
+!P4A2THelper methodsFor: 'typeChecking' stamp: 'KenD 3/29/2023 13:19:14'!
 inlineCacheHitCheck: host for: receiver fallbackLabel: invokeBlock
 	| endBlock taggedBlock phost |
 	
-	phost := host inPharo.
+	phost := host inCuis.
 	
 	builder testBit: 0 on: receiver.
 	
@@ -11295,7 +11295,7 @@ insertCondition: conditions fallback: aFallback block: fallbackBlock
 	
 	builder useAsNextBasicBlock: endBlock.! !
 
-!P4A2THelper methodsFor: 'typeChecking' stamp: 'OliFlueckiger 12/7/2011 19:52'!
+!P4A2THelper methodsFor: 'typeChecking' stamp: 'KenD 3/29/2023 13:19:14'!
 insertTypeGuard: types andCondition: conditions for: receiver around: aBlock fallback: aFallback
 	| nextBlock codeBlock fallbackBlock type |
 	
@@ -11306,7 +11306,7 @@ insertTypeGuard: types andCondition: conditions for: receiver around: aBlock fal
 	1 to: (types size - 1) do: [ :i |
 		type := types at: i.
 		nextBlock := builder nextBasicBlock.
-		type inPharo ~~ P4SmallInteger 
+		type inCuis ~~ P4SmallInteger 
 			ifTrue: [ builder move: (builder loadConstant: type theBehavior) to: self typeVariable ].
 		self inlineCacheHitCheck: type for: receiver fallbackLabel: nextBlock.
 		builder shortJump: codeBlock.  
@@ -11314,7 +11314,7 @@ insertTypeGuard: types andCondition: conditions for: receiver around: aBlock fal
 	
 	type := types at: types size.
 	
-	type inPharo ~~ P4SmallInteger 
+	type inCuis ~~ P4SmallInteger 
 		ifTrue: [ builder move: (builder loadConstant: type theBehavior) to: self typeVariable ].
 	self inlineCacheHitCheck: type for: receiver fallbackLabel: fallbackBlock.
 	
@@ -11336,10 +11336,10 @@ invokeBlockFor: method
 		<< ((builder loadConstant: method selector ) moveTo: self resultVariable);
 		<< (P4TACJump to: (P4Object earlySelectorAddress: #invoke:)).! !
 
-!P4A2TStatic methodsFor: 'convenience' stamp: 'OliFlueckiger 7/22/2011 16:13'!
+!P4A2TStatic methodsFor: 'convenience' stamp: 'KenD 3/29/2023 13:19:14'!
 currentHost: host 
-	(host inPharo class canPerform: #typeHints) ifTrue: [
-		host inPharo typeHints keysAndValuesDo: [ :name :type |
+	(host inCuis class canPerform: #typeHints) ifTrue: [
+		host inCuis typeHints keysAndValuesDo: [ :name :type |
 			self typeHint: name as: type]]! !
 
 !P4A2TStatic methodsFor: 'convenience' stamp: 'OliFlueckiger 7/22/2011 16:16'!
@@ -15309,156 +15309,156 @@ perform: aSelector on: receiver with: args
 	selector := aSelector.
 	^ receiver doesNotUnderstand: self  ! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 17:32'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 17:32'!
 asPClass
 	^ self! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:56'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:56'!
 dumpGlobalOn: bo
 	^ self dumpOn: bo! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 18:13'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 18:13'!
 dumpLocalOn: bo
 	^ bo postpone: self! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/28/2011 16:37'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 earlySelectorAddress: addr
-	^ pharoInstance earlySelectorAddress: addr  ! !
+	^ cuisInstance earlySelectorAddress: addr  ! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:19'!
-inPharo
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:19:14'!
+inCuis
 	<preventExport>
-	^ pharoInstance ! !
+	^ cuisInstance ! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:19'!
-inPharo: anObject
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:19:42'!
+inCuis: anObject
 	<preventExport>
-	pharoInstance := anObject.
+	cuisInstance := anObject.
 	p4instance instanceHeader: anObject pInstanceHeader! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 16:55'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 16:55'!
 inPinocchio
 	<preventExport>
 	^ p4instance ! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
 installMethod: method
 	<preventExport>
 	p4instance installMethod: method! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:41'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 lookupSelector: selector
 	<preventExport>
-	^ pharoInstance lookupSelector: selector! !
+	^ cuisInstance lookupSelector: selector! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pExportedName
-	^ pharoInstance pExportedName ifNil: [ p4instance pExportedName ]
+	^ cuisInstance pExportedName ifNil: [ p4instance pExportedName ]
 	! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 18:24'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pHeader
-	^ pharoInstance pHeader! !
+	^ cuisInstance pHeader! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 18:19'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pInstVarAt: i
 	^ i <= P4Object class pInstSize
 		ifTrue: [ p4instance pInstVarAt: i ]
-		ifFalse: [ pharoInstance instVarAt: i - P4Object class pInstSize + Class instSize ]! !
+		ifFalse: [ cuisInstance instVarAt: i - P4Object class pInstSize + Class instSize ]! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 8/18/2011 13:47'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pLookupSelector: addr
-	^ pharoInstance pLookupSelector: addr  ! !
+	^ cuisInstance pLookupSelector: addr  ! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
 pVariableAt: i
 	^ p4instance pVariableAt: i! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
 pVariableSize
 	^ p4instance pVariableSize! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/22/2011 16:47'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 printOn: stream
-	stream << p4instance name << ' (' << pharoInstance name << ')'! !
+	stream << p4instance name << ' (' << cuisInstance name << ')'! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/26/2011 17:47'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/26/2011 17:47'!
 superclass
 	^ p4instance superclass! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/26/2011 17:47'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 7/26/2011 17:47'!
 superclass: anObject
 	p4instance superclass: anObject! !
 
-!P4PharoBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 16:39'!
+!P4CuisBehavior methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 16:39'!
 theBehavior
 	^ p4instance theBehavior! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:20'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:20'!
 inP4: aClass
 	p4instance := aClass! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 22:53'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 22:53'!
 initialize
 	super initialize.
 	p4instance := P4Class new.
 	p4instance setBehavior: (P4SmalltalkBehavior for: self).  ! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:18'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:17:24'!
 metaclass: anObject
-	p4class := P4PharoMetaclass new instance: self		! !
+	p4class := P4CuisMetaclass new instance: self		! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
 name: aName
 	<preventExport>
 	p4instance name: aName! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/19/2011 13:08'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/19/2011 13:08'!
 pByteAt: i 
 	self error: 'Should not happen'! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/19/2011 13:08'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/19/2011 13:08'!
 pByteName
 	^ nil! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/19/2011 13:08'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/19/2011 13:08'!
 pByteSize
 	^ 0! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pInstSize
-	^ pharoInstance pInstSize! !
+	^ cuisInstance pInstSize! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 18:22'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pIsBytes
-	^ pharoInstance pIsBytes! !
+	^ cuisInstance pIsBytes! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pIsVariable 
-	^ pharoInstance pIsVariable! !
+	^ cuisInstance pIsVariable! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pIsVariableOrBytes 
-	^ pharoInstance pIsVariableOrBytes ! !
+	^ cuisInstance pIsVariableOrBytes ! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
 pVariableSizeHeader
 	^ p4instance pVariableSizeHeader! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
 package: package
 	<preventExport>
 	p4instance package: package! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:20'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:20'!
 pclass
 	^ p4class! !
 
-!P4PharoClass methodsFor: 'accessing' stamp: 'OliFlueckiger 8/9/2011 18:39'!
+!P4CuisClass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 typeCheckByteSize 
-	^pharoInstance typeCheckByteSize! !
+	^cuisInstance typeCheckByteSize! !
 
-!P4PharoMetaclass methodsFor: 'accessing' stamp: 'OliFlueckiger 12/7/2011 22:54'!
+!P4CuisMetaclass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:19:14'!
 instance: anObject
 	p4instance := P4Metaclass new
 					instance: anObject;
@@ -15466,25 +15466,25 @@ instance: anObject
 					superclass: (anObject superclass
 									ifNil: [ P4Class asPClass ]
 									ifNotNil: [ :s | s pclass ]).
-	pharoInstance := anObject inPharo class.! !
+	cuisInstance := anObject inCuis class.! !
 
-!P4PharoMetaclass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:17'!
+!P4CuisMetaclass methodsFor: 'accessing' stamp: 'KenD 3/29/2023 13:18:45'!
 pInstSize
-	^ pharoInstance pInstSize ! !
+	^ cuisInstance pInstSize ! !
 
-!P4PharoMetaclass methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 17:31'!
+!P4CuisMetaclass methodsFor: 'accessing' stamp: 'OliFlueckiger 7/20/2011 17:31'!
 pIsBytes
 	^ false! !
 
-!P4PharoMetaclass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 18:08'!
+!P4CuisMetaclass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 18:08'!
 pIsVariable
 	^ false! !
 
-!P4PharoMetaclass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 18:08'!
+!P4CuisMetaclass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 18:08'!
 pIsVariableOrBytes 
 	^ false! !
 
-!P4PharoMetaclass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:32'!
+!P4CuisMetaclass methodsFor: 'accessing' stamp: 'ToonVerwaest 7/21/2011 17:32'!
 pclass
 	^ P4Metaclass asPClass! !
 
@@ -15651,6 +15651,25 @@ dumpLocalOn: executableFormat
 pExportedName 
 	^ self name asSymbol! !
 
+!Magnitude methodsFor: '*P4' stamp: 'KenD 8/24/2022 13:26:45'!
+putOn: aStream
+
+	(aStream isBinary ifTrue: [ self asByteArray ] ifFalse: [ self asString]) putOn: aStream
+	! !
+
+!SmallInteger methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 18:20'!
+asTaggedInteger 
+	^ 1+(self bitShift: 1)! !
+
+!SmallInteger methodsFor: '*P4' stamp: 'KenD 8/24/2022 16:06:15'!
+basicIdentityHash
+
+	^self! !
+
+!SmallInteger methodsFor: '*P4' stamp: 'OliFlueckiger 10/4/2011 15:58'!
+pHash 
+	^ self! !
+
 !UndefinedObject methodsFor: '*P4' stamp: 'KenD 9/12/2022 15:45:07'!
 canHoldCodePoints
 
@@ -15756,25 +15775,6 @@ p4super
 !Metaclass methodsFor: '*P4' stamp: 'ToonVerwaest 7/21/2011 18:25'!
 pInstSize
 	^ self instSize - P4Object class instSize + P4Class instSize! !
-
-!Magnitude methodsFor: '*P4' stamp: 'KenD 8/24/2022 13:26:45'!
-putOn: aStream
-
-	(aStream isBinary ifTrue: [ self asByteArray ] ifFalse: [ self asString]) putOn: aStream
-	! !
-
-!SmallInteger methodsFor: '*P4' stamp: 'OliFlueckiger 7/6/2011 18:20'!
-asTaggedInteger 
-	^ 1+(self bitShift: 1)! !
-
-!SmallInteger methodsFor: '*P4' stamp: 'KenD 8/24/2022 16:06:15'!
-basicIdentityHash
-
-	^self! !
-
-!SmallInteger methodsFor: '*P4' stamp: 'OliFlueckiger 10/4/2011 15:58'!
-pHash 
-	^ self! !
 
 !Character methodsFor: '*P4' stamp: 'KenD 8/21/2022 14:16:06'!
 split: aString

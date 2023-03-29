@@ -1,6 +1,6 @@
-'From Cuis 6.0 [latest update: #5463] on 12 September 2022 at 3:05:27 pm'!
+'From Cuis 6.0 [latest update: #5733] on 29 March 2023 at 1:23:07 pm'!
 'Description Parsing Expression Grammar -- yet another parser..'!
-!provides: 'PEG' 1 18!
+!provides: 'PEG' 1 19!
 SystemOrganization addCategory: 'PEG'!
 
 
@@ -982,6 +982,11 @@ parseOn: input
 <= theExpression
 	expression := theExpression asChildParser! !
 
+!PEGParser methodsFor: 'adding' stamp: 'KenD 3/29/2023 13:07:40'!
+separator
+
+	^ separator ! !
+
 !PEGParser methodsFor: 'adding' stamp: 'ToonVerwaest 3/25/2010 12:44'!
 separator: aSeparator
 	separator := aSeparator! !
@@ -1027,18 +1032,12 @@ basicSeparator
 	" separator := nil "
 	^ separator ifNil: [ separator := self basicSeparators strongTimes omit ]! !
 
-!PEGParser class methodsFor: 'instance creation' stamp: 'KenD 9/9/2022 12:17:33'!
+!PEGParser class methodsFor: 'instance creation' stamp: 'KenD 3/29/2023 13:13:55'!
 basicSeparators
 	" separator := nil. separators := nil "
 	"Note  Character>>separators "
 	^ separators ifNil: [
-		separators := ((String new: 5)
-							at: 1 put: Character space; "32"
-							at: 2 put: Character cr; "13"
-							at: 3 put: Character lf; "10"
-							at: 4 put: Character tab; "HT: 9"
-							at: 5 put: Character newPage; "FF: 12"
-							yourself) asPEGChoice ]! !
+		separators := (Character separators) asString asPEGChoice ]! !
 
 !PEGParser class methodsFor: 'instance creation' stamp: 'ToonVerwaest 3/25/2010 12:44'!
 named: theName
