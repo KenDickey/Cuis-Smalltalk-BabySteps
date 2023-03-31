@@ -1,4 +1,4 @@
-'From Cuis 6.0 [latest update: #5733] on 29 March 2023 at 3:17:31 pm'!
+'From Cuis 6.0 [latest update: #5733] on 31 March 2023 at 1:02:35 pm'!
 'Description Pinocchio  Version 4 -- ported to Cuis Smalltalk with mods
 "Implementing Pinocchio: a VM-less metacircular runtime library for dynamic languages"
     https://scg.unibe.ch/archive/projects/Flue11a.pdf 
@@ -7,7 +7,7 @@
 See also:
     http://www.squeaksource.com/P4/
     https://scg.unibe.ch/assets/download/pinocchio/'!
-!provides: 'P4' 1 41!
+!provides: 'P4' 1 42!
 !requires: 'PEG' 1 15 nil!
 !requires: 'RISC5-Instructions' 1 23 nil!
 SystemOrganization addCategory: 'P4-ASM'!
@@ -31,7 +31,7 @@ SystemOrganization addCategory: 'P4-Kernel-Package'!
 SystemOrganization addCategory: 'P4-Kernel-String'!
 SystemOrganization addCategory: 'P4-Kernel-Structure'!
 SystemOrganization addCategory: 'P4-Parser'!
-SystemOrganization addCategory: 'P4-PharoBridge'!
+SystemOrganization addCategory: 'P4-CuisBridge'!
 SystemOrganization addCategory: 'P4-Presentation'!
 SystemOrganization addCategory: 'P4-Stream'!
 SystemOrganization addCategory: 'P4-SystemInstaller'!
@@ -41,7 +41,7 @@ SystemOrganization addCategory: 'P4-TAC-IR'!
 SystemOrganization addCategory: 'P4-TAC-Values'!
 SystemOrganization addCategory: 'P4-Test'!
 SystemOrganization addCategory: 'P4-Kernel-Callable'!
-SystemOrganization addCategory: 'P4-CuisBridge'!
+SystemOrganization addCategory: 'P4-PharoBridge'!
 
 
 !classDefinition: #ASTTest category: 'P4-AST'!
@@ -2859,6 +2859,9 @@ If a call is done to a register it is encoded in the same way as a "constant/reg
 
 !
 
+!P4TACRemoteArray commentStamp: '<historical>' prior: 0!
+I am an Environment / Display for "escaping" variables which are "closed over".!
+
 !ASTTest methodsFor: 'accessing' stamp: 'ToonVerwaest 3/25/2010 12:39'!
 ast: aString
 	^ parser match: (PEGStringScanner on: aString)! !
@@ -4559,6 +4562,16 @@ helper: aHelper
 !P4AST2TAC methodsFor: 'accessing' stamp: 'ToonVerwaest 5/25/2011 17:35'!
 methodSuper
 	self subclassResponsibility! !
+
+!P4AST2TAC methodsFor: 'visitor' stamp: 'KenD 3/31/2023 11:01:13'!
+declareInstVars
+
+	self subclassResponsibility ! !
+
+!P4AST2TAC methodsFor: 'visitor' stamp: 'KenD 3/31/2023 11:00:59'!
+storeBasePointer
+
+	self subclassResponsibility ! !
 
 !P4AST2TAC methodsFor: 'visitor' stamp: 'OliFlueckiger 5/4/2011 17:08'!
 visitArray: anArray
@@ -8821,7 +8834,7 @@ byPathName: aName
 	^ P4RootPackage resolve: segments
 	! !
 
-!P4Package class methodsFor: 'pharo package loading' stamp: 'KenD 3/29/2023 13:19:42'!
+!P4Package class methodsFor: 'cuis package loading' stamp: 'KenD 3/29/2023 13:19:42'!
 loadClass: aClass
 	| package |
 	aClass ifNil: [ ^ nil ].
@@ -8832,11 +8845,11 @@ loadClass: aClass
 			inCuis: aClass;
 			metaclass: aClass p4class]! !
 
-!P4Package class methodsFor: 'pharo package loading' stamp: 'OliFlueckiger 7/5/2011 15:51'!
+!P4Package class methodsFor: 'cuis package loading' stamp: 'OliFlueckiger 7/5/2011 15:51'!
 loadClasses
 	P4RootPackage flushPackages.! !
 
-!P4Package class methodsFor: 'pharo package loading' stamp: 'KenD 8/21/2022 14:19:41'!
+!P4Package class methodsFor: 'cuis package loading' stamp: 'KenD 8/21/2022 14:19:41'!
 packageOfClass: aClass
 	| path |
 	path := '-' split: aClass theNonMetaClass category.
@@ -8880,7 +8893,7 @@ resolve: aPath
 		current := current packageAt: aPath removeFirst ].
 	^ current cls! !
 
-!P4RootPackage class methodsFor: 'pharo class loading' stamp: 'OliFlueckiger 7/11/2011 15:15'!
+!P4RootPackage class methodsFor: 'cuis class loading' stamp: 'OliFlueckiger 7/11/2011 15:15'!
 flushPackages
 	instance ifNotNil: [ instance classesDo: #flush ].
 	instance := nil! !
