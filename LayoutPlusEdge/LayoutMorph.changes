@@ -26705,3 +26705,446 @@ self exampleEdgesColumn !
 self exampleEdgesRow!
 
 ----QUIT----(15 August 2024 15:27:10) LayoutMorph.image priorSource: 1213886!
+
+----STARTUP---- (16 August 2024 10:10:51) as /home/kend/Cuis-Smalltalk/Cuis-Smalltalk-BabySteps/LayoutPlusEdge/LayoutMorph.image!
+
+
+self exampleEdgesRow!
+
+Warning subclass: #RenderingGlitch
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Exceptions-Kernel'!
+
+!classDefinition: #RenderingGlitch category: #'Exceptions-Kernel' stamp: 'KenD 8/16/2024 10:16:53'!
+Warning subclass: #RenderingGlitch
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Exceptions-Kernel'!
+!RenderingGlitch commentStamp: '<historical>' prior: 0!
+                              Some exceptions happen during UI redraw.  
+
+While redrawing, we don't want to recursively pop-up warnings or open a debugger.
+
+On the other hand, we do want to note such exceptions in the Transcript.
+!
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 10:25:27' overrides: 17003978!
+            defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript newLine; addEntry: 'RenderingGlitch: ',  self messageText ; newLine.
+	"The value nil is returned as the value of the message that signaled the exception."
+	^nil! !
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 10:27:49' prior: 50369620 overrides: 17003978!
+                         defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript newLine; addEntry: 'RenderingGlitch: ',  self messageText ; newLine.
+	
+	"Back to mamma"
+	self resume! !
+!LayoutMorph methodsFor: 'convenience methods' stamp: 'KenD 8/16/2024 10:31:55' prior: 16889851!
+              addAdjusterAndMorph: aMorph proportionalHeight: aNumber
+	"Convenience method.
+	Add others as necessary."
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	self addAdjusterAndMorph: aMorph layoutSpec: (LayoutSpec proportionalHeight: zeroToOne)! !
+!LayoutMorph methodsFor: 'private' stamp: 'KenD 8/16/2024 10:36:13'!
+                          clampPropostion: aNumber
+	"aNumber should be a number in the range 0..1"
+	(aNumber isKindOf: Number)
+		ifFalse: [ RenderingGlitch signal: ''. ^ 0.5 ].
+	(aNumber < 0) 
+		ifTrue: [ RenderingGlitch signal: ''. ^ 0 ].
+	(aNumber > 1) 
+		ifTrue: [ RenderingGlitch signal: ''. ^ 1 ].
+	^aNumber! !
+!LayoutMorph methodsFor: 'private' stamp: 'KenD 8/16/2024 10:36:56'!
+                         clampProportion: aNumber
+	"aNumber should be a number in the range 0..1"
+	(aNumber isKindOf: Number)
+		ifFalse: [ RenderingGlitch signal: ''. ^ 0.5 ].
+	(aNumber < 0) 
+		ifTrue: [ RenderingGlitch signal: ''. ^ 0 ].
+	(aNumber > 1) 
+		ifTrue: [ RenderingGlitch signal: ''. ^ 1 ].
+	^aNumber! !
+
+!methodRemoval: LayoutMorph #clampPropostion: stamp: 'KenD 8/16/2024 10:36:56'!
+clampPropostion: aNumber
+	"aNumber should be a number in the range 0..1"
+	(aNumber isKindOf: Number)
+		ifFalse: [ RenderingGlitch signal: ''. ^ 0.5 ].
+	(aNumber < 0) 
+		ifTrue: [ RenderingGlitch signal: ''. ^ 0 ].
+	(aNumber > 1) 
+		ifTrue: [ RenderingGlitch signal: ''. ^ 1 ].
+	^aNumber!
+!LayoutMorph methodsFor: 'private' stamp: 'KenD 8/16/2024 10:38:37' prior: 50369666!
+                        clampProportion: aNumber
+	"aNumber should be a number in the range 0..1"
+	(aNumber isKindOf: Number)
+		ifFalse: [ RenderingGlitch signal: 'proportion must be a number: ', aNumber printString. ^ 0.5 ].
+	(aNumber < 0) 
+		ifTrue: [ RenderingGlitch signal: 'proportion must be in range 0..1: ', aNumber printString. ^ 0 ].
+	(aNumber > 1) 
+		ifTrue: [ RenderingGlitch signal: 'proportion must be in range 0..1: ', aNumber printString. ^ 1 ].
+	^aNumber! !
+!LayoutMorph methodsFor: 'convenience methods' stamp: 'KenD 8/16/2024 10:40:24' prior: 16889860!
+                             addAdjusterAndMorph: aMorph proportionalWidth: aNumber
+	"Convenience method.
+	Add others as necessary."
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	self addAdjusterAndMorph: aMorph layoutSpec: (LayoutSpec proportionalWidth: zeroToOne)! !
+!LayoutMorph methodsFor: 'convenience methods' stamp: 'KenD 8/16/2024 10:41:31' prior: 16889885!
+addMorph: aMorph proportionalHeight: aNumber
+	"Convenience method.
+	Add others as necessary."
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	self addMorph: aMorph layoutSpec: (LayoutSpec proportionalHeight: zeroToOne)! !
+!LayoutMorph methodsFor: 'convenience methods' stamp: 'KenD 8/16/2024 11:27:40' prior: 16889893!
+                    addMorph: aMorph proportionalWidth: aNumber
+	"Convenience method.
+	Add others as necessary."
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	self addMorph: aMorph layoutSpec: (LayoutSpec proportionalWidth: zeroToOne)! !
+
+----SNAPSHOT----(16 August 2024 11:28:04) LayoutMorph.image priorSource: 1214081!
+!LayoutMorph class methodsFor: 'examples' stamp: 'KenD 8/16/2024 11:28:57'!
+                        exampleEdgesRowExceptions
+	"Show 2 cases: 1 useEdgeSpace true and 1 false"
+	" self exampleEdgesRow "
+	| withEdge noEdge upSpec downSpec |
+	withEdge := self newRow :: useEdgeSpace: true;  separation: 20.
+	noEdge := self newRow :: useEdgeSpace: false;  separation: 20.
+	upSpec := LayoutSpec keepMorphExtent :: offAxisEdgeWeight: 0.
+	upSpec proportionalWidth: 80 minimum: 100; proportionalHeight: 0.8 minimum: 100.
+	downSpec := LayoutSpec keepMorphExtent :: offAxisEdgeWeight: 1.
+	downSpec proportionalWidth: -2 minimum: 100; proportionalHeight: 0.5 minimum: 100.
+	
+	withEdge addMorph: (BoxedMorph new :: color: Color blue;  layoutSpec: upSpec).
+	noEdge addMorph: (BoxedMorph new :: color: Color blue;  layoutSpec: upSpec).
+	withEdge addMorph: (LabelMorph new :: contents: 'WITH Edge').
+	noEdge addMorph: (LabelMorph new :: contents: 'withOUT Edge').
+	withEdge addMorph: (BoxedMorph new :: layoutSpec: downSpec).
+	noEdge addMorph: (BoxedMorph new ::  layoutSpec: downSpec).
+	
+	withEdge openInWorld.
+	noEdge openInWorld.! !
+!LayoutMorph class methodsFor: 'examples' stamp: 'KenD 8/16/2024 11:29:08' prior: 50369743!
+        exampleEdgesRowExceptions
+	"Show 2 cases: 1 useEdgeSpace true and 1 false"
+	" self exampleEdgesRowExceptions "
+	| withEdge noEdge upSpec downSpec |
+	withEdge := self newRow :: useEdgeSpace: true;  separation: 20.
+	noEdge := self newRow :: useEdgeSpace: false;  separation: 20.
+	upSpec := LayoutSpec keepMorphExtent :: offAxisEdgeWeight: 0.
+	upSpec proportionalWidth: 80 minimum: 100; proportionalHeight: 0.8 minimum: 100.
+	downSpec := LayoutSpec keepMorphExtent :: offAxisEdgeWeight: 1.
+	downSpec proportionalWidth: -2 minimum: 100; proportionalHeight: 0.5 minimum: 100.
+	
+	withEdge addMorph: (BoxedMorph new :: color: Color blue;  layoutSpec: upSpec).
+	noEdge addMorph: (BoxedMorph new :: color: Color blue;  layoutSpec: upSpec).
+	withEdge addMorph: (LabelMorph new :: contents: 'WITH Edge').
+	noEdge addMorph: (LabelMorph new :: contents: 'withOUT Edge').
+	withEdge addMorph: (BoxedMorph new :: layoutSpec: downSpec).
+	noEdge addMorph: (BoxedMorph new ::  layoutSpec: downSpec).
+	
+	withEdge openInWorld.
+	noEdge openInWorld.! !
+
+----SNAPSHOT----(16 August 2024 11:29:10) LayoutMorph.image priorSource: 1218856!
+
+self exampleEdgesRowExceptions!
+!LayoutMorph class methodsFor: 'examples' stamp: 'KenD 8/16/2024 11:30:04' prior: 50369778!
+          exampleEdgesRowExceptions
+	"Show 2 cases: 1 useEdgeSpace true and 1 false"
+	" self exampleEdgesRowExceptions "
+	| withEdge noEdge upSpec downSpec |
+	withEdge := self newRow :: useEdgeSpace: true;  separation: 20.
+	noEdge := self newRow :: useEdgeSpace: false;  separation: 20.
+	upSpec := LayoutSpec keepMorphExtent :: offAxisEdgeWeight: 0.
+	upSpec proportionalWidth: 80 minimum: 100; proportionalHeight: 0.8 minimum: 100.
+	downSpec := LayoutSpec keepMorphExtent :: offAxisEdgeWeight: 1.
+	downSpec proportionalWidth: 10 minimum: 100; proportionalHeight: 0.5 minimum: 100.
+	
+	withEdge addMorph: (BoxedMorph new :: color: Color blue;  layoutSpec: upSpec).
+	noEdge addMorph: (BoxedMorph new :: color: Color blue;  layoutSpec: upSpec).
+	withEdge addMorph: (LabelMorph new :: contents: 'WITH Edge').
+	noEdge addMorph: (LabelMorph new :: contents: 'withOUT Edge').
+	withEdge addMorph: (BoxedMorph new :: layoutSpec: downSpec).
+	noEdge addMorph: (BoxedMorph new ::  layoutSpec: downSpec).
+	
+	withEdge openInWorld.
+	noEdge openInWorld.! !
+
+self exampleEdgesRowExceptions !
+
+LayoutMorph clampProportion: 0.3.!
+
+LayoutMorph new clampProportion: 0.3.!
+
+LayoutMorph newRow clampProportion: 0.3.!
+
+LayoutMorph newRow clampProportion: 20.!
+
+LayoutMorph newRow clampProportion: -3.!
+
+LayoutMorph newRow clampProportion: #foo. !
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 11:33:18' prior: 50369633 overrides: 17003978!
+      defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript addEntry: 'RenderingGlitch: ',  self messageText ; newLine.
+	
+	"Back to mamma"
+	self resume! !
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 11:34:35' prior: 50369862 overrides: 17003978!
+                              defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript log: 'RenderingGlitch: ',  self messageText ; newLine.
+	
+	"Back to mamma"
+	self resume! !
+
+LayoutMorph newRow clampProportion: #foo.  !
+
+LayoutMorph newRow clampProportion:  30.!
+
+LayoutMorph newRow clampProportion:  -5.!
+
+LayoutMorph exampleEdgesRowExceptions.!
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 11:36:06' prior: 50369873 overrides: 17003978!
+                      defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript log: 'RenderingGlitch: ',  self messageText ; newLine.
+	
+	"Back to mamma"
+	^nil! !
+
+LayoutMorph exampleEdgesRowExceptions.!
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 11:36:35' prior: 50369889 overrides: 17003978!
+ defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript log: 'RenderingGlitch: ',  self messageText ; newLine.
+	
+	"Back to mamma"
+	self resume! !
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 11:36:44' prior: 50369900 overrides: 17003978!
+   defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript log: 'RenderingGlitch: ',  self messageText ; newLine.
+	
+	"Back to caller"
+	self resume! !
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 11:36:58' prior: 50369910 overrides: 17003978!
+  defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript log: 'RenderingGlitch: ',  self messageText ; newLine.
+	
+	"Continue at caller"
+	self resume! !
+!LayoutSpec methodsFor: 'private' stamp: 'KenD 8/16/2024 11:39:19'!
+                    clampProportion: aNumber
+	"aNumber should be a number in the range 0..1"
+	(aNumber isKindOf: Number)
+		ifFalse: [ RenderingGlitch signal: 'proportion must be a number: ', aNumber printString. ^ 0.5 ].
+	(aNumber < 0) 
+		ifTrue: [ RenderingGlitch signal: 'proportion must be in range 0..1: ', aNumber printString. ^ 0 ].
+	(aNumber > 1) 
+		ifTrue: [ RenderingGlitch signal: 'proportion must be in range 0..1: ', aNumber printString. ^ 1 ].
+	^aNumber! !
+!LayoutSpec class methodsFor: 'private' stamp: 'KenD 8/16/2024 11:41:43'!
+                    clampProportion: aNumber
+	"aNumber should be a number in the range 0..1"
+	(aNumber isKindOf: Number)
+		ifFalse: [ RenderingGlitch signal: 'proportion must be a number: ', aNumber printString. ^ 0.5 ].
+	(aNumber < 0) 
+		ifTrue: [ RenderingGlitch signal: 'proportion must be in range 0..1: ', aNumber printString. ^ 0 ].
+	(aNumber > 1) 
+		ifTrue: [ RenderingGlitch signal: 'proportion must be in range 0..1: ', aNumber printString. ^ 1 ].
+	^aNumber! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:42:33' prior: 16891510!
+                          fixedWidth: aNumber proportionalHeight: otherNumber
+
+	| zeroToOne |
+	zeroToOne := self clampProportion: otherNumber.
+	^self new
+		fixedWidth: aNumber;
+		proportionalHeight: zeroToOne! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:42:58' prior: 16891517!
+  fixedWidth: aNumber proportionalHeight: otherNumber offAxisEdgeWeight: aSymbolOrNumber
+	| zeroToOne |
+	zeroToOne := self clampProportion: otherNumber.
+	^self new
+		fixedWidth: aNumber;
+		proportionalHeight: zeroToOne;
+		offAxisEdgeWeight: aSymbolOrNumber! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:43:18' prior: 16891537!
+                          morphHeightProportionalWidth: aNumber
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	^self new
+		proportionalWidth: zeroToOne;
+		useMorphHeight! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:43:32' prior: 16891549!
+                           morphWidthProportionalHeight: aNumber
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	^self new
+		useMorphWidth;
+		proportionalHeight: zeroToOne ! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:43:49' prior: 16891555!
+                          proportionalHeight: aNumber
+	"Will use all available width"
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	^self new proportionalHeight: zeroToOne ! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:44:18' prior: 16891561!
+                       proportionalWidth: aNumber
+	"Will use all available height"
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	^self new proportionalWidth: zeroToOne ! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:44:38' prior: 16891567!
+                        proportionalWidth: aNumber fixedHeight: otherNumber
+
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	^self new
+		proportionalWidth: zeroToOne;
+		fixedHeight: otherNumber! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:44:55' prior: 16891574!
+  proportionalWidth: aNumber fixedHeight: otherNumber offAxisEdgeWeight: aSymbolOrNumber
+
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	^self new
+		proportionalWidth: zeroToOne;
+		fixedHeight: otherNumber;
+		offAxisEdgeWeight: aSymbolOrNumber! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:45:39' prior: 16891583!
+                         proportionalWidth: aNumber proportionalHeight: otherNumber
+
+	^self new
+		proportionalWidth: (self clampProportion: aNumber);
+		proportionalHeight: (self clampProportion: otherNumber)! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:46:12' prior: 16891590!
+  proportionalWidth: aNumber proportionalHeight: otherNumber offAxisEdgeWeight: aSymbolOrNumber
+
+	^self new
+		proportionalWidth: (self clampProportion: aNumber);
+		proportionalHeight: (self clampProportion: otherNumber);
+		offAxisEdgeWeight: aSymbolOrNumber! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:46:48' prior: 50369964!
+                         fixedWidth: aNumber proportionalHeight: otherNumber
+
+	^self new
+		fixedWidth: aNumber;
+		proportionalHeight: (self clampProportion: otherNumber)! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:47:10' prior: 50369973!
+        fixedWidth: aNumber proportionalHeight: otherNumber offAxisEdgeWeight: aSymbolOrNumber
+
+	^self new
+		fixedWidth: aNumber;
+		proportionalHeight: (self clampProportion: otherNumber);
+		offAxisEdgeWeight: aSymbolOrNumber! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:47:34' prior: 50369985!
+                               morphHeightProportionalWidth: aNumber
+	| zeroToOne |
+	zeroToOne := self clampProportion: aNumber.
+	^self new
+		proportionalWidth: (self clampProportion: aNumber);
+		useMorphHeight! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:47:41' prior: 50370082!
+     morphHeightProportionalWidth: aNumber
+
+	^self new
+		proportionalWidth: (self clampProportion: aNumber);
+		useMorphHeight! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:48:05' prior: 50369994!
+morphWidthProportionalHeight: aNumber
+
+	^self new
+		useMorphWidth;
+		proportionalHeight: (self clampProportion: aNumber) ! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:48:24' prior: 50370003!
+                               proportionalHeight: aNumber
+	"Will use all available width"
+
+	^self new proportionalHeight: (self clampProportion: aNumber) ! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:48:50' prior: 50370012!
+                            proportionalWidth: aNumber
+	"Will use all available height"
+
+	^self new proportionalWidth: (self clampProportion: aNumber) ! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:49:06' prior: 50370021!
+                             proportionalWidth: aNumber fixedHeight: otherNumber
+
+	^self new
+		proportionalWidth: (self clampProportion: aNumber);
+		fixedHeight: otherNumber! !
+!LayoutSpec class methodsFor: 'instance creation' stamp: 'KenD 8/16/2024 11:49:21' prior: 50370030!
+        proportionalWidth: aNumber fixedHeight: otherNumber offAxisEdgeWeight: aSymbolOrNumber
+
+	^self new
+		proportionalWidth: (self clampProportion: aNumber);
+		fixedHeight: otherNumber;
+		offAxisEdgeWeight: aSymbolOrNumber! !
+
+----SNAPSHOT----(16 August 2024 11:50:17) LayoutMorph.image priorSource: 1221189!
+
+LayoutMorph exampleEdgesRowExceptions.!
+!LayoutSpec methodsFor: 'accessing' stamp: 'KenD 8/16/2024 11:51:54' prior: 16891280!
+                 proportionalHeight: aNumber
+	^self proportionalHeight: (self clampProportion: aNumber) minimum: 0.0! !
+!LayoutSpec methodsFor: 'accessing' stamp: 'KenD 8/16/2024 11:52:37' prior: 16891295!
+   proportionalWidth: aNumber
+	^self proportionalWidth: (self clampProportion: aNumber) minimum: 0! !
+
+LayoutMorph exampleEdgesRowExceptions.!
+!LayoutSpec methodsFor: 'accessing' stamp: 'KenD 8/16/2024 11:54:49' prior: 16891285!
+                              proportionalHeight: aNumberOrNil minimum: otherNumberOrNil
+	"Alternatives: same as in #proportionalWidth:minimum:, see comment there"
+	proportionalHeight := aNumberOrNil isNil 
+		ifTrue: [nil] 
+		ifFalse: [self clampProportion: aNumberOrNil].
+	fixedHeight := otherNumberOrNil.
+	self updateContainingLayout.! !
+!LayoutSpec methodsFor: 'accessing' stamp: 'KenD 8/16/2024 11:55:22' prior: 16891300!
+                    proportionalWidth: aNumberOrNil minimum: otherNumberOrNil
+	"Alternatives:
+		- proportionalWidth notNil, fixedWidth notNil 	->		Use fraction of available space, take fixedWidth as minimum desired width
+		- proportionalWidth isNil, fixedWidth isNil  	->		Use current morph width
+		- proportionalWidth isNil, fixedWidth notNil 	->		Use fixedWidth
+		- proportionalWidth notNil, fixedWidth isNil 	->		NOT VALID"
+	proportionalWidth := aNumberOrNil isNil 
+		ifTrue: [nil] 
+		ifFalse: [self clampProportion: aNumberOrNil].
+	fixedWidth := otherNumberOrNil.
+	self updateContainingLayout.! !
+
+LayoutMorph exampleEdgesRowExceptions.!
+!RenderingGlitch methodsFor: 'exceptionDescription' stamp: 'KenD 8/16/2024 11:55:44' prior: 50369920 overrides: 17003978!
+                        defaultAction
+
+	"Note exception in the Transcript.  DO NOT open debugger or popup warnings."
+	Transcript log: 'RenderingGlitch: ',  self messageText .
+	
+	"Continue at caller"
+	self resume! !
+
+LayoutMorph exampleEdgesRowExceptions.!
+
+----QUIT----(16 August 2024 12:11:21) LayoutMorph.image priorSource: 1231644!
