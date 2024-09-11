@@ -1,10 +1,20 @@
-'From Cuis7.1 [latest update: #6644] on 10 September 2024 at 4:49:03 am'!
+'From Cuis7.1 [latest update: #6644] on 11 September 2024 at 4:37:20 pm'!
 'Description Various single-stroke character recognizers'!
-!provides: 'StrokeRecognizer' 1 7!
+!provides: 'StrokeRecognizer' 1 12!
 SystemOrganization addCategory: 'StrokeRecognizer-Tests'!
 SystemOrganization addCategory: 'StrokeRecognizer-Core'!
 SystemOrganization addCategory: #StrokeRecognizer!
 
+
+!classDefinition: #CompassTrialMorph category: #StrokeRecognizer!
+LayoutMorph subclass: #CompassTrialMorph
+	instanceVariableNames: 'recognizer inputMorph sample result resultLabel button pointDirections'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'StrokeRecognizer'!
+!classDefinition: 'CompassTrialMorph class' category: #StrokeRecognizer!
+CompassTrialMorph class
+	instanceVariableNames: ''!
 
 !classDefinition: #StrokeInputMorph category: #StrokeRecognizer!
 BoxedMorph subclass: #StrokeInputMorph
@@ -87,6 +97,9 @@ Dollar1Test class
 	instanceVariableNames: ''!
 
 
+!CompassTrialMorph commentStamp: '<historical>' prior: 0!
+I am a Morph useful to try out stroke recognition and add new pattern exemplars to recognizer.!
+
 !CompassExemplar commentStamp: '<historical>' prior: 0!
 When a pattern matches my #pattern, then the #name has been recognized.
 !
@@ -132,6 +145,64 @@ Protractor Paper: https://faculty.washington.edu/wobbrock//pubs/gi-12.03.pdf
 
 !
 
+!CompassTrialMorph methodsFor: 'event handling' stamp: 'KenD 9/10/2024 15:48:27'!
+saveStroke
+
+	"Button request to save into recognizer.  Get a name for it"
+	| name |
+	name := 	StringRequestMorph
+		request: 'What name for stroke pattern?'
+		orCancel: [nil].
+	name ifNotNil: [ :daName | 
+		recognizer addExemplar: 
+			(CompassExemplar name: daName asSymbol pattern: sample)
+	].! !
+
+!CompassTrialMorph methodsFor: 'event handling' stamp: 'KenD 9/10/2024 15:48:18'!
+strokeResult: points
+
+	"Update view of user input"
+	sample := CompassPattern fromPoints: points.
+	result := recognizer bestMatch: sample.
+	resultLabel contents: result asString.
+	pointDirections contents: sample directionsFromCentroid asString.
+	
+	! !
+
+!CompassTrialMorph methodsFor: 'initialization' stamp: 'KenD 9/10/2024 17:54:36'!
+initialize
+	
+	super initialize.
+	recognizer := CompassRecognizer new.
+	inputMorph := StrokeInputMorph new.
+	self addMorph: inputMorph .
+	resultLabel := LabelMorph new; contents: 'result goes here'.
+	self addMorph: resultLabel.
+	pointDirections := TextParagraphMorph contents: '#()'.
+	self addMorph: pointDirections. 
+	button := PluggableButtonMorph 
+				model: self 
+				stateGetter: nil 
+				action: #saveStroke
+				label: 'Save Stroke to Recognizer' ::
+				color: Color brown.
+	self addMorph: button.			
+	self separation: 20.
+	self color: Color green.
+
+	
+	
+
+	! !
+
+!CompassTrialMorph class methodsFor: 'instance creation' stamp: 'KenD 9/10/2024 17:55:41'!
+new
+
+	| newSelf |
+	newSelf := self newColumn.
+	newSelf morphExtent: newSelf minimumExtent.
+	^newSelf! !
+
 !StrokeInputMorph methodsFor: 'drawing' stamp: 'KenD 9/9/2024 16:09:25'!
 drawOn: aCanvas
 	| curP lastP |
@@ -158,12 +229,11 @@ mouseButton1Down: evt localPosition: position
 	points := OrderedCollection new.
 ! !
 
-!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/9/2024 15:57:50'!
+!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/10/2024 15:10:48'!
 mouseButton1Up: evt localPosition: position
 	
 	points add: position.
-	self flag: #Experiment.
-	self explore.
+	self owner strokeResult: points.
 	! !
 
 !StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/9/2024 15:58:16'!
@@ -174,6 +244,11 @@ mouseMove: evt localPosition: position
 	].
 	self redrawNeeded .
 ! !
+
+!StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 9/11/2024 07:18:19'!
+defaultExtent
+
+	^ `100@100`! !
 
 !StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 9/9/2024 16:09:46'!
 initialize
@@ -388,7 +463,7 @@ pathLength: pointCollection
 
 	^ distance! !
 
-!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/9/2024 13:46:44'!
+!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/11/2024 16:26:45'!
 resample: samplePointCollection with: desiredNumPoints
 	"Take a Collection of Points and answer a collection 
 	 resampled to length desiredNumPoints."
@@ -414,15 +489,38 @@ resample: samplePointCollection with: desiredNumPoints
 		i := i + 1].
 	newPoints size = (desiredNumPoints - 1) 
 		ifTrue: [newPoints add: samplePointCollection last].
+"Transcript log: 'RESAMPLE ', newPoints printString."
 	^ newPoints.! !
 
-!CompassPattern methodsFor: 'initialization' stamp: 'KenD 9/10/2024 04:47:51'!
+!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/11/2024 16:26:51'!
+translatePointsIn: aPointCollection toOrigin: newOrigin
+" Translate point position from Morph sample position.
+ *->x - -             --------
+ |                |            |        y        |
+ v               |            |        ^        |
+ y               |  ==>  |        * > x  |
+ |                |            |                   |             
+ | ------            |--------
+"
+	| translated |
+	translated := OrderedCollection new.
+	aPointCollection do: [ :pt | | newPt |
+		newPt := pt - newOrigin. "translate"
+		" invert Y axis"
+		translated add: ( newPt x @ (newPt y) negated )
+	].
+"Transcript log: 'TRANSLATED ', translated printString."
+	^ translated! !
+
+!CompassPattern methodsFor: 'initialization' stamp: 'KenD 9/11/2024 16:21:56'!
 fromPoints: aPointCollection
 
 	| sampleColl directionColl center prevPt isPeriod |
-	sampleColl := self resample: aPointCollection with: SampleSize.
+	sampleColl := self translatePointsIn: (self resample: aPointCollection 
+											with: SampleSize)
+	 				   toOrigin: (50@50).
 	directionColl := OrderedCollection new.
-	center := self centroid: aPointCollection.
+	center := self centroid: sampleColl.
 	prevPt := sampleColl at: 1.
 	isPeriod := (center dist: prevPt) <= CloseDistance.
 	2 to: sampleColl size do: [ :index | | currentPt |
@@ -443,11 +541,34 @@ at: index
 	"My pattern to match is my directionVector."
 	^directionVector at: index! !
 
+!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/10/2024 14:44:01'!
+directionsFromCentroid
+	"Answer array of direction names"
+
+	| names |
+	names := OrderedCollection new.
+	1 to: directionVector size do: [ :index |
+		(index odd) ifTrue: [ names add: (directionVector at: index)]
+	].
+	^ names asArray! !
+
 !CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/9/2024 14:49:25'!
 pattern
 
 	"My pattern to match is my directionVector."
 	^directionVector ! !
+
+!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/10/2024 14:45:11'!
+pointTravelDirections
+	"Answer array of direction names
+	 (directions from one point to next)"
+
+	| names |
+	names := OrderedCollection new.
+	1 to: directionVector size do: [ :index |
+		(index even) ifTrue: [ names add: (directionVector at: index)]
+	].
+	^ names asArray! !
 
 !CompassPattern class methodsFor: 'class initialization' stamp: 'KenD 9/10/2024 04:38:31'!
 initialize
@@ -940,7 +1061,7 @@ testTemplatePreprocess
 		self assert: t vector sum r < 1e-5.
 		self assert: (self is: (t vector collect: [:e | e x * e x + (e y * e y)]) sum closeTo: 1.0)]! !
 
-!Point methodsFor: '*strokerecognizer' stamp: 'KenD 9/7/2024 15:39:03'!
+!Point methodsFor: '*strokerecognizer' stamp: 'KenD 9/11/2024 16:33:22'!
 point2direction
 
 	"Answer compass direction point is closest to, considering (0,0) as origin and (0,1) as North.
@@ -964,7 +1085,7 @@ point2direction
 			(self y > 0) 
 			ifTrue: ["quadrant 1"
 				whichThird caseOf: 
-				{[#left]->[#North].[#middle]->[#NorthEast].[#right]->[#East]}
+				{[#left]->[#East].[#middle]->[#NorthEast].[#right]->[#North]}
 			] 
 			ifFalse: ["quadrant 2"
 				whichThird caseOf: 
@@ -975,7 +1096,7 @@ point2direction
 			(self y < 0) 
 			ifTrue: ["quadrant 3"
 				whichThird caseOf: 
-				{[#left]->[#South].[#middle]->[#SouthWest].[#right]->[#West]}
+				{[#left]->[#West].[#middle]->[#SouthWest].[#right]->[#South]}
 			 ]
 			ifFalse: ["quadrant 4"
 				whichThird caseOf: 
@@ -985,11 +1106,11 @@ point2direction
 	
 	! !
 
-!Point methodsFor: '*strokerecognizer' stamp: 'KenD 9/9/2024 16:32:13'!
+!Point methodsFor: '*strokerecognizer' stamp: 'KenD 9/11/2024 16:27:55'!
 point2direction: outPoint
 
 	"Answer compass direction point is closest to, considering self as origin"
 	| offset |
-	offset := self - outPoint.
+	offset := outPoint - self.
 	^offset point2direction! !
 CompassPattern initialize!
