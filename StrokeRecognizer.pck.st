@@ -1,19 +1,19 @@
-'From Cuis7.1 [latest update: #6644] on 11 September 2024 at 5:45:50 pm'!
+'From Cuis7.1 [latest update: #6679] on 12 September 2024 at 12:24:53 pm'!
 'Description Various single-stroke character recognizers'!
-!provides: 'StrokeRecognizer' 1 14!
-SystemOrganization addCategory: 'StrokeRecognizer-Tests'!
-SystemOrganization addCategory: 'StrokeRecognizer-Core'!
+!provides: 'StrokeRecognizer' 1 17!
+SystemOrganization addCategory: #'StrokeRecognizer-Tests'!
+SystemOrganization addCategory: #'StrokeRecognizer-Core'!
 SystemOrganization addCategory: #StrokeRecognizer!
 
 
-!classDefinition: #CompassTrialMorph category: #StrokeRecognizer!
-LayoutMorph subclass: #CompassTrialMorph
-	instanceVariableNames: 'recognizer inputMorph sample result resultLabel button pointDirections'
+!classDefinition: #CompassTrainingMorph category: #StrokeRecognizer!
+LayoutMorph subclass: #CompassTrainingMorph
+	instanceVariableNames: 'recognizer inputMorph sample result resultLabel button pointDirections strokeDirection'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'StrokeRecognizer'!
-!classDefinition: 'CompassTrialMorph class' category: #StrokeRecognizer!
-CompassTrialMorph class
+!classDefinition: 'CompassTrainingMorph class' category: #StrokeRecognizer!
+CompassTrainingMorph class
 	instanceVariableNames: ''!
 
 !classDefinition: #StrokeInputMorph category: #StrokeRecognizer!
@@ -26,13 +26,13 @@ BoxedMorph subclass: #StrokeInputMorph
 StrokeInputMorph class
 	instanceVariableNames: ''!
 
-!classDefinition: #Dollar1Morph category: 'StrokeRecognizer-Core'!
+!classDefinition: #Dollar1Morph category: #'StrokeRecognizer-Core'!
 BoxedMorph subclass: #Dollar1Morph
 	instanceVariableNames: 'recognizer points label button protractor field'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'StrokeRecognizer-Core'!
-!classDefinition: 'Dollar1Morph class' category: 'StrokeRecognizer-Core'!
+!classDefinition: 'Dollar1Morph class' category: #'StrokeRecognizer-Core'!
 Dollar1Morph class
 	instanceVariableNames: ''!
 
@@ -66,38 +66,38 @@ Object subclass: #CompassRecognizer
 CompassRecognizer class
 	instanceVariableNames: ''!
 
-!classDefinition: #Dollar1Recognizer category: 'StrokeRecognizer-Core'!
+!classDefinition: #Dollar1Recognizer category: #'StrokeRecognizer-Core'!
 Object subclass: #Dollar1Recognizer
 	instanceVariableNames: 'templates templates1D'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'StrokeRecognizer-Core'!
-!classDefinition: 'Dollar1Recognizer class' category: 'StrokeRecognizer-Core'!
+!classDefinition: 'Dollar1Recognizer class' category: #'StrokeRecognizer-Core'!
 Dollar1Recognizer class
 	instanceVariableNames: ''!
 
-!classDefinition: #Dollar1Stroke category: 'StrokeRecognizer-Core'!
+!classDefinition: #Dollar1Stroke category: #'StrokeRecognizer-Core'!
 Object subclass: #Dollar1Stroke
 	instanceVariableNames: 'name points vector curvature isLong'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'StrokeRecognizer-Core'!
-!classDefinition: 'Dollar1Stroke class' category: 'StrokeRecognizer-Core'!
+!classDefinition: 'Dollar1Stroke class' category: #'StrokeRecognizer-Core'!
 Dollar1Stroke class
 	instanceVariableNames: ''!
 
-!classDefinition: #Dollar1Test category: 'StrokeRecognizer-Tests'!
+!classDefinition: #Dollar1Test category: #'StrokeRecognizer-Tests'!
 TestCase subclass: #Dollar1Test
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'StrokeRecognizer-Tests'!
-!classDefinition: 'Dollar1Test class' category: 'StrokeRecognizer-Tests'!
+!classDefinition: 'Dollar1Test class' category: #'StrokeRecognizer-Tests'!
 Dollar1Test class
 	instanceVariableNames: ''!
 
 
-!CompassTrialMorph commentStamp: '<historical>' prior: 0!
+!CompassTrainingMorph commentStamp: '<historical>' prior: 0!
 I am a Morph useful to try out stroke recognition and add new pattern exemplars to recognizer.!
 
 !CompassExemplar commentStamp: '<historical>' prior: 0!
@@ -145,7 +145,7 @@ Protractor Paper: https://faculty.washington.edu/wobbrock//pubs/gi-12.03.pdf
 
 !
 
-!CompassTrialMorph methodsFor: 'event handling' stamp: 'KenD 9/10/2024 15:48:27'!
+!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 9/10/2024 15:48:27'!
 saveStroke
 
 	"Button request to save into recognizer.  Get a name for it"
@@ -158,7 +158,7 @@ saveStroke
 			(CompassExemplar name: daName asSymbol pattern: sample)
 	].! !
 
-!CompassTrialMorph methodsFor: 'event handling' stamp: 'KenD 9/10/2024 15:48:18'!
+!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 9/12/2024 08:30:37'!
 strokeResult: points
 
 	"Update view of user input"
@@ -166,26 +166,31 @@ strokeResult: points
 	result := recognizer bestMatch: sample.
 	resultLabel contents: result asString.
 	pointDirections contents: sample directionsFromCentroid asString.
-	
+	strokeDirection contents: sample pointTravelDirections asString.	
 	! !
 
-!CompassTrialMorph methodsFor: 'initialization' stamp: 'KenD 9/10/2024 17:54:36'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 12:03:01'!
 initialize
 	
 	super initialize.
 	recognizer := CompassRecognizer new.
 	inputMorph := StrokeInputMorph new.
 	self addMorph: inputMorph .
-	resultLabel := LabelMorph new; contents: 'result goes here'.
-	self addMorph: resultLabel.
+
 	pointDirections := TextParagraphMorph contents: '#()'.
 	self addMorph: pointDirections. 
+	
+	self addMorph: self resultRegion.
+	
+	strokeDirection := TextParagraphMorph contents: '#()'.
+	self addMorph: strokeDirection. 
+	
 	button := PluggableButtonMorph 
 				model: self 
 				stateGetter: nil 
 				action: #saveStroke
 				label: 'Save Stroke to Recognizer' ::
-				color: Color brown.
+				color: Color yellow.
 	self addMorph: button.			
 	self separation: 20.
 	self color: Color green.
@@ -195,7 +200,24 @@ initialize
 
 	! !
 
-!CompassTrialMorph class methodsFor: 'instance creation' stamp: 'KenD 9/10/2024 17:55:41'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 12:02:05'!
+resultRegion
+
+	| upMsg downMsg msgLayout |
+	resultLabel := LabelMorph new; contents: 'result goes here'.
+	upMsg := TextParagraphMorph new; 
+		contents: '   ^^ point ^^' , String newLineString, '      locations'.
+	upMsg morphExtent: 320@100.
+	downMsg := TextParagraphMorph new; 
+		contents: '       stroke', String newLineString, ' vvv directions vvv '.
+	downMsg morphExtent: 320@100.
+	msgLayout := LayoutMorph newRow :: separation: 20; color: Color cyan.
+	^msgLayout addMorph: upMsg; 
+				addMorph: resultLabel; 
+				addMorph: downMsg;
+				layoutSpec: (LayoutSpec proportionalWidth: 0.6).! !
+
+!CompassTrainingMorph class methodsFor: 'instance creation' stamp: 'KenD 9/10/2024 17:55:41'!
 new
 
 	| newSelf |
@@ -212,6 +234,15 @@ drawOn: aCanvas
 		curP := points at: i.
 		aCanvas line: lastP to: curP width: 6 color: Color black].
 ! !
+
+!StrokeInputMorph methodsFor: 'private' stamp: 'KenD 9/12/2024 12:24:40'!
+isValidPoint: aPoint
+
+	"Sampled points may contain NaN values or lay outside our extent."
+	"Note: (NaN isNumber) --> true!!"
+	(aPoint x) isNaN ifTrue: [ ^false ].
+	(aPoint y) isNaN ifTrue: [ ^false ].
+	^(0@0 extent: self morphExtent) containsPoint:  aPoint! !
 
 !StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/9/2024 15:55:53'!
 handlesMouseDown: evt
@@ -236,12 +267,11 @@ mouseButton1Up: evt localPosition: position
 	self owner strokeResult: points.
 	! !
 
-!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/9/2024 15:58:16'!
+!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/12/2024 12:17:31'!
 mouseMove: evt localPosition: position
 
-	evt mouseButton1Pressed ifTrue: [
-		points add: position.
-	].
+	((evt mouseButton1Pressed) and: [ self isValidPoint: position ] )
+		ifTrue: [ points add: position ]. 
 	self redrawNeeded .
 ! !
 
@@ -250,15 +280,15 @@ defaultExtent
 
 	^ `100@100`! !
 
-!StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 9/9/2024 16:09:46'!
+!StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 11:13:55'!
 initialize
 
 	super initialize.
 	points := OrderedCollection new.
 	self morphExtent: 100@100;
-		borderWidth: 6;
-		borderColor: Color lightBrown;
-		color: Color beige.
+		borderWidth: 8;
+		borderColor: Color purple ;
+		color: Color orange.
 ! !
 
 !Dollar1Morph methodsFor: 'initialization' stamp: 'hlsf 8/4/2024 16:50:01'!
