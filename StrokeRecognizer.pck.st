@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6717] on 12 September 2024 at 1:13:02 pm'!
+'From Cuis7.1 [latest update: #6717] on 12 September 2024 at 1:32:32 pm'!
 'Description Various single-stroke character recognizers'!
-!provides: 'StrokeRecognizer' 1 18!
+!provides: 'StrokeRecognizer' 1 19!
 !requires: 'Cuis-Base' 71 6717 nil!
 SystemOrganization addCategory: #'StrokeRecognizer-Tests'!
 SystemOrganization addCategory: #'StrokeRecognizer-Core'!
@@ -121,18 +121,24 @@ Rather than nil, a special pattern array is used for uniform processing.
 !
 
 !CompassRecognizer commentStamp: '<historical>' prior: 0!
-This single stroke recognizer is based on Compass traversal.
-Scale glyph to a box with {Point,direction,...,point,direction,point} compared to templates.
+This single stroke recognizer is based on Compass directions.
 Point vectors are resampled to reduce noise.
-Directions are about centroid of Glyph.
+Sample point directions are about centroid of Glyph.
+           N
+   NW    |    NE
+        \   |   /
+ W -- * -- E
+        /   |   \
+   SW    |    SE
+            S
+ Each sample point is assigned a closest compass point.
+ Each pair of sample points in a stroke is assigned 
+   a compass direction from earlier to later.
+ This results in a vector #( sampleDir strokeDir sampleDir ...  strokeDir sampleDir).
+ Recognition consists in comparing sampled CompassPattern with CompassExemplar s
+    and choosing the best match.
+ Period is recognized as a spacial case where all samples are close to centroid.
 
-  ------------
-  |  NW  |   N    |  NE  |
-  ------------
-  |  W    |   *    |   E    |
-  ------------
-  |  SW  |   S     |  SE  |
-  ------------
 
 
 !
