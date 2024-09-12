@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6644] on 11 September 2024 at 4:37:20 pm'!
+'From Cuis7.1 [latest update: #6644] on 11 September 2024 at 5:45:50 pm'!
 'Description Various single-stroke character recognizers'!
-!provides: 'StrokeRecognizer' 1 12!
+!provides: 'StrokeRecognizer' 1 14!
 SystemOrganization addCategory: 'StrokeRecognizer-Tests'!
 SystemOrganization addCategory: 'StrokeRecognizer-Core'!
 SystemOrganization addCategory: #StrokeRecognizer!
@@ -59,7 +59,7 @@ CompassPattern class
 !classDefinition: #CompassRecognizer category: #StrokeRecognizer!
 Object subclass: #CompassRecognizer
 	instanceVariableNames: 'exemplars'
-	classVariableNames: ''
+	classVariableNames: 'BasePatterns NumberPatterns PunctuationPatterns'
 	poolDictionaries: ''
 	category: 'StrokeRecognizer'!
 !classDefinition: 'CompassRecognizer class' category: #StrokeRecognizer!
@@ -634,6 +634,46 @@ addExemplar: aCompassExemplar
 			"Add anyway.  REVISIT??"
 			 exemplars add: aCompassExemplar
 		]! !
+
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/11/2024 17:44:50'!
+useBaseExemplars
+
+	exemplars := self class basePatterns ! !
+
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/11/2024 17:45:06'!
+useNumberExemplars
+
+	exemplars := self class numberPatterns ! !
+
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/11/2024 17:45:29'!
+usePunctuationExemplars
+
+	exemplars := self class punctuationPatterns ! !
+
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 16:59:21'!
+basePatterns
+	
+	^BasePatterns! !
+
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 17:00:15'!
+basePatterns: patternExemplars
+	
+	BasePatterns := patternExemplars! !
+
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 16:59:32'!
+numberPatterns
+	
+	^NumberPatterns! !
+
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 17:08:01'!
+numberPatterns: patternExemplars
+	
+	NumberPatterns := patternExemplars! !
+
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 16:59:43'!
+punctuationPatterns
+	
+	^PunctuationPatterns! !
 
 !Dollar1Recognizer methodsFor: 'initialization' stamp: 'hlsf 8/4/2024 16:59:07'!
 addTemplate: points as: name
