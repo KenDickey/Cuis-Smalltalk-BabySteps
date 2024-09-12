@@ -1,6 +1,7 @@
-'From Cuis7.1 [latest update: #6679] on 12 September 2024 at 12:24:53 pm'!
+'From Cuis7.1 [latest update: #6717] on 12 September 2024 at 1:13:02 pm'!
 'Description Various single-stroke character recognizers'!
-!provides: 'StrokeRecognizer' 1 17!
+!provides: 'StrokeRecognizer' 1 18!
+!requires: 'Cuis-Base' 71 6717 nil!
 SystemOrganization addCategory: #'StrokeRecognizer-Tests'!
 SystemOrganization addCategory: #'StrokeRecognizer-Core'!
 SystemOrganization addCategory: #StrokeRecognizer!
@@ -8,7 +9,7 @@ SystemOrganization addCategory: #StrokeRecognizer!
 
 !classDefinition: #CompassTrainingMorph category: #StrokeRecognizer!
 LayoutMorph subclass: #CompassTrainingMorph
-	instanceVariableNames: 'recognizer inputMorph sample result resultLabel button pointDirections strokeDirection'
+	instanceVariableNames: 'recognizer inputMorph sample result resultLabel button pointDirections strokeDirections'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'StrokeRecognizer'!
@@ -158,18 +159,18 @@ saveStroke
 			(CompassExemplar name: daName asSymbol pattern: sample)
 	].! !
 
-!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 9/12/2024 08:30:37'!
+!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 9/12/2024 13:10:09'!
 strokeResult: points
 
 	"Update view of user input"
 	sample := CompassPattern fromPoints: points.
 	result := recognizer bestMatch: sample.
-	resultLabel contents: result asString.
+	resultLabel contents: (result key printStringFractionDigits: 3), ' -> ', result value asString.
 	pointDirections contents: sample directionsFromCentroid asString.
-	strokeDirection contents: sample pointTravelDirections asString.	
+	strokeDirections contents: sample pointTravelDirections asString.	
 	! !
 
-!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 12:03:01'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 13:11:34'!
 initialize
 	
 	super initialize.
@@ -178,12 +179,15 @@ initialize
 	self addMorph: inputMorph .
 
 	pointDirections := TextParagraphMorph contents: '#()'.
+	pointDirections morphExtent: 300 @ 100;
+	          				layoutSpec: LayoutSpec keepMorphExtent.
 	self addMorph: pointDirections. 
 	
 	self addMorph: self resultRegion.
 	
-	strokeDirection := TextParagraphMorph contents: '#()'.
-	self addMorph: strokeDirection. 
+	strokeDirections := TextParagraphMorph contents: '#()'.
+	strokeDirections morphExtent: 300 @ 100;
+	          				layoutSpec: LayoutSpec keepMorphExtent.	self addMorph: strokeDirections. 
 	
 	button := PluggableButtonMorph 
 				model: self 
@@ -200,22 +204,24 @@ initialize
 
 	! !
 
-!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 12:02:05'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 13:06:36'!
 resultRegion
 
 	| upMsg downMsg msgLayout |
 	resultLabel := LabelMorph new; contents: 'result goes here'.
 	upMsg := TextParagraphMorph new; 
 		contents: '   ^^ point ^^' , String newLineString, '      locations'.
-	upMsg morphExtent: 320@100.
+	upMsg morphExtent: 140 @ 50;
+	           layoutSpec: LayoutSpec keepMorphExtent.
 	downMsg := TextParagraphMorph new; 
 		contents: '       stroke', String newLineString, ' vvv directions vvv '.
-	downMsg morphExtent: 320@100.
+	downMsg morphExtent: 140 @ 50;
+	           layoutSpec: LayoutSpec keepMorphExtent.
 	msgLayout := LayoutMorph newRow :: separation: 20; color: Color cyan.
 	^msgLayout addMorph: upMsg; 
 				addMorph: resultLabel; 
 				addMorph: downMsg;
-				layoutSpec: (LayoutSpec proportionalWidth: 0.6).! !
+				layoutSpec: (LayoutSpec proportionalWidth: 0.4  proportionalHeight: 0.1 ).! !
 
 !CompassTrainingMorph class methodsFor: 'instance creation' stamp: 'KenD 9/10/2024 17:55:41'!
 new
