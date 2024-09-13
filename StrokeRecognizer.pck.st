@@ -1,6 +1,6 @@
-'From Cuis7.1 [latest update: #6717] on 12 September 2024 at 1:32:32 pm'!
+'From Cuis7.1 [latest update: #6717] on 12 September 2024 at 9:53:40 pm'!
 'Description Various single-stroke character recognizers'!
-!provides: 'StrokeRecognizer' 1 19!
+!provides: 'StrokeRecognizer' 1 20!
 !requires: 'Cuis-Base' 71 6717 nil!
 SystemOrganization addCategory: #'StrokeRecognizer-Tests'!
 SystemOrganization addCategory: #'StrokeRecognizer-Core'!
@@ -176,7 +176,7 @@ strokeResult: points
 	strokeDirections contents: sample pointTravelDirections asString.	
 	! !
 
-!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 13:11:34'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 21:51:47'!
 initialize
 	
 	super initialize.
@@ -185,15 +185,12 @@ initialize
 	self addMorph: inputMorph .
 
 	pointDirections := TextParagraphMorph contents: '#()'.
-	pointDirections morphExtent: 300 @ 100;
-	          				layoutSpec: LayoutSpec keepMorphExtent.
 	self addMorph: pointDirections. 
 	
 	self addMorph: self resultRegion.
 	
 	strokeDirections := TextParagraphMorph contents: '#()'.
-	strokeDirections morphExtent: 300 @ 100;
-	          				layoutSpec: LayoutSpec keepMorphExtent.	self addMorph: strokeDirections. 
+	self addMorph: strokeDirections. 
 	
 	button := PluggableButtonMorph 
 				model: self 
@@ -210,18 +207,18 @@ initialize
 
 	! !
 
-!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 13:06:36'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 21:44:17'!
 resultRegion
 
 	| upMsg downMsg msgLayout |
 	resultLabel := LabelMorph new; contents: 'result goes here'.
 	upMsg := TextParagraphMorph new; 
-		contents: '   ^^ point ^^' , String newLineString, '      locations'.
-	upMsg morphExtent: 140 @ 50;
+		contents: ' ^^ point ^^ ' , String newLineString, '    locations'.
+	upMsg shrinkFromExtent: 1000@1000;
 	           layoutSpec: LayoutSpec keepMorphExtent.
 	downMsg := TextParagraphMorph new; 
-		contents: '       stroke', String newLineString, ' vvv directions vvv '.
-	downMsg morphExtent: 140 @ 50;
+		contents: '         stroke', String newLineString, ' vvv headings vvv '.
+	downMsg shrinkFromExtent: 1000@1000;
 	           layoutSpec: LayoutSpec keepMorphExtent.
 	msgLayout := LayoutMorph newRow :: separation: 20; color: Color cyan.
 	^msgLayout addMorph: upMsg; 
