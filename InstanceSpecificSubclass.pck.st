@@ -1,9 +1,13 @@
-'From Cuis 4.2 of 25 July 2013 [latest update: #2717] on 5 April 2016 at 1:07:31.915494 pm'!
+'From Cuis7.1 [latest update: #6843] on 27 November 2024 at 6:26:21 pm'!
 'Description An instance of a UI class can get instance specific behavior by adding a subclass of its original class and overriding methods in that subclass.  The instance then becomes of that subclass.
 
 This is a test.  This is only a test.  If this were a real alert you would be dead by now.  Use with caution!!'!
-!provides: 'InstanceSpecificSubclass' 1 8!
+!provides: 'InstanceSpecificSubclass' 1 9!
 !requires: 'Cuis-Base' 42 2702 nil!
+!requires: 'UI-Shapes' 1 46 nil!
+SystemOrganization addCategory: #InstanceSpecificSubclass!
+
+
 !classDefinition: #SubclassUtils category: #InstanceSpecificSubclass!
 Object subclass: #SubclassUtils
 	instanceVariableNames: ''
@@ -62,10 +66,6 @@ subclass compile: 'handlesMouseOver: evt  ^true'.
 testMorph addColorCycleAnimator.
 
 "MouseOver cloned ellipse now cycles colors.."!
-
-!Class methodsFor: '*instancespecificsubclass' stamp: 'KenD 3/26/2016 15:11'!
-isInstanceSpecificSubclass
-	^false! !
 
 !SubclassUtils class methodsFor: 'examples' stamp: 'KenD 4/5/2016 10:25'!
 ellipseMouseOverExample
@@ -134,3 +134,7 @@ makeInstanceSubclassFor: anObject
 	anObject class register: anObject.
 	^subclass
 	! !
+
+!Class methodsFor: '*instancespecificsubclass' stamp: 'KenD 3/26/2016 15:11'!
+isInstanceSpecificSubclass
+	^false! !
