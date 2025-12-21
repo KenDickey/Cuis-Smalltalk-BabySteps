@@ -1,7 +1,7 @@
-'From Cuis7.5 [latest update: #7776] on 20 December 2025 at 4:17:24 pm'!
+'From Cuis7.5 [latest update: #7776] on 21 December 2025 at 9:57:41 am'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 9!
+!provides: 'OKLCH-Picker' 1 10!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -52,7 +52,7 @@ Color is absent where not supported by OKLCH.
 
 !
 
-!ColorRingMorph methodsFor: 'drawing' stamp: 'KenD 20/Dec/2025 14:07:18'!
+!ColorRingMorph methodsFor: 'drawing' stamp: 'KenD 21/Dec/2025 09:37:01'!
 dotAt: circlePoint color: myColor
 	"Draw a black dot relative to center at circlePoint"
 	| myForm morphPoint |
@@ -63,18 +63,12 @@ dotAt: circlePoint color: myColor
 			myForm colorAt: morphPoint + (deltaX@deltaY) put: myColor.
 		]
 	].
-	myForm colorAt: morphPoint + (5@1) put: myColor.
-	myForm colorAt: morphPoint + (5@0) put: myColor.
-	myForm colorAt: morphPoint + (5@-1) put: myColor.
-	myForm colorAt: morphPoint + (1@5) put: myColor.
-	myForm colorAt: morphPoint + (0@5) put: myColor.
-	myForm colorAt: morphPoint + (-1@5) put: myColor.
-	myForm colorAt: morphPoint + (-5@1) put: myColor.
-	myForm colorAt: morphPoint + (-5@0) put: myColor.
-	myForm colorAt: morphPoint + (-5@-1) put: myColor.
-	myForm colorAt: morphPoint + (1@-5) put: myColor.
-	myForm colorAt: morphPoint + (0@-5) put: myColor.
-	myForm colorAt: morphPoint + (-1@-5) put: myColor.
+	-1 to: 1 do: [ :pos |
+		myForm colorAt: morphPoint + (5@pos) put: myColor.
+		myForm colorAt: morphPoint + (pos@5) put: myColor.
+		myForm colorAt: morphPoint + (-5@pos) put: myColor.
+		myForm colorAt: morphPoint + (pos@-5) put: myColor.
+	].
 	image := myForm.  
 	self redrawNeeded.! !
 
@@ -130,7 +124,7 @@ morph2circle: morphPoint
 	"Transcript log: 'Morph Pt: ', morphPoint printString, ' -> Circle Pt : ', answer printString."
 	^answer! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 20/Dec/2025 15:19:39'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 21/Dec/2025 09:41:03'!
 sideLength: numPixels l: l c: c h: h
 
 	| center colorRingOffset |
@@ -152,10 +146,10 @@ sideLength: numPixels l: l c: c h: h
 	hueArm borderStyle: #simple;
 			borderWidth: 4;
 			borderColor: Color black;
-			morphExtent: 18@(center + colorRingOffset).
+			morphExtent: (center + colorRingOffset) @ 18.
 	self addMorphFront: hueArm.
 	"Want hueArm to pivot about cernerPoint "
-	hueArm morphPosition: (centerPoint x - 9)@(-16).
+	hueArm morphPosition: (centerPoint x - 9)@(centerPoint y - 9).
 	
 
 		! !
@@ -233,19 +227,24 @@ colorAbsenceColor
 	"Answer this when no OKLCH color is present"
 	^Color cyan! !
 
-!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 20/Dec/2025 16:16:47'!
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 21/Dec/2025 09:56:07'!
 rotateToDegrees: degrees
 
-	"Like rotateBy: but to absolute degrees"
+	"Like rotateBy: but to absolute degrees."
 	
-	| radians myRotation |
-	radians := (degrees - 90) degreesToRadians.
-	myRotation := location degrees degreesToRadians.
-	self rotateBy: myRotation negated.
-	self rotateBy: radians.
+	| currentDegrees myRotation |
+	currentDegrees := location degrees.
+	myRotation := currentDegrees degreesToRadians negated.
+	(currentDegrees abs > 1) ifTrue: [ "reset to 0"
+		self rotateBy: myRotation.
+	].
+      "Rotation is Clockwise, but Hue rotates CounterClockwise."
+	self rotateBy: degrees degreesToRadians negated. 
 	self redrawNeeded.! !
 
-!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 20/Dec/2025 15:27:23'!
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 21/Dec/2025 09:39:03'!
 rotationCenter
 
-	^(self morphExtent x // 2) @ (self morphExtent y - (self morphExtent x // 2) )! !
+	| circleDelta |
+	circleDelta := self morphExtent y // 2.
+	^(circleDelta @ circleDelta)! !
