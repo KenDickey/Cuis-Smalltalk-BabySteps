@@ -1,23 +1,49 @@
-'From Cuis7.5 [latest update: #7776] on 19 December 2025 at 4:56:46 pm'!
+'From Cuis7.5 [latest update: #7776] on 20 December 2025 at 4:17:24 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 6!
+!provides: 'OKLCH-Picker' 1 9!
 !requires: 'Cuis-Base' 75 7758 nil!
+!requires: 'UI-DragAndDrop' 1 4 nil!
+!requires: 'UI-Entry' 1 57 nil!
+!requires: 'UI-Click-Select' 1 97 nil!
+!requires: 'UI-Color-Panel' 1 34 nil!
+!requires: 'UI-Core' 1 25 nil!
+!requires: 'UI-Panel' 1 138 nil!
 SystemOrganization addCategory: #'OKLCH-Picker'!
 
 
-!classDefinition: #OKLCHCircle category: #'OKLCH-Picker'!
-ImageMorph subclass: #OKLCHCircle
-	instanceVariableNames: 'centerPoint lightness chroma hue'
+!classDefinition: #ColorRingMorph category: #'OKLCH-Picker'!
+ImageMorph subclass: #ColorRingMorph
+	instanceVariableNames: 'radius center'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'OKLCH-Picker'!
-!classDefinition: 'OKLCHCircle class' category: #'OKLCH-Picker'!
-OKLCHCircle class
+!classDefinition: 'ColorRingMorph class' category: #'OKLCH-Picker'!
+ColorRingMorph class
+	instanceVariableNames: ''!
+
+!classDefinition: #OKLCHCircleMorph category: #'OKLCH-Picker'!
+ImageMorph subclass: #OKLCHCircleMorph
+	instanceVariableNames: 'centerPoint lightness chroma hue colorRing hueArm chromaBox'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'OKLCH-Picker'!
+!classDefinition: 'OKLCHCircleMorph class' category: #'OKLCH-Picker'!
+OKLCHCircleMorph class
 	instanceVariableNames: 'center'!
 
+!classDefinition: #HueArmMorph category: #'OKLCH-Picker'!
+FrameMorph subclass: #HueArmMorph
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'OKLCH-Picker'!
+!classDefinition: 'HueArmMorph class' category: #'OKLCH-Picker'!
+HueArmMorph class
+	instanceVariableNames: ''!
 
-!OKLCHCircle commentStamp: '<historical>' prior: 0!
+
+!OKLCHCircleMorph commentStamp: '<historical>' prior: 0!
 OKLCH Circle for Picker.
 
 For a given lightness value, colorwheel is Hue by degree (0..360) 
@@ -26,7 +52,68 @@ Color is absent where not supported by OKLCH.
 
 !
 
-!OKLCHCircle methodsFor: 'geometry' stamp: 'KenD 19/Dec/2025 13:36:28'!
+!ColorRingMorph methodsFor: 'drawing' stamp: 'KenD 20/Dec/2025 14:07:18'!
+dotAt: circlePoint color: myColor
+	"Draw a black dot relative to center at circlePoint"
+	| myForm morphPoint |
+	morphPoint := self circle2morph: circlePoint.
+	myForm := self imageForm.
+	-4 to: 4 do: [ :deltaX |
+		-4 to: 4 do: [ :deltaY |
+			myForm colorAt: morphPoint + (deltaX@deltaY) put: myColor.
+		]
+	].
+	myForm colorAt: morphPoint + (5@1) put: myColor.
+	myForm colorAt: morphPoint + (5@0) put: myColor.
+	myForm colorAt: morphPoint + (5@-1) put: myColor.
+	myForm colorAt: morphPoint + (1@5) put: myColor.
+	myForm colorAt: morphPoint + (0@5) put: myColor.
+	myForm colorAt: morphPoint + (-1@5) put: myColor.
+	myForm colorAt: morphPoint + (-5@1) put: myColor.
+	myForm colorAt: morphPoint + (-5@0) put: myColor.
+	myForm colorAt: morphPoint + (-5@-1) put: myColor.
+	myForm colorAt: morphPoint + (1@-5) put: myColor.
+	myForm colorAt: morphPoint + (0@-5) put: myColor.
+	myForm colorAt: morphPoint + (-1@-5) put: myColor.
+	image := myForm.  
+	self redrawNeeded.! !
+
+!ColorRingMorph methodsFor: 'drawing' stamp: 'KenD 20/Dec/2025 14:50:06'!
+drawDots
+	"Draw a circle of color-wheel dots at 10 degree increments"
+	| innerRadius |
+	innerRadius := radius - 20.
+	0 to: 350 by: 10 do: [ :degrees |
+		self dotAt: (Point r: innerRadius degrees: degrees) roundedHAFZ 
+			color: (Color h: degrees s: 0.69 v: 0.82).
+	]. ! !
+
+!ColorRingMorph methodsFor: 'geometry' stamp: 'KenD 20/Dec/2025 13:17:23'!
+circle2morph: circlePoint
+	"Given a point relative to centerPoint as (0,0), return the Morph's point relative to it's origin"
+	
+	^ (circlePoint x + center x) @ (circlePoint y - center y) negated.! !
+
+!ColorRingMorph methodsFor: 'initialization' stamp: 'KenD 20/Dec/2025 13:34:16'!
+radius: r
+
+	radius := r.
+	center := (r @ r).
+	self color: Color transparent;
+		drawDots;
+		redrawNeeded;
+		yourself
+	! !
+
+!ColorRingMorph class methodsFor: 'instance creation' stamp: 'KenD 20/Dec/2025 13:35:06'!
+radius: r
+
+	| sideLength |
+	sideLength := r * 2 + 1. "Want a center pixel"
+	
+	^(self newWith: (Form extent: (sideLength@sideLength) depth: 32)) radius: r.! !
+
+!OKLCHCircleMorph methodsFor: 'geometry' stamp: 'KenD 19/Dec/2025 13:36:28'!
 circle2morph: circlePoint
 	"Given a point relative to centerPoint as (0,0), return the Morph's point relative to it's origin"
 	| answer |
@@ -35,7 +122,7 @@ circle2morph: circlePoint
 	^ answer
 ! !
 
-!OKLCHCircle methodsFor: 'geometry' stamp: 'KenD 19/Dec/2025 13:36:38'!
+!OKLCHCircleMorph methodsFor: 'geometry' stamp: 'KenD 19/Dec/2025 13:36:38'!
 morph2circle: morphPoint
 	"Given a point relative to centerPoint as (0,0), return the Morph's point relative to it's origin"
 	| answer |
@@ -43,10 +130,10 @@ morph2circle: morphPoint
 	"Transcript log: 'Morph Pt: ', morphPoint printString, ' -> Circle Pt : ', answer printString."
 	^answer! !
 
-!OKLCHCircle methodsFor: 'initialization' stamp: 'KenD 17/Dec/2025 18:37:53'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 20/Dec/2025 15:19:39'!
 sideLength: numPixels l: l c: c h: h
 
-	| center |
+	| center colorRingOffset |
 	super initialize.
 	color := Color blue.
 	center := numPixels // 2.
@@ -54,10 +141,26 @@ sideLength: numPixels l: l c: c h: h
 	lightness := l.
 	chroma := c.
 	hue := h.
-	self beColorful
+	
+	colorRingOffset := 26. 
+	colorRing := ColorRingMorph radius: center + colorRingOffset.
+	self beColorful.
+	self addMorphFront: colorRing.
+	"Want colorRIng Center to be our Center"
+	colorRing morphPosition: (colorRingOffset @ colorRingOffset) negated.
+	hueArm := HueArmMorph new.
+	hueArm borderStyle: #simple;
+			borderWidth: 4;
+			borderColor: Color black;
+			morphExtent: 18@(center + colorRingOffset).
+	self addMorphFront: hueArm.
+	"Want hueArm to pivot about cernerPoint "
+	hueArm morphPosition: (centerPoint x - 9)@(-16).
+	
+
 		! !
 
-!OKLCHCircle methodsFor: 'drawing' stamp: 'KenD 19/Dec/2025 13:15:09'!
+!OKLCHCircleMorph methodsFor: 'drawing' stamp: 'KenD 20/Dec/2025 13:11:10'!
 beColorful
  	"Map between Morpj (x,y) from (0,0) 
 	 to Circle with centerPoint."
@@ -84,12 +187,11 @@ beColorful
 	].
 	image := myForm.
 	self dotAt: 0@0.  "Circle center"
-	self dotAt: (Point r: chroma * radius degrees: hue). "FIXME: Want circleAt"
 	
 	^self
   ! !
 
-!OKLCHCircle methodsFor: 'drawing' stamp: 'KenD 18/Dec/2025 20:00:10'!
+!OKLCHCircleMorph methodsFor: 'drawing' stamp: 'KenD 18/Dec/2025 20:00:10'!
 dotAt: circlePoint
 	"Draw a black dot relative to center at circlePoint"
 	| myForm morphPoint |
@@ -106,7 +208,12 @@ dotAt: circlePoint
 	myForm colorAt: morphPoint + (0@-3) put: Color black.
 	image := myForm.! !
 
-!OKLCHCircle class methodsFor: 'instance creation' stamp: 'KenD 17/Dec/2025 18:35:49'!
+!OKLCHCircleMorph methodsFor: 'geometry testing' stamp: 'KenD 20/Dec/2025 13:45:01'!
+submorphsMightProtrude
+
+	^true "ColorRingMorph"! !
+
+!OKLCHCircleMorph class methodsFor: 'instance creation' stamp: 'KenD 17/Dec/2025 18:35:49'!
 sideLength: numPixels l: lightness c: chroma h: hue
 
 	| sideLength |
@@ -120,8 +227,25 @@ sideLength: numPixels l: lightness c: chroma h: hue
 		h: hue
 ! !
 
-!OKLCHCircle class methodsFor: 'accessing' stamp: 'KenD 18/Dec/2025 12:22:39'!
+!OKLCHCircleMorph class methodsFor: 'accessing' stamp: 'KenD 18/Dec/2025 12:22:39'!
 colorAbsenceColor
 
 	"Answer this when no OKLCH color is present"
 	^Color cyan! !
+
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 20/Dec/2025 16:16:47'!
+rotateToDegrees: degrees
+
+	"Like rotateBy: but to absolute degrees"
+	
+	| radians myRotation |
+	radians := (degrees - 90) degreesToRadians.
+	myRotation := location degrees degreesToRadians.
+	self rotateBy: myRotation negated.
+	self rotateBy: radians.
+	self redrawNeeded.! !
+
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 20/Dec/2025 15:27:23'!
+rotationCenter
+
+	^(self morphExtent x // 2) @ (self morphExtent y - (self morphExtent x // 2) )! !
