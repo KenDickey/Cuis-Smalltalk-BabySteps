@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7779] on 24 December 2025 at 3:21:37 pm'!
+'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 1:57:17 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 21!
+!provides: 'OKLCH-Picker' 1 26!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -56,6 +56,8 @@ HueArmMorph class
 !OKLCHCircleMorph commentStamp: '<historical>' prior: 0!
 OKLCH Circle for Picker.
 
+Cylindrical model: ligtness slice over degreees=hue, radius=chroma.
+
 For a given lightness value, colorwheel is Hue by degree (0..360) 
 and radial distabce/magnitude by chroma/saturation (gray..maxSat).
 Color is absent where not supported by OKLCH.
@@ -106,12 +108,6 @@ circle2morph: circlePoint
 	"Given a point relative to centerPoint as (0,0), return the Morph's point relative to it's origin"
 	
 	^ (circlePoint x + center x) @ (circlePoint y - center y) negated.! !
-
-!ColorRingMorph methodsFor: 'color updating' stamp: 'KenD 23/Dec/2025 13:17:46'!
-refreshColorPane
-	"When selector changes.."
-
-	self updateColorFromModel: self model.! !
 
 !ColorRingMorph methodsFor: 'initialization' stamp: 'KenD 20/Dec/2025 13:34:16'!
 radius: r
@@ -177,10 +173,26 @@ radius
 
 	^ centerPoint x "Same as centerPoint y"! !
 
+!OKLCHCircleMorph methodsFor: 'accessing' stamp: 'KenD 26/Dec/2025 11:16:53'!
+colorAbsenceColor
+
+	"Answer this when no OKLCH color is present"
+	^Color cyan lighter! !
+
 !OKLCHCircleMorph methodsFor: 'accessing' stamp: 'KenD 21/Dec/2025 15:11:55'!
 colorDrawingScale
 
 	^colorDrawingScale! !
+
+!OKLCHCircleMorph methodsFor: 'accessing' stamp: 'KenD 25/Dec/2025 09:46:08'!
+colorRing
+
+	^colorRing! !
+
+!OKLCHCircleMorph methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 13:31:52'!
+hueArm
+
+	^hueArm! !
 
 !OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 21/Dec/2025 12:51:10'!
 addColorRing
@@ -193,7 +205,7 @@ addColorRing
 	"Make colorRIng Center to be our Center"
 	colorRing morphPosition: (colorRingOffset @ colorRingOffset) negated.! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 21/Dec/2025 15:43:52'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 25/Dec/2025 13:20:08'!
 addCromaFrame: chroma0To1
 
 	|  side chromaFrameCenter |
@@ -206,20 +218,21 @@ addCromaFrame: chroma0To1
 	chromaFrameCenter := chromaFrame morphExtent / 2.
 	hueArm addMorphFront: chromaFrame.
 	"Center on Chroma.  Cap Chroma to radius."
-	chromaFrame morphPosition: (((colorDrawingScale * chroma0To1) - (chromaFrameCenter x)) min: self radius)
+	chromaFrame morphPosition: (((colorDrawingScale * chroma0To1) - (chromaFrameCenter x))
+									 min: self radius)
 								@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2)).! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 21/Dec/2025 15:44:06'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 26/Dec/2025 11:23:20'!
 addHueArm: hueInDegrees
 
-	| radius ringOffset  |
-	radius := centerPoint x.
+	"My Hue arm is like a clock arm, rotated to show the hue in degrees."
+	| ringOffset  |
 	ringOffset := self colorRingOffset.
 	hueArm := HueArmMorph new.
 	hueArm borderStyle: #simple;
 			borderWidth: 3;
 			borderColor: Color black;
-			morphExtent: (radius + ringOffset) @ (ringOffset // 2) .
+			morphExtent: (self radius + ringOffset) @ (ringOffset // 2) .
 	self addMorphFront: hueArm.
 	"Want hueArm to pivot about cernerPoint "
 	hueArm morphPosition: centerPoint + self hueArmOffset;
@@ -227,12 +240,12 @@ addHueArm: hueInDegrees
 			yourself.
 	! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 21/Dec/2025 14:30:44'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 25/Dec/2025 15:18:36'!
 sideLength: numPixels l: llightness0to1 c: chroma0to1 h: hueIndegrees
 
 	| center  |
 	super initialize.
-	color := Color blue.
+	color := Color transparent.
 	center := numPixels // 2.
 	centerPoint := (center @ center).
 	colorDrawingScale := 3 * center.
@@ -263,7 +276,7 @@ dotAt: circlePoint
 	myForm colorAt: morphPoint + (0@-3) put: Color black.
 	image := myForm.! !
 
-!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 21/Dec/2025 15:11:27'!
+!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 26/Dec/2025 11:17:08'!
 beColorful: lightness0To1
  	"Chroma and Hue are constant for a given lightness.
 	Map between Morpj (x,y) from (0,0) to Circle with centerPoint."
@@ -279,8 +292,10 @@ beColorful: lightness0To1
 								    c: (circlePoint magnitude) / colorDrawingScale 
 								    h: circlePoint degrees.
 				myForm colorAt: morphPoint
-						put: (pixelColor ifNotNil: [pixelColor] ifNil: [self class colorAbsenceColor ])
-			].
+						put: (pixelColor ifNotNil: [pixelColor] ifNil: [self colorAbsenceColor ])
+				]
+				ifFalse: [myForm colorAt: morphPoint put: Color transparent].
+			
 			(circlePoint magnitude roundedHAFZ = myRadius)
 				ifTrue: [ myForm colorAt: morphPoint put: Color purple ].
 		]
@@ -301,21 +316,15 @@ newChromaAt: chroma0To1
 			(((colorDrawingScale * chroma0To1) - (chromaFrameCenter x)) min: self radius)
 					@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2))! !
 
-!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 24/Dec/2025 14:48:38'!
+!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 13:33:54'!
 setColor:  aColor
 	
 	aColor oklchDo: [ :lightness0To1 :chroma0to1 :hueInDegrees |
 		self beColorful: lightness0To1.
 		self newChromaAt: chroma0to1.
-		hueArm rotateToDegrees: hueInDegrees.
+		self hueArm rotateToDegrees: hueInDegrees.
 	].
 	self redrawNeeded ! !
-
-!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 23/Dec/2025 14:20:17'!
-updateColorFromModel: colorModel
-	"When color selection changes.."
-	
-	self setColor: colorModel color! !
 
 !OKLCHCircleMorph methodsFor: 'geometry testing' stamp: 'KenD 20/Dec/2025 13:45:01'!
 submorphsMightProtrude
@@ -358,12 +367,6 @@ sideLength: numPixels l: lightness c: chroma h: hue
 		h: hue
 ! !
 
-!OKLCHCircleMorph class methodsFor: 'accessing' stamp: 'KenD 18/Dec/2025 12:22:39'!
-colorAbsenceColor
-
-	"Answer this when no OKLCH color is present"
-	^Color cyan! !
-
 !OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 23/Dec/2025 13:04:54'!
 defaultAlignement
 	^ #rowLeft! !
@@ -372,6 +375,11 @@ defaultAlignement
 defaultLayerNumber
 	"Act like any other Morph with respect to Z-order"
 	^100! !
+
+!OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 25/Dec/2025 14:21:32'!
+defaultSeparation
+
+	^10! !
 
 !OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 24/Dec/2025 11:37:52'!
 labelFont
@@ -388,12 +396,17 @@ model: aColorModel
 	
 	model := aColorModel ! !
 
-!OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 23/Dec/2025 09:22:43'!
+!OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 09:37:53'!
 setColor: aColor
-
-	self model setColor: aColor.
-	self refreshColor.
-! !
+	" Set my model's color.
+	  Keep current alpha if not supplied with new color."
+	| newColor |
+	newColor := ((aColor alpha = 1.0) 
+			ifFalse: [ alphaValue := aColor alpha. 
+					aColor ] "Remember new Alpha"
+			ifTrue: [aColor alpha: alphaValue ]).
+	self model setColor: newColor.
+	"Invokes #colorChanged for refreshColor"! !
 
 !OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 24/Dec/2025 13:19:02'!
 swatchBorderColor
@@ -416,49 +429,71 @@ colorSwatchesBeDroppable
 				]
 	].! !
 
-!OKLCHEditPanel methodsFor: 'initialization' stamp: 'KenD 24/Dec/2025 15:15:46'!
+!OKLCHEditPanel methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 09:29:41'!
 initialize
 
 	super initialize.
 	self beRow.
 	self color: Color veryVeryLightGray.
 	self titleMorph showButtonsNamed: #( close collapse ).
+	alphaValue := 1.
 	model ifNil: [ model := ColorEditorModel new ].
 	colorSwatch := DropColorMorph fromColor: model color. "alpha=1"
 	alphaSwatch :=  DropColorMorph fromColor: model color. 
 	rgbEntry      := SimpleNumberEntryMorph hexRGBEntry.
+	self model when: #colorChanged: send: #refreshColor to: self.
 	circleMorph := OKLCHCircleMorph 
 						sideLength: self class defaultCircleMorphSideLength 
 						color: model color.
-	self! !
+	^self borderWidth: self defaultSeparation ; "Add room for color circle"
+		  borderColor: Color transparent;
+		 yourself! !
 
-!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 24/Dec/2025 15:03:27'!
+!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 09:46:57'!
+colorChanged: aColorModel
+
+	(self model = aColorModel)
+		ifFalse: [ model := aColorModel ].
+	self refreshColor;
+		redrawNeeded 
+
+! !
+
+!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 13:54:19'!
 refreshAlphaSwatch
 	"When color changes"
 	
 	(alphaSwatch color = self model color)
-	ifFalse: [ | newAlpha newColor |
-		newAlpha := self model color alpha.
-		newColor := self model color alpha: newAlpha.
+	ifFalse: [ | newColor | 
+		newColor := self model color.
 		alphaSwatch image: 
-		(newColor 
-			iconOrThumbnailOfSize: 32@32).
+			(newColor iconOrThumbnailOfSize: 32@32).
 		alphaSwatch color: newColor
 	]! !
 
-!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 23/Dec/2025 13:19:26'!
+!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 26/Dec/2025 11:20:29'!
 refreshCircleMorph
 
-		circleMorph updateColorFromModel: self model! !
+	circleMorph setColor: self model color! !
 
-!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 23/Dec/2025 13:09:50'!
+!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 13:49:29'!
 refreshColor
 	"model color has changed.  Refresh my views."
 	
+	lightnessSlider refreshValueFromModel.
+
 	self 
-		refreshColorSwatch;
-		refreshCircleMorph;
-		refreshAlphaSwatch! !
+		refreshAlphaSwatch;
+		refreshColorSwatch.
+
+	{ alphaEntry. rgbEntry. lEntry. cEntry.  hEntry. } do: [ :entry |
+		entry refreshValueFrom: self model.
+	].
+
+	self refreshCircleMorph;
+		redrawNeeded;
+		yourself
+! !
 
 !OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 23/Dec/2025 14:26:35'!
 refreshColorSwatch
@@ -467,38 +502,62 @@ refreshColorSwatch
 	colorSwatch image: (model baseColor iconOrThumbnailOfSize: self class colorSwatchExtent).
 	colorSwatch color: self model baseColor "NB: No alpha here. Alpha=1"! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 24/Dec/2025 14:36:51'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 12:49:33'!
 buildColorCircleColumn
 
 	| circleLayout |
-	circleLayout := LayoutMorph newColumn :: color: Color transparent.
+	circleLayout := LayoutMorph newColumn :: 
+		separation: 20;
+		axisEdgeWeight: #center;
+		color: Color transparent.
+						
+	circleMorph := OKLCHCircleMorph sideLength: 260 color: self model color.
+	circleMorph layoutSpec: (LayoutSizeSpec new  offAxisEdgeWeight: #center).
+	
+	^circleLayout 
+		addMorph: circleMorph;
+		yourself
+! !
+
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 26/Dec/2025 13:31:46'!
+buildLightnessSliderColumn
+
+	| lightSliderLayout |
+	lightSliderLayout := LayoutMorph newColumn :: 
+		separation: self defaultSeparation;
+		color: Color transparent.
+		
 	lightnessSlider := PluggableScrollBar new ::
 						model: (self model)
 								setValueSelector: #setOKLightness: 
 								refreshValueSelector: #getOKLightness ;
 						setProperty: #balloonText toValue: 'set Lightness' ;
-						morphExtent: (300 @ Theme current scrollbarThickness);
+						interval: 0;
+						color: Color grey;
+						morphExtent: (Theme current scrollbarThickness @ 300);
 						value: (self model getOKLightness).
-	circleMorph := OKLCHCircleMorph sideLength: 260 color: self model color.
-	^circleLayout 
+	
+	^lightSliderLayout 
 		addMorph: lightnessSlider;
-		addMorph: circleMorph;
-		yourself! !
+		yourself
+! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 24/Dec/2025 14:56:52'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 26/Dec/2025 13:42:27'!
 buildMorphicWindow
 " Our layout is a bit different to a traditional dialog, so we override as 
   we don't need button area at the bottom and main panel is a row of morphs." 
 	
 	layoutMorph beRow.  "A row of columns"
 	self layoutMorph gap: self defaultSeparation ;
-		padding: 10;
 		axisEdgeWeight: self defaultAlignement ;
-		color: (Theme current paneBackgroundFrom: Color grey);
+		padding: 10;
+		color: (Color veryVeryLightGray);
 		addMorph: self buildColorCircleColumn;
+		addMorph: self buildLightnessSliderColumn;
 		addMorph: self buildValuesColumn;
 		addMorph: self buildSwatchesColumn;
 		morphExtent: self minimumExtent.
+	self titleMorph color: Color grey.
 	self model 
 		when: #colorChanged 
 		send: #refreshColor 
@@ -509,11 +568,14 @@ buildMorphicWindow
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 24/Dec/2025 15:20:51'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 13:53:43'!
 buildSwatchesColumn
 
 	| swatchesLayout colorFrame rgbLayout alphaFrame |
-	swatchesLayout := LayoutMorph newColumn :: color: Color transparent.
+	swatchesLayout := LayoutMorph newColumn ::
+		 padding: 10;
+		 axisEdgeWeight: #columnTop;
+		 color: Color transparent.
 	colorFrame := FrameMorph new ::
 		morphExtent: (self class colorSwatchExtent) + 16;
 		borderWidth: 4; 	
@@ -531,6 +593,12 @@ Full Color [α=1]' .
 	colorFrame setProperty: #mouseEnter:   
 				toValue: [ :ignoredEvent | colorFrame flash ].
 	
+	rgbEntry := SimpleNumberEntryMorph hexRGBEntry ::
+					valueAccessor: [ :myModel | myModel rgbValue ];
+					valueUpdator: [ :myValue |  
+						self model setRGBColorFromInteger: myValue ];
+					refreshValueFrom: self model;
+					yourself.
 	rgbLayout := LayoutMorph newRow ::
 				color: Color transparent;
 				addMorph: (LabelMorph contents: 'RGB 16r' font: self minorFont);
@@ -558,10 +626,9 @@ Full Color [α=1]' .
 Color plus α' .
 
 	alphaEntry := SimpleNumberEntryMorph 
-					floatRangeFrom: 0.0 to: 1.0
-					maxNumChars: 5 ::
-					valueAccessor: [ :myModel | myModel alpha ];
-					valueUpdator: [ :myValue | self model alpha: myValue ];
+					percentForRealFactor: 1.0 ::
+					valueAccessor: [ :myModel | myModel color alpha ];
+					valueUpdator: [ :myValue | self model color alpha: myValue ];
 					refreshValueFrom: self model;
 					yourself.
 				
@@ -573,49 +640,58 @@ Color plus α' .
 					buildValueBox: 'Alpha' 
 					lable: 'α:' 
 					entryBox: alphaEntry 
-					units: '0.0 - 1.0' 
+					units: '%' 
 					upName: 'Solid' 
 					downName: 'Transparent');
 		yourself
 		! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 24/Dec/2025 14:39:20'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 26/Dec/2025 13:29:01'!
 buildValueBox: stringTitle 
 lable: entryNameString 
 entryBox: entryMorph 
 units: unitString 
 upName: upString 
 downName: downString
-	| aBox entryBox |
+	| aBox entryBox adjustBox |
 	aBox := LayoutMorph newColumn ::
-		addMorph: (LabelMorph contents: stringTitle font: self labelFont).
+		addMorph: (LabelMorph contents: stringTitle font: self labelFont);
+		color: Color veryLightGray.
 	entryBox := LayoutMorph newRow ::
 		addMorph: (LabelMorph contents: entryNameString font: self labelFont);
 		addMorph: entryMorph;
-		addMorph: (LabelMorph contents: unitString font: self minorFont).
-	^aBox addMorph: entryBox;
+		addMorph: (LabelMorph contents: unitString font: self minorFont);
+		axisEdgeWeight: #rowLeft.
+	adjustBox := LayoutMorph newColumn ::
 		"@@FIXME: add up & down buttons@@"
 		addMorph: (LabelMorph contents: upString font: self minorFont);
-		addMorph: (LabelMorph contents: downString font: self minorFont);
+		addMorph: (LabelMorph contents: downString font: self minorFont).
+
+	^aBox 
+		addMorph: entryBox;
+		addMorph: adjustBox;
 		yourself
 	! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 24/Dec/2025 14:32:38'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 26/Dec/2025 14:24:44'!
 buildValuesColumn
 
 	| valuesLayout |
-	valuesLayout := LayoutMorph newColumn :: color: Color transparent.
-	lEntry := SimpleNumberEntryMorph percentExact ::
+	valuesLayout := LayoutMorph newColumn ::
+		 padding: 10;
+		 axisEdgeWeight: #center;
+		 color: Color transparent.
+	lEntry := SimpleNumberEntryMorph percentForRealFactor: 1.0 ::
 					valueAccessor: [ :myModel | myModel getOKLightness ];
-					valueUpdator: [ :myValue | self model setOKLightness: myValue / 100];
+					valueUpdator: [ :myValue | self model setOKLightness: myValue ];
 					refreshValueFrom: self model;
 					yourself.
-	cEntry := SimpleNumberEntryMorph floatRangeFrom: 0.0 to: 0.4 maxNumChars: 7 ::
-					valueAccessor: [ :myModel | myModel getOKChroma ];
+	cEntry := SimpleNumberEntryMorph percentForRealFactor: 0.4 ::
+					valueAccessor: [ :myModel | myModel getOKChroma  ];
 					valueUpdator: [ :myValue | self model setOKChroma: myValue ];
 					refreshValueFrom: self model;
 					yourself.
-	hEntry := SimpleNumberEntryMorph circleDegreesExact ::
+	hEntry := SimpleNumberEntryMorph circleDegrees ::
 					valueAccessor: [ :myModel | myModel getOKHue ];
 					valueUpdator: [ :myValue | self model setOKHue: myValue ];
 					refreshValueFrom: self model;
@@ -624,38 +700,35 @@ buildValuesColumn
 					buildValueBox: 'Lightness' 
 					lable: 'L:' 
 					entryBox: lEntry 
-					units: '0.0 - 1.0' 
+					units: '%' 
 					upName: 'White' 
 					downName: 'Black').
 	valuesLayout addMorph: (self
 					buildValueBox: 'Chroma' 
 					lable: 'C:' 
 					entryBox: cEntry 
-					units: '0.0 - 0.4' 
+					units: '0 - 40%' 
 					upName: 'Saturate' 
 					downName: 'Grey').
 	valuesLayout addMorph: (self
 					buildValueBox: 'Hue' 
 					lable: 'H:' 
 					entryBox: hEntry 
-					units: '0 - 360' 
-					upName: 'Left' 
+					units: '0 - 360 degrees' 
+					upName: 'antiClock' 
 					downName: 'Clockwise').	
 	^valuesLayout				! !
 
-!OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 23/Dec/2025 13:01:39'!
+!OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 26/Dec/2025 11:15:40'!
 initializedInstance
 "
 	self initializedInstance openInWorld.
 "
- 	| panel |
-	panel := self new
+ 	^self new
 		model: (ColorEditorModel color: self defaultColor) ;
 		buildMorphicWindow;
-		setLabel: 'LCH Color Editor'.
-	^ panel 	
-		"widgetsColor: panel windowColor ;
-		yourself"! !
+		setLabel: self titleString.
+		! !
 
 !OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 24/Dec/2025 13:34:38'!
 open
@@ -664,10 +737,13 @@ open
 "	
 	^ self openWithColor: self defaultColor! !
 
-!OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 23/Dec/2025 13:00:48'!
+!OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 26/Dec/2025 14:33:10'!
 openWithColor: aColor
 
-	^ self open: (ColorEditorModel color: aColor) label: 'LCH Color Editor'! !
+	^ self new
+		model: (ColorEditorModel color: aColor) ;
+		buildMorphicWindow;
+		setLabel: self titleString! !
 
 !OKLCHEditPanel class methodsFor: 'accessing' stamp: 'KenD 23/Dec/2025 14:25:49'!
 colorSwatchExtent
@@ -684,26 +760,34 @@ defaultColor
 
 	^ Color  r: 16r40/255 g: 16rA5/255 b: 16rD0/255.! !
 
+!OKLCHEditPanel class methodsFor: 'accessing' stamp: 'KenD 26/Dec/2025 11:14:53'!
+titleString
+
+	^ 'OK-LCH Color Editor'
+	 ! !
+
 !OKLCHEditPanel class methodsFor: 'new-morph participation' stamp: 'KenD 23/Dec/2025 12:57:33'!
 includeInNewMorphMenu
 	"Return true for all classes that can be instantiated from the menu"
 	
 	^ true! !
 
-!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 21/Dec/2025 09:56:07'!
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 27/Dec/2025 13:29:03'!
 rotateToDegrees: degrees
-
 	"Like rotateBy: but to absolute degrees."
 	
 	| currentDegrees myRotation |
 	currentDegrees := location degrees.
 	myRotation := currentDegrees degreesToRadians negated.
 	(currentDegrees abs > 1) ifTrue: [ "reset to 0"
-		self rotateBy: myRotation.
+		self hide;  redrawNeeded;
+			rotateBy: myRotation.
 	].
       "Rotation is Clockwise, but Hue rotates CounterClockwise."
-	self rotateBy: degrees degreesToRadians negated. 
-	self redrawNeeded.! !
+	self hide; redrawNeeded;
+		rotateBy: degrees degreesToRadians negated;
+		show; redrawNeeded;
+		yourself! !
 
 !HueArmMorph methodsFor: 'geometry' stamp: 'KenD 21/Dec/2025 09:39:03'!
 rotationCenter
