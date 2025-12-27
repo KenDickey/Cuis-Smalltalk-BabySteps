@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 2:19:37 pm'!
+'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 3:37:55 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 27!
+!provides: 'OKLCH-Picker' 1 29!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -44,7 +44,7 @@ OKLCHEditPanel class
 
 !classDefinition: #HueArmMorph category: #'OKLCH-Picker'!
 FrameMorph subclass: #HueArmMorph
-	instanceVariableNames: ''
+	instanceVariableNames: 'model'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'OKLCH-Picker'!
@@ -173,6 +173,16 @@ radius
 
 	^ centerPoint x "Same as centerPoint y"! !
 
+!OKLCHCircleMorph methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 15:26:38'!
+chromaFrame
+
+	^chromaFrame! !
+
+!OKLCHCircleMorph methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 15:27:00'!
+chromaFrame: aFraneMorph
+
+	chromaFrame := aFraneMorph! !
+
 !OKLCHCircleMorph methodsFor: 'accessing' stamp: 'KenD 26/Dec/2025 11:16:53'!
 colorAbsenceColor
 
@@ -205,7 +215,7 @@ addColorRing
 	"Make colorRIng Center to be our Center"
 	colorRing morphPosition: (colorRingOffset @ colorRingOffset) negated.! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 25/Dec/2025 13:20:08'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 15:34:18'!
 addCromaFrame: chroma0To1
 
 	|  side chromaFrameCenter |
@@ -220,7 +230,20 @@ addCromaFrame: chroma0To1
 	"Center on Chroma.  Cap Chroma to radius."
 	chromaFrame morphPosition: (((colorDrawingScale * chroma0To1) - (chromaFrameCenter x))
 									 min: self radius)
-								@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2)).! !
+								@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2)).
+	chromaFrame setProperty: #handlesMouseDown: 
+				  toValue: [ :igniredEvent | ^true].
+	chromaFrame setProperty: #mouseMove:localPosition: 
+				  toValue: [ :mouseEvent :localPosition |
+					mouseEvent anyButtonPressed ifTrue: [
+					Transcript log: 'local chroma position: ', localPosition printString.
+
+						chromaFrame morphPosition: 
+							(chromaFrame morphPosition + ((localPosition x) @ 0)).
+						(chromaFrame valueOfProperty: #model)
+							 setOKHue: (colorDrawingScale * chromaFrame morphPosition x).
+					].
+				  ].! !
 
 !OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 26/Dec/2025 11:23:20'!
 addHueArm: hueInDegrees
@@ -471,7 +494,7 @@ refreshAlphaSwatch
 		alphaSwatch color: newColor
 	]! !
 
-!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 26/Dec/2025 11:20:29'!
+!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 14:23:41'!
 refreshCircleMorph
 
 	circleMorph setColor: self model color! !
@@ -502,7 +525,7 @@ refreshColorSwatch
 	colorSwatch image: (model baseColor iconOrThumbnailOfSize: self class colorSwatchExtent).
 	colorSwatch color: self model baseColor "NB: No alpha here. Alpha=1"! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 12:49:33'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 15:29:31'!
 buildColorCircleColumn
 
 	| circleLayout |
@@ -513,13 +536,15 @@ buildColorCircleColumn
 						
 	circleMorph := OKLCHCircleMorph sideLength: 260 color: self model color.
 	circleMorph layoutSpec: (LayoutSizeSpec new  offAxisEdgeWeight: #center).
+	circleMorph hueArm model: self model.
+	circleMorph chromaFrame setProperty: #model toValue: self model.
 	
 	^circleLayout 
 		addMorph: circleMorph;
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 14:17:28'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 14:21:36'!
 buildLightnessSliderColumn
 
 	| lightSliderLayout |
@@ -772,6 +797,27 @@ includeInNewMorphMenu
 	
 	^ true! !
 
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 27/Dec/2025 14:27:26'!
+handlesMouseDown: aMouseButtonEvent
+	"Do I want to receive mouseDown events (mouseDown:, mouseMove:, mouseUp:)?"
+	
+	^ true! !
+
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 27/Dec/2025 15:00:44'!
+mouseMove: aMouseMoveEvent localPosition: localEventPosition
+
+	aMouseMoveEvent anyButtonPressed ifTrue: [
+		self rotateToDegrees:  self currentDegrees - localEventPosition degrees.
+		self model setOKHue: self currentDegrees
+	]! !
+
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 27/Dec/2025 14:31:31'!
+currentDegrees
+
+	"Rotation opposite of default"
+	^location degrees negated
+	! !
+
 !HueArmMorph methodsFor: 'geometry' stamp: 'KenD 27/Dec/2025 13:29:03'!
 rotateToDegrees: degrees
 	"Like rotateBy: but to absolute degrees."
@@ -795,6 +841,16 @@ rotationCenter
 	| circleDelta |
 	circleDelta := self morphExtent y // 2.
 	^(circleDelta @ circleDelta)! !
+
+!HueArmMorph methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 14:59:25'!
+model
+
+	^model! !
+
+!HueArmMorph methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 14:59:49'!
+model: aColorEditorModel
+
+	model := aColorEditorModel! !
 
 !HueArmMorph class methodsFor: 'new-morph participation' stamp: 'KenD 23/Dec/2025 09:02:34'!
 includeInNewMorphMenu
