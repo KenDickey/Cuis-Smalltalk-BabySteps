@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 1:57:17 pm'!
+'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 2:19:37 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 26!
+!provides: 'OKLCH-Picker' 1 27!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -519,7 +519,7 @@ buildColorCircleColumn
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 26/Dec/2025 13:31:46'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 14:17:28'!
 buildLightnessSliderColumn
 
 	| lightSliderLayout |
@@ -529,13 +529,13 @@ buildLightnessSliderColumn
 		
 	lightnessSlider := PluggableScrollBar new ::
 						model: (self model)
-								setValueSelector: #setOKLightness: 
-								refreshValueSelector: #getOKLightness ;
+								setValueSelector: #setOKDarkness: 
+								refreshValueSelector: #getOKDarkness ;
 						setProperty: #balloonText toValue: 'set Lightness' ;
 						interval: 0;
 						color: Color grey;
 						morphExtent: (Theme current scrollbarThickness @ 300);
-						value: (self model getOKLightness).
+						value: (self model getOKDarkness). "Black @ bottom"
 	
 	^lightSliderLayout 
 		addMorph: lightnessSlider;
