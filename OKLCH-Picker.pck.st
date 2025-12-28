@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 3:37:55 pm'!
+'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 4:01:05 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 29!
+!provides: 'OKLCH-Picker' 1 30!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -215,7 +215,7 @@ addColorRing
 	"Make colorRIng Center to be our Center"
 	colorRing morphPosition: (colorRingOffset @ colorRingOffset) negated.! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 15:34:18'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 16:00:00'!
 addCromaFrame: chroma0To1
 
 	|  side chromaFrameCenter |
@@ -235,13 +235,14 @@ addCromaFrame: chroma0To1
 				  toValue: [ :igniredEvent | ^true].
 	chromaFrame setProperty: #mouseMove:localPosition: 
 				  toValue: [ :mouseEvent :localPosition |
-					mouseEvent anyButtonPressed ifTrue: [
-					Transcript log: 'local chroma position: ', localPosition printString.
-
-						chromaFrame morphPosition: 
-							(chromaFrame morphPosition + ((localPosition x) @ 0)).
-						(chromaFrame valueOfProperty: #model)
-							 setOKHue: (colorDrawingScale * chromaFrame morphPosition x).
+					mouseEvent anyButtonPressed ifTrue: [ | model newX |
+						model := chromaFrame valueOfProperty: #model.
+						newX := (chromaFrame morphPosition x + localPosition x) min: self radius.
+						chromaFrame morphPosition: (newX @  chromaFrame morphPosition y).
+						model setOKChroma: (chromaFrame morphPosition x 
+											+ (chromaFrameCenter x)
+											 / colorDrawingScale).
+						self newChromaAt: model color oklchChroma 
 					].
 				  ].! !
 
