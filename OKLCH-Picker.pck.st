@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 7:30:55 pm'!
+'From Cuis7.7 [latest update: #7780] on 28 December 2025 at 10:40:52 am'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 31!
+!provides: 'OKLCH-Picker' 1 32!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -595,7 +595,7 @@ buildMorphicWindow
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 13:53:43'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 28/Dec/2025 10:40:00'!
 buildSwatchesColumn
 
 	| swatchesLayout colorFrame rgbLayout alphaFrame |
@@ -654,8 +654,8 @@ Color plus α' .
 
 	alphaEntry := SimpleNumberEntryMorph 
 					percentForRealFactor: 1.0 ::
-					valueAccessor: [ :myModel | myModel color alpha ];
-					valueUpdator: [ :myValue | self model color alpha: myValue ];
+					valueAccessor: [ :myModel | self model alpha  * 100 ];
+					valueUpdator: [ :myValue | self model alpha: (myValue / 100) ];
 					refreshValueFrom: self model;
 					yourself.
 				
