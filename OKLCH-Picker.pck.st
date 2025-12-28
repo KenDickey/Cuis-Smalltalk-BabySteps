@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 4:01:05 pm'!
+'From Cuis7.7 [latest update: #7780] on 27 December 2025 at 7:30:55 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 30!
+!provides: 'OKLCH-Picker' 1 31!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -215,7 +215,7 @@ addColorRing
 	"Make colorRIng Center to be our Center"
 	colorRing morphPosition: (colorRingOffset @ colorRingOffset) negated.! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 16:00:00'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 19:04:57'!
 addCromaFrame: chroma0To1
 
 	|  side chromaFrameCenter |
@@ -224,7 +224,7 @@ addCromaFrame: chroma0To1
 	chromaFrame borderStyle: #simple;
 			borderWidth: 3;
 			borderColor: Color white;
-			morphExtent: (side / 2 @ side).
+			morphExtent: (2 * hueArm rotationCenter x negated @ side).
 	chromaFrameCenter := chromaFrame morphExtent / 2.
 	hueArm addMorphFront: chromaFrame.
 	"Center on Chroma.  Cap Chroma to radius."
@@ -237,7 +237,8 @@ addCromaFrame: chroma0To1
 				  toValue: [ :mouseEvent :localPosition |
 					mouseEvent anyButtonPressed ifTrue: [ | model newX |
 						model := chromaFrame valueOfProperty: #model.
-						newX := (chromaFrame morphPosition x + localPosition x) min: self radius.
+						newX := (chromaFrame morphPosition x + localPosition x) 
+								min: (model maxOKChroma * colorDrawingScale) - (chromaFrameCenter x).
 						chromaFrame morphPosition: (newX @  chromaFrame morphPosition y).
 						model setOKChroma: (chromaFrame morphPosition x 
 											+ (chromaFrameCenter x)
@@ -786,6 +787,12 @@ defaultColor
 
 	^ Color  r: 16r40/255 g: 16rA5/255 b: 16rD0/255.! !
 
+!OKLCHEditPanel class methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 19:08:26'!
+swatchBorderColor
+
+	"Match with Visual Menu Item text color"
+	^ (Color r: 0.5 g: 0.07 b: 0.5) ! !
+
 !OKLCHEditPanel class methodsFor: 'accessing' stamp: 'KenD 26/Dec/2025 11:14:53'!
 titleString
 
@@ -803,6 +810,21 @@ handlesMouseDown: aMouseButtonEvent
 	"Do I want to receive mouseDown events (mouseDown:, mouseMove:, mouseUp:)?"
 	
 	^ true! !
+
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 27/Dec/2025 19:11:59'!
+handlesMouseOver: aMouseEvent
+
+	^true! !
+
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 27/Dec/2025 19:09:58'!
+mouseEnter: igniredMouseEvent
+
+	self borderColor: OKLCHEditPanel swatchBorderColor! !
+
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 27/Dec/2025 19:10:23'!
+mouseLeave: igniredMouseEvent
+
+	self borderColor: Color black! !
 
 !HueArmMorph methodsFor: 'events' stamp: 'KenD 27/Dec/2025 15:00:44'!
 mouseMove: aMouseMoveEvent localPosition: localEventPosition
