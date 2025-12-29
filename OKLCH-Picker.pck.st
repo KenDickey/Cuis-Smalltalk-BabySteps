@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 29 December 2025 at 3:22:31 pm'!
+'From Cuis7.7 [latest update: #7780] on 29 December 2025 at 3:37:57 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 34!
+!provides: 'OKLCH-Picker' 1 35!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -654,7 +654,7 @@ buildMorphicWindow
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 14:24:33'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 15:36:51'!
 buildSwatchesColumn
 
 	| swatchesLayout colorFrame rgbLayout alphaFrame |
@@ -729,8 +729,8 @@ Color plus α' .
 					lable: 'α:' 
 					entryBox: alphaEntry 
 					units: '%' 
-					upName: 'Solid' 
-					downName: 'Transparent'
+					upName: 'More Opaque' 
+					downName: 'More Transparent'
 					deltaAdjust: 0.04);
 		yourself
 		! !
@@ -813,7 +813,7 @@ scale: aScale
 		yourself
 	! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 15:03:52'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 15:36:16'!
 buildValuesColumn
 
 	| valuesLayout |
@@ -841,16 +841,16 @@ buildValuesColumn
 					lable: 'L:' 
 					entryBox: lEntry 
 					units: '%' 
-					upName: 'White' 
-					downName: 'Black'
+					upName: 'Lighter' 
+					downName: 'Darker'
 					deltaAdjust: 0.03).
 	valuesLayout addMorph: (self
 					buildValueBox: 'Chroma' 
 					lable: 'C:' 
 					entryBox: cEntry 
 					units: '0 - 50%' 
-					upName: 'Saturate' 
-					downName: 'Grey'
+					upName: 'More Saturated' 
+					downName: 'More Grey'
 					deltaAdjust: 0.004).
 	valuesLayout addMorph: (self
 					buildValueBox: 'Hue' 
