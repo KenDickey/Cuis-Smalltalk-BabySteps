@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 28 December 2025 at 10:40:52 am'!
+'From Cuis7.7 [latest update: #7780] on 29 December 2025 at 3:22:31 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 32!
+!provides: 'OKLCH-Picker' 1 34!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -32,9 +32,19 @@ ImageMorph subclass: #OKLCHCircleMorph
 OKLCHCircleMorph class
 	instanceVariableNames: 'center'!
 
+!classDefinition: #SimpleEntryButton category: #'OKLCH-Picker'!
+ImageMorph subclass: #SimpleEntryButton
+	instanceVariableNames: 'entryMorph myDelta'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'OKLCH-Picker'!
+!classDefinition: 'SimpleEntryButton class' category: #'OKLCH-Picker'!
+SimpleEntryButton class
+	instanceVariableNames: ''!
+
 !classDefinition: #OKLCHEditPanel category: #'OKLCH-Picker'!
 DialogPanel subclass: #OKLCHEditPanel
-	instanceVariableNames: 'circleMorph colorSwatch alphaSwatch lightnessSlider alphaSlider rgbEntry lEntry cEntry hEntry lAdjust cAdjust hAdjust alphaEntry'
+	instanceVariableNames: 'circleMorph colorSwatch alphaSwatch lightnessSlider rgbEntry lEntry cEntry hEntry alphaEntry'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'OKLCH-Picker'!
@@ -63,6 +73,10 @@ and radial distabce/magnitude by chroma/saturation (gray..maxSat).
 Color is absent where not supported by OKLCH.
 
 !
+
+!SimpleEntryButton commentStamp: '<historical>' prior: 0!
+I am an excessively dumb button which adds a positive or negative delta 
+to my entryMorph, which is a SimpleNumberEntryMorph!
 
 !OKLCHEditPanel commentStamp: '<historical>' prior: 0!
 OK-LCH Color Editor.
@@ -204,12 +218,12 @@ hueArm
 
 	^hueArm! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 21/Dec/2025 12:51:10'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 29/Dec/2025 15:16:26'!
 addColorRing
 
 	| radius colorRingOffset |
 	radius := centerPoint x.
-	colorRingOffset := radius // 5. 
+	colorRingOffset := (radius // 5) + 4. 
 	colorRing := ColorRingMorph radius: radius + colorRingOffset.
 	self addMorphFront: colorRing.
 	"Make colorRIng Center to be our Center"
@@ -341,9 +355,9 @@ newChromaAt: chroma0To1
 			(((colorDrawingScale * chroma0To1) - (chromaFrameCenter x)) min: self radius)
 					@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2))! !
 
-!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 13:33:54'!
+!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 29/Dec/2025 15:13:34'!
 setColor:  aColor
-	
+	"Invoked by contaier on color change"
 	aColor oklchDo: [ :lightness0To1 :chroma0to1 :hueInDegrees |
 		self beColorful: lightness0To1.
 		self newChromaAt: chroma0to1.
@@ -392,6 +406,64 @@ sideLength: numPixels l: lightness c: chroma h: hue
 		h: hue
 ! !
 
+!SimpleEntryButton methodsFor: 'events' stamp: 'KenD 29/Dec/2025 09:21:51'!
+handlesMouseDown: aMouseButtonEvent
+	^ true! !
+
+!SimpleEntryButton methodsFor: 'events' stamp: 'KenD 29/Dec/2025 09:21:44'!
+handlesMouseOver: evt
+	"implements #mouseEnter: and/or #mouseLeave:"
+	^true! !
+
+!SimpleEntryButton methodsFor: 'events' stamp: 'KenD 29/Dec/2025 14:21:25'!
+mouseButton1Up: aMouseButtonEvent localPosition: localEventPosition
+
+	super mouseButton1Up: aMouseButtonEvent localPosition: localEventPosition.
+	entryMorph valueUpdator value: (entryMorph value + myDelta).
+	entryMorph redrawNeeded 
+! !
+
+!SimpleEntryButton methodsFor: 'events' stamp: 'KenD 29/Dec/2025 09:56:28'!
+mouseEnter: aMouseEvent
+
+	borderColor := OKLCHEditPanel swatchBorderColor.
+	self redrawNeeded ! !
+
+!SimpleEntryButton methodsFor: 'events' stamp: 'KenD 29/Dec/2025 09:56:48'!
+mouseLeave: aMouseEvent
+
+	borderColor := Color black.
+	self redrawNeeded ! !
+
+!SimpleEntryButton methodsFor: 'initialization' stamp: 'KenD 29/Dec/2025 14:20:57'!
+entryModel: aSimpeNumberEntryMorph delta: aNumber
+
+	entryMorph := aSimpeNumberEntryMorph.
+	myDelta := aNumber.
+! !
+
+!SimpleEntryButton class methodsFor: 'instance creation' stamp: 'KenD 29/Dec/2025 14:28:03'!
+newDown: aSimpeNumberEntryMorph delta: aNumber
+	
+	| newMe |
+	(aNumber > 0) ifTrue: [self error: 'newDown delta must be negative'].
+	newMe :=  super newWith:  (BitBltCanvas arrowOfDirection: #down size: 16).
+	^newMe borderWidth: 2;
+			borderColor: Color black;
+			entryModel:  aSimpeNumberEntryMorph delta: aNumber;
+			yourself! !
+
+!SimpleEntryButton class methodsFor: 'instance creation' stamp: 'KenD 29/Dec/2025 14:22:46'!
+newUp: aSimpeNumberEntryMorph delta: aNumber
+	
+	| newMe |
+	(aNumber < 0) ifTrue: [self error: 'newUp delta must be positive'].
+	newMe :=  super newWith:  (BitBltCanvas arrowOfDirection: #up size: 16).
+	^newMe borderWidth: 2;
+			borderColor: Color black;
+			entryModel:  aSimpeNumberEntryMorph delta: aNumber;
+			yourself! !
+
 !OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 23/Dec/2025 13:04:54'!
 defaultAlignement
 	^ #rowLeft! !
@@ -421,16 +493,11 @@ model: aColorModel
 	
 	model := aColorModel ! !
 
-!OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 09:37:53'!
+!OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 29/Dec/2025 14:53:05'!
 setColor: aColor
-	" Set my model's color.
-	  Keep current alpha if not supplied with new color."
-	| newColor |
-	newColor := ((aColor alpha = 1.0) 
-			ifFalse: [ alphaValue := aColor alpha. 
-					aColor ] "Remember new Alpha"
-			ifTrue: [aColor alpha: alphaValue ]).
-	self model setColor: newColor.
+	" Set my model's color."
+	
+	self model setColor: aColor.
 	"Invokes #colorChanged for refreshColor"! !
 
 !OKLCHEditPanel methodsFor: 'accessing' stamp: 'KenD 24/Dec/2025 13:19:02'!
@@ -439,29 +506,13 @@ swatchBorderColor
 	"Match with Visual Menu Item text color"
 	^ (Color r: 0.5 g: 0.07 b: 0.5) ! !
 
-!OKLCHEditPanel methodsFor: 'initialization' stamp: 'KenD 23/Dec/2025 14:16:58'!
-colorSwatchesBeDroppable
-
-	{alphaSwatch. colorSwatch.} do: [ :dropTarget | 
-		dropTarget
-			setProperty:  #'allowsMorphDrop' toValue: true;
-			setProperty: #wantsDroppedMorph:event: 
-				toValue: [ :dropMorph :evt | dropMorph valueWhenDropped isKindOf: Color] ;
-			setProperty: #dropAction 
-				toValue: [ :dropMorph :colorValue |
-					self setColor: colorValue. 
-					dropMorph showAcceptAndDeleteSelf.
-				]
-	].! !
-
-!OKLCHEditPanel methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 09:29:41'!
+!OKLCHEditPanel methodsFor: 'initialization' stamp: 'KenD 29/Dec/2025 09:15:10'!
 initialize
 
 	super initialize.
 	self beRow.
 	self color: Color veryVeryLightGray.
 	self titleMorph showButtonsNamed: #( close collapse ).
-	alphaValue := 1.
 	model ifNil: [ model := ColorEditorModel new ].
 	colorSwatch := DropColorMorph fromColor: model color. "alpha=1"
 	alphaSwatch :=  DropColorMorph fromColor: model color. 
@@ -473,6 +524,14 @@ initialize
 	^self borderWidth: self defaultSeparation ; "Add room for color circle"
 		  borderColor: Color transparent;
 		 yourself! !
+
+!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 29/Dec/2025 14:35:57'!
+colorChanged
+
+	self refreshColor
+		
+
+! !
 
 !OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 09:46:57'!
 colorChanged: aColorModel
@@ -595,7 +654,7 @@ buildMorphicWindow
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 28/Dec/2025 10:40:00'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 14:24:33'!
 buildSwatchesColumn
 
 	| swatchesLayout colorFrame rgbLayout alphaFrame |
@@ -654,8 +713,10 @@ Color plus α' .
 
 	alphaEntry := SimpleNumberEntryMorph 
 					percentForRealFactor: 1.0 ::
-					valueAccessor: [ :myModel | self model alpha  * 100 ];
-					valueUpdator: [ :myValue | self model alpha: (myValue / 100) ];
+					valueAccessor: [ :myModel | self model alpha ];
+					valueUpdator: [ :myValue | 
+						self model alpha: ((myValue min: 1.0) max: 0.0)
+					];
 					refreshValueFrom: self model;
 					yourself.
 				
@@ -669,18 +730,21 @@ Color plus α' .
 					entryBox: alphaEntry 
 					units: '%' 
 					upName: 'Solid' 
-					downName: 'Transparent');
+					downName: 'Transparent'
+					deltaAdjust: 0.04);
 		yourself
 		! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 26/Dec/2025 13:29:01'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 14:26:26'!
 buildValueBox: stringTitle 
 lable: entryNameString 
 entryBox: entryMorph 
 units: unitString 
 upName: upString 
 downName: downString
-	| aBox entryBox adjustBox |
+deltaAdjust: delta
+
+	| aBox entryBox adjustBox adjustUp adjustDown |
 	aBox := LayoutMorph newColumn ::
 		addMorph: (LabelMorph contents: stringTitle font: self labelFont);
 		color: Color veryLightGray.
@@ -689,10 +753,19 @@ downName: downString
 		addMorph: entryMorph;
 		addMorph: (LabelMorph contents: unitString font: self minorFont);
 		axisEdgeWeight: #rowLeft.
+	adjustUp := LayoutMorph newRow :: 
+					axisEdgeWeight: #rowLeft;
+					addMorph: (SimpleEntryButton newUp: entryMorph 
+													delta: delta);
+					addMorph: (LabelMorph contents: upString font: self minorFont).
+	adjustDown := LayoutMorph newRow :: 
+					axisEdgeWeight: #rowLeft;
+					addMorph: (SimpleEntryButton newDown: entryMorph 
+													delta: delta negated);
+					addMorph: (LabelMorph contents: downString font: self minorFont).
 	adjustBox := LayoutMorph newColumn ::
-		"@@FIXME: add up & down buttons@@"
-		addMorph: (LabelMorph contents: upString font: self minorFont);
-		addMorph: (LabelMorph contents: downString font: self minorFont).
+		addMorph: adjustUp;
+		addMorph: adjustDown.
 
 	^aBox 
 		addMorph: entryBox;
@@ -700,7 +773,47 @@ downName: downString
 		yourself
 	! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 26/Dec/2025 14:24:44'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 13:20:20'!
+buildValueBox: stringTitle 
+lable: entryNameString 
+entryBox: entryMorph 
+units: unitString 
+upName: upString 
+downName: downString
+deltaAdjust: delta
+scale: aScale
+	| aBox entryBox adjustBox adjustUp adjustDown |
+	aBox := LayoutMorph newColumn ::
+		addMorph: (LabelMorph contents: stringTitle font: self labelFont);
+		color: Color veryLightGray.
+	entryBox := LayoutMorph newRow ::
+		addMorph: (LabelMorph contents: entryNameString font: self labelFont);
+		addMorph: entryMorph;
+		addMorph: (LabelMorph contents: unitString font: self minorFont);
+		axisEdgeWeight: #rowLeft.
+	adjustUp := LayoutMorph newRow :: 
+					axisEdgeWeight: #rowLeft;
+					addMorph: (SimpleEntryButton newUp: entryMorph 
+													delta: delta
+													scale: aScale);
+					addMorph: (LabelMorph contents: upString font: self minorFont).
+	adjustDown := LayoutMorph newRow :: 
+					axisEdgeWeight: #rowLeft;
+					addMorph: (SimpleEntryButton newDown: entryMorph 
+													delta: delta negated
+													scale: aScale);
+					addMorph: (LabelMorph contents: downString font: self minorFont).
+	adjustBox := LayoutMorph newColumn ::
+		addMorph: adjustUp;
+		addMorph: adjustDown.
+
+	^aBox 
+		addMorph: entryBox;
+		addMorph: adjustBox;
+		yourself
+	! !
+
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 15:03:52'!
 buildValuesColumn
 
 	| valuesLayout |
@@ -713,7 +826,7 @@ buildValuesColumn
 					valueUpdator: [ :myValue | self model setOKLightness: myValue ];
 					refreshValueFrom: self model;
 					yourself.
-	cEntry := SimpleNumberEntryMorph percentForRealFactor: 0.4 ::
+	cEntry := SimpleNumberEntryMorph percentForRealFactor: 0.5 ::
 					valueAccessor: [ :myModel | myModel getOKChroma  ];
 					valueUpdator: [ :myValue | self model setOKChroma: myValue ];
 					refreshValueFrom: self model;
@@ -729,22 +842,40 @@ buildValuesColumn
 					entryBox: lEntry 
 					units: '%' 
 					upName: 'White' 
-					downName: 'Black').
+					downName: 'Black'
+					deltaAdjust: 0.03).
 	valuesLayout addMorph: (self
 					buildValueBox: 'Chroma' 
 					lable: 'C:' 
 					entryBox: cEntry 
-					units: '0 - 40%' 
+					units: '0 - 50%' 
 					upName: 'Saturate' 
-					downName: 'Grey').
+					downName: 'Grey'
+					deltaAdjust: 0.004).
 	valuesLayout addMorph: (self
 					buildValueBox: 'Hue' 
 					lable: 'H:' 
 					entryBox: hEntry 
 					units: '0 - 360 degrees' 
 					upName: 'antiClock' 
-					downName: 'Clockwise').	
+					downName: 'Clockwise'
+					deltaAdjust: 3).	
 	^valuesLayout				! !
+
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 14:54:11'!
+colorSwatchesBeDroppable
+
+	{alphaSwatch. colorSwatch.} do: [ :dropTarget | 
+		dropTarget
+			setProperty:  #'allowsMorphDrop' toValue: true;
+			setProperty: #wantsDroppedMorph:event: 
+				toValue: [ :dropMorph :evt | dropMorph valueWhenDropped isKindOf: Color] ;
+			setProperty: #dropAction 
+				toValue: [ :dropMorph :colorValue |
+					self setColor: colorValue. 
+					dropMorph showAcceptAndDeleteSelf.
+				]
+	].! !
 
 !OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 26/Dec/2025 11:15:40'!
 initializedInstance
@@ -826,12 +957,12 @@ mouseLeave: igniredMouseEvent
 
 	self borderColor: Color black! !
 
-!HueArmMorph methodsFor: 'events' stamp: 'KenD 27/Dec/2025 15:00:44'!
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 29/Dec/2025 15:09:44'!
 mouseMove: aMouseMoveEvent localPosition: localEventPosition
 
 	aMouseMoveEvent anyButtonPressed ifTrue: [
 		self rotateToDegrees:  self currentDegrees - localEventPosition degrees.
-		self model setOKHue: self currentDegrees
+		self model setOKHue: self currentDegrees.
 	]! !
 
 !HueArmMorph methodsFor: 'geometry' stamp: 'KenD 27/Dec/2025 14:31:31'!
