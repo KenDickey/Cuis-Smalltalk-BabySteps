@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 30 December 2025 at 11:05:27 am'!
+'From Cuis7.7 [latest update: #7780] on 30 December 2025 at 12:50:11 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 37!
+!provides: 'OKLCH-Picker' 1 38!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -506,7 +506,7 @@ swatchBorderColor
 	"Match with Visual Menu Item text color"
 	^ (Color r: 0.5 g: 0.07 b: 0.5) ! !
 
-!OKLCHEditPanel methodsFor: 'initialization' stamp: 'KenD 29/Dec/2025 09:15:10'!
+!OKLCHEditPanel methodsFor: 'initialization' stamp: 'KenD 30/Dec/2025 12:27:26'!
 initialize
 
 	super initialize.
@@ -517,7 +517,7 @@ initialize
 	colorSwatch := DropColorMorph fromColor: model color. "alpha=1"
 	alphaSwatch :=  DropColorMorph fromColor: model color. 
 	rgbEntry      := SimpleNumberEntryMorph hexRGBEntry.
-	self model when: #colorChanged: send: #refreshColor to: self.
+"	self model when: #colorChanged: send: #refreshColor to: self."
 	circleMorph := OKLCHCircleMorph 
 						sideLength: self class defaultCircleMorphSideLength 
 						color: model color.
@@ -530,16 +530,6 @@ colorChanged
 
 	self refreshColor
 		
-
-! !
-
-!OKLCHEditPanel methodsFor: 'color updating' stamp: 'KenD 27/Dec/2025 09:46:57'!
-colorChanged: aColorModel
-
-	(self model = aColorModel)
-		ifFalse: [ model := aColorModel ].
-	self refreshColor;
-		redrawNeeded 
 
 ! !
 
@@ -586,7 +576,7 @@ refreshColorSwatch
 	colorSwatch image: (model baseColor iconOrThumbnailOfSize: self class colorSwatchExtent).
 	colorSwatch color: self model baseColor "NB: No alpha here. Alpha=1"! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 15:29:31'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 30/Dec/2025 12:30:02'!
 buildColorCircleColumn
 
 	| circleLayout |
@@ -595,8 +585,8 @@ buildColorCircleColumn
 		axisEdgeWeight: #center;
 		color: Color transparent.
 						
-	circleMorph := OKLCHCircleMorph sideLength: 260 color: self model color.
-	circleMorph layoutSpec: (LayoutSizeSpec new  offAxisEdgeWeight: #center).
+	"circleMorph := OKLCHCircleMorph sideLength: 260 color: self model color."
+	circleMorph layoutSpec: (LayoutSizeSpec new offAxisEdgeWeight: #center).
 	circleMorph hueArm model: self model.
 	circleMorph chromaFrame setProperty: #model toValue: self model.
 	
@@ -605,9 +595,10 @@ buildColorCircleColumn
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 27/Dec/2025 14:21:36'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 30/Dec/2025 12:31:18'!
 buildLightnessSliderColumn
 
+	"Answer a verticle slider with dark at bottom and light at top"
 	| lightSliderLayout |
 	lightSliderLayout := LayoutMorph newColumn :: 
 		separation: self defaultSeparation;
@@ -847,6 +838,11 @@ colorSwatchesBeDroppable
 fontPreferenceChanged
 
 	"No action taken here"! !
+
+!OKLCHEditPanel methodsFor: 'geometry testing' stamp: 'KenD 30/Dec/2025 12:24:29'!
+submorphsMightProtrude
+
+	^true "ColorRingMorph, hueArmMorph"! !
 
 !OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 26/Dec/2025 11:15:40'!
 initializedInstance
