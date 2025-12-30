@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 29 December 2025 at 3:37:57 pm'!
+'From Cuis7.7 [latest update: #7780] on 30 December 2025 at 7:48:30 am'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 35!
+!provides: 'OKLCH-Picker' 1 36!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -773,47 +773,7 @@ deltaAdjust: delta
 		yourself
 	! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 13:20:20'!
-buildValueBox: stringTitle 
-lable: entryNameString 
-entryBox: entryMorph 
-units: unitString 
-upName: upString 
-downName: downString
-deltaAdjust: delta
-scale: aScale
-	| aBox entryBox adjustBox adjustUp adjustDown |
-	aBox := LayoutMorph newColumn ::
-		addMorph: (LabelMorph contents: stringTitle font: self labelFont);
-		color: Color veryLightGray.
-	entryBox := LayoutMorph newRow ::
-		addMorph: (LabelMorph contents: entryNameString font: self labelFont);
-		addMorph: entryMorph;
-		addMorph: (LabelMorph contents: unitString font: self minorFont);
-		axisEdgeWeight: #rowLeft.
-	adjustUp := LayoutMorph newRow :: 
-					axisEdgeWeight: #rowLeft;
-					addMorph: (SimpleEntryButton newUp: entryMorph 
-													delta: delta
-													scale: aScale);
-					addMorph: (LabelMorph contents: upString font: self minorFont).
-	adjustDown := LayoutMorph newRow :: 
-					axisEdgeWeight: #rowLeft;
-					addMorph: (SimpleEntryButton newDown: entryMorph 
-													delta: delta negated
-													scale: aScale);
-					addMorph: (LabelMorph contents: downString font: self minorFont).
-	adjustBox := LayoutMorph newColumn ::
-		addMorph: adjustUp;
-		addMorph: adjustDown.
-
-	^aBox 
-		addMorph: entryBox;
-		addMorph: adjustBox;
-		yourself
-	! !
-
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 15:36:16'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 30/Dec/2025 07:47:14'!
 buildValuesColumn
 
 	| valuesLayout |
@@ -823,17 +783,23 @@ buildValuesColumn
 		 color: Color transparent.
 	lEntry := SimpleNumberEntryMorph percentForRealFactor: 1.0 ::
 					valueAccessor: [ :myModel | myModel getOKLightness ];
-					valueUpdator: [ :myValue | self model setOKLightness: myValue ];
+					valueUpdator: [ :myValue | 
+								self model setOKLightness: ((myValue min: 1.0) max: 0.0) ];
 					refreshValueFrom: self model;
 					yourself.
 	cEntry := SimpleNumberEntryMorph percentForRealFactor: 0.5 ::
 					valueAccessor: [ :myModel | myModel getOKChroma  ];
-					valueUpdator: [ :myValue | self model setOKChroma: myValue ];
+					valueUpdator: [ :myValue | 
+								self model setOKChroma: ((myValue min: 1.0) max: 0.0) ];
 					refreshValueFrom: self model;
 					yourself.
 	hEntry := SimpleNumberEntryMorph circleDegrees ::
 					valueAccessor: [ :myModel | myModel getOKHue ];
-					valueUpdator: [ :myValue | self model setOKHue: myValue ];
+					valueUpdator: [ :myValue | | newDeg | 
+						newDeg := myValue \\ 360.
+						self model "clocks go through 0 degrees in both directions"
+							setOKHue: ((newDeg > 0)
+								ifTrue: [ newDeg ] ifFalse: [newDeg + 360 ])];
 					refreshValueFrom: self model;
 					yourself.
 	valuesLayout addMorph: (self
