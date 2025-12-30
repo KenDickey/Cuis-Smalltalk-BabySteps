@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 30 December 2025 at 7:48:30 am'!
+'From Cuis7.7 [latest update: #7780] on 30 December 2025 at 11:05:27 am'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 36!
+!provides: 'OKLCH-Picker' 1 37!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -842,6 +842,11 @@ colorSwatchesBeDroppable
 					dropMorph showAcceptAndDeleteSelf.
 				]
 	].! !
+
+!OKLCHEditPanel methodsFor: 'events-processing' stamp: 'KenD 30/Dec/2025 07:58:50'!
+fontPreferenceChanged
+
+	"No action taken here"! !
 
 !OKLCHEditPanel class methodsFor: 'instance creation' stamp: 'KenD 26/Dec/2025 11:15:40'!
 initializedInstance
