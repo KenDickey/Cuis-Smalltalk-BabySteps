@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 31 December 2025 at 9:04:11 am'!
+'From Cuis7.7 [latest update: #7780] on 31 December 2025 at 12:42:18 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 39!
+!provides: 'OKLCH-Picker' 1 41!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -107,14 +107,14 @@ dotAt: circlePoint color: myColor
 	image := myForm.  
 	self redrawNeeded.! !
 
-!ColorRingMorph methodsFor: 'drawing' stamp: 'KenD 20/Dec/2025 14:50:06'!
+!ColorRingMorph methodsFor: 'drawing' stamp: 'KenD 31/Dec/2025 11:16:29'!
 drawDots
 	"Draw a circle of color-wheel dots at 10 degree increments"
 	| innerRadius |
 	innerRadius := radius - 20.
 	0 to: 350 by: 10 do: [ :degrees |
 		self dotAt: (Point r: innerRadius degrees: degrees) roundedHAFZ 
-			color: (Color h: degrees s: 0.69 v: 0.82).
+			color: (Color h: degrees s: 0.95 v: 0.9).
 	]. ! !
 
 !ColorRingMorph methodsFor: 'geometry' stamp: 'KenD 20/Dec/2025 13:17:23'!
@@ -261,7 +261,7 @@ addCromaFrame: chroma0To1
 					].
 				  ].! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 31/Dec/2025 08:28:13'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 31/Dec/2025 11:23:40'!
 addHueArm: hueInDegrees
 
 	"My Hue arm is like a clock arm, rotated to show the hue in degrees."
@@ -273,11 +273,9 @@ addHueArm: hueInDegrees
 			borderColor: Color black;
 			morphExtent: (self radius - self hueArmOffset x) @ (ringOffset // 2) .
 	"Want hueArm to pivot about cernerPoint "
-	hueArm morphPosition: centerPoint + self hueArmOffset;
-			hide;
-			rotateToDegrees: hueInDegrees;
-			show.
+	hueArm morphPosition: centerPoint + self hueArmOffset.
 	self addMorphFront: hueArm.
+	hueArm hide.
 	^hueArm
 
 	! !
@@ -446,24 +444,24 @@ entryModel: aSimpeNumberEntryMorph delta: aNumber
 	myDelta := aNumber.
 ! !
 
-!SimpleEntryButton class methodsFor: 'instance creation' stamp: 'KenD 29/Dec/2025 14:28:03'!
+!SimpleEntryButton class methodsFor: 'instance creation' stamp: 'KenD 31/Dec/2025 12:21:04'!
 newDown: aSimpeNumberEntryMorph delta: aNumber
 	
 	| newMe |
 	(aNumber > 0) ifTrue: [self error: 'newDown delta must be negative'].
 	newMe :=  super newWith:  (BitBltCanvas arrowOfDirection: #down size: 16).
-	^newMe borderWidth: 2;
+	^newMe borderWidth: 3;
 			borderColor: Color black;
 			entryModel:  aSimpeNumberEntryMorph delta: aNumber;
 			yourself! !
 
-!SimpleEntryButton class methodsFor: 'instance creation' stamp: 'KenD 29/Dec/2025 14:22:46'!
+!SimpleEntryButton class methodsFor: 'instance creation' stamp: 'KenD 31/Dec/2025 12:21:09'!
 newUp: aSimpeNumberEntryMorph delta: aNumber
 	
 	| newMe |
 	(aNumber < 0) ifTrue: [self error: 'newUp delta must be positive'].
 	newMe :=  super newWith:  (BitBltCanvas arrowOfDirection: #up size: 16).
-	^newMe borderWidth: 2;
+	^newMe borderWidth: 3;
 			borderColor: Color black;
 			entryModel:  aSimpeNumberEntryMorph delta: aNumber;
 			yourself! !
@@ -599,13 +597,14 @@ buildColorCircleColumn
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 30/Dec/2025 12:31:18'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 31/Dec/2025 12:30:49'!
 buildLightnessSliderColumn
 
 	"Answer a verticle slider with dark at bottom and light at top"
 	| lightSliderLayout |
 	lightSliderLayout := LayoutMorph newColumn :: 
-		separation: self defaultSeparation;
+		separation: 0;
+		axisEdgeWeight: #center;
 		color: Color transparent.
 		
 	lightnessSlider := PluggableScrollBar new ::
@@ -614,6 +613,7 @@ buildLightnessSliderColumn
 								refreshValueSelector: #getOKDarkness ;
 						setProperty: #balloonText toValue: 'set Lightness' ;
 						interval: 0;
+						scrollDelta: 0.02 pageDelta: 0.1;  "2% & 10%"
 						color: Color grey;
 						morphExtent: (Theme current scrollbarThickness @ 300);
 						value: (self model getOKDarkness). "Black @ bottom"
@@ -768,7 +768,7 @@ deltaAdjust: delta
 		yourself
 	! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 30/Dec/2025 07:47:14'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 31/Dec/2025 12:19:15'!
 buildValuesColumn
 
 	| valuesLayout |
@@ -778,13 +778,13 @@ buildValuesColumn
 		 color: Color transparent.
 	lEntry := SimpleNumberEntryMorph percentForRealFactor: 1.0 ::
 					valueAccessor: [ :myModel | myModel getOKLightness ];
-					valueUpdator: [ :myValue | 
+					valueUpdator: [ :myValue | "Enforce range bounds"
 								self model setOKLightness: ((myValue min: 1.0) max: 0.0) ];
 					refreshValueFrom: self model;
 					yourself.
 	cEntry := SimpleNumberEntryMorph percentForRealFactor: 0.5 ::
 					valueAccessor: [ :myModel | myModel getOKChroma  ];
-					valueUpdator: [ :myValue | 
+					valueUpdator: [ :myValue |  "Enforce range bounds"
 								self model setOKChroma: ((myValue min: 1.0) max: 0.0) ];
 					refreshValueFrom: self model;
 					yourself.
@@ -794,7 +794,8 @@ buildValuesColumn
 						newDeg := myValue \\ 360.
 						self model "clocks go through 0 degrees in both directions"
 							setOKHue: ((newDeg > 0)
-								ifTrue: [ newDeg ] ifFalse: [newDeg + 360 ])];
+								ifTrue: [ newDeg ] 
+								ifFalse: [ newDeg + 360 ])];
 					refreshValueFrom: self model;
 					yourself.
 	valuesLayout addMorph: (self
@@ -809,7 +810,7 @@ buildValuesColumn
 					buildValueBox: 'Chroma' 
 					lable: 'C:' 
 					entryBox: cEntry 
-					units: '0 - 50%' 
+					units: '0 ~ 60%' 
 					upName: 'More Saturated' 
 					downName: 'More Grey'
 					deltaAdjust: 0.004).
@@ -889,11 +890,11 @@ defaultColor
 
 	^ Color  r: 16r40/255 g: 16rA5/255 b: 16rD0/255.! !
 
-!OKLCHEditPanel class methodsFor: 'accessing' stamp: 'KenD 27/Dec/2025 19:08:26'!
+!OKLCHEditPanel class methodsFor: 'accessing' stamp: 'KenD 31/Dec/2025 12:23:16'!
 swatchBorderColor
 
 	"Match with Visual Menu Item text color"
-	^ (Color r: 0.5 g: 0.07 b: 0.5) ! !
+	^ `(Color r: 0.5 g: 0.07 b: 0.5)`! !
 
 !OKLCHEditPanel class methodsFor: 'accessing' stamp: 'KenD 26/Dec/2025 11:14:53'!
 titleString
@@ -928,7 +929,7 @@ mouseLeave: igniredMouseEvent
 
 	self borderColor: Color black! !
 
-!HueArmMorph methodsFor: 'events' stamp: 'KenD 31/Dec/2025 08:38:49'!
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 31/Dec/2025 12:36:59'!
 mouseMove: aMouseMoveEvent localPosition: localEventPosition
 
 	aMouseMoveEvent anyButtonPressed ifTrue: [
@@ -943,20 +944,20 @@ currentDegrees
 	^location degrees negated
 	! !
 
-!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 31/Dec/2025 08:53:25'!
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 31/Dec/2025 12:40:55'!
 rotateToDegrees: newDegrees
 	"Like rotateBy: but to absolute degrees."
 	
-	"reset to 0"
-	self hide;
-		redrawNeeded;
+	"reset to 0 because #rotateBy: is from current position"
+	self hide; redrawNeeded;
 		rotateBy: location radians negated.
 	
       "Rotation is Clockwise, but Hue rotates CounterClockwise."
 	self	rotateBy: newDegrees degreesToRadians negated;
 		show;
-		redrawNeeded; "redraw"
-		yourself! !
+		redrawNeeded;
+		yourself
+! !
 
 !HueArmMorph methodsFor: 'geometry' stamp: 'KenD 21/Dec/2025 09:39:03'!
 rotationCenter
