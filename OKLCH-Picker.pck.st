@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 31 December 2025 at 12:42:18 pm'!
+'From Cuis7.7 [latest update: #7780] on 31 December 2025 at 2:00:42 pm'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 41!
+!provides: 'OKLCH-Picker' 1 42!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -229,7 +229,7 @@ addColorRing
 	"Make colorRIng Center to be our Center"
 	colorRing morphPosition: (colorRingOffset @ colorRingOffset) negated.! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 31/Dec/2025 08:57:31'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 31/Dec/2025 13:56:18'!
 addCromaFrame: chroma0To1
 
 	|  side chromaFrameCenter |
@@ -238,12 +238,13 @@ addCromaFrame: chroma0To1
 	chromaFrame borderStyle: #simple;
 			borderWidth: 3;
 			borderColor: Color white;
+	"(hueArm x to chromaFrame x) = (rotation center x to chromaFrame center x)"
 			morphExtent: (2 * hueArm rotationCenter x negated @ side).
+			
 	chromaFrameCenter := chromaFrame morphExtent / 2.
 	hueArm addMorphFront: chromaFrame.
 	"Center on Chroma.  Cap Chroma to radius."
-	chromaFrame morphPosition: (((colorDrawingScale * chroma0To1) - (chromaFrameCenter x))
-									 min: self radius)
+	chromaFrame morphPosition: ((colorDrawingScale * chroma0To1) min: self radius)
 								@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2)).
 	chromaFrame setProperty: #handlesMouseDown: 
 				  toValue: [ :igniredEvent | ^true].
@@ -251,13 +252,11 @@ addCromaFrame: chroma0To1
 				  toValue: [ :mouseEvent :localPosition |
 					mouseEvent anyButtonPressed ifTrue: [ | model newX |
 						model := chromaFrame valueOfProperty: #model.
-						newX := (chromaFrame morphPosition x + localPosition x) 
-								min: (model maxOKChroma * colorDrawingScale) - (chromaFrameCenter x).
+						newX := ((chromaFrame morphPosition x + localPosition x) 
+								min: (model maxOKChroma * colorDrawingScale - chromaFrameCenter x)).
 						chromaFrame morphPosition: (newX @  chromaFrame morphPosition y).
-						model setOKChroma: (chromaFrame morphPosition x 
-											+ (chromaFrameCenter x)
-											 / colorDrawingScale).
-						self newChromaAt: model color oklchChroma 
+						model setOKChroma: (chromaFrame morphPosition x) / colorDrawingScale.
+						"self newChromaAt: model color oklchChroma "
 					].
 				  ].! !
 
@@ -346,18 +345,18 @@ beColorful: lightness0To1
 	^self
   ! !
 
-!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 31/Dec/2025 09:00:42'!
+!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 31/Dec/2025 13:57:59'!
 newChromaAt: chroma0To1
 
 	|  chromaFrameCenter |
 	chromaFrameCenter := chromaFrame morphExtent / 2.
 	"Center on Chroma.  Cap Chroma to radius."
 	chromaFrame morphPosition: 
-			(((colorDrawingScale * chroma0To1) - (chromaFrameCenter x)) min: self radius)
-					@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2));
+			((colorDrawingScale * chroma0To1) min: self radius)
+			@ ((chromaFrameCenter y negated) + (hueArm morphExtent y // 2));
 			redrawNeeded! !
 
-!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 29/Dec/2025 15:13:34'!
+!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 31/Dec/2025 12:57:01'!
 setColor:  aColor
 	"Invoked by contaier on color change"
 	aColor oklchDo: [ :lightness0To1 :chroma0to1 :hueInDegrees |
@@ -649,7 +648,7 @@ buildMorphicWindow
 		yourself
 ! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 15:36:51'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 31/Dec/2025 12:48:21'!
 buildSwatchesColumn
 
 	| swatchesLayout colorFrame rgbLayout alphaFrame |
@@ -709,7 +708,7 @@ Color plus α' .
 	alphaEntry := SimpleNumberEntryMorph 
 					percentForRealFactor: 1.0 ::
 					valueAccessor: [ :myModel | self model alpha ];
-					valueUpdator: [ :myValue | 
+					valueUpdator: [ :myValue |  "Clamp alpha at 0.0-1.0"
 						self model alpha: ((myValue min: 1.0) max: 0.0)
 					];
 					refreshValueFrom: self model;
@@ -726,7 +725,7 @@ Color plus α' .
 					units: '%' 
 					upName: 'More Opaque' 
 					downName: 'More Transparent'
-					deltaAdjust: 0.04);
+					deltaAdjust: 0.04);  "4%"
 		yourself
 		! !
 
@@ -768,7 +767,7 @@ deltaAdjust: delta
 		yourself
 	! !
 
-!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 31/Dec/2025 12:19:15'!
+!OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 31/Dec/2025 12:50:59'!
 buildValuesColumn
 
 	| valuesLayout |
@@ -792,7 +791,7 @@ buildValuesColumn
 					valueAccessor: [ :myModel | myModel getOKHue ];
 					valueUpdator: [ :myValue | | newDeg | 
 						newDeg := myValue \\ 360.
-						self model "clocks go through 0 degrees in both directions"
+						self model "Angle goes through 0 degrees in both directions"
 							setOKHue: ((newDeg > 0)
 								ifTrue: [ newDeg ] 
 								ifFalse: [ newDeg + 360 ])];
@@ -805,7 +804,7 @@ buildValuesColumn
 					units: '%' 
 					upName: 'Lighter' 
 					downName: 'Darker'
-					deltaAdjust: 0.03).
+					deltaAdjust: 0.03).  "3%"
 	valuesLayout addMorph: (self
 					buildValueBox: 'Chroma' 
 					lable: 'C:' 
@@ -813,7 +812,7 @@ buildValuesColumn
 					units: '0 ~ 60%' 
 					upName: 'More Saturated' 
 					downName: 'More Grey'
-					deltaAdjust: 0.004).
+					deltaAdjust: 0.004). "0.4%"
 	valuesLayout addMorph: (self
 					buildValueBox: 'Hue' 
 					lable: 'H:' 
@@ -821,7 +820,7 @@ buildValuesColumn
 					units: '0 - 360 degrees' 
 					upName: 'antiClock' 
 					downName: 'Clockwise'
-					deltaAdjust: 3).	
+					deltaAdjust: 3). "3 degrees"
 	^valuesLayout				! !
 
 !OKLCHEditPanel methodsFor: 'GUI building' stamp: 'KenD 29/Dec/2025 14:54:11'!
@@ -929,11 +928,11 @@ mouseLeave: igniredMouseEvent
 
 	self borderColor: Color black! !
 
-!HueArmMorph methodsFor: 'events' stamp: 'KenD 31/Dec/2025 12:36:59'!
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 31/Dec/2025 12:53:42'!
 mouseMove: aMouseMoveEvent localPosition: localEventPosition
 
 	aMouseMoveEvent anyButtonPressed ifTrue: [
-		self rotateToDegrees:  self currentDegrees - (localEventPosition + self rotationCenter) degrees.
+		self rotateToDegrees:  self currentDegrees - localEventPosition degrees.
 		self model setOKHue: self currentDegrees.
 	]! !
 
@@ -944,7 +943,7 @@ currentDegrees
 	^location degrees negated
 	! !
 
-!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 31/Dec/2025 12:40:55'!
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 31/Dec/2025 12:55:43'!
 rotateToDegrees: newDegrees
 	"Like rotateBy: but to absolute degrees."
 	
@@ -952,7 +951,8 @@ rotateToDegrees: newDegrees
 	self hide; redrawNeeded;
 		rotateBy: location radians negated.
 	
-      "Rotation is Clockwise, but Hue rotates CounterClockwise."
+      "Rotation is Clockwise, but Hue rotates CounterClockwise.
+	 #rotateBy: from zero."
 	self	rotateBy: newDegrees degreesToRadians negated;
 		show;
 		redrawNeeded;
