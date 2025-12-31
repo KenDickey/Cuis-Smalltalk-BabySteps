@@ -1,7 +1,7 @@
-'From Cuis7.7 [latest update: #7780] on 30 December 2025 at 12:50:11 pm'!
+'From Cuis7.7 [latest update: #7780] on 31 December 2025 at 9:04:11 am'!
 'Description Color Picker using OKCLH.
 https://okclh.com'!
-!provides: 'OKLCH-Picker' 1 38!
+!provides: 'OKLCH-Picker' 1 39!
 !requires: 'Cuis-Base' 75 7758 nil!
 !requires: 'UI-DragAndDrop' 1 4 nil!
 !requires: 'UI-Entry' 1 57 nil!
@@ -229,7 +229,7 @@ addColorRing
 	"Make colorRIng Center to be our Center"
 	colorRing morphPosition: (colorRingOffset @ colorRingOffset) negated.! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 27/Dec/2025 19:04:57'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 31/Dec/2025 08:57:31'!
 addCromaFrame: chroma0To1
 
 	|  side chromaFrameCenter |
@@ -261,7 +261,7 @@ addCromaFrame: chroma0To1
 					].
 				  ].! !
 
-!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 26/Dec/2025 11:23:20'!
+!OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 31/Dec/2025 08:28:13'!
 addHueArm: hueInDegrees
 
 	"My Hue arm is like a clock arm, rotated to show the hue in degrees."
@@ -271,12 +271,15 @@ addHueArm: hueInDegrees
 	hueArm borderStyle: #simple;
 			borderWidth: 3;
 			borderColor: Color black;
-			morphExtent: (self radius + ringOffset) @ (ringOffset // 2) .
-	self addMorphFront: hueArm.
+			morphExtent: (self radius - self hueArmOffset x) @ (ringOffset // 2) .
 	"Want hueArm to pivot about cernerPoint "
 	hueArm morphPosition: centerPoint + self hueArmOffset;
+			hide;
 			rotateToDegrees: hueInDegrees;
-			yourself.
+			show.
+	self addMorphFront: hueArm.
+	^hueArm
+
 	! !
 
 !OKLCHCircleMorph methodsFor: 'initialization' stamp: 'KenD 25/Dec/2025 15:18:36'!
@@ -345,7 +348,7 @@ beColorful: lightness0To1
 	^self
   ! !
 
-!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 23/Dec/2025 13:27:02'!
+!OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 31/Dec/2025 09:00:42'!
 newChromaAt: chroma0To1
 
 	|  chromaFrameCenter |
@@ -353,7 +356,8 @@ newChromaAt: chroma0To1
 	"Center on Chroma.  Cap Chroma to radius."
 	chromaFrame morphPosition: 
 			(((colorDrawingScale * chroma0To1) - (chromaFrameCenter x)) min: self radius)
-					@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2))! !
+					@ ((chromaFrameCenter y  negated) + (hueArm morphExtent y // 2));
+			redrawNeeded! !
 
 !OKLCHCircleMorph methodsFor: 'color updating' stamp: 'KenD 29/Dec/2025 15:13:34'!
 setColor:  aColor
@@ -924,36 +928,34 @@ mouseLeave: igniredMouseEvent
 
 	self borderColor: Color black! !
 
-!HueArmMorph methodsFor: 'events' stamp: 'KenD 29/Dec/2025 15:09:44'!
+!HueArmMorph methodsFor: 'events' stamp: 'KenD 31/Dec/2025 08:38:49'!
 mouseMove: aMouseMoveEvent localPosition: localEventPosition
 
 	aMouseMoveEvent anyButtonPressed ifTrue: [
-		self rotateToDegrees:  self currentDegrees - localEventPosition degrees.
+		self rotateToDegrees:  self currentDegrees - (localEventPosition + self rotationCenter) degrees.
 		self model setOKHue: self currentDegrees.
 	]! !
 
-!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 27/Dec/2025 14:31:31'!
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 31/Dec/2025 08:42:44'!
 currentDegrees
 
 	"Rotation opposite of default"
 	^location degrees negated
 	! !
 
-!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 27/Dec/2025 13:29:03'!
-rotateToDegrees: degrees
+!HueArmMorph methodsFor: 'geometry' stamp: 'KenD 31/Dec/2025 08:53:25'!
+rotateToDegrees: newDegrees
 	"Like rotateBy: but to absolute degrees."
 	
-	| currentDegrees myRotation |
-	currentDegrees := location degrees.
-	myRotation := currentDegrees degreesToRadians negated.
-	(currentDegrees abs > 1) ifTrue: [ "reset to 0"
-		self hide;  redrawNeeded;
-			rotateBy: myRotation.
-	].
+	"reset to 0"
+	self hide;
+		redrawNeeded;
+		rotateBy: location radians negated.
+	
       "Rotation is Clockwise, but Hue rotates CounterClockwise."
-	self hide; redrawNeeded;
-		rotateBy: degrees degreesToRadians negated;
-		show; redrawNeeded;
+	self	rotateBy: newDegrees degreesToRadians negated;
+		show;
+		redrawNeeded; "redraw"
 		yourself! !
 
 !HueArmMorph methodsFor: 'geometry' stamp: 'KenD 21/Dec/2025 09:39:03'!
