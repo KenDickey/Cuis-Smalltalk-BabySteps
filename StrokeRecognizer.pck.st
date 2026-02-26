@@ -1,17 +1,17 @@
-'From Cuis7.1 [latest update: #6717] on 16 September 2024 at 11:54:59 am'!
+'From Cuis7.7 [latest update: #7839] on 25 February 2026 at 4:05:52 pm'!
 'Description Single-stroke character recognizer designed for Palm Graffiti gestures.
 
 The recognizer is original.  The gestures were from PalmOS.
 
 https://en.wikipedia.org/wiki/Graffiti_(Palm_OS) states:
   "The original patent expired at the end of 2016"'!
-!provides: 'StrokeRecognizer' 1 23!
-!requires: 'Cuis-Base' 71 6717 nil!
+!provides: 'StrokeRecognizer' 1 26!
+!requires: 'Cuis-Base' 77 7839 nil!
 SystemOrganization addCategory: #StrokeRecognizer!
 
 
 !classDefinition: #CompassTrainingMorph category: #StrokeRecognizer!
-LayoutMorph subclass: #CompassTrainingMorph
+LinearLayoutMorph subclass: #CompassTrainingMorph
 	instanceVariableNames: 'recognizer inputMorph sample result resultLabel button pointDirections strokeDirections'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -21,7 +21,7 @@ CompassTrainingMorph class
 	instanceVariableNames: ''!
 
 !classDefinition: #StrokeInputMorph category: #StrokeRecognizer!
-BoxedMorph subclass: #StrokeInputMorph
+BorderedBoxMorph subclass: #StrokeInputMorph
 	instanceVariableNames: 'points'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -110,7 +110,7 @@ Sample point directions are about centroid of Glyph.
 
 !
 
-!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 9/10/2024 15:48:27'!
+!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 10/Sep/2024 15:48:27'!
 saveStroke
 
 	"Button request to save into recognizer.  Get a name for it"
@@ -123,7 +123,7 @@ saveStroke
 			(CompassExemplar name: daName asSymbol pattern: sample)
 	].! !
 
-!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 9/12/2024 13:10:09'!
+!CompassTrainingMorph methodsFor: 'event handling' stamp: 'KenD 12/Sep/2024 13:10:09'!
 strokeResult: points
 
 	"Update view of user input"
@@ -134,7 +134,7 @@ strokeResult: points
 	strokeDirections contents: sample pointTravelDirections asString.	
 	! !
 
-!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 21:51:47'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 12/Sep/2024 21:51:47'!
 initialize
 	
 	super initialize.
@@ -165,7 +165,7 @@ initialize
 
 	! !
 
-!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 21:44:17'!
+!CompassTrainingMorph methodsFor: 'initialization' stamp: 'KenD 12/Sep/2024 21:44:17'!
 resultRegion
 
 	| upMsg downMsg msgLayout |
@@ -184,7 +184,7 @@ resultRegion
 				addMorph: downMsg;
 				layoutSpec: (LayoutSpec proportionalWidth: 0.4  proportionalHeight: 0.1 ).! !
 
-!CompassTrainingMorph class methodsFor: 'instance creation' stamp: 'KenD 9/10/2024 17:55:41'!
+!CompassTrainingMorph class methodsFor: 'instance creation' stamp: 'KenD 10/Sep/2024 17:55:41'!
 new
 
 	| newSelf |
@@ -192,7 +192,7 @@ new
 	newSelf morphExtent: newSelf minimumExtent.
 	^newSelf! !
 
-!StrokeInputMorph methodsFor: 'drawing' stamp: 'KenD 9/9/2024 16:09:25'!
+!StrokeInputMorph methodsFor: 'drawing' stamp: 'KenD 9/Sep/2024 16:09:25'!
 drawOn: aCanvas
 	| curP lastP |
 	super drawOn: aCanvas.
@@ -202,7 +202,7 @@ drawOn: aCanvas
 		aCanvas line: lastP to: curP width: 6 color: Color black].
 ! !
 
-!StrokeInputMorph methodsFor: 'private' stamp: 'KenD 9/12/2024 12:24:40'!
+!StrokeInputMorph methodsFor: 'private' stamp: 'KenD 12/Sep/2024 12:24:40'!
 isValidPoint: aPoint
 
 	"Sampled points may contain NaN values or lay outside our extent."
@@ -211,30 +211,30 @@ isValidPoint: aPoint
 	(aPoint y) isNaN ifTrue: [ ^false ].
 	^(0@0 extent: self morphExtent) containsPoint:  aPoint! !
 
-!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/9/2024 15:55:53'!
+!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/Sep/2024 15:55:53'!
 handlesMouseDown: evt
 
 	^ true! !
 
-!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/9/2024 15:56:03'!
+!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/Sep/2024 15:56:03'!
 handlesMouseMove: anEvent 
 
 	^ true! !
 
-!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/9/2024 15:56:19'!
+!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/Sep/2024 15:56:19'!
 mouseButton1Down: evt localPosition: position
 
 	points := OrderedCollection new.
 ! !
 
-!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/10/2024 15:10:48'!
+!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 10/Sep/2024 15:10:48'!
 mouseButton1Up: evt localPosition: position
 	
 	points add: position.
 	self owner strokeResult: points.
 	! !
 
-!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 9/12/2024 12:17:31'!
+!StrokeInputMorph methodsFor: 'events' stamp: 'KenD 12/Sep/2024 12:17:31'!
 mouseMove: evt localPosition: position
 
 	((evt mouseButton1Pressed) and: [ self isValidPoint: position ] )
@@ -242,12 +242,12 @@ mouseMove: evt localPosition: position
 	self redrawNeeded .
 ! !
 
-!StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 9/11/2024 07:18:19'!
+!StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 11/Sep/2024 07:18:19'!
 defaultExtent
 
 	^ `100@100`! !
 
-!StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 9/12/2024 11:13:55'!
+!StrokeInputMorph methodsFor: 'initialization' stamp: 'KenD 12/Sep/2024 11:13:55'!
 initialize
 
 	super initialize.
@@ -258,7 +258,7 @@ initialize
 		color: Color orange.
 ! !
 
-!StrokeInputMorph class methodsFor: 'stroke morph' stamp: 'KenD 9/16/2024 11:31:57'!
+!StrokeInputMorph class methodsFor: 'stroke morph' stamp: 'KenD 16/Sep/2024 11:31:57'!
 strokeForm
 
 "(Base64MimeConverter mimeEncode: ( '/home/kend/Downloads/256px-Palm_Graffiti_gestures.png' asFileEntry binaryContents readStream)) contents edit."
@@ -1999,7 +1999,7 @@ QAk0QwAAABN0RVh0VGh1bWI6OlNpemUANTAuMktCQswrJiEAAAAzdEVYdFRodW1iOjpVUkkA
 ZmlsZTovLy90bXAvbG9jYWxjb3B5X2RmNGY5MGU2YjUyMi0xLnBuZ1ADOAQAAAAASUVORK5C
 YII='  base64Decoded readStream.! !
 
-!StrokeInputMorph class methodsFor: 'stroke morph' stamp: 'KenD 9/16/2024 11:32:26'!
+!StrokeInputMorph class methodsFor: 'stroke morph' stamp: 'KenD 16/Sep/2024 11:32:26'!
 strokeMorph
 "
 	Answer Palm Graffiti Gentures ImageMorph.
@@ -2011,22 +2011,22 @@ strokeMorph
 
 	^ ImageMorph newWith: self strokeForm! !
 
-!CompassExemplar methodsFor: 'accessing' stamp: 'KenD 9/9/2024 14:47:59'!
+!CompassExemplar methodsFor: 'accessing' stamp: 'KenD 9/Sep/2024 14:47:59'!
 at: patternIndex 
 
 	^pattern at: patternIndex ! !
 
-!CompassExemplar methodsFor: 'accessing' stamp: 'KenD 9/9/2024 14:47:24'!
+!CompassExemplar methodsFor: 'accessing' stamp: 'KenD 9/Sep/2024 14:47:24'!
 name 
 
 	^name! !
 
-!CompassExemplar methodsFor: 'accessing' stamp: 'KenD 9/9/2024 14:47:32'!
+!CompassExemplar methodsFor: 'accessing' stamp: 'KenD 9/Sep/2024 14:47:32'!
 pattern 
 
 	^pattern! !
 
-!CompassExemplar methodsFor: 'initialization' stamp: 'KenD 9/15/2024 15:02:06'!
+!CompassExemplar methodsFor: 'initialization' stamp: 'KenD 15/Sep/2024 15:02:06'!
 name: aStringOrSymbol pattern: aCompassPatternOrDIrectionArray
 
 	name := aStringOrSymbol asSymbol.
@@ -2034,7 +2034,7 @@ name: aStringOrSymbol pattern: aCompassPatternOrDIrectionArray
 		ifTrue: [ pattern := aCompassPatternOrDIrectionArray pattern]
 		ifFalse: [ 	pattern := aCompassPatternOrDIrectionArray 	].! !
 
-!CompassExemplar methodsFor: 'comparing' stamp: 'KenD 9/9/2024 15:28:35'!
+!CompassExemplar methodsFor: 'comparing' stamp: 'KenD 9/Sep/2024 15:28:35'!
 compare: aCompassPattern
 
 	"Answer an association: float->name
@@ -2054,7 +2054,7 @@ compare: aCompassPattern
 
 	^ (numSame / numElts) asFloat -> name! !
 
-!CompassExemplar methodsFor: 'printing' stamp: 'KenD 9/15/2024 15:02:20'!
+!CompassExemplar methodsFor: 'printing' stamp: 'KenD 15/Sep/2024 15:02:20'!
 printOn: aStream
 	
 	aStream nextPutAll: '(CompassExemplar name: ';
@@ -2063,12 +2063,12 @@ printOn: aStream
 	 	print: self pattern.
 	aStream nextPut: $)! !
 
-!CompassExemplar class methodsFor: 'instance creation' stamp: 'KenD 9/9/2024 14:07:25'!
+!CompassExemplar class methodsFor: 'instance creation' stamp: 'KenD 9/Sep/2024 14:07:25'!
 name: aStringOrSymbol pattern: aCompassPattern
 
 	^self new name: aStringOrSymbol pattern: aCompassPattern! !
 
-!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/9/2024 15:09:54'!
+!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/Sep/2024 15:09:54'!
 centroid: aPointCollection
 
 	| sumX sumY numPoints |
@@ -2081,7 +2081,7 @@ centroid: aPointCollection
 	numPoints := aPointCollection size.
 	^(sumX / numPoints) @ (sumY / numPoints)! !
 
-!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/9/2024 13:42:16'!
+!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/Sep/2024 13:42:16'!
 pathLength: pointCollection
 	"Answer culumative distance between Points in a Collection."
 
@@ -2096,7 +2096,7 @@ pathLength: pointCollection
 
 	^ distance! !
 
-!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/11/2024 16:26:45'!
+!CompassPattern methodsFor: 'processing' stamp: 'KenD 11/Sep/2024 16:26:45'!
 resample: samplePointCollection with: desiredNumPoints
 	"Take a Collection of Points and answer a collection 
 	 resampled to length desiredNumPoints."
@@ -2125,7 +2125,7 @@ resample: samplePointCollection with: desiredNumPoints
 "Transcript log: 'RESAMPLE ', newPoints printString."
 	^ newPoints.! !
 
-!CompassPattern methodsFor: 'processing' stamp: 'KenD 9/11/2024 16:26:51'!
+!CompassPattern methodsFor: 'processing' stamp: 'KenD 11/Sep/2024 16:26:51'!
 translatePointsIn: aPointCollection toOrigin: newOrigin
 " Translate point position from Morph sample position.
  *->x - -             --------
@@ -2145,7 +2145,7 @@ translatePointsIn: aPointCollection toOrigin: newOrigin
 "Transcript log: 'TRANSLATED ', translated printString."
 	^ translated! !
 
-!CompassPattern methodsFor: 'initialization' stamp: 'KenD 9/11/2024 16:21:56'!
+!CompassPattern methodsFor: 'initialization' stamp: 'KenD 11/Sep/2024 16:21:56'!
 fromPoints: aPointCollection
 
 	| sampleColl directionColl center prevPt isPeriod |
@@ -2168,13 +2168,13 @@ fromPoints: aPointCollection
 	directionVector := (isPeriod) ifTrue: [PeriodArray] ifFalse: [directionColl asArray]
 	! !
 
-!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/9/2024 14:49:46'!
+!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/Sep/2024 14:49:46'!
 at: index
 
 	"My pattern to match is my directionVector."
 	^directionVector at: index! !
 
-!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/10/2024 14:44:01'!
+!CompassPattern methodsFor: 'accessing' stamp: 'KenD 10/Sep/2024 14:44:01'!
 directionsFromCentroid
 	"Answer array of direction names"
 
@@ -2185,19 +2185,19 @@ directionsFromCentroid
 	].
 	^ names asArray! !
 
-!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/9/2024 14:49:25'!
+!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/Sep/2024 14:49:25'!
 pattern
 
 	"My pattern to match is my directionVector."
 	^directionVector ! !
 
-!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/15/2024 14:07:55'!
+!CompassPattern methodsFor: 'accessing' stamp: 'KenD 15/Sep/2024 14:07:55'!
 pattern: directionSymbolVec
 
 	"My pattern to match is my directionVector."
 	directionVector := directionSymbolVec! !
 
-!CompassPattern methodsFor: 'accessing' stamp: 'KenD 9/10/2024 14:45:11'!
+!CompassPattern methodsFor: 'accessing' stamp: 'KenD 10/Sep/2024 14:45:11'!
 pointTravelDirections
 	"Answer array of direction names
 	 (directions from one point to next)"
@@ -2209,7 +2209,7 @@ pointTravelDirections
 	].
 	^ names asArray! !
 
-!CompassPattern class methodsFor: 'class initialization' stamp: 'KenD 9/10/2024 04:38:31'!
+!CompassPattern class methodsFor: 'class initialization' stamp: 'KenD 10/Sep/2024 04:38:31'!
 initialize
 " self initialize "
 	| patternArraySize |
@@ -2223,22 +2223,22 @@ initialize
 			put: ((index odd) ifTrue: [#center] ifFalse: [#ignored])
 		].! !
 
-!CompassPattern class methodsFor: 'instance creation' stamp: 'KenD 9/9/2024 14:03:42'!
+!CompassPattern class methodsFor: 'instance creation' stamp: 'KenD 9/Sep/2024 14:03:42'!
 fromPoints: aPointCollection
 
 	^self new fromPoints: aPointCollection! !
 
-!CompassPattern class methodsFor: 'accessing' stamp: 'KenD 9/10/2024 04:41:40'!
+!CompassPattern class methodsFor: 'accessing' stamp: 'KenD 10/Sep/2024 04:41:40'!
 periodArray
 
 	^PeriodArray ! !
 
-!CompassPattern class methodsFor: 'accessing' stamp: 'KenD 9/15/2024 14:11:56'!
+!CompassPattern class methodsFor: 'accessing' stamp: 'KenD 15/Sep/2024 14:11:56'!
 periodPattern
 
 	^ CompassPattern new :: pattern: PeriodArray ! !
 
-!CompassRecognizer methodsFor: 'initialization' stamp: 'KenD 9/15/2024 14:13:46'!
+!CompassRecognizer methodsFor: 'initialization' stamp: 'KenD 15/Sep/2024 14:13:46'!
 initialize
 
 	exemplars := OrderedCollection new.
@@ -2246,7 +2246,7 @@ initialize
 		name: 'Period' 
 		pattern: CompassPattern periodPattern).! !
 
-!CompassRecognizer methodsFor: 'testing' stamp: 'KenD 9/9/2024 15:31:01'!
+!CompassRecognizer methodsFor: 'testing' stamp: 'KenD 9/Sep/2024 15:31:01'!
 bestMatch: aCompassPattern
 
 	"Check sampled pattern against exemplars and find highest score"
@@ -2260,7 +2260,7 @@ bestMatch: aCompassPattern
 
 	^ bestMatch! !
 
-!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/9/2024 14:55:40'!
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/Sep/2024 14:55:40'!
 addExemplar: aCompassExemplar
 
 	(exemplars size isZero) 
@@ -2279,62 +2279,62 @@ addExemplar: aCompassExemplar
 			 exemplars add: aCompassExemplar
 		]! !
 
-!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/16/2024 11:51:59'!
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 16/Sep/2024 11:51:59'!
 useBaseExemplars
 
 	exemplars := CompassRecognizer basePatterns ! !
 
-!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/15/2024 15:05:49'!
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 15/Sep/2024 15:05:49'!
 useExemplars: aCompassExemplarOrderedCollection
 
 	exemplars := aCompassExemplarOrderedCollection! !
 
-!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/16/2024 11:52:08'!
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 16/Sep/2024 11:52:08'!
 useNumberExemplars
 
 	exemplars := CompassRecognizer numberPatterns ! !
 
-!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 9/16/2024 11:52:16'!
+!CompassRecognizer methodsFor: 'updating' stamp: 'KenD 16/Sep/2024 11:52:16'!
 usePunctuationExemplars
 
 	exemplars := CompassRecognizer punctuationPatterns ! !
 
-!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 16:59:21'!
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 11/Sep/2024 16:59:21'!
 basePatterns
 	
 	^BasePatterns! !
 
-!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 17:00:15'!
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 11/Sep/2024 17:00:15'!
 basePatterns: patternExemplars
 	
 	BasePatterns := patternExemplars! !
 
-!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 16:59:32'!
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 11/Sep/2024 16:59:32'!
 numberPatterns
 	
 	^NumberPatterns! !
 
-!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 17:08:01'!
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 11/Sep/2024 17:08:01'!
 numberPatterns: patternExemplars
 	
 	NumberPatterns := patternExemplars! !
 
-!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 9/11/2024 16:59:43'!
+!CompassRecognizer class methodsFor: 'accessing' stamp: 'KenD 11/Sep/2024 16:59:43'!
 punctuationPatterns
 	
 	^PunctuationPatterns! !
 
-!CompassRecognizer class methodsFor: 'instance creation' stamp: 'KenD 9/15/2024 15:53:59'!
+!CompassRecognizer class methodsFor: 'instance creation' stamp: 'KenD 15/Sep/2024 15:53:59'!
 useBase
 
 	^ self new :: useBaseExemplars ! !
 
-!CompassRecognizer class methodsFor: 'instance creation' stamp: 'KenD 9/15/2024 15:53:48'!
+!CompassRecognizer class methodsFor: 'instance creation' stamp: 'KenD 15/Sep/2024 15:53:48'!
 useNumbers
 
 	^ self new :: useNumberExemplars ! !
 
-!CompassRecognizer class methodsFor: 'class initialization' stamp: 'KenD 9/15/2024 15:29:38'!
+!CompassRecognizer class methodsFor: 'class initialization' stamp: 'KenD 15/Sep/2024 15:29:38'!
 initBase
 
 	self basePatterns:
@@ -2382,7 +2382,7 @@ initBase
 
 	! !
 
-!CompassRecognizer class methodsFor: 'class initialization' stamp: 'KenD 9/15/2024 15:52:40'!
+!CompassRecognizer class methodsFor: 'class initialization' stamp: 'KenD 15/Sep/2024 15:52:40'!
 initNumbers
 
 	self numberPatterns: 
@@ -2418,7 +2418,7 @@ initNumbers
 
 	! !
 
-!CompassRecognizer class methodsFor: 'class initialization' stamp: 'KenD 9/15/2024 15:51:50'!
+!CompassRecognizer class methodsFor: 'class initialization' stamp: 'KenD 15/Sep/2024 15:51:50'!
 initialize
 "
 	self initialize.
@@ -2427,7 +2427,7 @@ initialize
 	self initNumbers.
 	! !
 
-!Point methodsFor: '*strokerecognizer' stamp: 'KenD 9/11/2024 16:33:22'!
+!Point methodsFor: '*strokerecognizer' stamp: 'KenD 11/Sep/2024 16:33:22'!
 point2direction
 
 	"Answer compass direction point is closest to, considering (0,0) as origin and (0,1) as North.
@@ -2472,7 +2472,7 @@ point2direction
 	
 	! !
 
-!Point methodsFor: '*strokerecognizer' stamp: 'KenD 9/11/2024 16:27:55'!
+!Point methodsFor: '*strokerecognizer' stamp: 'KenD 11/Sep/2024 16:27:55'!
 point2direction: outPoint
 
 	"Answer compass direction point is closest to, considering self as origin"
